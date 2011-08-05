@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{897C6108-C25A-412F-BE1B-52CF7F1F7A35}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SimTelemetry</RootNamespace>
+    <AssemblyName>SimTelemetry</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Triton">
+      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton\bin\Release\Triton.dll</HintPath>
+    </Reference>
+    <Reference Include="Triton.Controls">
+      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton.Controls\bin\Release\Triton.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Triton.Database">
+      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton.Database\bin\Release\Triton.Database.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Channels\Rotations.cs" />
+    <Compile Include="Channels\Speed.cs" />
+    <Compile Include="DataChannels.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plotter.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Plotter.Designer.cs">
+      <DependentUpon>Plotter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PlotterConfigurations.cs" />
+    <Compile Include="PlotterCurves.cs" />
+    <Compile Include="PlotterGraph.cs" />
+    <Compile Include="PlotterYAxis.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrackMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TrackMap.Designer.cs">
+      <DependentUpon>TrackMap.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Plotter.resx">
+      <DependentUpon>Plotter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="TrackMap.resx">
+      <DependentUpon>TrackMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">
+      <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
+      <Name>SimTelemetry.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Game.Rfactor\SimTelemetry.Game.Rfactor.csproj">
+      <Project>{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}</Project>
+      <Name>SimTelemetry.Game.Rfactor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
+      <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
+      <Name>SimTelemetry.Objects</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
