@@ -1,0 +1,9 @@
+This software is still under development. The purpose is to create a DIY, independant telemetry system for both realtime and plotable telemetry.
+
+Currently the software resides with 2 applications and several subprojects. Some of these DLL's are not yet completely integrated into SimTelemetry and will be merged later.
+
+The MoTeC style telemetry software is in SimTelemetry. The realtime telemetry is in LiveTelemetry. The idea is to add recording telemetry files to LiveTelemetry and make a good viewer in SimTelemetry.
+
+At this moment it's far from ideal and only suited for rFactor 1.255. Instead of using C++ plugins I use memory scans to read (more than you sometimes want to know) values. The software only works for rFactor alone, the idea for in the future is to move this to a flexible framework.
+
+Please feel free to contact me at hans1990@gmail.com for any more idea's, additions, expansions, pull requests or information regarding this project. All help is welcome.
