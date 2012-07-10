@@ -1,9 +1,11 @@
 This software is still under development. The purpose is to create a DIY, independant telemetry system for both realtime and plotable telemetry.
 
-Currently the software resides with 2 applications and several subprojects. Some of these DLL's are not yet completely integrated into SimTelemetry and will be merged later.
+Currently the software resides with 2 applications and several subprojects. LiveTelemetry is the main application with a live screen of the track; includes track map, live timing sheets and car information (like tyres, brakes, gauges, fuel usage, engine wear).
+This application runs an optional data logger as well, which may be useful to analyze the car telemetry. I'd be wonderful to synchronize this to something like MoTeC, but unfortunately their format it propriatary. Instead, an own viewer will be made.
+This viewer is made in the project SimTelemetry. This is still in development. The dashboard is very usable.
 
-The MoTeC style telemetry software is in SimTelemetry. The realtime telemetry is in LiveTelemetry. The idea is to add recording telemetry files to LiveTelemetry and make a good viewer in SimTelemetry.
+SimTelemetry.Game are plug-ins for various simulators. rFactor1 support is good, GTR2 is decent. rFactor2 is very old build from the initial beta version (from January)
 
-At this moment it's far from ideal and only suited for rFactor 1.255. Instead of using C++ plugins I use memory scans to read (more than you sometimes want to know) values. The software only works for rFactor alone, the idea for in the future is to move this to a flexible framework.
+SimTelemetry.Peripherals contains communication code for some personal peripherals I made to enhance my own racing experience. It's not of much use, unless you implement the same client code on your own hardware dashboards!
 
-Please feel free to contact me at hans1990@gmail.com for any more idea's, additions, expansions, pull requests or information regarding this project. All help is welcome.
+Please feel free to contribute, fork, give feedback, etc. (hans1990@gmail.com). Thanks :)
