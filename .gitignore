@@ -1,2 +1,9 @@
-/*/bin/
+/*/bin
+/*/obj
+*/bin
+*/*/bin
+/*/*/bin
+*/obj
+*/*/obj
+/*/*/obj
 /_ReSharper.SimTelemetry
