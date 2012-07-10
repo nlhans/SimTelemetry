@@ -1,6 +1,0 @@
-C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Release\SimTelemetry.Objects.dll
-C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Release\SimTelemetry.Objects.pdb
-C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Release\Triton.dll
-C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Release\Triton.pdb
-C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Release\SimTelemetry.Objects.dll
-C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Release\SimTelemetry.Objects.pdb
