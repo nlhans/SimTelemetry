@@ -6,8 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Game;
-using SimTelemetry.Game.Rfactor;
+using SimTelemetry.Data;
 using SimTelemetry.Objects;
 
 namespace LiveTelemetry
@@ -27,8 +26,9 @@ namespace LiveTelemetry
 
         }
 
-        private int sortDriver(DriverGeneral d1, DriverGeneral d2)
+        private int sortDriver(IDriverGeneral d1, IDriverGeneral d2)
         {
+            if (d1 == null || d2 == null) return 0;
             if (d1.Position == d2.Position) return 0;
             if (d1.Position > 120 || d1.Position == 0) return 1;
             if (d2.Position > 120 || d2.Position == 0) return -1;
@@ -60,14 +60,14 @@ namespace LiveTelemetry
             this.Size = new Size(460, 500);
             Graphics g = e.Graphics;
             g.FillRectangle(Brushes.Black, e.ClipRectangle);
-            if (rFactor.Session.Cars == 0) return;
+            if (!Telemetry.m.Active_Session) return;
 
             // Draw header
             System.Drawing.Font f = new Font("Arial", 8, FontStyle.Regular);
 
             try
             {
-                switch (rFactor.Session.Type.Type)
+                switch (Telemetry.m.Sim.Session.Type.Type)
                 {
                     default:
                         g.DrawString("P", f, Brushes.DarkGray, 10f, 10f);
@@ -96,7 +96,7 @@ namespace LiveTelemetry
                 int ind = 1;
                 float LineHeight = 15f;
 
-                List<DriverGeneral> drivers = rFactor.Drivers.AllDrivers;
+                List<IDriverGeneral> drivers = Telemetry.m.Sim.Drivers.AllDrivers;
                 drivers.Sort(sortDriver);
 
                 double lapTimeBest = 10000;
@@ -106,6 +106,10 @@ namespace LiveTelemetry
                 float BestSector2 = 1000f;
                 float BestSector3 = 1000f;
 
+                float MyBestSector1 = 1000f;
+                float MyBestSector2 = 1000f;
+                float MyBestSector3 = 1000f;
+
                 int BestSector1Position = 0;
                 int BestSector2Position = 0;
                 int BestSector3Position = 0;
@@ -114,47 +118,63 @@ namespace LiveTelemetry
                 string FastestDriver = "";
                 int DriverCount = 0;
                 // get all time best sector times
-                
-                foreach (DriverGeneral driver in drivers)
+                List<ILap> mylaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
+                foreach (ILap l in mylaps)
                 {
-                    driverIndex++;
-                    //if (driver.Position >= 120 || driver.Position == 0) continue;
-                    //if (driver.Name.Trim() == "") continue;
+                    if (l.Sector1 >0.1 && l.Sector2 >0.1 && l.Sector3 >0.1)
+                    {
+                        MyBestSector1 = Math.Min(MyBestSector1, l.Sector1);
+                        MyBestSector2 = Math.Min(MyBestSector2, l.Sector2);
+                        MyBestSector3 = Math.Min(MyBestSector3, l.Sector3);
+                    }
 
-                    // fastest lap
-                    DriverCount++;
-                    ILap fastlap = driver.GetBestLap();
+                }
 
-                    if (fastlap != null && fastlap.LapTime < FastestLap && fastlap.LapTime > 0)
+                foreach (IDriverGeneral driver in drivers)
+                {
+                    
+                    if (driver.Position != 0 && driver.Position <= 120 && Math.Abs(driver.CoordinateX) >= 0.1)
                     {
-                        FastestLap = fastlap.LapTime;
-                        FastestDriver = driver.Name;
-                    }
-                    if (driver.LapTime_Best_Sector1 > 0)
-                    {
-                        if (BestSector1 > driver.LapTime_Best_Sector1)
+                        driverIndex++;
+                        //if (driver.Position >= 120 || driver.Position == 0) continue;
+                        //if (driver.Name.Trim() == "") continue;
+
+                        // fastest lap
+                        DriverCount++;
+                        ILap fastlap = driver.GetBestLap();
+
+
+                        if (fastlap != null && fastlap.LapTime < FastestLap && fastlap.LapTime > 0)
                         {
-                            BestSector1 = driver.LapTime_Best_Sector1;
-                            BestSector1Position = driver.Position;
+                            FastestLap = fastlap.LapTime;
+                            FastestDriver = driver.Name;
                         }
-                    }
-                    if (driver.LapTime_Best_Sector2 > 0)
-                    {
-                        if (BestSector2 > driver.LapTime_Best_Sector2)
+                        if (driver.LapTime_Best_Sector1 > 0)
                         {
-                            BestSector2 = driver.LapTime_Best_Sector2;
-                            BestSector2Position = driver.Position;
+                            if (BestSector1 > driver.LapTime_Best_Sector1)
+                            {
+                                BestSector1 = driver.LapTime_Best_Sector1;
+                                BestSector1Position = driver.Position;
+                            }
                         }
-                    }
-                    //BestSector2 = Math.Min(BestSector2, driver.LapTime_Best_Sector2);
-                    if (driver.LapTime_Best_Sector3 > 0)
-                    {
-                        if (BestSector3 > driver.LapTime_Best_Sector3)
+                        if (driver.LapTime_Best_Sector2 > 0)
                         {
-                            BestSector3 = driver.LapTime_Best_Sector3;
-                            BestSector3Position = driver.Position;
+                            if (BestSector2 > driver.LapTime_Best_Sector2)
+                            {
+                                BestSector2 = driver.LapTime_Best_Sector2;
+                                BestSector2Position = driver.Position;
+                            }
                         }
-                        //BestSector3 = Math.Min(BestSector3, driver.LapTime_Best_Sector3);
+                        //BestSector2 = Math.Min(BestSector2, driver.LapTime_Best_Sector2);
+                        if (driver.LapTime_Best_Sector3 > 0)
+                        {
+                            if (BestSector3 > driver.LapTime_Best_Sector3)
+                            {
+                                BestSector3 = driver.LapTime_Best_Sector3;
+                                BestSector3Position = driver.Position;
+                            }
+                            //BestSector3 = Math.Min(BestSector3, driver.LapTime_Best_Sector3);
+                        }
                     }
 
                 }
@@ -167,14 +187,16 @@ namespace LiveTelemetry
                 
 
                 // Go through all drivers
-                DriverGeneral Lastdriver = drivers[0];
+                IDriverGeneral Lastdriver = drivers[0];
                 double Previous_SplitLeader = 0;
-                foreach (DriverGeneral driver in drivers)
+                foreach (IDriverGeneral driver in drivers)
                 {
                     driverIndex++;
                     Lastdriver = driver;
                     if (ind * LineHeight > this.Size.Height - 20 - 3 * 20)
                         break;
+
+                    if (Math.Abs(driver.CoordinateX) < 0.1) continue;
                     //if (driver.Position >= 120 || driver.Position == 0 || driver.__LapsData.ToInt32() == 0) continue;
                     //if (driver.Name.Trim() == "")
                     //    continue;
@@ -194,7 +216,7 @@ namespace LiveTelemetry
                         LastPitLap[driver.Name] = driver.Laps;
                     }
 
-                    if (rFactor.Session.Type.Type == SessionType.RACE)
+                    if (Telemetry.m.Sim.Session.Type.Type == SessionType.RACE)
                     {
                         if (driver.LapTime_Last < lapTimeBest && driver.LapTime_Last != -1f)
                             lapTimeBest = driver.LapTime_Last;
@@ -464,12 +486,12 @@ else */
                     g.DrawString(PrintLapTime(BestSector3, true), f, Brushes.Magenta, 345f, 10f + ind * LineHeight);
                     ind++;
                     g.DrawString("Personal Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(rFactor.Drivers.Player.Sector_1_Best + rFactor.Drivers.Player.Sector_2_Best + rFactor.Drivers.Player.Sector_3_Best, false), f, Brushes.Magenta, 140f,
+                    g.DrawString(PrintLapTime(MyBestSector1 + MyBestSector2 + MyBestSector3, false), f, Brushes.Magenta, 140f,
                                  10f + ind * LineHeight);
 
-                    g.DrawString(PrintLapTime(rFactor.Drivers.Player.Sector_1_Best, true), f, Brushes.Magenta, 245f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(rFactor.Drivers.Player.Sector_2_Best, true), f, Brushes.Magenta, 295f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(rFactor.Drivers.Player.Sector_3_Best, true), f, Brushes.Magenta, 345f, 10f + ind * LineHeight);
+                    g.DrawString(PrintLapTime(MyBestSector1, true), f, Brushes.Magenta, 245f, 10f + ind * LineHeight);
+                    g.DrawString(PrintLapTime(MyBestSector2, true), f, Brushes.Magenta, 295f, 10f + ind * LineHeight);
+                    g.DrawString(PrintLapTime(MyBestSector3, true), f, Brushes.Magenta, 345f, 10f + ind * LineHeight);
                 }
             }
             catch (Exception ex)

@@ -1,0 +1,9 @@
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\bin\Release\SimTelemetry.Game.Rfactor.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\bin\Release\SimTelemetry.Game.Rfactor.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\bin\Release\SimTelemetry.Objects.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\bin\Release\Triton.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\bin\Release\SimTelemetry.Objects.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\bin\Release\Triton.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\obj\Release\SimTelemetry.Game.Rfactor.csprojResolveAssemblyReference.cache
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\obj\Release\SimTelemetry.Game.Rfactor.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Game.Rfactor\obj\Release\SimTelemetry.Game.Rfactor.pdb

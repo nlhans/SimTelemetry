@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -6,6 +7,7 @@ namespace SimTelemetry.Data
 {
     public static partial class Extensions
     {
+
         public static void WriteString(this FileStream fs, string f)
         {
             byte[] b = ASCIIEncoding.ASCII.GetBytes(f);
@@ -15,10 +17,15 @@ namespace SimTelemetry.Data
         }
         public static void WriteLine(this FileStream fs, string f)
         {
-            byte[] b = ASCIIEncoding.ASCII.GetBytes(f+"\r\n");
+            try
+            {
+                byte[] b = ASCIIEncoding.ASCII.GetBytes(f + "\r\n");
 
-            fs.Write(b, 0, b.Length);
-
+                fs.Write(b, 0, b.Length);
+            }catch(Exception e)
+            {
+                //throw e;
+            }
         }
 
         public static string ReadLine(this FileStream fs)

@@ -1,21 +1,35 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using SimTelemetry.Objects.Utilities;
 using Triton.Memory;
+using SimTelemetry.Objects;
 
 namespace SimTelemetry.Game.Rfactor
 {
     public class rFactor
     {
+        public static ISimulator Simulator { get; set; }
         public const double Revision = 0.1;
 
         public static Session Session;
         public static Drivers Drivers;
         public static DriverPlayer Player;
-        public static MemoryReader Game;
+        public static MemoryPolledReader Game;
+        
+        public rFactor(ISimulator sim)
+        {
+            Simulator = sim;
+            Game = new MemoryPolledReader(sim);
+
+            Session = new Session();
+            Drivers = new Drivers();
+
+            Player = new DriverPlayer();
+        }
 
 
-        public static string rFactor_Directory
+        /*public static string rFactor_Directory
         {
             get
             {
@@ -25,34 +39,17 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        public rFactor()
-        {
-            Process[] ps = Process.GetProcessesByName("rfactor");
-            if(ps.Length==1)
-            {
-                Game = new MemoryReader();
-                Game.ReadProcess = ps[0];
-                Game.OpenProcess();
-
-                
-            }
-            else
-            {
-                throw new Exception("Could not find rfactor");
-            }
-
-            Session = new Session();
-            Drivers = new Drivers();
-
-            Player = new DriverPlayer();
-        }
-
-        public static string Track_AIW
+        public static string GameData_TrackFile
         {
             get
             {
                 return Game.ReadString(new IntPtr(0x00709D28), 256);
             }
+        }*/
+
+        public static void Kill()
+        {
+            Game.Active = false;
         }
     }
 }

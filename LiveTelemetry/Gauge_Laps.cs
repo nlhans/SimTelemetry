@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Game.Rfactor;
+using SimTelemetry.Data;
 using SimTelemetry.Objects;
 
 namespace LiveTelemetry
@@ -50,7 +50,7 @@ namespace LiveTelemetry
             {
                 Graphics g = e.Graphics;
                 g.FillRectangle(Brushes.Black, e.ClipRectangle);
-                if (rFactor.Session.Cars == 0) return;
+                if (!Telemetry.m.Active_Session) return;
 
                 System.Drawing.Font f = new Font("Arial", 8, FontStyle.Regular);
 
@@ -64,17 +64,17 @@ namespace LiveTelemetry
                 float lineheight = 16f;
                 int ind = 16;
                 int sind = ind;
-                List<ILap> laps = rFactor.Drivers.Player.GetLapTimes();
+                List<ILap> laps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
 
                 float best_lap = 1000f;
                 float best_sector1 = 1000f;
                 float best_sector2 = 1000f;
                 float best_sector3 = 1000f;
 
-                float absolute_best_lap = rFactor.Drivers.Player.LapTime_Best;
-                float absolute_best_sector1 = rFactor.Drivers.Player.LapTime_Best_Sector1;
-                float absolute_best_sector2 = rFactor.Drivers.Player.LapTime_Best_Sector2;
-                float absolute_best_sector3 = rFactor.Drivers.Player.LapTime_Best_Sector3;
+                float absolute_best_lap = Telemetry.m.Sim.Drivers.Player.LapTime_Best;
+                float absolute_best_sector1 = Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector1;
+                float absolute_best_sector2 = Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector2;
+                float absolute_best_sector3 = Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector3;
 
                 for (int lap = 0; lap <= laps.Count - ind; lap++)
                 {
@@ -153,15 +153,15 @@ namespace LiveTelemetry
                     }
                     if (laps[lap].Sector1 < 1 && laps[lap].Sector2 < 1 && laps[lap].Sector3 < 1)
                     {
-                            if(laps[lap - 1].Sector3 < 0 || (laps.Count == lap && rFactor.Drivers.Player.TrackPosition!= TrackPosition.SECTOR1))
+                            if(laps[lap - 1].Sector3 < 0 || (laps.Count == lap && Telemetry.m.Sim.Drivers.Player.TrackPosition!= TrackPosition.SECTOR1))
                         g.DrawString("Out lap - no sector data", f, Brushes.Red, 100f, 10f + ind * lineheight);
                     }
-                    if (laps[lap].Sector1 > 1 && laps[lap].Sector2 > 1 && laps[lap].Sector3 < 1 && !(rFactor.Drivers.Player.TrackPosition == TrackPosition.SECTOR3 && lap+1 == laps.Count))
+                    if (laps[lap].Sector1 > 1 && laps[lap].Sector2 > 1 && laps[lap].Sector3 < 1 && !(Telemetry.m.Sim.Drivers.Player.TrackPosition == TrackPosition.SECTOR3 && lap+1 == laps.Count))
                     {
                         g.DrawString("Pits", f, Brushes.Red,200f, 10f + ind * lineheight);
                     }
                     if (laps[lap].LapTime > 0)
-                        g.DrawString(PrintLapTime(laps[lap].LapTime - rFactor.Drivers.Player.LapTime_Best, true), f, Brushes.White, 310f, 10f + ind * lineheight);
+                        g.DrawString(PrintLapTime(laps[lap].LapTime - Telemetry.m.Sim.Drivers.Player.LapTime_Best, true), f, Brushes.White, 310f, 10f + ind * lineheight);
 
                     ind--;
 
@@ -170,11 +170,11 @@ namespace LiveTelemetry
                 sind++;
                 g.DrawString("Fastest lap:", f, Brushes.DarkGray,35f, 10f + sind * lineheight);
 
-                g.DrawString(PrintLapTime(rFactor.Drivers.Player.LapTime_Best_Sector1, true), f, Brushes.Magenta, 100f, 10f + sind * lineheight);
-                g.DrawString(PrintLapTime(rFactor.Drivers.Player.LapTime_Best_Sector2, true), f, Brushes.Magenta, 150f, 10f + sind * lineheight);
-                g.DrawString(PrintLapTime(rFactor.Drivers.Player.LapTime_Best_Sector3, true), f, Brushes.Magenta, 200f, 10f + sind * lineheight);
+                g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector1, true), f, Brushes.Magenta, 100f, 10f + sind * lineheight);
+                g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector2, true), f, Brushes.Magenta, 150f, 10f + sind * lineheight);
+                g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector3, true), f, Brushes.Magenta, 200f, 10f + sind * lineheight);
 
-                g.DrawString(PrintLapTime(rFactor.Drivers.Player.LapTime_Best, false), f, Brushes.Magenta, 250f, 10f + sind * lineheight);
+                g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best, false), f, Brushes.Magenta, 250f, 10f + sind * lineheight);
 
                 sind++;
                 g.DrawString("Combined lap:", f, Brushes.DarkGray, 20f, 10f + sind * lineheight);
@@ -185,7 +185,7 @@ namespace LiveTelemetry
 
                 g.DrawString(PrintLapTime(absolute_best_sector1 + absolute_best_sector2 + absolute_best_sector3, false), f, Brushes.Magenta, 250f, 10f + sind * lineheight);
 
-                g.DrawString(PrintLapTime(absolute_best_sector1 + absolute_best_sector2 + absolute_best_sector3 - rFactor.Drivers.Player.LapTime_Best, true), f, Brushes.White, 310f, 10f + sind * lineheight);
+                g.DrawString(PrintLapTime(absolute_best_sector1 + absolute_best_sector2 + absolute_best_sector3 - Telemetry.m.Sim.Drivers.Player.LapTime_Best, true), f, Brushes.White, 310f, 10f + sind * lineheight);
 
 
                 Font sf = new Font("Arial", 8f);

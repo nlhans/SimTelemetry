@@ -1,9 +1,22 @@
-﻿using SimTelemetry.Objects;
+﻿using System;
+using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data
 {
     public class SampledSession : ISession
     {
+        private string _gameDataTrackFile;
+
+        private string _gameDirectory;
+
+        private bool _flagYellowFull;
+
+        private bool _flagRed;
+
+        private bool _flagGreen;
+
+        private bool _flagFinish;
+
         public SampledSession Duplicate()
         {
             return (SampledSession)this.MemberwiseClone();
@@ -28,6 +41,25 @@ namespace SimTelemetry.Data
         private int _carsOnTrack;
 
         private int _cars;
+
+        public string GameData_TrackFile
+        {
+            get { return _gameDataTrackFile; }
+            set { _gameDataTrackFile = value; }
+        }
+
+        public string GameDirectory
+        {
+            get { return _gameDirectory; }
+            set { _gameDirectory = value; }
+        }
+
+        private int _raceLaps;
+        public int RaceLaps
+        {
+            get { return _raceLaps; }
+            set { _raceLaps = value; }
+        }
 
         public bool IsRace
         {
@@ -87,6 +119,32 @@ namespace SimTelemetry.Data
         {
             get { return _cars; }
             set { _cars = value; }
+        }
+
+        public bool Active { get;set; }
+
+        public bool Flag_YellowFull
+        {
+            get { return _flagYellowFull; }
+            set { _flagYellowFull = value; }
+        }
+
+        public bool Flag_Red
+        {
+            get { return _flagRed; }
+            set { _flagRed = value; }
+        }
+
+        public bool Flag_Green
+        {
+            get { return _flagGreen; }
+            set { _flagGreen = value; }
+        }
+
+        public bool Flag_Finish
+        {
+            get { return _flagFinish; }
+            set { _flagFinish = value; }
         }
     }
 }

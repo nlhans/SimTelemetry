@@ -4,7 +4,6 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Game.Rfactor
 {
-
     public class DriverGeneral : IDriverGeneral
     {
         private int Base = 0;
@@ -15,16 +14,35 @@ namespace SimTelemetry.Game.Rfactor
             this.Base = i;
         }
 
+        /*[Loggable(1)]
+        public bool Retired
+        {
+            get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x27A8)) == 1) ? true : false); }
+            set { }
+        }*/
+
+        [Loggable(1)]
+        public bool Ignition
+        {
+            get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0xAA)) > 0) ? true : false); }
+            set { }
+        }
+
+        [Loggable(1)]
         public int MemoryBlock
         {
+            set { }
             get { return ((Base - 0x7154C0)/0x5F48); }
         }
 
+        [Loggable(1)]
         public int SectorsDriven
         {
+            set { }
             get { return rFactor.Game.ReadInt32(new IntPtr(0x0070F988 + 0x04 + 0x04*3*MemoryBlock)); }
         }
 
+        [Loggable(1)]
         public bool Active
         {
             set { }
@@ -100,7 +118,9 @@ namespace SimTelemetry.Game.Rfactor
         public double Fuel
         {
             set { }
-            get { return rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0x315C)); }
+            get { double a= rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0x315C));
+                return a;
+            }
         }
 
         [Loggable(1)]
@@ -174,6 +194,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float LapTime_Best_Sector1
         {
+            set { }
             get
             {
                 List<ILap> laps = GetLapTimes();
@@ -181,8 +202,8 @@ namespace SimTelemetry.Game.Rfactor
                 float best = 1000f;
                 foreach (ILap l in laps)
                 {
-                    if (best > l.Sector1 && l.Sector1 > 0)
-                        best = l.Sector1;
+                    if (l.Sector1 > 0.1)
+                        best = Math.Min(best,l.Sector1);
 
                 }
                 return best;
@@ -192,6 +213,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float LapTime_Best_Sector2
         {
+            set { }
             get
             {
                 List<ILap> laps = GetLapTimes();
@@ -199,8 +221,8 @@ namespace SimTelemetry.Game.Rfactor
                 float best = 1000f;
                 foreach (ILap l in laps)
                 {
-                    if (best > l.Sector2 && l.Sector2 > 0)
-                        best = l.Sector2;
+                    if (l.Sector2 > 0.1)
+                        best = Math.Min(best, l.Sector2);
 
                 }
                 return best;
@@ -210,6 +232,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float LapTime_Best_Sector3
         {
+            set { }
             get
             {
                 List<ILap> laps = GetLapTimes();
@@ -217,8 +240,8 @@ namespace SimTelemetry.Game.Rfactor
                 float best = 1000f;
                 foreach (ILap l in laps)
                 {
-                    if (best > l.Sector3 && l.Sector3 > 0)
-                        best = l.Sector3;
+                    if (l.Sector3 > 0.1)
+                        best = Math.Min(best, l.Sector3);
 
                 }
                 return best;
@@ -227,6 +250,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float Sector_1_Best
         {
+            set { }
             get
             {
                 return GetBestLap().Sector1;
@@ -237,6 +261,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float Sector_2_Best
         {
+            set { }
             get
             {
                 return GetBestLap().Sector2;
@@ -247,6 +272,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float Sector_3_Best
         {
+            set { }
             get
             {
                 return GetBestLap().Sector3;
@@ -257,6 +283,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float Sector_1_Last
         {
+            set { }
             get
             {
                 List<ILap> laps = GetLapTimes();
@@ -273,6 +300,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float Sector_2_Last
         {
+            set { }
             get
             {
                 List<ILap> laps = GetLapTimes();
@@ -289,6 +317,7 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(1)]
         public float Sector_3_Last
         {
+            set { }
             get
             {
                 List<ILap> laps = GetLapTimes();
@@ -305,7 +334,7 @@ namespace SimTelemetry.Game.Rfactor
         public ILap GetBestLap()
         {
             List<ILap> laps = GetLapTimes();
-            if (laps.Count == 0) return null;
+            if (laps.Count == 0) return new rFactorLap(0, 0, 0, 0);
             ILap best = laps[0];
             foreach (ILap l in laps)
             {
@@ -317,27 +346,36 @@ namespace SimTelemetry.Game.Rfactor
             return best;
         }
 
+        [Loggable(50)]
         public double MetersDriven
         {
+            set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(Base + 0x3D04)); }
         }
 
+        [Loggable(1)]
         public int PitStopRuns
         {
+            set { }
             get { return rFactor.Game.ReadByte(new IntPtr(Base + 0x3D2C)); }
         }
+        [Loggable(1)]
         public bool Retired
         { // 0x604E
-            get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x629C)) == 1) ? true : false); }
+            set { }
+            get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x4160)) == 1) ? true : false); } // 0x629C. 27A8
         }
 
+        [Loggable(1)]
         public TrackPosition TrackPosition
         {
+            set { }
             get
             {
                 if (Pits) return TrackPosition.PITS;
                 // get last lap
                 List<ILap> laps = GetLapTimes();
+                if (laps.Count == 0) return TrackPosition.PITS;
                 ILap LastLap = laps[laps.Count - 1];
 
                 if (LastLap.Sector1 <= 0) return TrackPosition.SECTOR1;
@@ -365,8 +403,9 @@ namespace SimTelemetry.Game.Rfactor
             return val;
         }
 
-        public double GetSplitTime(DriverGeneral player)
+        public double GetSplitTime(IDriverGeneral _player)
         {
+            DriverGeneral player = (DriverGeneral) _player;
             //return 1;
             int lapsbase_leader =player.__LapsData.ToInt32();
             if (lapsbase_leader == 0) 
@@ -404,7 +443,7 @@ namespace SimTelemetry.Game.Rfactor
 
         }
 
-        private double GetSectorRaceTime(int intptr, int sector)
+        public double GetSectorRaceTime(int intptr, int sector)
         {
             int lap = sector / 3;
             sector %= 3;
@@ -428,7 +467,7 @@ namespace SimTelemetry.Game.Rfactor
             
             List<ILap> laps = new List<ILap>();
 
-            if (DateTime.Now.Subtract(LastLapTimeRetrival).TotalMilliseconds < 3000)
+            if (DateTime.Now.Subtract(LastLapTimeRetrival).TotalMilliseconds < 2000)
                 return LastLapTimes;
             int lapsbase = __LapsData.ToInt32();
 
@@ -525,7 +564,13 @@ namespace SimTelemetry.Game.Rfactor
         public double Speed
         {
             set { }
-            get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x57C0)); }
+            get
+            {
+                if (this.Name == "Hans")
+                    return Math.Max(rFactor.Player.SpeedSlipping,
+                                    rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x57C0)));
+                return   rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x57C0));
+            }
         }
 
         [Loggable(10)]
@@ -637,6 +682,25 @@ namespace SimTelemetry.Game.Rfactor
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2FEC)); }
+        }
+
+        [Loggable(1)]
+        public bool Flag_Yellow
+        {
+            set { }
+            get { return ((rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0xCD8)) == 2) ? false : true); }
+        }
+        [Loggable(1)]
+        public bool Flag_Blue
+        {
+            set { }
+            get { return ((rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x3E39)) == 0) ? false : true); }
+        }
+        [Loggable(1)]
+        public bool Flag_Black
+        {
+            set { }
+            get { return ((rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x3D24)) == 0) ? false : true); }
         }
 
         private int __LapsDataCached;

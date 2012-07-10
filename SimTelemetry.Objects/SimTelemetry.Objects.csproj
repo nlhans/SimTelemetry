@@ -33,27 +33,44 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Triton">
+      <HintPath>..\..\..\Triton\Triton\bin\Release\Triton.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteMethods.cs" />
     <Compile Include="Conversions.cs" />
-    <Compile Include="IDriverGeneral.cs" />
-    <Compile Include="IDriverCollection.cs" />
-    <Compile Include="IDriverPlayer.cs" />
-    <Compile Include="ILap.cs" />
-    <Compile Include="ISession.cs" />
-    <Compile Include="LevelIndicator.cs" />
-    <Compile Include="Loggable.cs" />
+    <Compile Include="Device.cs" />
+    <Compile Include="Devices.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="Game\DataConversions.cs" />
+    <Compile Include="Game\DisplayConversion.cs" />
+    <Compile Include="Game\IDriverGeneral.cs" />
+    <Compile Include="Game\IDriverCollection.cs" />
+    <Compile Include="Game\IDriverPlayer.cs" />
+    <Compile Include="Game\ILap.cs" />
+    <Compile Include="Game\ISession.cs" />
+    <Compile Include="Game\LogOnChange.cs" />
+    <Compile Include="Game\LogOnEvent.cs" />
+    <Compile Include="Game\LogProperty.cs" />
+    <Compile Include="ITelemetry.cs" />
+    <Compile Include="ISimulator.cs" />
+    <Compile Include="Game\LevelIndicator.cs" />
+    <Compile Include="Game\Loggable.cs" />
+    <Compile Include="Peripherals\IDevice.cs" />
+    <Compile Include="Peripherals\DevicePacket.cs" />
+    <Compile Include="Peripherals\IDevices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SessionInfo.cs" />
-    <Compile Include="SessionState.cs" />
-    <Compile Include="SessionType.cs" />
-    <Compile Include="TrackPosition.cs" />
-    <Compile Include="Unloggable.cs" />
+    <Compile Include="Game\SessionInfo.cs" />
+    <Compile Include="Game\SessionState.cs" />
+    <Compile Include="Game\SessionType.cs" />
+    <Compile Include="Game\TrackPosition.cs" />
+    <Compile Include="Game\Unloggable.cs" />
+    <Compile Include="Game\WayPoint.cs" />
+    <Compile Include="Utilities\MemoryPolledReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

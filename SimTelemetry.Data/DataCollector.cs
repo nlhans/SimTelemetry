@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using SimTelemetry.Game.Rfactor;
 using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data
@@ -18,6 +17,7 @@ namespace SimTelemetry.Data
         private int ticker = -1;
         private FileStream strw;
         private Thread Logger;
+        string _LogFile;
         private bool LoggerRunning = true;
 
         private Dictionary<string, int> _Mapping_DriverPlayer = new Dictionary<string, int>();
@@ -34,9 +34,6 @@ namespace SimTelemetry.Data
 
         public DataCollector()
         {
-            rFactor r = new rFactor();
-
-            CreateLog("testje.txt");
         }
 
         private int LastLaps = -1;
@@ -99,14 +96,14 @@ namespace SimTelemetry.Data
             byte[] player = Log_DriverPlayer();
             byte[] general = Log_DriverGeneral();
 
-            if(rFactor.Drivers.AllDrivers[0].Laps != LastLaps)
+            if (Telemetry.m.Sim.Drivers.AllDrivers.Count > 0 && Telemetry.m.Sim.Drivers.AllDrivers[0].Laps != LastLaps)
             {
 
                 strw.WriteLine("[Lap]");
-                strw.WriteLine("Number=" + rFactor.Drivers.AllDrivers[0].Laps);
-                strw.WriteLine("LastLap=" + rFactor.Drivers.AllDrivers[0].LapTime_Last);
-                
-                LastLaps = rFactor.Drivers.AllDrivers[0].Laps;
+                strw.WriteLine("Number=" + Telemetry.m.Sim.Drivers.AllDrivers[0].Laps);
+                strw.WriteLine("LastLap=" + Telemetry.m.Sim.Drivers.AllDrivers[0].LapTime_Last);
+
+                LastLaps = Telemetry.m.Sim.Drivers.AllDrivers[0].Laps;
 
             }
 
@@ -127,6 +124,8 @@ namespace SimTelemetry.Data
         public void CreateLog(string name)
         {
             int indexer = 0;
+            ticker = 0;
+            _LogFile = name;
             // Write header
             strw = File.Open(name, FileMode.Create, FileAccess.Write, FileShare.None);
 
@@ -134,8 +133,16 @@ namespace SimTelemetry.Data
             Driver_Properties = TypeDescriptor.GetProperties(typeof(IDriverGeneral));
             Session_Properties = TypeDescriptor.GetProperties(typeof(ISession));
 
+            DriverPlayer_Frequency = new Dictionary<string, double>();
+            Driver_Frequency = new Dictionary<string, double>();
+            Session_Frequency = new Dictionary<string, double>();
+
+            _Mapping_Session = new Dictionary<string, int>();
+            _Mapping_DriverPlayer = new Dictionary<string, int>();
+            _Mapping_DriverGeneral = new Dictionary<string, int>();
+
             strw.WriteLine("[Information]");
-            strw.WriteLine("Revision=" + rFactor.Revision);
+            //rw.WriteLine("Revision=" + Telemetry.m.Sim.Revision);
             strw.WriteLine("");
 
             // Map ALL properties of DriverPlayer to numbers
@@ -143,7 +150,6 @@ namespace SimTelemetry.Data
 
             indexer = 0;
             PropertyInfo[] pic = typeof(IDriverPlayer).GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-
             foreach (PropertyInfo pi in pic)
             {
                 PropertyDescriptor fi = DriverPlayer_Properties[pi.Name];
@@ -243,17 +249,19 @@ namespace SimTelemetry.Data
 
         private byte[] Log_Session()
         {
-            return __Dump(typeof(Session), rFactor.Session, _Mapping_Session, Session_Properties, Session_Frequency);
+            return __Dump(typeof(ISession), Telemetry.m.Sim.Session, _Mapping_Session, Session_Properties, Session_Frequency);
 
         }
 
         private byte[] Log_DriverGeneral()
         {
-            foreach(IDriverGeneral g in rFactor.Drivers.AllDrivers)
-            {
-                if (g.IsPlayer)
-                    return __Dump(typeof(IDriverPlayer), g, _Mapping_DriverGeneral, Driver_Properties, Driver_Frequency);
+            lock(Telemetry.m.Sim.Drivers.AllDrivers){
+                foreach (IDriverGeneral g in Telemetry.m.Sim.Drivers.AllDrivers)
+                {
+                    if (g.IsPlayer)
+                        return __Dump(typeof(IDriverPlayer), g, _Mapping_DriverGeneral, Driver_Properties, Driver_Frequency);
 
+                }
             }
 
             return new byte[0];
@@ -261,11 +269,13 @@ namespace SimTelemetry.Data
 
         private byte[] Log_DriverPlayer()
         {
-            return __Dump(typeof (IDriverPlayer), rFactor.Player, _Mapping_DriverPlayer, DriverPlayer_Properties, DriverPlayer_Frequency);
+            return __Dump(typeof(IDriverPlayer), Telemetry.m.Sim.Player, _Mapping_DriverPlayer, DriverPlayer_Properties, DriverPlayer_Frequency);
         }
 
         private byte[] __Dump(Type ty, object o, Dictionary<string, int> mapping, PropertyDescriptorCollection myObjectFields, Dictionary<string, double> Frequencies)
         {
+            // TODO: Do dumping.
+            return new byte[0]; 
             List<byte> output = new List<byte>();
 
             foreach (PropertyDescriptor fi in myObjectFields)
@@ -324,6 +334,11 @@ namespace SimTelemetry.Data
             strw.WriteLine("[END]");
             strw.WriteLine("");
             strw.Close();
+        }
+
+        public string GetFile()
+        {
+            return _LogFile;
         }
     }
 }

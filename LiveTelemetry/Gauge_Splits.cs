@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Game.Rfactor;
+using SimTelemetry.Data;
 using SimTelemetry.Objects;
 
 namespace LiveTelemetry
@@ -22,7 +22,7 @@ namespace LiveTelemetry
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         }
 
-        private int sortDriver(DriverGeneral d1, DriverGeneral d2)
+        private int sortDriver(IDriverGeneral d1,IDriverGeneral d2)
         {
             if (d1.Position == d2.Position) return 0;
             if (d1.Position > 120 || d1.Position == 0) return 1;
@@ -38,7 +38,7 @@ namespace LiveTelemetry
             {
                 Graphics g = e.Graphics;
                 g.FillRectangle(Brushes.Black, e.ClipRectangle);
-                if (rFactor.Session.Cars == 0) return;
+                if (!Telemetry.m.Active_Session) return;
 
                 System.Drawing.Font f = new Font("Arial", 8, FontStyle.Regular);
 
@@ -49,21 +49,21 @@ namespace LiveTelemetry
                 g.DrawString("Last Lap", f, Brushes.DarkGray, 300f, 10f);
                 g.DrawString("Pits", f, Brushes.DarkGray, 380f, 10f);
                 
-                List<DriverGeneral> drivers = rFactor.Drivers.AllDrivers;
+                List<IDriverGeneral> drivers = Telemetry.m.Sim.Drivers.AllDrivers;
                 drivers.Sort(sortDriver);
 
                 int ind =1;
                 float LineHeight = 16f;
 
                 // Go through all drivers
-                for (int p = Math.Max(0, rFactor.Drivers.Player.Position - 6); p <= rFactor.Drivers.Player.Position + 12; p++ )
+                for (int p = Math.Max(0, Telemetry.m.Sim.Drivers.Player.Position - 6); p <= Telemetry.m.Sim.Drivers.Player.Position + 12; p++ )
                 {
                     if (ind == 16 || p >= drivers.Count)
                         break;
-                    DriverGeneral driver = drivers[p];
+                    IDriverGeneral driver = drivers[p];
 
                     Brush OntrackBrush = ((!driver.Pits && driver.Speed > 5) ? Brushes.White : Brushes.Red);
-                    if(rFactor.Drivers.Player.Position == driver.Position) OntrackBrush = Brushes.Yellow;
+                    if(Telemetry.m.Sim.Drivers.Player.Position == driver.Position) OntrackBrush = Brushes.Yellow;
                     g.DrawString(driver.Position.ToString(), f, Brushes.White, 10f, 10f + ind * LineHeight);
                     string[] name = driver.Name.ToUpper().Split(" ".ToCharArray());
                     if (name.Length == 1)

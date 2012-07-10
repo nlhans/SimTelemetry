@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using SimTelemetry.Objects;
@@ -9,7 +10,37 @@ namespace SimTelemetry.Game.Rfactor
 {
     public class Session : ISession
     {
-        [Loggable(0.1)]
+        [Unloggable]
+        public bool Active
+        {
+            get
+            {
+                return Cars > 0 && Time > 0;
+            }
+            set { }
+        }
+
+        [Unloggable]
+        public string GameData_TrackFile
+        {
+            get
+            {
+                return rFactor.Game.ReadString(new IntPtr(0x00709D28), 256);
+            }
+            set { }
+        }
+        [Unloggable]
+        public string GameDirectory
+        {
+            get
+            {
+                string meugen = rFactor.Game.ReadString(new IntPtr(0x00AEB320), 256);
+                string rfactor_map = meugen.Substring(0, meugen.Length - Path.GetFileName(meugen).Length);
+                return rfactor_map;
+            }
+            set { }
+        }
+        [Loggable(true)]
         public bool IsRace
         {
             set { }
@@ -28,7 +59,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
         }
 
-        [Loggable(0.1)]
+        [Loggable(true)]
         public string CircuitName
         {
             set { }
@@ -38,21 +69,21 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(0.1)]
+        [Loggable(true)]
         public float TrackTemperature
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(0x00AE2CD8)); }
         }
 
-        [Loggable(0.1)]
+        [Loggable(true)]
         public float AmbientTemperature
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(0x00AE2CD4)); }
         }
 
-        [Loggable(0.1)]
+        [Loggable(true)]
         public SessionInfo Type
         {
             set { }
@@ -152,7 +183,7 @@ namespace SimTelemetry.Game.Rfactor
                 return count;
             }
         }
-        [Loggable(0.1)]
+        [Loggable(true)]
         public int Cars
         {
             set { }
@@ -161,6 +192,32 @@ namespace SimTelemetry.Game.Rfactor
 
                 return rFactor.Game.ReadByte((IntPtr)0x715290);
             }
+        }
+
+        public bool Flag_YellowFull
+        {
+            get
+            {
+                return false; return ((rFactor.Game.ReadByte(new IntPtr(0x00AE0458)) != 2) ? true:false); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public bool Flag_Red
+        {
+            get { return false; }
+            set { throw new NotImplementedException(); }
+        }
+
+        public bool Flag_Green
+        {
+            get { return false; }
+            set { throw new NotImplementedException(); }
+        }
+
+        public bool Flag_Finish
+        {
+            get { return false; }
+            set { throw new NotImplementedException(); }
         }
     }
 }

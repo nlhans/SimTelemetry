@@ -1,0 +1,28 @@
+﻿namespace SimTelemetry.Objects
+{
+    public enum DataConversions
+    {
+        ROTATION_RADS_TO_RPM,
+        ROTATION_RADS_TO_RPS,
+        ROTATION_RPS_TO_RPM,
+        ROTATION_RPS_TO_RADS,
+        ROTATION_RPM_TO_RADS,
+        ROTATION_RPM_TO_RPS,
+
+        SPEED_MS_TO_KMH,
+        SPEED_MS_TO_MPH,
+        SPEED_KMH_TO_MS,
+        SPEED_KMH_TO_MPH,
+        SPEED_MPH_TO_MS,
+        SPEED_MPH_TO_KMH,
+
+        TEMPERATURE_KELVIN_TO_CELSIUS,
+        TEMPERATURE_KELVIN_TO_FAHRENHEIT,
+        TEMPERATURE_CELSIUS_TO_KELVIN,
+        TEMPERATURE_CELSIUS_TO_FAHRENHEIT,
+        TEMPERATURE_FAHRENHEIT_TO_KELVIN,
+        TEMPERATURE_FAHRENHEIT_TO_CELSIUS,
+
+
+    }
+}

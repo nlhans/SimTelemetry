@@ -12,18 +12,25 @@ namespace SimTelemetry.Game.Rfactor
         // rFactor has support up to 108 cars?
         const int MaxCars = 108;
 
-        private List<DriverGeneral> _AllDrivers = new List<DriverGeneral>();
+        private List<IDriverGeneral> _AllDrivers = new List<IDriverGeneral>();
 
         private static Timer UpdateDrivers;
-        public DriverGeneral Player
+        public IDriverGeneral Player
         {
             get
             {
-                foreach(DriverGeneral g in AllDrivers)
+                try
                 {
-                    if (g.IsPlayer) return g;
+                    foreach (IDriverGeneral g in AllDrivers)
+                    {
+                        if (g.IsPlayer) return g;
+                    }
+                }catch(Exception ex)
+                {
                 }
-                return null;
+                if (AllDrivers.Count == 0)
+                    _AllDrivers.Add(new DriverGeneral(0x7154C0));
+                return new DriverGeneral(0x7154C0);
             }
         }
 
@@ -51,7 +58,7 @@ namespace SimTelemetry.Game.Rfactor
         private int PrevCars = 0;
         void UpdateDrivers_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if(rFactor.Session.Cars != PrevCars)
+            if(rFactor.Session.Cars != PrevCars || PrevCars!= _AllDrivers.Count)
             {
                 lock (_AllDrivers)
                 {
@@ -68,13 +75,15 @@ namespace SimTelemetry.Game.Rfactor
                         if (c.Name != "" && c.Position > 0 && c.Position < 120)
                             _AllDrivers.Add(c);
                     }
+                    if(_AllDrivers.Count == 0)
+                        _AllDrivers.Add(new DriverGeneral(0x7154C0));
                 }
 
                 PrevCars = rFactor.Session.Cars;
             }
         }
 
-        public List<DriverGeneral> AllDrivers
+        public List<IDriverGeneral> AllDrivers
         {
          get { return _AllDrivers; }   
 

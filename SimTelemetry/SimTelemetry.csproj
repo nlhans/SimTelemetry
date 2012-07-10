@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{897C6108-C25A-412F-BE1B-52CF7F1F7A35}</ProjectGuid>
+    <ProjectGuid>{9C68C799-305F-417C-BFA5-9BF6E1280107}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimTelemetry</RootNamespace>
@@ -44,50 +44,49 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Triton">
-      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton\bin\Release\Triton.dll</HintPath>
+    <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Triton\Triton\bin\Debug\Triton.dll</HintPath>
     </Reference>
-    <Reference Include="Triton.Controls">
-      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton.Controls\bin\Release\Triton.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="Triton.Database">
-      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton.Database\bin\Release\Triton.Database.dll</HintPath>
+    <Reference Include="Triton.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Triton\Triton.Controls\bin\Debug\Triton.Controls.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Channels\Rotations.cs" />
-    <Compile Include="Channels\Speed.cs" />
-    <Compile Include="DataChannels.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="MainForm.cs">
+    <Compile Include="DataChannels.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <Compile Include="DataChannels.Designer.cs">
+      <DependentUpon>DataChannels.cs</DependentUpon>
     </Compile>
-    <Compile Include="Plotter.cs">
+    <Compile Include="Plotter\Extensions.cs" />
+    <Compile Include="Plotter\Plotter.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Plotter.Designer.cs">
+    <Compile Include="Plotter\Plotter.Designer.cs">
       <DependentUpon>Plotter.cs</DependentUpon>
     </Compile>
-    <Compile Include="PlotterConfigurations.cs" />
-    <Compile Include="PlotterCurves.cs" />
-    <Compile Include="PlotterGraph.cs" />
-    <Compile Include="PlotterYAxis.cs" />
+    <Compile Include="Plotter\PlotterConfigurations.cs" />
+    <Compile Include="Plotter\PlotterCurves.cs" />
+    <Compile Include="Plotter\PlotterGraph.cs" />
+    <Compile Include="Plotter\PlotterYAxis.cs" />
+    <Compile Include="TelemetryViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TelemetryViewer.Designer.cs">
+      <DependentUpon>TelemetryViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrackMap.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TrackMap.Designer.cs">
-      <DependentUpon>TrackMap.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <EmbeddedResource Include="DataChannels.resx">
+      <DependentUpon>DataChannels.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Plotter.resx">
+    <EmbeddedResource Include="Plotter\Plotter.resx">
       <DependentUpon>Plotter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TelemetryViewer.resx">
+      <DependentUpon>TelemetryViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -98,9 +97,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="TrackMap.resx">
-      <DependentUpon>TrackMap.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -115,10 +111,6 @@
     <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">
       <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
       <Name>SimTelemetry.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimTelemetry.Game.Rfactor\SimTelemetry.Game.Rfactor.csproj">
-      <Project>{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}</Project>
-      <Name>SimTelemetry.Game.Rfactor</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>

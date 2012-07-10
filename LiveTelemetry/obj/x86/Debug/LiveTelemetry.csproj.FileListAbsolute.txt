@@ -1,0 +1,59 @@
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.csprojResolveAssemblyReference.cache
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_A1GP.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_Laps.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_Splits.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_Tyres.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.LapChart.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.LiveTelemetry.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.ucFuel.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.ucSessionInfo.resources
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.csproj.GenerateResource.Cache
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\LiveTelemetry.exe
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\LiveTelemetry.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Data.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Game.GTR2.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Game.Rfactor.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Game.rFactor2.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Objects.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Peripherals.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Data.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Game.GTR2.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Game.rFactor2.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Game.Rfactor.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Objects.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Peripherals.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.Joysticks.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.exe
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.Joysticks.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\LiveTelemetry.exe
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\LiveTelemetry.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Data.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Objects.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Peripherals.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.Joysticks.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Data.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Objects.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.Peripherals.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.Joysticks.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_A1GP.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_Laps.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_Splits.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.Gauge_Tyres.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.LapChart.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.LiveTelemetry.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.ucFuel.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.ucSessionInfo.resources
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.exe
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\obj\x86\Debug\LiveTelemetry.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.exe
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.Controls.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\SimTelemetry.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\Triton.Controls.pdb

@@ -31,34 +31,51 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HyperPropertyDescriptor">
-      <HintPath>..\..\..\..\HyperPropertyDescriptor.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Triton">
+      <HintPath>..\..\..\Triton\Triton\bin\Release\Triton.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataCollector.cs" />
     <Compile Include="DataReader.cs" />
     <Compile Include="DataSample.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Logger\TelemetryLogPacket.cs" />
+    <Compile Include="Logger\TelemetryLogReader.cs" />
+    <Compile Include="Logger\TelemetryLogWriter.cs" />
+    <Compile Include="Logger\TelemetryLoggerSubscribedInstance.cs" />
+    <Compile Include="Logger\TelemetryPacketParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampledDriverGeneral.cs" />
     <Compile Include="SampledDriverPlayer.cs" />
     <Compile Include="SampledSession.cs" />
+    <Compile Include="Telemetry.cs" />
+    <Compile Include="Simulators.cs" />
+    <Compile Include="TrackMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TrackMap.Designer.cs">
+      <DependentUpon>TrackMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Track\ApexCollection.cs" />
+    <Compile Include="Track\RouteCollection.cs" />
+    <Compile Include="Track\SectionsCollection.cs" />
+    <Compile Include="Track\TrackParser.cs" />
+    <Compile Include="Track\Lap.cs" />
+    <Compile Include="Track\TrackRoute.cs" />
+    <Compile Include="Track\TrackWaypoint.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimTelemetry.Game.Rfactor\SimTelemetry.Game.Rfactor.csproj">
-      <Project>{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}</Project>
-      <Name>SimTelemetry.Game.Rfactor</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
       <Name>SimTelemetry.Objects</Name>

@@ -1,13 +1,27 @@
-﻿using SimTelemetry.Objects;
+﻿using System;
+using System.Collections.Generic;
+using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data
 {
     public class SampledDriverGeneral : IDriverGeneral
     {
-        public SampledDriverGeneral Duplicate()
+        private bool _flagBlue;
+
+        private bool _flagYellow;
+
+        private bool _flagBlack;
+
+        public ILap GetBestLap()
         {
-            return (SampledDriverGeneral)this.MemberwiseClone();
+            return null;
         }
+
+        public bool Ignition { get; set; }
+
+        private int _memoryBlock;
+
+        private int _sectorsDriven;
 
         private bool _active;
 
@@ -29,6 +43,8 @@ namespace SimTelemetry.Data
 
         private double _fuel;
 
+        private double _fuelMax;
+
         private string _carModel;
 
         private string _carClass;
@@ -46,6 +62,32 @@ namespace SimTelemetry.Data
         private float _lapTimeBest;
 
         private float _lapTimeLast;
+
+        private float _lapTimeBestSector1;
+
+        private float _lapTimeBestSector2;
+
+        private float _lapTimeBestSector3;
+
+        private float _sector1Best;
+
+        private float _sector2Best;
+
+        private float _sector3Best;
+
+        private float _sector1Last;
+
+        private float _sector2Last;
+
+        private float _sector3Last;
+
+        private double _metersDriven;
+
+        private int _pitStopRuns;
+
+        private bool _retired;
+
+        private TrackPosition _trackPosition;
 
         private LevelIndicator _steeringHelp;
 
@@ -102,6 +144,33 @@ namespace SimTelemetry.Data
         private float _tyreWearLr;
 
         private float _tyreWearRr;
+
+        public SampledDriverGeneral Duplicate()
+        {
+            return (SampledDriverGeneral)this.MemberwiseClone();
+        }
+
+        public double GetSplitTime(IDriverGeneral player)
+        {
+            return -1;
+        }
+
+        public List<ILap> GetLapTimes()
+        {
+            return new List<ILap>();
+        }
+
+        public int MemoryBlock
+        {
+            get { return _memoryBlock; }
+            set { _memoryBlock = value; }
+        }
+
+        public int SectorsDriven
+        {
+            get { return _sectorsDriven; }
+            set { _sectorsDriven = value; }
+        }
 
         public bool Active
         {
@@ -163,6 +232,12 @@ namespace SimTelemetry.Data
             set { _fuel = value; }
         }
 
+        public double Fuel_Max
+        {
+            get { return _fuelMax; }
+            set { _fuelMax = value; }
+        }
+
         public string CarModel
         {
             get { return _carModel; }
@@ -215,6 +290,84 @@ namespace SimTelemetry.Data
         {
             get { return _lapTimeLast; }
             set { _lapTimeLast = value; }
+        }
+
+        public float LapTime_Best_Sector1
+        {
+            get { return _lapTimeBestSector1; }
+            set { _lapTimeBestSector1 = value; }
+        }
+
+        public float LapTime_Best_Sector2
+        {
+            get { return _lapTimeBestSector2; }
+            set { _lapTimeBestSector2 = value; }
+        }
+
+        public float LapTime_Best_Sector3
+        {
+            get { return _lapTimeBestSector3; }
+            set { _lapTimeBestSector3 = value; }
+        }
+
+        public float Sector_1_Best
+        {
+            get { return _sector1Best; }
+            set { _sector1Best = value; }
+        }
+
+        public float Sector_2_Best
+        {
+            get { return _sector2Best; }
+            set { _sector2Best = value; }
+        }
+
+        public float Sector_3_Best
+        {
+            get { return _sector3Best; }
+            set { _sector3Best = value; }
+        }
+
+        public float Sector_1_Last
+        {
+            get { return _sector1Last; }
+            set { _sector1Last = value; }
+        }
+
+        public float Sector_2_Last
+        {
+            get { return _sector2Last; }
+            set { _sector2Last = value; }
+        }
+
+        public float Sector_3_Last
+        {
+            get { return _sector3Last; }
+            set { _sector3Last = value; }
+        }
+
+        public double MetersDriven
+        {
+            get { return _metersDriven; }
+            set { _metersDriven = value; }
+        }
+
+        public int PitStopRuns
+        {
+            get { return _pitStopRuns; }
+            set { _pitStopRuns = value; }
+        }
+
+        public bool Retired
+        {
+            get { return _retired; }
+            set { _retired = value; }
+        }
+
+        public TrackPosition TrackPosition
+        {
+            get { return _trackPosition; }
+            set { _trackPosition = value; }
         }
 
         public LevelIndicator SteeringHelp
@@ -383,6 +536,24 @@ namespace SimTelemetry.Data
         {
             get { return _tyreWearRr; }
             set { _tyreWearRr = value; }
+        }
+
+        public bool Flag_Blue
+        {
+            get { return _flagBlue; }
+            set { _flagBlue = value; }
+        }
+
+        public bool Flag_Yellow
+        {
+            get { return _flagYellow; }
+            set { _flagYellow = value; }
+        }
+
+        public bool Flag_Black
+        {
+            get { return _flagBlack; }
+            set { _flagBlack = value; }
         }
     }
 }

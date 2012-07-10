@@ -1,0 +1,13 @@
+<Modules>
+  <Module PersistentId="d:Miscellaneous Files" ModuleId="Triton.Joysticks" />
+  <Module PersistentId="8A946732-F275-449E-92D3-53FBDA69865E" ModuleId="LiveTelemetry" />
+  <Module PersistentId="07B7CC09-D45E-44E9-91A8-5F7A4085B96F" ModuleId="SimTelemetry.Game.Rfactor" />
+  <Module PersistentId="9292F888-9ED7-42D3-A673-9D70D565FA4E" ModuleId="SimTelemetry.Objects" />
+  <Module PersistentId="5897DD6E-1D95-4C28-9362-A96C084C903C" ModuleId="SimTelemetry.Data" />
+  <Module PersistentId="7CDDC844-9319-4750-8944-570958B2B2C0" ModuleId="GTech-Pro" />
+  <Module PersistentId="705CD38F-897F-4AE3-8461-739A84657D23" ModuleId="SimTelemetry.Game.GTR2" />
+  <Module PersistentId="BE808CB9-AF50-43A3-83D0-D719E52957B8" ModuleId="SimTelemetry.Game.rFactor2" />
+  <Module PersistentId="C13964E5-773D-414F-AF87-5D6CE41E1066" ModuleId="SimTelemetry.Peripherals" />
+  <Module PersistentId="897C6108-C25A-412F-BE1B-52CF7F1F7A35" ModuleId="SimTelemetry-old" />
+  <Module PersistentId="9C68C799-305F-417C-BFA5-9BF6E1280107" ModuleId="SimTelemetry" />
+</Modules>

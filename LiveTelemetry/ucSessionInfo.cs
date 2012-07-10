@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Game.Rfactor;
+using SimTelemetry.Data;
 using SimTelemetry.Objects;
 
 namespace LiveTelemetry
@@ -28,10 +23,10 @@ namespace LiveTelemetry
             {
                 Graphics g = e.Graphics;
                 g.FillRectangle(Brushes.Black, e.ClipRectangle);
-                if (rFactor.Session.Cars == 0) return;
+                if (!Telemetry.m.Active_Session) return;
 
                 // What session type?
-                SessionInfo i = rFactor.Session.Type;
+                SessionInfo i = Telemetry.m.Sim.Session.Type;
 
                 string sSessionType = "Race";
                 switch (i.Type)
@@ -63,7 +58,7 @@ namespace LiveTelemetry
                 g.DrawString(sSessionType, f24, Brushes.White, 8, 5);
                 if (i.Type != SessionType.RACE)
                 {
-                    double ftime = rFactor.Session.Time-30;
+                    double ftime = Telemetry.m.Sim.Session.Time-30;
                     int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
                     int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
                     int seconds = Convert.ToInt32((ftime - hours * 3600 - minutes * 60));
@@ -86,7 +81,7 @@ namespace LiveTelemetry
                 {
                     // display time/laps
 
-                    double ftime = rFactor.Session.Time - 30;
+                    double ftime = Telemetry.m.Sim.Session.Time - 30;
                     int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
                     int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
                     int seconds = Convert.ToInt32((ftime - hours * 3600 - minutes * 60));
@@ -98,7 +93,7 @@ namespace LiveTelemetry
                     int minutes_l = Convert.ToInt32(Math.Floor((i.Length - hours_l * 3600) / 60));
                     int seconds_l = Convert.ToInt32((i.Length - hours_l * 3600 - minutes_l * 60));
 
-                    int total_laps = rFactor.Session.RaceLaps;
+                    int total_laps = Telemetry.m.Sim.Session.RaceLaps;
                     if (total_laps > 0)
                     {
                         if (ftime > 0)
@@ -113,7 +108,7 @@ namespace LiveTelemetry
                                 15);
 
                         int leader_laps = 0;
-                        foreach (DriverGeneral dg in rFactor.Drivers.AllDrivers)
+                        foreach (IDriverGeneral dg in Telemetry.m.Sim.Drivers.AllDrivers)
                         {
                             if (dg.Position == 1)
                             {

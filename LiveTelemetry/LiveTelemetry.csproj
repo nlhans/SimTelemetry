@@ -46,13 +46,15 @@
     <Reference Include="System.Xml" />
     <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton\bin\Release\Triton.dll</HintPath>
+      <HintPath>..\..\..\Triton\Triton\bin\Debug\Triton.dll</HintPath>
     </Reference>
-    <Reference Include="Triton.Joysticks">
-      <HintPath>..\..\..\..\My Dropbox\Programmeren\C#\Triton\Triton.Controls\bin\Release\Triton.Joysticks.dll</HintPath>
+    <Reference Include="Triton.Joysticks, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Triton\Triton.Joysticks\bin\Debug\Triton.Joysticks.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataLogging.cs" />
     <Compile Include="Gauge_A1GP.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -89,14 +91,23 @@
     <Compile Include="LiveTelemetry.Designer.cs">
       <DependentUpon>LiveTelemetry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LiveTrackMap.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="LiveTrackMap.Designer.cs">
-      <DependentUpon>LiveTrackMap.cs</DependentUpon>
+    <Compile Include="ucFuel.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ucFuel.Designer.cs">
+      <DependentUpon>ucFuel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ucResizableImage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ucResizableImage.Designer.cs">
+      <DependentUpon>ucResizableImage.cs</DependentUpon>
+    </Compile>
     <Compile Include="ucSessionInfo.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -121,38 +132,33 @@
     <EmbeddedResource Include="LiveTelemetry.resx">
       <DependentUpon>LiveTelemetry.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="ucFuel.resx">
+      <DependentUpon>ucFuel.cs</DependentUpon>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="ucSessionInfo.resx">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimTelemetry.Game.Rfactor\SimTelemetry.Game.Rfactor.csproj">
-      <Project>{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}</Project>
-      <Name>SimTelemetry.Game.Rfactor</Name>
+    <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">
+      <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
+      <Name>SimTelemetry.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
       <Name>SimTelemetry.Objects</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Peripherals\SimTelemetry.Peripherals.csproj">
+      <Project>{C13964E5-773D-414F-AF87-5D6CE41E1066}</Project>
+      <Name>SimTelemetry.Peripherals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry\SimTelemetry.csproj">
+      <Project>{9C68C799-305F-417C-BFA5-9BF6E1280107}</Project>
+      <Name>SimTelemetry</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

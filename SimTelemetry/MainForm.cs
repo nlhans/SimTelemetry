@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using SimTelemetry.Data;
@@ -11,8 +13,8 @@ namespace SimTelemetry
 {
     public partial class MainForm : Form
     {
-
-
+      //  private string LogsMap = @"I:\Dropbox\Tools\Telemetry\SimTelemetry\LiveTelemetry\bin\Debug\Logs";
+        private string LogsMap = "Logs/";
         private bool DR_ReadingDone = false;
         private int Plot_SelectedLap = -1;
 
@@ -26,7 +28,6 @@ namespace SimTelemetry
         private bool _timeLineIgnoreEvents = false;
 
         /**** DATA COLLECTOR & READERS ****/
-        private DataCollector _dC;
         private DataReader _dR;
 
         private PlotterConfigurations _PlotterConfiguration;
@@ -41,22 +42,29 @@ namespace SimTelemetry
             cTrackMap = new TrackMap {Dock = DockStyle.Fill};
             this.cSidePanelSplit.Panel1.Controls.Add(cTrackMap);
 
+            // TRACKS LIST
+            cTracks = new VisualListDetails(false) { Size = new Size(1, 120), Dock = DockStyle.Bottom };
+            cTracks.Columns.Add("track", "Track", 200);
+            cTracks.MultiSelect = false;
+            cTracks.ItemSelectionChanged += cTracks_ItemSelectionChanged;
+            this.cSidePanelSplit.Panel2.Controls.Add(cTracks);
+
+            // SESSIONS LIST
+            cSessions = new VisualListDetails(false) { Size = new Size(1, 120), Dock = DockStyle.Bottom };
+            cSessions.Columns.Add("session", "Session", 150);
+            cSessions.Columns.Add("date", "Date", 100);
+            cSessions.Columns.Add("iter", "#", 100);
+            cSessions.MultiSelect = false;
+            cSessions.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(cSessions_ItemSelectionChanged);
+            this.cSidePanelSplit.Panel2.Controls.Add(cSessions);
+
             // LAPS LIST
-            cLaps = new VisualListDetails(false) {Size = new Size(1, 200), Dock = DockStyle.Bottom};
-            cLaps.Columns.Add("number", "Lap #");
-            cLaps.Columns.Add("number", "Time");
+            cLaps = new VisualListDetails(false) { Size = new Size(1, 120), Dock = DockStyle.Bottom };
+            cLaps.Columns.Add("lap", "Lap #");
+            cLaps.Columns.Add("time", "Time");
+            cLaps.Columns.Add("file", "file",1);
             cLaps.ItemSelectionChanged += LapsList_Changed;
             this.cSidePanelSplit.Panel2.Controls.Add(cLaps);
-
-            // RECORD
-            cButtonRecord = new Button {Text = "Record", Location = new Point(105, 5), Size = new Size(100, 50)};
-            cButtonRecord.Click += cButtonRecord_Click;
-            this.cSidePanelSplit.Panel2.Controls.Add(cButtonRecord);
-
-            // REPAINT
-            cButtonRepaint = new Button {Text = "Repaint", Location = new Point(5, 5), Size = new Size(100, 50)};
-            cButtonRepaint.Click += cButtonRepaint_Click;
-            this.cSidePanelSplit.Panel2.Controls.Add(cButtonRepaint);
 
             // Plotter
             cPlotter = new Plotter {Dock = DockStyle.Fill};
@@ -71,8 +79,128 @@ namespace SimTelemetry
             
 
             cScreenSplit.Panel2.Controls.Add(cPlotter);
+
+            // Select files
+            try
+            {
+                List<string> files =
+                    Directory.GetFiles(LogsMap).ToList();
+                List<string> tracks = new List<string>();
+                foreach (string log in files)
+                {
+                    string track = log.Substring(0, log.IndexOf("+"));
+                    int slash = track.IndexOf("Logs");
+                    track = track.Substring(slash + 5);
+                    if (tracks.Contains(track) == false)
+                        tracks.Add(track);
+
+                }
+                foreach (string track in tracks)
+                {
+                    cTracks.Items.Add(new ListViewItem(track));
+                }
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.StackTrace);
+            }
+        }
+        private string PrintLapTime(double time, bool sector)
+        {
+            if (time == -1)
+                return "--:--:--";
+            if (time < 60)
+            {
+                if (sector) return time.ToString("00.000");
+                else
+                {
+                    return "0:" + time.ToString("00.000");
+                }
+            }
+            else
+            {
+                int minutes = Convert.ToInt32(Math.Floor(Convert.ToDouble(time / 60f)));
+
+                return minutes + ":" + (time % 60f).ToString("00.000");
+            }
+
+        }
+        #region track selectors
+        void cSessions_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if(cSessions.SelectedItems.Count == 1)
+            {
+                string session = cSessions.SelectedItems[0].Text;
+                string sessiondate = cSessions.SelectedItems[0].SubItems[1].Text;
+                string sessionindex = cSessions.SelectedItems[0].SubItems[2].Text;
+                string track = cTracks.SelectedItems[0].Text;
+                cLaps.Items.Clear();
+                // get all laps
+                List<string> files =
+                    Directory.GetFiles(LogsMap).ToList();
+                List<string> laps = new List<string>();
+                foreach (string log in files)
+                {
+                    string[] data = log.Replace(".dat","").Split("+".ToCharArray());
+
+                    if (data[0].EndsWith(track) && data[1] == session && data[2] == sessiondate && data[3] == sessionindex)
+                    {
+                        // open file
+                        try
+                        {
+                            string[] lines = File.ReadAllLines(log);
+                            for (int i = 0; i < lines.Length; i++)
+                            {
+                                string line = lines[i].Trim();
+                                if (line == "[Lap]")
+                                {
+                                    int lapID = Convert.ToInt32(lines[i + 1].Substring(7));
+                                    double lapTime = Convert.ToDouble(lines[i + 2].Substring(8));
+                                    cLaps.Items.Add(new ListViewItem(new string[3] { lapID.ToString(), PrintLapTime(lapTime, false), log }));
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        { }
+                        int lap = Convert.ToInt32(data[4].Substring(4).Trim());
+                        // laptime
+                        double laptime = 10;
+                    }
+                }
+
+            }
         }
 
+        void cTracks_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            //
+            if (cTracks.SelectedItems.Count == 1)
+            {
+                string track = cTracks.SelectedItems[0].Text;
+                cSessions.Items.Clear();
+                List<string> files =
+                    Directory.GetFiles(LogsMap).ToList();
+                List<string> sessions = new List<string>();
+                foreach (string log in files)
+                {
+                    string[] data = log.Split("+".ToCharArray());
+                    if (data[0].EndsWith(track))
+                    {
+                        // this is our track
+                        if (sessions.Contains(data[1] + "|" + data[2] + "|" + data[3]) == false)
+                        sessions.Add(data[1] + "|" + data[2]+"|"+data[3]);
+                    }
+                }
+                foreach (string sess in sessions)
+                {
+                    string[] data = sess.Split("|".ToCharArray());
+
+                    cSessions.Items.Add(new ListViewItem(data));
+                }
+            }
+        }
+        #endregion
+        #region Plot
         void cPlotter_TimelineScroll(object sender, ScrollEventArgs e)
         {
             if(_timeLineIgnoreEvents==false)
@@ -116,105 +244,14 @@ namespace SimTelemetry
             }
         }
 
-
-        void LapsList_Changed(object sender, ListViewItemSelectionChangedEventArgs e)
-        {
-            if(e.IsSelected)
-            {
-                int lap = 0;
-                if(Int32.TryParse(e.Item.Text, out lap))
-                {
-                    Plot_SelectedLap = lap-1;
-                    DrawPlot(-0);
-                    DrawPlotbounds();
-                }
-
-            }
-
-        }
-
-        void cButtonRecord_Click(object sender, EventArgs e)
-        {
-            if (_dC == null)
-            {
-                if (_dR != null)
-                    _dR.Stop();
-                _dC = new DataCollector();
-                _dC.Run();
-                cButtonRecord.Text = "STOP and DISPLAY";
-            }
-            else
-            {
-                _dC.Stop();
-                _dC = null;
-                _dR = new DataReader("testje.txt");
-
-                cButtonRecord.Text = "Record";
-
-            }
-        }
-
         void cPlotter_Drawn()
         {
             cTrackMap.TimeCursor = cPlotter.TimeCursor;
             cTrackMap.Draw();
         }
-
-        private void ReadDataAsync(object n)
-        {
-
-            _dR.Read();
-        }
-
-        void cButtonRepaint_Click(object sender, EventArgs e)
-        {
-            cButtonRepaint.Text = "Reading file..";
-            if (_dR == null)
-            {
-                DR_ReadingDone = false;
-                _dR = new DataReader("testje.txt");
-                _dR.DataReceived += Dr_DataReceived;
-                _dR.LapsReceived += Dr_LapsReceived;
-                _dR.SpecifiedLap_Received += Dr_SpecifiedLap_Received;
-                ThreadPool.QueueUserWorkItem(ReadDataAsync);
-            }
-
-        
-        }
-
-        void Dr_SpecifiedLap_Received()
-        {
-            //
-        }
-
-        void Dr_LapsReceived()
-        {
-            if(cLaps.InvokeRequired)
-            {
-                Invoke(new AnonymousSignal(Dr_LapsReceived));
-                return;
-            }
-            Plot_SelectedLap = -1;
-            cLaps.Items.Clear();
-            int i = 0;
-            foreach(KeyValuePair<int, double> lap in _dR.Laps)
-            {
-                i++;
-                if (i == 1) continue;
-                ListViewItem il = new ListViewItem(new string[2] {lap.Key.ToString(), lap.Value.ToString()});
-                cLaps.Items.Add(il);
-
-            }
-        }
-
-        void Dr_DataReceived()
-        {
-            DR_ReadingDone = true;
-        }
-
         private void DrawPlot(object o)
         {
-            double timeMin = Int32.MaxValue,  timeMax = Int32.MinValue;
+            double timeMin = Int32.MaxValue, timeMax = Int32.MinValue;
 
             if (DR_ReadingDone == false)
             {
@@ -241,10 +278,11 @@ namespace SimTelemetry
             }
             try
             {
+                DataChannels.Reset();
                 foreach (KeyValuePair<int, DataSample> s in _dR.Samples)
                 {
 
-                    if (cPlotter.Graphs[0].Curves[0].Data.ContainsKey(s.Value.Time) == false && s.Value.Drivers[0].Laps == Plot_SelectedLap)
+                    if (cPlotter.Graphs[0].Curves[0].Data.ContainsKey(s.Value.Time) == false)// && s.Value.Drivers[0].Laps == Plot_SelectedLap)
                     {
                         timeMin = Math.Min(timeMin, s.Value.Time);
                         timeMax = Math.Max(timeMax, s.Value.Time);
@@ -252,21 +290,16 @@ namespace SimTelemetry
                         cTrackMap.Samples.Add(s.Value);
 
                         int i_g = 0;
-                        foreach(PlotterGraph g in cPlotter.Graphs)
+                        foreach (PlotterGraph g in cPlotter.Graphs)
                         {
                             int i_c = 0;
-                            foreach(PlotterCurves c in g.Curves)
+                            foreach (PlotterCurves c in g.Curves)
                             {
-                                cPlotter.Graphs[i_g].Curves[i_c].Data.Add(s.Value.Time-timeMin, DataChannels.Parse(c.Legend, s.Value));
+                                cPlotter.Graphs[i_g].Curves[i_c].Data.Add(s.Value.Time - timeMin, DataChannels.Parse(c.Legend, s.Value, s.Value.Time));
                                 i_c++;
                             }
                             i_g++;
                         }
-                        /*cPlotter.Graphs[1].Curves[0].Data.Add(s.Value.Time - t2, -1 * s.Value.Player.Tyre_Speed_LF * s.Value.Player.Wheel_Radius_LF - s.Value.Drivers[0].Speed);
-                        cPlotter.Graphs[1].Curves[1].Data.Add(s.Value.Time - t2, -1 * s.Value.Player.Tyre_Speed_RF * s.Value.Player.Wheel_Radius_RF - s.Value.Drivers[0].Speed);
-                        cPlotter.Graphs[1].Curves[2].Data.Add(s.Value.Time - t2, -1 * s.Value.Player.Tyre_Speed_LR * s.Value.Player.Wheel_Radius_LR - s.Value.Drivers[0].Speed);
-                        cPlotter.Graphs[1].Curves[3].Data.Add(s.Value.Time - t2, -1 * s.Value.Player.Tyre_Speed_RR * s.Value.Player.Wheel_Radius_RR - s.Value.Drivers[0].Speed);*/
-
 
                     }
 
@@ -304,13 +337,13 @@ namespace SimTelemetry
 
 
             _timeLineIgnoreEvents = true;
-            cPlotter.timeline.Value = Convert.ToInt32(Math.Round(10000*(_timeScaleOffset + _timeScaleFactor/2)));
+            cPlotter.timeline.Value = Convert.ToInt32(Math.Round(10000 * (_timeScaleOffset + _timeScaleFactor / 2)));
             cPlotter.timeline.SmallChange = 100;
-            cPlotter.timeline.LargeChange = Convert.ToInt32(Math.Round(10000*_timeScaleFactor));
+            cPlotter.timeline.LargeChange = Convert.ToInt32(Math.Round(10000 * _timeScaleFactor));
             _timeLineIgnoreEvents = false;
 
-            TimeStart += TimeSpan*_timeScaleOffset;
-            TimeEnd = _timeScaleFactor*TimeSpan + TimeStart;
+            TimeStart += TimeSpan * _timeScaleOffset;
+            TimeEnd = _timeScaleFactor * TimeSpan + TimeStart;
 
             cTrackMap.TimeOffset = _timeLineStart;
             cTrackMap.Time_Bounds_Min = TimeStart - _timeLineStart;
@@ -323,15 +356,55 @@ namespace SimTelemetry
             cPlotter.Draw();
             cTrackMap.Draw();
         }
+        #endregion
+        #region LapList
+        void LapsList_Changed(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if(e.IsSelected)
+            {
+                int lap = 0;
+                if(Int32.TryParse(e.Item.Text, out lap))
+                {
+                    string file = cLaps.SelectedItems[0].SubItems[2].Text;
+                    _dR = new DataReader(file);
+                    _dR.DataReceived += Dr_DataReceived;
+                    Plot_SelectedLap = lap;
+                    // get the file corresponding
+                    cLaps.Enabled = false;
+                    cSessions.Enabled = false;
+                    cTracks.Enabled = false;
+                    ThreadPool.QueueUserWorkItem(ReadDataAsync);
 
+                }
+
+            }
+
+        }
+        #endregion
+        #region DataReader
+        private void ReadDataAsync(object n)
+        {
+            _dR.Read();
+        }
+        void Dr_DataReceived()
+        {
+            if(this.cLaps.InvokeRequired)
+            {
+                this.Invoke(new AnonymousSignal(Dr_DataReceived));
+                return;
+            }
+            cLaps.Enabled = true;
+            cSessions.Enabled = true;
+            cTracks.Enabled = true;
+
+            DR_ReadingDone = true;
+            DrawPlot(-0);
+            DrawPlotbounds();
+        }
+        #endregion
+        
         void _FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_dC != null)
-            {
-                _dC.Stop();
-                _dC.Close();
-                _dC = null;
-            }
             if (_dR != null)
             {
                 _dR.Stop();
@@ -339,6 +412,19 @@ namespace SimTelemetry
             }
             Application.Exit();
             e.Cancel = false;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            _dR = new DataReader("Logs/Monza2009+Free practice 3+9-11-2011+1+Lap 5.dat");
+            _dR.DataReceived += Dr_DataReceived;
+            Plot_SelectedLap = 5;
+            // get the file corresponding
+            cLaps.Enabled = false;
+            cSessions.Enabled = false;
+            cTracks.Enabled = false;
+            ThreadPool.QueueUserWorkItem(ReadDataAsync);
         }
     }
 }

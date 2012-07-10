@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SimTelemetry.Game.Rfactor;
 using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data

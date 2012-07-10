@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
-using SimTelemetry.Game.Rfactor;
 using SimTelemetry.Objects;
 using Triton;
 
@@ -70,7 +69,7 @@ namespace SimTelemetry.Data
                                                             BindingFlags.Instance);
 
             file = f;
-            file = "testje.txt";
+            //file = "testje.txt";
 
         }
 
@@ -79,218 +78,233 @@ namespace SimTelemetry.Data
 
 
         // Read all laps data
-            string[] lines = File.ReadAllLines(file);
-
-            int lapnumber = 0;
-            for (int l = 0; l < lines.Length; l++)
+            try
             {
-                if(lines[l] == "[Lap]")
-                {
-                    // get number and data
-                    string[] num = lines[l + 1].Split("=".ToCharArray(), 2);
-                    string[] time = lines[l + 2].Split("=".ToCharArray(), 2);
+                string[] lines = File.ReadAllLines(file);
 
-                    double laptime = 0;
-                    
-                    if (double.TryParse(time[1], out laptime) && Int32.TryParse(num[1], out lapnumber))
+                int lapnumber = 0;
+                for (int l = 0; l < lines.Length; l++)
+                {
+                    if (lines[l] == "[Lap]")
                     {
-                        if (Laps.ContainsKey(lapnumber - 1) && Laps[lapnumber - 1] == laptime)
+                        // get number and data
+                        string[] num = lines[l + 1].Split("=".ToCharArray(), 2);
+                        string[] time = lines[l + 2].Split("=".ToCharArray(), 2);
+
+                        double laptime = 0;
+
+                        if (double.TryParse(time[1], out laptime) && Int32.TryParse(num[1], out lapnumber))
                         {
-                            if (Laps.ContainsKey(lapnumber))
-                                Laps[lapnumber] = -1;
+                            if (Laps.ContainsKey(lapnumber - 1) && Laps[lapnumber - 1] == laptime)
+                            {
+                                if (Laps.ContainsKey(lapnumber))
+                                    Laps[lapnumber] = -1;
+                                else
+                                    Laps.Add(lapnumber, -1);
+                            }
                             else
-                                Laps.Add(lapnumber, -1);
-                        }
-                        else
-                        {
-                            if (Laps.ContainsKey(lapnumber))
-                                Laps[lapnumber] = laptime;
-                            else
-                                Laps.Add(lapnumber, laptime);
+                            {
+                                if (Laps.ContainsKey(lapnumber))
+                                    Laps[lapnumber] = laptime;
+                                else
+                                    Laps.Add(lapnumber, laptime);
+                            }
+
                         }
 
                     }
-
                 }
-            }
-            lapnumber++;
+                lapnumber++;
                 if (Laps.ContainsKey(lapnumber))
                     Laps[lapnumber] = -1;
                 else
                     Laps.Add(lapnumber, -1);
-            
 
-            ThreadPool.QueueUserWorkItem(new WaitCallback(TriggerAsync), LapsReceived);
 
-            strw = File.Open(file, FileMode.Open, FileAccess.Read);
-            int state = 0;
-            string tmp = "";
+                ThreadPool.QueueUserWorkItem(new WaitCallback(TriggerAsync), LapsReceived);
 
-            // Read header
-            // First line is [Information]
-            while (state >= 0)
-            {
-                string line = strw.ReadLine().Trim();
-                if (line == "") continue;
-                switch (state)
+                strw = File.Open(file, FileMode.Open, FileAccess.Read);
+                int state = 0;
+                string tmp = "";
+
+                // Read header
+                // First line is [Information]
+                while (state >= 0)
                 {
-                    case 0:
+                    string line = strw.ReadLine().Trim();
+                    if (line == "") continue;
+                    switch (state)
+                    {
+                        case 0:
 
-                        if (line != "[Information]")
-                            throw new Exception("Expected information line first");
-                        state++;
-                        break;
-
-                    case 1:
-
-                        // Revision..
-                        Console.WriteLine(line);
-                        state++;
-                        break;
-
-                    case 2:
-                        if (line != "[DriverPlayer]")
-                            throw new Exception("Expected driver mapping");
-                        state++;
-                        break;
-
-                    case 3:
-                        if (line == "[DriverGeneral]")
-                        {
-                            state++; // it's now time for Driver mapping
-                        }
-                        else
-                        {
-                            // Split on key/data
-                            string[] k = line.Split("=".ToCharArray(), 2);
-                            string[] d = k[1].Split(",".ToCharArray(), 2);
-
-                            int id = Convert.ToInt32(d[0]);
-                            _Mapping_DriverPlayer.Add(k[0], id);
-                        }
-                        break;
-
-                    case 4:
-                        if (line == "[Session]")
-                        {
-                            state++; // it's now time for session mapping
-                        }
-                        else
-                        {
-                            // Split on key/data
-                            string[] k = line.Split("=".ToCharArray(), 2);
-                            string[] d = k[1].Split(",".ToCharArray(), 2);
-
-                            int id = Convert.ToInt32(d[0]);
-                            _Mapping_DriverGeneral.Add(k[0], id);
-                        }
-                        break;
-
-                    case 5:
-                        if (line.Contains("START OF DATA"))
-                        {
-                            state = -1;
-                            // DATA TIME JOEPIE!
+                            if (line != "[Information]")
+                                throw new Exception("Expected information line first");
+                            state++;
                             break;
-                        }
-                        else
-                        {
-                            // Split on key/data
-                            string[] k = line.Split("=".ToCharArray(), 2);
-                            string[] d = k[1].Split(",".ToCharArray(), 2);
 
-                            int id = Convert.ToInt32(d[0]);
-                            _Mapping_Session.Add(k[0], id);
-                        }
+                        case 1:
+
+                            // Revision..
+                            Console.WriteLine(line);
+                            state++;
+                            break;
+
+                        case 2:
+                            if (line != "[DriverPlayer]")
+                                throw new Exception("Expected driver mapping");
+                            state++;
+                            break;
+
+                        case 3:
+                            if (line == "[DriverGeneral]")
+                            {
+                                state++; // it's now time for Driver mapping
+                            }
+                            else
+                            {
+                                // Split on key/data
+                                string[] k = line.Split("=".ToCharArray(), 2);
+                                string[] d = k[1].Split(",".ToCharArray(), 2);
+
+                                int id = Convert.ToInt32(d[0]);
+                                _Mapping_DriverPlayer.Add(k[0], id);
+                            }
+                            break;
+
+                        case 4:
+                            if (line == "[Session]")
+                            {
+                                state++; // it's now time for session mapping
+                            }
+                            else
+                            {
+                                // Split on key/data
+                                string[] k = line.Split("=".ToCharArray(), 2);
+                                string[] d = k[1].Split(",".ToCharArray(), 2);
+
+                                int id = Convert.ToInt32(d[0]);
+                                _Mapping_DriverGeneral.Add(k[0], id);
+                            }
+                            break;
+
+                        case 5:
+                            if (line.Contains("START OF DATA"))
+                            {
+                                state = -1;
+                                // DATA TIME JOEPIE!
+                                break;
+                            }
+                            else
+                            {
+                                // Split on key/data
+                                string[] k = line.Split("=".ToCharArray(), 2);
+                                string[] d = k[1].Split(",".ToCharArray(), 2);
+
+                                int id = Convert.ToInt32(d[0]);
+                                _Mapping_Session.Add(k[0], id);
+                            }
+                            break;
+                    }
+                }
+                SampledDriverGeneral DriverGeneral = new SampledDriverGeneral();
+                SampledDriverPlayer DriverPlayer = new SampledDriverPlayer();
+                SampledSession Session = new SampledSession();
+                int sample_i = 0;
+                int empty_line_counter = 0;
+                while (true)
+                {
+                    string headerline = strw.ReadLine().Trim();
+                    if (headerline == "")
+                    {
+                        if (empty_line_counter == 10)
+                            break;
+                        empty_line_counter++;
+                        continue;
+                    }
+                    empty_line_counter = 0;
+                    if (headerline.Contains("END"))
+                    {
+                        // everything ends.. even good log files
                         break;
-                }
-            }
-            SampledDriverGeneral DriverGeneral = new SampledDriverGeneral();
-            SampledDriverPlayer DriverPlayer = new SampledDriverPlayer();
-            SampledSession Session = new SampledSession();
-            int sample_i = 0;
-            while (true)
-            {
-                string headerline = strw.ReadLine().Trim();
-                if (headerline == "") continue;
-                if (headerline.Contains("END"))
-                {
-                    // everything ends.. even good log files
-                    break;
-
-                }
-
-                if (headerline == "[Lap]")
-                {
-                    // number
-                    string[] no = strw.ReadLine().Trim().Split("=".ToCharArray(), 2);
-                    string[] time = strw.ReadLine().Trim().Split("=".ToCharArray(), 2);
-
-                    int nu = 0;
-                    if (Int32.TryParse(no[1], out nu))
-                    {
-                        if (Lap_Awaiting == nu)
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(TriggerAsync), SpecifiedLap_Received);
 
                     }
 
-                }
-
-                if (headerline.StartsWith("[Data@"))
-                {
-                    try
+                    if (headerline == "[Lap]")
                     {
-                        sample_i++;
-                        int sample = Convert.ToInt32(headerline.Substring(6, headerline.Length - 6 - 1));
-                        DataSample ds = new DataSample();
-                        ds.Time = sample * 1.0 * DataCollector.SleepTime / 1000.0;
+                        // number
+                        string[] no = strw.ReadLine().Trim().Split("=".ToCharArray(), 2);
+                        string[] time = strw.ReadLine().Trim().Split("=".ToCharArray(), 2);
 
-                        // Next line indicates amount of bytes per block.
-                        string block_info = strw.ReadLine().Trim();
-                        string[] block_info_length = block_info.Split(",".ToCharArray());
-                        int[] block_info_length_i = new int[block_info_length.Length];
-
-                        for (int i = 0; i < block_info_length.Length; i++)
+                        int nu = 0;
+                        if (Int32.TryParse(no[1], out nu))
                         {
-                            block_info_length_i[i] = Convert.ToInt32(block_info_length[i]);
+                            if (Lap_Awaiting == nu)
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(TriggerAsync), SpecifiedLap_Received);
 
                         }
 
-                        // read.
-                        byte[] block_Session = new byte[block_info_length_i[0]];
-                        byte[] block_DriverPlayer = new byte[block_info_length_i[1]];
-                        byte[] block_DriverGeneral = new byte[block_info_length_i[2]];
-
-                        strw.Read(block_Session, 0, block_Session.Length);
-                        strw.Read(block_DriverPlayer, 0, block_DriverPlayer.Length);
-                        strw.Read(block_DriverGeneral, 0, block_DriverGeneral.Length);
-
-                        // Parse
-                        ds.Player = Read_DriverPlayer(block_DriverPlayer, DriverPlayer);
-                        DriverPlayer = ds.Player.Duplicate();
-
-                        ds.Session = Read_Session(block_Session, Session);
-                        Session = ds.Session.Duplicate();
-
-                        ds.Drivers = new List<SampledDriverGeneral>();
-                        ds.Drivers.Add(Read_DriverGeneral(block_DriverGeneral, DriverGeneral));
-                        DriverGeneral = ds.Drivers[0].Duplicate();
-                        Samples.Add(sample_i, ds);
-
                     }
-                    catch (Exception ex)
+
+                    if (headerline.StartsWith("[Data@"))
+                    {
+                        try
+                        {
+                            sample_i++;
+                            int sample = Convert.ToInt32(headerline.Substring(6, headerline.Length - 6 - 1));
+                            DataSample ds = new DataSample();
+                            ds.Time = sample * 1.0 * DataCollector.SleepTime / 1000.0;
+
+                            // Next line indicates amount of bytes per block.
+                            string block_info = strw.ReadLine().Trim();
+                            string[] block_info_length = block_info.Split(",".ToCharArray());
+                            int[] block_info_length_i = new int[block_info_length.Length];
+
+                            for (int i = 0; i < block_info_length.Length; i++)
+                            {
+                                block_info_length_i[i] = Convert.ToInt32(block_info_length[i]);
+
+                            }
+
+                            // read.
+                            byte[] block_Session = new byte[block_info_length_i[0]];
+                            byte[] block_DriverPlayer = new byte[block_info_length_i[1]];
+                            byte[] block_DriverGeneral = new byte[block_info_length_i[2]];
+
+                            strw.Read(block_Session, 0, block_Session.Length);
+                            strw.Read(block_DriverPlayer, 0, block_DriverPlayer.Length);
+                            strw.Read(block_DriverGeneral, 0, block_DriverGeneral.Length);
+
+                            // Parse
+                            ds.Player = Read_DriverPlayer(block_DriverPlayer, DriverPlayer);
+                            DriverPlayer = ds.Player.Duplicate();
+
+                            ds.Session = Read_Session(block_Session, Session);
+                            Session = ds.Session.Duplicate();
+
+                            ds.Drivers = new List<SampledDriverGeneral>();
+                            ds.Drivers.Add(Read_DriverGeneral(block_DriverGeneral, DriverGeneral));
+                            DriverGeneral = ds.Drivers[0].Duplicate();
+                            Samples.Add(sample_i, ds);
+
+                        }
+                        catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
                     }
+                    }
+
                 }
 
+                // Maybe new
+                int aasdft = 0;
+                strw.Close();
+
+                ThreadPool.QueueUserWorkItem(new WaitCallback(TriggerAsync), DataReceived);
+            }catch(Exception ex)
+            {
+
+
             }
-
-            // Maybe new
-            int aasdft = 0;
-            strw.Close();
-
-            ThreadPool.QueueUserWorkItem(new WaitCallback(TriggerAsync), DataReceived);
         }
 
 

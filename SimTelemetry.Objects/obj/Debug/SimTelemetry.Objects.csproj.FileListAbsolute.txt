@@ -1,0 +1,14 @@
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Debug\SimTelemetry.Objects.csprojResolveAssemblyReference.cache
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\SimTelemetry.Objects.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\SimTelemetry.Objects.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\Triton.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\Triton.pdb
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Debug\SimTelemetry.Objects.dll
+C:\Users\Hans\Documents\Visual Studio 2012\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Debug\SimTelemetry.Objects.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\SimTelemetry.Objects.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\SimTelemetry.Objects.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\Triton.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\bin\Debug\Triton.pdb
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Debug\SimTelemetry.Objects.dll
+C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\SimTelemetry.Objects\obj\Debug\SimTelemetry.Objects.pdb

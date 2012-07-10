@@ -5,10 +5,23 @@ namespace SimTelemetry.Data
 {
     public class SampledDriverPlayer : IDriverPlayer
     {
-        public SampledDriverPlayer Duplicate()
-        {
-            return (SampledDriverPlayer) this.MemberwiseClone();
-        }
+        private double _engineLifetimeLive;
+
+        private double _engineLifetimeTypical;
+
+        private double _engineLifetimeVariation;
+
+        private double _engineLifetimeOilBase;
+
+        private double _engineLifetimeRpmBase;
+
+        private double _engineTemperatureOil;
+
+        private double _engineTemperatureWater;
+
+        private int _engineBoostSetting;
+
+        private int _gear;
 
         private int _pitStopNumber;
 
@@ -51,6 +64,18 @@ namespace SimTelemetry.Data
         private string _tyreCompoundRear;
 
         private double _tyreGripForwardsLf;
+
+        private double _weightRearwheel;
+
+        private double _dryWeight;
+
+        private double _tyrePressureOptimalLf;
+
+        private double _tyrePressureOptimalLr;
+
+        private double _tyrePressureOptimalRf;
+
+        private double _tyrePressureOptimalRr;
 
         private double _tyrePressureLf;
 
@@ -108,6 +133,14 @@ namespace SimTelemetry.Data
 
         private double _tyreTemperatureRrOutside;
 
+        private double _tyreTemperatureLfOptimal;
+
+        private double _tyreTemperatureLrOptimal;
+
+        private double _tyreTemperatureRfOptimal;
+
+        private double _tyreTemperatureRrOptimal;
+
         private double _tyreTemperatureLfFresh;
 
         private double _tyreTemperatureLrFresh;
@@ -140,6 +173,24 @@ namespace SimTelemetry.Data
 
         private double _aerodynamicsRearWingDragBase;
 
+        private double _aerodynamicsLeftFenderDrag;
+
+        private double _aerodynamicsRightFenderDrag;
+
+        private double _aerodynamicsBodyDrag;
+
+        private double _aerodynamicsBodyDragHeightDiff;
+
+        private double _aerodynamicsBodyDragHeightAvg;
+
+        private double _aerodynamicsRadiatorDrag;
+
+        private int _aerodynamicsRadiatorSetting;
+
+        private double _aerodynamicsBrakeDuctDrag;
+
+        private int _aerodynamicsBrakeDuctSetting;
+
         private double _engineRpm;
 
         private double _engineRpmMaxLive;
@@ -166,6 +217,14 @@ namespace SimTelemetry.Data
 
         private double _powertrainDriverDistribution;
 
+        private double _brakeTypicalFailureLf;
+
+        private double _brakeTypicalFailureLr;
+
+        private double _brakeTypicalFailureRf;
+
+        private double _brakeTypicalFailureRr;
+
         private double _brakeTemperatureLf;
 
         private double _brakeTemperatureLr;
@@ -181,6 +240,22 @@ namespace SimTelemetry.Data
         private double _brakeThicknessRf;
 
         private double _brakeThicknessRr;
+
+        private double _brakeOptimalTemperatureLfLow;
+
+        private double _brakeOptimalTemperatureLrLow;
+
+        private double _brakeOptimalTemperatureRfLow;
+
+        private double _brakeOptimalTemperatureRrLow;
+
+        private double _brakeOptimalTemperatureLfHigh;
+
+        private double _brakeOptimalTemperatureLrHigh;
+
+        private double _brakeOptimalTemperatureRfHigh;
+
+        private double _brakeOptimalTemperatureRrHigh;
 
         private double _brakeTorqueLf;
 
@@ -200,6 +275,8 @@ namespace SimTelemetry.Data
 
         private double _pedalsBrake;
 
+        private double _steeringAngle;
+
         private LevelIndicator _drivingHelpBrakingHelp;
 
         private LevelIndicator _drivingHelpSteeringHelp;
@@ -211,6 +288,79 @@ namespace SimTelemetry.Data
         private bool _drivingHelpSpinRecovery;
 
         private bool _drivingHelpStabilityControl;
+
+        private bool _drivingHelpAutoClutch;
+
+        private double _speed;
+
+        private double _brakeInitialThicknessLf;
+
+        private double _brakeInitialThicknessRf;
+
+        private double _brakeInitialThicknessLr;
+
+        private double _brakeInitialThicknessRr;
+
+        private double _speedSlipping;
+
+        public SampledDriverPlayer Duplicate()
+        {
+            return (SampledDriverPlayer) this.MemberwiseClone();
+        }
+
+        public double Engine_Lifetime_Live
+        {
+            get { return _engineLifetimeLive; }
+            set { _engineLifetimeLive = value; }
+        }
+
+        public double Engine_Lifetime_Typical
+        {
+            get { return _engineLifetimeTypical; }
+            set { _engineLifetimeTypical = value; }
+        }
+
+        public double Engine_Lifetime_Variation
+        {
+            get { return _engineLifetimeVariation; }
+            set { _engineLifetimeVariation = value; }
+        }
+
+        public double Engine_Lifetime_Oil_Base
+        {
+            get { return _engineLifetimeOilBase; }
+            set { _engineLifetimeOilBase = value; }
+        }
+
+        public double Engine_Lifetime_RPM_Base
+        {
+            get { return _engineLifetimeRpmBase; }
+            set { _engineLifetimeRpmBase = value; }
+        }
+
+        public double Engine_Temperature_Oil
+        {
+            get { return _engineTemperatureOil; }
+            set { _engineTemperatureOil = value; }
+        }
+
+        public double Engine_Temperature_Water
+        {
+            get { return _engineTemperatureWater; }
+            set { _engineTemperatureWater = value; }
+        }
+
+        public int Engine_BoostSetting
+        {
+            get { return _engineBoostSetting; }
+            set { _engineBoostSetting = value; }
+        }
+
+        public int Gear
+        {
+            get { return _gear; }
+            set { _gear = value; }
+        }
 
         public int PitStop_Number
         {
@@ -336,6 +486,42 @@ namespace SimTelemetry.Data
         {
             get { return _tyreGripForwardsLf; }
             set { _tyreGripForwardsLf = value; }
+        }
+
+        public double Weight_Rearwheel
+        {
+            get { return _weightRearwheel; }
+            set { _weightRearwheel = value; }
+        }
+
+        public double DryWeight
+        {
+            get { return _dryWeight; }
+            set { _dryWeight = value; }
+        }
+
+        public double Tyre_Pressure_Optimal_LF
+        {
+            get { return _tyrePressureOptimalLf; }
+            set { _tyrePressureOptimalLf = value; }
+        }
+
+        public double Tyre_Pressure_Optimal_LR
+        {
+            get { return _tyrePressureOptimalLr; }
+            set { _tyrePressureOptimalLr = value; }
+        }
+
+        public double Tyre_Pressure_Optimal_RF
+        {
+            get { return _tyrePressureOptimalRf; }
+            set { _tyrePressureOptimalRf = value; }
+        }
+
+        public double Tyre_Pressure_Optimal_RR
+        {
+            get { return _tyrePressureOptimalRr; }
+            set { _tyrePressureOptimalRr = value; }
         }
 
         public double Tyre_Pressure_LF
@@ -506,6 +692,30 @@ namespace SimTelemetry.Data
             set { _tyreTemperatureRrOutside = value; }
         }
 
+        public double Tyre_Temperature_LF_Optimal
+        {
+            get { return _tyreTemperatureLfOptimal; }
+            set { _tyreTemperatureLfOptimal = value; }
+        }
+
+        public double Tyre_Temperature_LR_Optimal
+        {
+            get { return _tyreTemperatureLrOptimal; }
+            set { _tyreTemperatureLrOptimal = value; }
+        }
+
+        public double Tyre_Temperature_RF_Optimal
+        {
+            get { return _tyreTemperatureRfOptimal; }
+            set { _tyreTemperatureRfOptimal = value; }
+        }
+
+        public double Tyre_Temperature_RR_Optimal
+        {
+            get { return _tyreTemperatureRrOptimal; }
+            set { _tyreTemperatureRrOptimal = value; }
+        }
+
         public double Tyre_Temperature_LF_Fresh
         {
             get { return _tyreTemperatureLfFresh; }
@@ -602,6 +812,60 @@ namespace SimTelemetry.Data
             set { _aerodynamicsRearWingDragBase = value; }
         }
 
+        public double Aerodynamics_LeftFender_Drag
+        {
+            get { return _aerodynamicsLeftFenderDrag; }
+            set { _aerodynamicsLeftFenderDrag = value; }
+        }
+
+        public double Aerodynamics_RightFender_Drag
+        {
+            get { return _aerodynamicsRightFenderDrag; }
+            set { _aerodynamicsRightFenderDrag = value; }
+        }
+
+        public double Aerodynamics_Body_Drag
+        {
+            get { return _aerodynamicsBodyDrag; }
+            set { _aerodynamicsBodyDrag = value; }
+        }
+
+        public double Aerodynamics_Body_DragHeightDiff
+        {
+            get { return _aerodynamicsBodyDragHeightDiff; }
+            set { _aerodynamicsBodyDragHeightDiff = value; }
+        }
+
+        public double Aerodynamics_Body_DragHeightAvg
+        {
+            get { return _aerodynamicsBodyDragHeightAvg; }
+            set { _aerodynamicsBodyDragHeightAvg = value; }
+        }
+
+        public double Aerodynamics_Radiator_Drag
+        {
+            get { return _aerodynamicsRadiatorDrag; }
+            set { _aerodynamicsRadiatorDrag = value; }
+        }
+
+        public int Aerodynamics_Radiator_Setting
+        {
+            get { return _aerodynamicsRadiatorSetting; }
+            set { _aerodynamicsRadiatorSetting = value; }
+        }
+
+        public double Aerodynamics_BrakeDuct_Drag
+        {
+            get { return _aerodynamicsBrakeDuctDrag; }
+            set { _aerodynamicsBrakeDuctDrag = value; }
+        }
+
+        public int Aerodynamics_BrakeDuct_Setting
+        {
+            get { return _aerodynamicsBrakeDuctSetting; }
+            set { _aerodynamicsBrakeDuctSetting = value; }
+        }
+
         public double Engine_RPM
         {
             get { return _engineRpm; }
@@ -680,6 +944,30 @@ namespace SimTelemetry.Data
             set { _powertrainDriverDistribution = value; }
         }
 
+        public double Brake_TypicalFailure_LF
+        {
+            get { return _brakeTypicalFailureLf; }
+            set { _brakeTypicalFailureLf = value; }
+        }
+
+        public double Brake_TypicalFailure_LR
+        {
+            get { return _brakeTypicalFailureLr; }
+            set { _brakeTypicalFailureLr = value; }
+        }
+
+        public double Brake_TypicalFailure_RF
+        {
+            get { return _brakeTypicalFailureRf; }
+            set { _brakeTypicalFailureRf = value; }
+        }
+
+        public double Brake_TypicalFailure_RR
+        {
+            get { return _brakeTypicalFailureRr; }
+            set { _brakeTypicalFailureRr = value; }
+        }
+
         public double Brake_Temperature_LF
         {
             get { return _brakeTemperatureLf; }
@@ -726,6 +1014,54 @@ namespace SimTelemetry.Data
         {
             get { return _brakeThicknessRr; }
             set { _brakeThicknessRr = value; }
+        }
+
+        public double Brake_OptimalTemperature_LF_Low
+        {
+            get { return _brakeOptimalTemperatureLfLow; }
+            set { _brakeOptimalTemperatureLfLow = value; }
+        }
+
+        public double Brake_OptimalTemperature_LR_Low
+        {
+            get { return _brakeOptimalTemperatureLrLow; }
+            set { _brakeOptimalTemperatureLrLow = value; }
+        }
+
+        public double Brake_OptimalTemperature_RF_Low
+        {
+            get { return _brakeOptimalTemperatureRfLow; }
+            set { _brakeOptimalTemperatureRfLow = value; }
+        }
+
+        public double Brake_OptimalTemperature_RR_Low
+        {
+            get { return _brakeOptimalTemperatureRrLow; }
+            set { _brakeOptimalTemperatureRrLow = value; }
+        }
+
+        public double Brake_OptimalTemperature_LF_High
+        {
+            get { return _brakeOptimalTemperatureLfHigh; }
+            set { _brakeOptimalTemperatureLfHigh = value; }
+        }
+
+        public double Brake_OptimalTemperature_LR_High
+        {
+            get { return _brakeOptimalTemperatureLrHigh; }
+            set { _brakeOptimalTemperatureLrHigh = value; }
+        }
+
+        public double Brake_OptimalTemperature_RF_High
+        {
+            get { return _brakeOptimalTemperatureRfHigh; }
+            set { _brakeOptimalTemperatureRfHigh = value; }
+        }
+
+        public double Brake_OptimalTemperature_RR_High
+        {
+            get { return _brakeOptimalTemperatureRrHigh; }
+            set { _brakeOptimalTemperatureRrHigh = value; }
         }
 
         public double Brake_Torque_LF
@@ -784,8 +1120,8 @@ namespace SimTelemetry.Data
 
         public double SteeringAngle
         {
-            get { return _SteeringAngle; }
-            set { _SteeringAngle = value; }
+            get { return _steeringAngle; }
+            set { _steeringAngle = value; }
         }
 
         public LevelIndicator DrivingHelp_BrakingHelp
@@ -824,13 +1160,46 @@ namespace SimTelemetry.Data
             set { _drivingHelpStabilityControl = value; }
         }
 
-        private double _speed = 0;
-        private double _SteeringAngle = 0;
+        public bool DrivingHelp_AutoClutch
+        {
+            get { return _drivingHelpAutoClutch; }
+            set { _drivingHelpAutoClutch = value; }
+        }
 
         public double Speed
         {
             get { return _speed; }
             set { _speed = value; }
+        }
+
+        public double Brake_InitialThickness_LF
+        {
+            get { return _brakeInitialThicknessLf; }
+            set { _brakeInitialThicknessLf = value; }
+        }
+
+        public double Brake_InitialThickness_RF
+        {
+            get { return _brakeInitialThicknessRf; }
+            set { _brakeInitialThicknessRf = value; }
+        }
+
+        public double Brake_InitialThickness_LR
+        {
+            get { return _brakeInitialThicknessLr; }
+            set { _brakeInitialThicknessLr = value; }
+        }
+
+        public double Brake_InitialThickness_RR
+        {
+            get { return _brakeInitialThicknessRr; }
+            set { _brakeInitialThicknessRr = value; }
+        }
+
+        public double SpeedSlipping
+        {
+            get { return _speedSlipping; }
+            set { _speedSlipping = value; }
         }
     }
 }

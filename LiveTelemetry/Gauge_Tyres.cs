@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Game.Rfactor;
+using SimTelemetry.Data;
 using SimTelemetry.Objects;
 
 namespace LiveTelemetry
@@ -37,6 +37,9 @@ namespace LiveTelemetry
             double what = temperature / optimal;
             what = Math.Max(0.7, Math.Min(1.3, what));
             double wavelength = 79 + what * 75 / 0.15;
+
+            if (double.IsNaN(wavelength))
+                wavelength = 79;
 
             return new SolidBrush(getColorFromWaveLength(TI32(wavelength)));
 
@@ -135,19 +138,20 @@ namespace LiveTelemetry
             {
                 base.OnPaint(e);
 
-                double OLF = rFactor.Player.Tyre_Temperature_LF_Optimal;
-                double OLR = rFactor.Player.Tyre_Temperature_LR_Optimal;
-                double ORF = rFactor.Player.Tyre_Temperature_RF_Optimal;
-                double ORR = rFactor.Player.Tyre_Temperature_RR_Optimal;
-
-                double SLF = -1*3.6*rFactor.Player.Tyre_Speed_LF*rFactor.Player.Wheel_Radius_LF;
-                double SLR = -1*3.6*rFactor.Player.Tyre_Speed_LR*rFactor.Player.Wheel_Radius_LR;
-                double SRF = -1*3.6*rFactor.Player.Tyre_Speed_RF*rFactor.Player.Wheel_Radius_RF;
-                double SRR = -1*3.6*rFactor.Player.Tyre_Speed_RR*rFactor.Player.Wheel_Radius_RR;
-                double SPD = 3.6*rFactor.Player.Speed;
                 Graphics g = e.Graphics;
                 g.FillRectangle(Brushes.Black, e.ClipRectangle);
-                if (rFactor.Session.Cars == 0) return;
+                if (!Telemetry.m.Active_Session) return;
+
+                double OLF = Telemetry.m.Sim.Player.Tyre_Temperature_LF_Optimal;
+                double OLR = Telemetry.m.Sim.Player.Tyre_Temperature_LR_Optimal;
+                double ORF = Telemetry.m.Sim.Player.Tyre_Temperature_RF_Optimal;
+                double ORR = Telemetry.m.Sim.Player.Tyre_Temperature_RR_Optimal;
+
+                double SLF = -1*3.6*Telemetry.m.Sim.Player.Tyre_Speed_LF*Telemetry.m.Sim.Player.Wheel_Radius_LF;
+                double SLR = -1*3.6*Telemetry.m.Sim.Player.Tyre_Speed_LR*Telemetry.m.Sim.Player.Wheel_Radius_LR;
+                double SRF = -1*3.6*Telemetry.m.Sim.Player.Tyre_Speed_RF*Telemetry.m.Sim.Player.Wheel_Radius_RF;
+                double SRR = -1*3.6*Telemetry.m.Sim.Player.Tyre_Speed_RR*Telemetry.m.Sim.Player.Wheel_Radius_RR;
+                double SPD = 3.6*Telemetry.m.Sim.Player.Speed;
 
                 System.Drawing.Font f = new Font("Arial", 8f);
 
@@ -158,9 +162,9 @@ namespace LiveTelemetry
                 }
                 else
                 {
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_LF_Outside, OLF), 50, 40, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_LF_Middle, OLF), 58, 40, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_LF_Inside, OLF), 66, 40, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_LF_Outside, OLF), 50, 40, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_LF_Middle, OLF), 58, 40, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_LF_Inside, OLF), 66, 40, 8, 50);
                 }
 
                 if (SPD > 5 && (SLR/SPD > 1.1 || SLR/SPD < 0.9))
@@ -169,9 +173,9 @@ namespace LiveTelemetry
                 }
                 else
                 {
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_LR_Outside, OLR), 50, 220, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_LR_Middle, OLR), 58, 220, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_LR_Inside, OLR), 66, 220, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_LR_Outside, OLR), 50, 220, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_LR_Middle, OLR), 58, 220, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_LR_Inside, OLR), 66, 220, 8, 50);
                 }
 
                 if (SPD > 5 && (SRF/SPD > 1.1 || SRF/SPD < 0.9))
@@ -180,9 +184,9 @@ namespace LiveTelemetry
                 }
                 else
                 {
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_RF_Outside, ORF), 216, 40, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_RF_Middle, ORF), 208, 40, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_RF_Inside, ORF), 200, 40, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_RF_Outside, ORF), 216, 40, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_RF_Middle, ORF), 208, 40, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_RF_Inside, ORF), 200, 40, 8, 50);
                 }
 
 
@@ -192,107 +196,107 @@ namespace LiveTelemetry
                 }
                 else
                 {
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_RR_Outside, ORR), 216, 220, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_RR_Middle, ORR), 208, 220, 8, 50);
-                    g.FillRectangle(GetTyreBrush(rFactor.Player.Tyre_Temperature_RR_Inside, ORR), 200, 220, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_RR_Outside, ORR), 216, 220, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_RR_Middle, ORR), 208, 220, 8, 50);
+                    g.FillRectangle(GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Temperature_RR_Inside, ORR), 200, 220, 8, 50);
                 }
 
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_LF_Outside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_LF_Outside).ToString("000") + "C", f,
                              Brushes.White, 12, 20);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_LF_Middle).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_LF_Middle).ToString("000") + "C", f,
                              Brushes.White, 47, 20);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_LF_Inside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_LF_Inside).ToString("000") + "C", f,
                              Brushes.White, 82, 20);
 
-                g.DrawString(rFactor.Drivers.Player.TyreWear_LF.ToString("000%"), f,
+                g.DrawString(Telemetry.m.Sim.Drivers.Player.TyreWear_LF.ToString("000%"), f,
                              Brushes.White, 47, 92);
 
-                g.DrawString(rFactor.Player.Tyre_Pressure_LF.ToString("000.0") + "kPa", f,
-                             GetTyreBrush(rFactor.Player.Tyre_Pressure_LF + 273.15,
-                                          rFactor.Player.Tyre_Pressure_Optimal_LF + 273.15), 47, 107);
+                g.DrawString(Telemetry.m.Sim.Player.Tyre_Pressure_LF.ToString("000.0") + "kPa", f,
+                             GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Pressure_LF + 273.15,
+                                          Telemetry.m.Sim.Player.Tyre_Pressure_Optimal_LF + 273.15), 47, 107);
 
 
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_RF_Inside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_RF_Inside).ToString("000") + "C", f,
                              Brushes.White, 162, 20);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_RF_Middle).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_RF_Middle).ToString("000") + "C", f,
                              Brushes.White, 197, 20);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_RF_Outside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_RF_Outside).ToString("000") + "C", f,
                              Brushes.White, 232, 20);
 
-                g.DrawString(rFactor.Drivers.Player.TyreWear_RF.ToString("000%"), f,
+                g.DrawString(Telemetry.m.Sim.Drivers.Player.TyreWear_RF.ToString("000%"), f,
                              Brushes.White, 197, 92);
 
-                g.DrawString(rFactor.Player.Tyre_Pressure_RF.ToString("000.0") + "kPa", f,
-                             GetTyreBrush(rFactor.Player.Tyre_Pressure_LF + 273.15,
-                                          rFactor.Player.Tyre_Pressure_Optimal_LF + 273.15), 197, 107);
+                g.DrawString(Telemetry.m.Sim.Player.Tyre_Pressure_RF.ToString("000.0") + "kPa", f,
+                             GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Pressure_LF + 273.15,
+                                          Telemetry.m.Sim.Player.Tyre_Pressure_Optimal_LF + 273.15), 197, 107);
 
 
 
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_LR_Outside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_LR_Outside).ToString("000") + "C", f,
                              Brushes.White, 12, 200);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_LR_Middle).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_LR_Middle).ToString("000") + "C", f,
                              Brushes.White, 47, 200);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_LR_Inside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_LR_Inside).ToString("000") + "C", f,
                              Brushes.White, 82, 200);
 
-                g.DrawString(rFactor.Drivers.Player.TyreWear_LR.ToString("000%"), f,
+                g.DrawString(Telemetry.m.Sim.Drivers.Player.TyreWear_LR.ToString("000%"), f,
                              Brushes.White, 47, 272);
 
-                g.DrawString(rFactor.Player.Tyre_Pressure_LR.ToString("000.0") + "kPa", f,
-                             GetTyreBrush(rFactor.Player.Tyre_Pressure_LF + 273.15,
-                                          rFactor.Player.Tyre_Pressure_Optimal_LF + 273.15), 47, 287);
+                g.DrawString(Telemetry.m.Sim.Player.Tyre_Pressure_LR.ToString("000.0") + "kPa", f,
+                             GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Pressure_LF + 273.15,
+                                          Telemetry.m.Sim.Player.Tyre_Pressure_Optimal_LF + 273.15), 47, 287);
 
 
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_RR_Inside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_RR_Inside).ToString("000") + "C", f,
                              Brushes.White, 162, 200);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_RR_Middle).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_RR_Middle).ToString("000") + "C", f,
                              Brushes.White, 197, 200);
-                g.DrawString(Temperature.KC(rFactor.Player.Tyre_Temperature_RR_Outside).ToString("000") + "C", f,
+                g.DrawString(Temperature.KC(Telemetry.m.Sim.Player.Tyre_Temperature_RR_Outside).ToString("000") + "C", f,
                              Brushes.White, 232, 200);
 
-                g.DrawString(rFactor.Drivers.Player.TyreWear_RR.ToString("000%"), f,
+                g.DrawString(Telemetry.m.Sim.Drivers.Player.TyreWear_RR.ToString("000%"), f,
                              Brushes.White, 197, 272);
 
-                g.DrawString(rFactor.Player.Tyre_Pressure_RR.ToString("000.0") + "kPa", f,
-                             GetTyreBrush(rFactor.Player.Tyre_Pressure_LF + 273.15,
-                                          rFactor.Player.Tyre_Pressure_Optimal_LF + 273.15), 197, 287);
+                g.DrawString(Telemetry.m.Sim.Player.Tyre_Pressure_RR.ToString("000.0") + "kPa", f,
+                             GetTyreBrush(Telemetry.m.Sim.Player.Tyre_Pressure_LF + 273.15,
+                                          Telemetry.m.Sim.Player.Tyre_Pressure_Optimal_LF + 273.15), 197, 287);
 
                 double BrakeWear_LF = 1 -
-                                      (rFactor.Player.Brake_InitialThickness_LF - rFactor.Player.Brake_Thickness_LF)/
-                                      (rFactor.Player.Brake_InitialThickness_LF - rFactor.Player.Brake_TypicalFailure_LF);
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_LF - Telemetry.m.Sim.Player.Brake_Thickness_LF)/
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_LF - Telemetry.m.Sim.Player.Brake_TypicalFailure_LF);
                 double BrakeWear_RF = 1 -
-                                      (rFactor.Player.Brake_InitialThickness_RF - rFactor.Player.Brake_Thickness_RF)/
-                                      (rFactor.Player.Brake_InitialThickness_RF - rFactor.Player.Brake_TypicalFailure_RF);
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_RF - Telemetry.m.Sim.Player.Brake_Thickness_RF)/
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_RF - Telemetry.m.Sim.Player.Brake_TypicalFailure_RF);
 
 
 
                 double BrakeWear_LR = 1 -
-                                      (rFactor.Player.Brake_InitialThickness_LR - rFactor.Player.Brake_Thickness_LR)/
-                                      (rFactor.Player.Brake_InitialThickness_LR - rFactor.Player.Brake_TypicalFailure_LR);
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_LR - Telemetry.m.Sim.Player.Brake_Thickness_LR)/
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_LR - Telemetry.m.Sim.Player.Brake_TypicalFailure_LR);
                 double BrakeWear_RR = 1 -
-                                      (rFactor.Player.Brake_InitialThickness_RR - rFactor.Player.Brake_Thickness_RR)/
-                                      (rFactor.Player.Brake_InitialThickness_RR - rFactor.Player.Brake_TypicalFailure_RR);
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_RR - Telemetry.m.Sim.Player.Brake_Thickness_RR)/
+                                      (Telemetry.m.Sim.Player.Brake_InitialThickness_RR - Telemetry.m.Sim.Player.Brake_TypicalFailure_RR);
 
                 // Draw brakes. front
                 g.FillRectangle(
-                    GetBrakeBrush(rFactor.Player.Brake_Temperature_LF, rFactor.Player.Brake_OptimalTemperature_LF_Low,
-                                  rFactor.Player.Brake_OptimalTemperature_LF_High), 78, 50, 7, 30);
+                    GetBrakeBrush(Telemetry.m.Sim.Player.Brake_Temperature_LF, Telemetry.m.Sim.Player.Brake_OptimalTemperature_LF_Low,
+                                  Telemetry.m.Sim.Player.Brake_OptimalTemperature_LF_High), 78, 50, 7, 30);
                 g.DrawString(
-                    Temperature.KC(rFactor.Player.Brake_Temperature_LF).ToString("000") + "C", f, Brushes.White, 84, 50);
+                    Temperature.KC(Telemetry.m.Sim.Player.Brake_Temperature_LF).ToString("000") + "C", f, Brushes.White, 84, 50);
 
-                if (rFactor.Player.Brake_Thickness_LF == 0)
+                if (Telemetry.m.Sim.Player.Brake_Thickness_LF == 0)
                     g.DrawString("STUK", f, Brushes.Red, 84, 65);
                 else
                     g.DrawString(BrakeWear_LF.ToString("000%"), f,
                                  ((BrakeWear_LF < 0.3) ? Brushes.Yellow : Brushes.White), 84, 65);
 
                 g.FillRectangle(
-                    GetBrakeBrush(rFactor.Player.Brake_Temperature_RF, rFactor.Player.Brake_OptimalTemperature_LF_Low,
-                                  rFactor.Player.Brake_OptimalTemperature_LF_High), 188, 50, 7, 30);
+                    GetBrakeBrush(Telemetry.m.Sim.Player.Brake_Temperature_RF, Telemetry.m.Sim.Player.Brake_OptimalTemperature_LF_Low,
+                                  Telemetry.m.Sim.Player.Brake_OptimalTemperature_LF_High), 188, 50, 7, 30);
                 g.DrawString(
-                    Temperature.KC(rFactor.Player.Brake_Temperature_RF).ToString("000") + "C", f, Brushes.White, 160, 50);
+                    Temperature.KC(Telemetry.m.Sim.Player.Brake_Temperature_RF).ToString("000") + "C", f, Brushes.White, 160, 50);
 
-                if (rFactor.Player.Brake_Thickness_RF == 0)
+                if (Telemetry.m.Sim.Player.Brake_Thickness_RF == 0)
                     g.DrawString("STUK", f, Brushes.Red, 155, 65);
                 else
                     g.DrawString(BrakeWear_RF.ToString("000%"), f,
@@ -300,25 +304,25 @@ namespace LiveTelemetry
 
                 // Draw brakes. rear
                 g.FillRectangle(
-                    GetBrakeBrush(rFactor.Player.Brake_Temperature_LR, rFactor.Player.Brake_OptimalTemperature_LR_Low,
-                                  rFactor.Player.Brake_OptimalTemperature_LR_High), 78, 230, 7, 30);
+                    GetBrakeBrush(Telemetry.m.Sim.Player.Brake_Temperature_LR, Telemetry.m.Sim.Player.Brake_OptimalTemperature_LR_Low,
+                                  Telemetry.m.Sim.Player.Brake_OptimalTemperature_LR_High), 78, 230, 7, 30);
                 g.DrawString(
-                    Temperature.KC(rFactor.Player.Brake_Temperature_LR).ToString("000") + "C", f, Brushes.White, 84, 230);
+                    Temperature.KC(Telemetry.m.Sim.Player.Brake_Temperature_LR).ToString("000") + "C", f, Brushes.White, 84, 230);
 
-                if (rFactor.Player.Brake_Thickness_LR == 0)
+                if (Telemetry.m.Sim.Player.Brake_Thickness_LR == 0)
                     g.DrawString("STUK", f, Brushes.Red, 84, 245);
                 else
                     g.DrawString(BrakeWear_LR.ToString("000%"), f,
                                  ((BrakeWear_LR < 0.3) ? Brushes.Yellow : Brushes.White), 84, 245);
 
                 g.FillRectangle(
-                    GetBrakeBrush(rFactor.Player.Brake_Temperature_RR, rFactor.Player.Brake_OptimalTemperature_LR_Low,
-                                  rFactor.Player.Brake_OptimalTemperature_LR_High), 188, 230, 7, 30);
+                    GetBrakeBrush(Telemetry.m.Sim.Player.Brake_Temperature_RR, Telemetry.m.Sim.Player.Brake_OptimalTemperature_LR_Low,
+                                  Telemetry.m.Sim.Player.Brake_OptimalTemperature_LR_High), 188, 230, 7, 30);
                 g.DrawString(
-                    Temperature.KC(rFactor.Player.Brake_Temperature_RR).ToString("000") + "C", f, Brushes.White, 160,
+                    Temperature.KC(Telemetry.m.Sim.Player.Brake_Temperature_RR).ToString("000") + "C", f, Brushes.White, 160,
                     230);
 
-                if (rFactor.Player.Brake_Thickness_RR == 0)
+                if (Telemetry.m.Sim.Player.Brake_Thickness_RR == 0)
                     g.DrawString("STUK", f, Brushes.Red, 155, 245);
                 else
                     g.DrawString(BrakeWear_RR.ToString("000%"), f,
@@ -326,13 +330,13 @@ namespace LiveTelemetry
 
 
 
-                double oil = rFactor.Player.Engine_Temperature_Oil;
-                double oil_max = rFactor.Player.Engine_Lifetime_Oil_Base + 30;
+                double oil = Telemetry.m.Sim.Player.Engine_Temperature_Oil;
+                double oil_max = Telemetry.m.Sim.Player.Engine_Lifetime_Oil_Base + 30;
                 double oil_factor = oil/oil_max;
                 g.DrawString("OIL", f, DimBrush, 30, 130);
                 for (int perc = 0; perc < 120; perc += 3)
                 {
-                    if (perc * oil_max / 120 > rFactor.Player.Engine_Lifetime_Oil_Base)
+                    if (perc * oil_max / 120 > Telemetry.m.Sim.Player.Engine_Lifetime_Oil_Base)
                     {
                         if (perc * oil_max / 120 > oil)
                             g.FillRectangle(DimRed, 60 + 30 + perc, 130, 2, 13);
@@ -350,14 +354,14 @@ namespace LiveTelemetry
                 }
                 g.DrawString((oil).ToString("000") + "C", f, Brushes.Yellow, 220, 130);
 
-                double water = rFactor.Player.Engine_Temperature_Water;
-                double water_max = rFactor.Player.Engine_Lifetime_Oil_Base+30;
+                double water = Telemetry.m.Sim.Player.Engine_Temperature_Water;
+                double water_max = Telemetry.m.Sim.Player.Engine_Lifetime_Oil_Base+30;
               
                 double water_factor = water/water_max;
                 g.DrawString("Water", f, DimBrush, 30, 150);
                 for (int perc = 0; perc < 120; perc += 3)
                 {
-                    if (perc * water_max / 120 > rFactor.Player.Engine_Lifetime_Oil_Base)
+                    if (perc * water_max / 120 > Telemetry.m.Sim.Player.Engine_Lifetime_Oil_Base)
                     {
                         if (perc * water_max / 120 > water)
                             g.FillRectangle(DimRed, 60 + 30 + perc, 150, 2, 13);
@@ -379,10 +383,10 @@ namespace LiveTelemetry
                 g.DrawString("TRACK TEMPERATURE", f, DimBrush, 300f, 50f);
 
                 System.Drawing.Font trf = new Font("Calibri", 36f);
-                g.DrawString(rFactor.Session.TrackTemperature.ToString("00") + "C", trf, Brushes.DarkGray, 320f, 70f);
+                g.DrawString(Telemetry.m.Sim.Session.TrackTemperature.ToString("00") + "C", trf, Brushes.DarkGray, 320f, 70f);
 
                 g.DrawString("AMBIENT TEMPERATURE", f, DimBrush, 300f, 150f);
-                g.DrawString(rFactor.Session.AmbientTemperature.ToString("00") + "C", trf, Brushes.DarkGray, 320f, 170f);
+                g.DrawString(Telemetry.m.Sim.Session.AmbientTemperature.ToString("00") + "C", trf, Brushes.DarkGray, 320f, 170f);
 
                 Font sf = new Font("Arial", 8f);
 

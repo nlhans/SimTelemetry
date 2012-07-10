@@ -6,43 +6,51 @@ namespace SimTelemetry.Game.Rfactor
     public class DriverPlayer : IDriverPlayer
     {
         // Engine lifetime
+        [Loggable(1)]
         public double Engine_Lifetime_Live
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC0AC)); }
         }
+        [Loggable(0.01)]
         public double Engine_Lifetime_Typical
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADF23C)); }
         }
+        [Loggable(0.01)]
         public double Engine_Lifetime_Variation
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADF244)); }
         }
+        [Loggable(0.01)]
         public double Engine_Lifetime_Oil_Base
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC0C4)) - 273.15; }
             //get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC04C)) - 273.15 + 12; }
         }
+        [Loggable(0.01)]
         public double Engine_Lifetime_RPM_Base
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADF21C)); }
         }
+        [Loggable(0.01)]
         public double Engine_Temperature_Oil
         {
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC044)) - 273.15; }
             set { }
         }
+        [Loggable(0.01)]
         public double Engine_Temperature_Water
         {
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC084)) - 273.15; }
             set { }
         }
 
+        [Loggable(1)]
         public int Engine_BoostSetting
         {
             get { return rFactor.Game.ReadByte(new IntPtr(0x00ADBF70)); }
@@ -114,7 +122,8 @@ namespace SimTelemetry.Game.Rfactor
         [Loggable(0.01)]
         public double Tyre_Grip_Forwards_LF { set { } get { return rFactor.Game.ReadDouble(new IntPtr(0x00AD9E28)); } }
 
-        private double Weight_Rearwheel
+        [Loggable(0.01)]
+        public double Weight_Rearwheel
         {
             get
             {
@@ -133,10 +142,11 @@ namespace SimTelemetry.Game.Rfactor
                 double WheelBase = 0;
 
                 return 2.1 * (FuelWeight + DryWeight) / 4 * 9.81;
-            }
+            }set{}
         }
 
-        protected double DryWeight
+        [Loggable(0.01)]
+        public double DryWeight
         {
             get { return 75 + rFactor.Game.ReadDouble(new IntPtr(0x00ADCFB4)); }
             set { }
@@ -471,6 +481,8 @@ namespace SimTelemetry.Game.Rfactor
         public bool DrivingHelp_SpinRecovery { set { } get { return rFactor.Game.ReadByte(new IntPtr(0x00AD9787)) == 1; } }
         [Loggable(0.01)]
         public bool DrivingHelp_StabilityControl { set { } get { return rFactor.Game.ReadByte(new IntPtr(0x00AD9780)) == 1; } }
+        [Loggable(0.01)]
+        public bool DrivingHelp_AutoClutch { set { } get { return rFactor.Game.ReadByte(new IntPtr(0x00AD9782)) == 1; } }
 
         [Loggable(25)]
         public double Speed
@@ -479,6 +491,7 @@ namespace SimTelemetry.Game.Rfactor
             get { return rFactor.Drivers.Player.Speed; }
         }
 
+        [Loggable(0.01)]
         public double Brake_InitialThickness_LF
         {
             get
@@ -491,6 +504,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
         }
 
+        [Loggable(0.01)]
         public double Brake_InitialThickness_RF
         {
             get
@@ -503,6 +517,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
         }
 
+        [Loggable(0.01)]
         public double Brake_InitialThickness_LR
         {
             get
@@ -515,6 +530,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
         }
 
+        [Loggable(0.01)]
         public double Brake_InitialThickness_RR
         {
             get
@@ -524,6 +540,13 @@ namespace SimTelemetry.Game.Rfactor
                 int steps_RR = rFactor.Game.ReadByte(new IntPtr(0x00AE10AC));
                 return baseval + stepval * steps_RR;
             }
+            set { }
+        }
+
+        [Loggable(25)]
+        public double SpeedSlipping
+        {
+            get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADBFE8)); }
             set { }
         }
     }
