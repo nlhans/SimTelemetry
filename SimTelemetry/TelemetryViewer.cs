@@ -57,85 +57,26 @@ namespace SimTelemetry
             _PlotterConfiguration.Configure(cPlotter);
 
             this.GraphSplit.Panel2.Controls.Add(cPlotter);
-            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Jacksonville Superspeedway-TEST_DAY-2012-07-11-2\Lap 0.dat");
+            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Jacksonville Superspeedway-TEST_DAY-2012-07-11-5\Lap 26.gz");
             _logReader.Read();
             while (_logReader.Progress == 0) ;
             while (_logReader.Progress != 1000) ;
 
             double timeMin = 100000, timeMax = 0;
-
-            double lastX = 0, lastY = 0, lastZ = 0,spd=0, mySpeed = 0, lastSpeed=0, lastTime=0, myAcc=0;
-            Triton.Maths.IIR spd_filter = new Triton.Maths.IIR(new double[25]{
-        0.03986147865151436200,
-        0.03989606880123134500,
-        0.03992766857748184000,
-        0.03995627322145577800,
-        0.03998187842539897100,
-        0.04000448033326193400,
-        0.04002407554128045000,
-        0.04004066109848827800,
-        0.04005423450716150100,
-        0.04006479372319470700,
-        0.04007233715640879500,
-        0.04007686367079047600,
-        0.04007837258466332600,
-        0.04007686367079047600,
-        0.04007233715640879500,
-        0.04006479372319470700,
-        0.04005423450716150100,
-        0.04004066109848827800,
-        0.04002407554128045000,
-        0.04000448033326193400,
-        0.03998187842539897100,
-        0.03995627322145577800,
-        0.03992766857748184000,
-        0.03989606880123134500,
-        0.03986147865151436200}, new double[1]{
-            0
-        });
-            Triton.Maths.IIR acc_filter = new Triton.Maths.IIR(new double[5]{
-                
-        0.19974388710184859000,
-        0.20012802619262748000,
-        0.20025617341104796000,
-        0.20012802619262748000,
-        0.19974388710184859000}, new double[1] { 0 });
-
-            foreach(KeyValuePair<double, TelemetrySample> sp in _logReader.Samples)
+            lock (_logReader.Samples)
             {
-                timeMin = Math.Min(sp.Key / 1000.0, timeMin);
-                timeMax = Math.Max(sp.Key / 1000.0, timeMax);
-                TelemetrySample sample = sp.Value;
-                //X=7
-                //Y=8
-                //Z=9
-
-                double x=(double)sample.Data[3][7], y=(double)sample.Data[3][8], z=(double)sample.Data[3][9];
-                double dt = sp.Key - lastTime;
-                if (lastX != x && dt> 0)
+                foreach (KeyValuePair<double, TelemetrySample> sp in _logReader.Samples)
                 {
-                    spd = Math.Pow(x - lastX, 2) + Math.Pow(y - lastY, 2) + Math.Pow(z - lastZ, 2);
-                    spd = Math.Sqrt(spd)/(dt/1000);
+                    timeMin = Math.Min(sp.Key / 1000.0, timeMin);
+                    timeMax = Math.Max(sp.Key / 1000.0, timeMax);
+                    TelemetrySample sample = sp.Value;
 
+                    cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][48]);
+                    cPlotter.Graphs[1].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][47] * 3.6);
+                    cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][10] * 100);
+                    cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][11] * 100);
 
-                    mySpeed = spd_filter.Add(spd);
-                    if (mySpeed > 420 / 3.6) mySpeed = 420 / 3.6;
-                    if (mySpeed < -420 / 3.6) mySpeed = -420 / 3.6;
-                    double acc = ((double)sample.Data[3][47] - lastSpeed) / (dt / 1000);
-                    myAcc =  acc_filter.Add(acc);
-                    lastSpeed = (double)sample.Data[3][47];
-                    if (myAcc > 2 * 9.81) myAcc = 2 * 9.81;
-                    if (myAcc < -7 * 9.81) myAcc = -7 * 9.81;
                 }
-                lastX = x; lastY = y; lastZ = z; lastTime = sp.Key; lastSpeed = (double)sample.Data[3][47];
-
-                cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][48]);
-                cPlotter.Graphs[1].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][47] * 3.6);
-                cPlotter.Graphs[1].Curves[0].Data.Add(sample.Time / 1000.0, (double)mySpeed*3.6);
-                cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][10] * 100);
-                cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][11] * 100);
-                cPlotter.Graphs[3].Curves[0].Data.Add(sample.Time / 1000.0, (double)myAcc/9.81 );
-
             }
             _timeLineStart = timeMin;
             _timeLineEnd = timeMax;
