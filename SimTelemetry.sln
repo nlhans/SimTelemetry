@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Peripherals", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry", "SimTelemetry\SimTelemetry.csproj", "{9C68C799-305F-417C-BFA5-9BF6E1280107}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry-old", "SimTelemetry-old\SimTelemetry-old.csproj", "{897C6108-C25A-412F-BE1B-52CF7F1F7A35}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,16 +119,6 @@ Global
 		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|Mixed Platforms.Build.0 = Release|x86
 		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|x86.ActiveCfg = Release|x86
 		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|x86.Build.0 = Release|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Debug|x86.ActiveCfg = Debug|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Debug|x86.Build.0 = Debug|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Release|Any CPU.ActiveCfg = Release|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Release|Mixed Platforms.Build.0 = Release|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Release|x86.ActiveCfg = Release|x86
-		{897C6108-C25A-412F-BE1B-52CF7F1F7A35}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
