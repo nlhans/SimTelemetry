@@ -39,7 +39,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Triton">
-      <HintPath>..\..\..\Triton\Triton\bin\Release\Triton.dll</HintPath>
+      <HintPath>..\..\..\Projects\Triton\Triton\bin\Debug\Triton.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

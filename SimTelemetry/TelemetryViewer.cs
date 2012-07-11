@@ -57,7 +57,7 @@ namespace SimTelemetry
             _PlotterConfiguration.Configure(cPlotter);
 
             this.GraphSplit.Panel2.Controls.Add(cPlotter);
-            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\Projects\SimTelemetry\SimTelemetry\LiveTelemetry\bin\Debug\test.txt");
+            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\test.txt");
             _logReader.Read();
             while (_logReader.Progress == 0) ;
             while (_logReader.Progress != 1000) ;

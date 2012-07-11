@@ -44,13 +44,11 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Triton\Triton\bin\Debug\Triton.dll</HintPath>
+    <Reference Include="Triton">
+      <HintPath>..\..\..\Projects\Triton\Triton\bin\Debug\Triton.dll</HintPath>
     </Reference>
-    <Reference Include="Triton.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Triton\Triton.Controls\bin\Debug\Triton.Controls.dll</HintPath>
+    <Reference Include="Triton.Controls">
+      <HintPath>..\..\..\Projects\Triton\Triton.Controls\bin\Debug\Triton.Controls.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
