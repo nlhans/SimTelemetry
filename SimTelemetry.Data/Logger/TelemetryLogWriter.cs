@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Timers;
+using System.Threading;
+using Timer = System.Timers.Timer;
+using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
+using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
 using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data.Logger
@@ -15,6 +18,7 @@ namespace SimTelemetry.Data.Logger
         private StreamWriter _mWrite;
         private byte[] Header = new byte[0]; // Header per annotation file.
         private DateTime AnnotationStart = DateTime.Now;
+        private ManualResetEvent AnnotationWaiter = new ManualResetEvent(false);
 
         private Timer _Worker;
         public bool Active { get; protected set; }
@@ -39,7 +43,11 @@ namespace SimTelemetry.Data.Logger
         {
             if (_mWrite != null)
             {
-                _mWrite.Close();
+                AnnotationWaiter.WaitOne();
+                lock (_mWrite)
+                {
+                    _mWrite.Close();
+                }
             }
 
             _mWrite = new StreamWriter(name);
@@ -49,6 +57,7 @@ namespace SimTelemetry.Data.Logger
 
             AnnotationStart = DateTime.Now;
             // Yay
+
 
         }
 
@@ -156,6 +165,7 @@ namespace SimTelemetry.Data.Logger
         {
             if (_mWrite != null)
             {
+                AnnotationWaiter.Reset();
                 lock (_mWrite)
                 {
 
@@ -169,6 +179,7 @@ namespace SimTelemetry.Data.Logger
                     ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)8), 2, 8, 0);            // Data length
 
                     // Write time sync packet.
+                    // TODO: NEed better syncing with game.
                     TimeSpan dt = DateTime.Now.Subtract(AnnotationStart);
                     double dt_ms = dt.TotalMilliseconds;
                     data = BitConverter.GetBytes(dt_ms);
@@ -198,6 +209,7 @@ namespace SimTelemetry.Data.Logger
                         }
                     }
                 }
+                AnnotationWaiter.Set();
             }
         }
     }

@@ -14,7 +14,7 @@ using Triton;
 
 namespace SimTelemetry.Data.Track
 {
-    public class TrackParser
+    public class TrackParser : ITrackParser
     {
         public List<Lap> TrackLogger = new List<Lap>(); // logger data with laptimes.
         

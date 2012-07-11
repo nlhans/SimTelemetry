@@ -7,8 +7,9 @@
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using System.Windows.Forms;
-    using SimTelemetry.Data;
+using System.Windows.Forms;
+using SimTelemetry.Data;
+using SimTelemetry.Objects;
     using SimTelemetry.Data.Track;
     using Triton;
     using Timer = System.Windows.Forms.Timer;

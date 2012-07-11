@@ -46,6 +46,7 @@
     <Compile Include="Device.cs" />
     <Compile Include="Devices.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="Game\Track\ApexCollection.cs" />
     <Compile Include="Game\DataConversions.cs" />
     <Compile Include="Game\DisplayConversion.cs" />
     <Compile Include="Game\IDriverGeneral.cs" />
@@ -53,9 +54,14 @@
     <Compile Include="Game\IDriverPlayer.cs" />
     <Compile Include="Game\ILap.cs" />
     <Compile Include="Game\ISession.cs" />
+    <Compile Include="Game\Track\Lap.cs" />
     <Compile Include="Game\LogOnChange.cs" />
     <Compile Include="Game\LogOnEvent.cs" />
     <Compile Include="Game\LogProperty.cs" />
+    <Compile Include="Game\Track\RouteCollection.cs" />
+    <Compile Include="Game\Track\SectionsCollection.cs" />
+    <Compile Include="Game\Track\TrackRoute.cs" />
+    <Compile Include="Game\Track\TrackWaypoint.cs" />
     <Compile Include="ITelemetry.cs" />
     <Compile Include="ISimulator.cs" />
     <Compile Include="Game\LevelIndicator.cs" />

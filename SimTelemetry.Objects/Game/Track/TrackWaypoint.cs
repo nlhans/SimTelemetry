@@ -1,4 +1,4 @@
-﻿namespace SimTelemetry.Data.Track
+﻿namespace SimTelemetry.Objects
 {
     public struct TrackWaypoint
     {

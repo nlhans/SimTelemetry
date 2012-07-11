@@ -21,7 +21,7 @@ namespace SimTelemetry.Data
         private static Telemetry _m = new Telemetry();
         public static Telemetry m { get { return _m; } }
 
-        public TrackParser Track { get; set; }
+        public ITrackParser Track { get; set; }
 
         public IDevices Peripherals;
 
@@ -34,11 +34,7 @@ namespace SimTelemetry.Data
         private Dictionary<string, Telemetry_SimState> State = new Dictionary<string, Telemetry_SimState>();
         private bool AppActive = true;
         private Thread StatePooler;
-
-#if DEBUG
-        private TelemetryLogWriter _logWriter = new TelemetryLogWriter();
-        private TelemetryLogReader _logReader;
-#endif
+        private TelemetryLogger Logger;
         #region Events
 
         public event Signal Sim_Start;
@@ -68,6 +64,7 @@ namespace SimTelemetry.Data
         public void Bootup(object no)
         {
             Sims = new Simulators();
+            Logger = new TelemetryLogger(this);
 
             StatePooler = new Thread(SimStatePooler);
             StatePooler.Start();
@@ -75,43 +72,14 @@ namespace SimTelemetry.Data
             TritonBase.PreExit += new AnonymousSignal(TritonBase_PreExit);
 
             this.Session_Start += new Signal(Telemetry_Session_Start);
-            this.Session_Stop += new Signal(Telemetry_Session_Stop);
 
-        }
-
-        void Telemetry_Session_Stop(object sender)
-        {
-            
-#if DEBUG
-            _logWriter.Stop();
-#endif
         }
 
         void Telemetry_Session_Start(object sender)
         {
             Track = new TrackParser(Sim.Session.GameDirectory, Sim.Session.GameData_TrackFile);
+            Thread.Sleep(500);
 
-            Thread.Sleep(1500);
-            
-#if DEBUG
-            _logWriter.Subscribe<ISession>("Session", Sim.Session);
-            _logWriter.Subscribe<IDriverPlayer>("Player", Sim.Player);
-            int i = 0;
-            foreach(IDriverGeneral driver in Sim.Drivers.AllDrivers)
-            {
-                _logWriter.Subscribe<IDriverGeneral>("Driver"+i, driver);
-                i++;
-                break;
-            }
-            bool read = true;
-            if (!read)
-                _logWriter.Start("test.txt");
-            else
-            {
-                _logReader = new TelemetryLogReader("test.txt");
-                //_logReader.Read();
-            }
-#endif
             if (Track_Load != null)
                 Track_Load(null);
         }

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SimTelemetry.Data.Track
+namespace SimTelemetry.Objects
 {
     public class ApexCollection
     {
         public Dictionary<double, string> Positions = new Dictionary<double, string>();
         public ApexCollection()
         {
+            // Test corners
             // Jackson ville
             /*
             Positions.Add(750, "Entry C1");

@@ -50,6 +50,7 @@
     <Compile Include="DataReader.cs" />
     <Compile Include="DataSample.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Logger\TelemetryLogger.cs" />
     <Compile Include="Logger\TelemetryLogPacket.cs" />
     <Compile Include="Logger\TelemetryLogReader.cs" />
     <Compile Include="Logger\TelemetryLogWriter.cs" />
@@ -67,13 +68,7 @@
     <Compile Include="TrackMap.Designer.cs">
       <DependentUpon>TrackMap.cs</DependentUpon>
     </Compile>
-    <Compile Include="Track\ApexCollection.cs" />
-    <Compile Include="Track\RouteCollection.cs" />
-    <Compile Include="Track\SectionsCollection.cs" />
     <Compile Include="Track\TrackParser.cs" />
-    <Compile Include="Track\Lap.cs" />
-    <Compile Include="Track\TrackRoute.cs" />
-    <Compile Include="Track\TrackWaypoint.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">

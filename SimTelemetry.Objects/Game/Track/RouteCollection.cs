@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimTelemetry.Data.Track
+namespace SimTelemetry.Objects
 {
     public class RouteCollection
     {
@@ -13,7 +13,7 @@ namespace SimTelemetry.Data.Track
 
         public double x_min = Double.MaxValue, x_max = double.MinValue, y_min = double.MaxValue, y_max = double.MinValue;
 
-        internal void Add(TrackWaypoint wp)
+        public void Add(TrackWaypoint wp)
         {
             x_min = Math.Min(wp.X, x_min);
             x_max = Math.Max(wp.X, x_max);
@@ -36,7 +36,7 @@ namespace SimTelemetry.Data.Track
 
         }
 
-        internal void Finalize()
+        public void Finalize()
         {
             Racetrack.Sort(delegate(TrackWaypoint wp1, TrackWaypoint wp2)
             {
