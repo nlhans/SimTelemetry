@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading;
 using SimTelemetry.Objects;
@@ -45,10 +46,16 @@ namespace SimTelemetry.Data.Logger
                         return 0;
                         break;
                     case 1:
-                        return _DataPointer *1000 / data.Length;
+                        if (data.Length > 0)
+                            return _DataPointer * 1000 / data.Length;
+                        else
+                            return 0;
                         break;
                     case 2:
-                        return _PacketPointer * 1000 / Packets.Count;
+                        if (Packets.Count > 0)
+                            return _PacketPointer * 1000 / Packets.Count;
+                        else
+                            return 1000;
                         break;
                     case 3:
                         return 1000;
@@ -66,7 +73,29 @@ namespace SimTelemetry.Data.Logger
                 throw new FileLoadException("File does not exist");
 
             _File = path_file;
-            data = File.ReadAllBytes(_File);
+            if (new FileInfo(path_file).Extension == ".gz")
+            {
+                // Uncompress it.
+
+                // Create the compressed file.
+                using (MemoryStream DatFile = new MemoryStream())
+                using (FileStream GzFile = File.OpenRead(path_file))
+                using (GZipStream Decompress = new GZipStream(GzFile, CompressionMode.Decompress))
+                {
+                    Decompress.CopyTo(DatFile);
+
+                    data = new byte[DatFile.Length];
+                    DatFile.Seek(0, SeekOrigin.Begin);
+                    DatFile.Read(data, 0, (int)DatFile.Length);
+                    // Done.
+                }
+
+            }
+            else
+            {
+                data = File.ReadAllBytes(_File);
+            }
+
         }
 
         public void Read()

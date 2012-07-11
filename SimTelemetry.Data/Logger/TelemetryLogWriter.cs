@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Timer = System.Timers.Timer;
 using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
 using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
@@ -15,6 +17,7 @@ namespace SimTelemetry.Data.Logger
         private Dictionary<string, TelemetryLoggerSubscribedInstance> Instances = new Dictionary<string, TelemetryLoggerSubscribedInstance>();
         private ushort InstanceID = 1;
         private string AnnotationFile = ""; // File to dump in.
+        private string AnnotationFileCompress = ""; // File to compress after annotation.
         private StreamWriter _mWrite;
         private byte[] Header = new byte[0]; // Header per annotation file.
         private DateTime AnnotationStart = DateTime.Now;
@@ -35,6 +38,30 @@ namespace SimTelemetry.Data.Logger
 
         }
 
+        private void Compress()
+        {
+            try
+            {
+                // Create the compressed file.
+                using (FileStream DatFile = File.OpenRead(AnnotationFileCompress))
+                using (FileStream GzFile = File.Create(AnnotationFileCompress.Replace(".dat", ".gz")))
+                using (GZipStream Compress = new GZipStream(GzFile, CompressionMode.Compress))
+                {
+                    // Compress this data:
+                    DatFile.CopyTo(Compress);
+
+                    // Done.
+                }
+
+                // Delete uncompressed
+                File.Delete(AnnotationFileCompress);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to compress file " + AnnotationFileCompress);
+            }
+        }
+
         /**
          * Start logging in a new file
          * If not yet started, start logging in this file.
@@ -43,11 +70,15 @@ namespace SimTelemetry.Data.Logger
         {
             if (_mWrite != null)
             {
+                AnnotationFileCompress = AnnotationFile;
                 AnnotationWaiter.WaitOne();
                 lock (_mWrite)
                 {
                     _mWrite.Close();
                 }
+
+                // Start compressing.
+                new Task(() => { Compress(); }).Start();
             }
 
             _mWrite = new StreamWriter(name);
@@ -56,6 +87,7 @@ namespace SimTelemetry.Data.Logger
             _mWrite.Flush();
 
             AnnotationStart = DateTime.Now;
+            AnnotationFile = name;
             // Yay
 
 
