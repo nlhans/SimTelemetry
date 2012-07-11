@@ -57,7 +57,7 @@ namespace SimTelemetry
             _PlotterConfiguration.Configure(cPlotter);
 
             this.GraphSplit.Panel2.Controls.Add(cPlotter);
-            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\test.txt");
+            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Jacksonville Superspeedway-TEST_DAY-2012-07-11-2\Lap 0.dat");
             _logReader.Read();
             while (_logReader.Progress == 0) ;
             while (_logReader.Progress != 1000) ;
@@ -119,15 +119,15 @@ namespace SimTelemetry
 
 
                     mySpeed = spd_filter.Add(spd);
-                    if (mySpeed > 320 / 3.6) mySpeed = 320 / 3.6;
-                    if (mySpeed < -320 / 3.6) mySpeed = -320 / 3.6;
-                    double acc = (mySpeed - lastSpeed) / (dt / 1000);
-                    myAcc = acc_filter.Add(acc);
-                    lastSpeed = mySpeed;
+                    if (mySpeed > 420 / 3.6) mySpeed = 420 / 3.6;
+                    if (mySpeed < -420 / 3.6) mySpeed = -420 / 3.6;
+                    double acc = ((double)sample.Data[3][47] - lastSpeed) / (dt / 1000);
+                    myAcc =  acc_filter.Add(acc);
+                    lastSpeed = (double)sample.Data[3][47];
                     if (myAcc > 2 * 9.81) myAcc = 2 * 9.81;
                     if (myAcc < -7 * 9.81) myAcc = -7 * 9.81;
                 }
-                lastX = x; lastY = y; lastZ = z; lastTime = sp.Key; lastSpeed = mySpeed;
+                lastX = x; lastY = y; lastZ = z; lastTime = sp.Key; lastSpeed = (double)sample.Data[3][47];
 
                 cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][48]);
                 cPlotter.Graphs[1].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][47] * 3.6);
