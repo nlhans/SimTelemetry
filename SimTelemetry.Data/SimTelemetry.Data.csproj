@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="Logger\TelemetryLogger.cs" />
-    <Compile Include="Logger\TelemetryLogPacket.cs" />
     <Compile Include="Logger\TelemetryLogReader.cs" />
     <Compile Include="Logger\TelemetryLogWriter.cs" />
     <Compile Include="Logger\TelemetryLoggerSubscribedInstance.cs" />

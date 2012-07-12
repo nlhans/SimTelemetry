@@ -1,4 +1,4 @@
-﻿namespace SimTelemetry.Data.Logger
+﻿namespace SimTelemetry.Objects
 {
     public enum TelemetryLogPacket
     {

@@ -68,6 +68,7 @@
     <Compile Include="Plotter\PlotterConfigurations.cs" />
     <Compile Include="Plotter\PlotterCurves.cs" />
     <Compile Include="Plotter\PlotterGraph.cs" />
+    <Compile Include="Plotter\PlotterPalette.cs" />
     <Compile Include="Plotter\PlotterYAxis.cs" />
     <Compile Include="TelemetryViewer.cs">
       <SubType>Form</SubType>
@@ -77,6 +78,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ucCoordinateMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ucCoordinateMap.Designer.cs">
+      <DependentUpon>ucCoordinateMap.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="DataChannels.resx">
       <DependentUpon>DataChannels.cs</DependentUpon>
     </EmbeddedResource>

@@ -44,6 +44,9 @@
     <Compile Include="ByteMethods.cs" />
     <Compile Include="Conversions.cs" />
     <Compile Include="ITrackParser.cs" />
+    <Compile Include="Logger\TelemetryLogPacket.cs" />
+    <Compile Include="Logger\TelemetryPacket.cs" />
+    <Compile Include="Logger\TelemetrySample.cs" />
     <Compile Include="Peripherals\Device.cs" />
     <Compile Include="Peripherals\Devices.cs" />
     <Compile Include="Exceptions.cs" />

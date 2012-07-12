@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using SimTelemetry.Controls;
 using SimTelemetry.Data.Logger;
+using SimTelemetry.Objects;
 using Triton;
 
 namespace SimTelemetry
@@ -15,9 +16,11 @@ namespace SimTelemetry
     public partial class TelemetryViewer : Form
     {
 
+        private TelemetryLogReader _logReader;
+
         private DataChannels Channels;
         private Plotter cPlotter;
-        private TrackMap cTrackMap;
+        private ucCoordinateMap cTrackMap;
 
         /**** TIMELINE ****/
         private double _timeScaleFactor = 1; // % of the lap displayed. 1% - 100%
@@ -32,16 +35,36 @@ namespace SimTelemetry
 
 
 
-        private TelemetryLogReader _logReader;
+        public double[] TimeLine
+        {
+            get
+            {
+                return new double[2] { _timeScaleOffset * (_timeLineEnd - _timeLineStart), (_timeScaleOffset + _timeScaleFactor) * +(_timeLineEnd - _timeLineStart) };
+            }
+        }
+        public Dictionary<double, TelemetrySample> Data
+        {
+            get
+            {
+                return _logReader.Samples;
+            }
+        }
+
+        public double[] TimeCursor
+        {
+            get { return new double[2] {0, cPlotter.TimeCursor }; }
+        }
 
         public TelemetryViewer()
         {
             DataChannels c = new DataChannels();
-            //c.ShowDialog();
+            c.ShowDialog();
             InitializeComponent();
 
             // Trackmap
-            //cTrackMap = new TrackMap();
+            cTrackMap = new ucCoordinateMap(this);
+            cTrackMap.Dock = DockStyle.Fill;
+            this.GraphSplit.Panel1.Controls.Add(cTrackMap);
 
 
 
@@ -57,7 +80,7 @@ namespace SimTelemetry
             _PlotterConfiguration.Configure(cPlotter);
 
             this.GraphSplit.Panel2.Controls.Add(cPlotter);
-            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Jacksonville Superspeedway-TEST_DAY-2012-07-11-5\Lap 26.gz");
+            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Silverstone-TEST_DAY-2012-07-11-3\Lap 0.dat");
             _logReader.Read();
             while (_logReader.Progress == 0) ;
             while (_logReader.Progress != 1000) ;
@@ -129,6 +152,7 @@ namespace SimTelemetry
         void cPlotter_Drawn()
         {
 
+            cTrackMap.Invalidate();
         }
         private void DrawPlotbounds()
         {
