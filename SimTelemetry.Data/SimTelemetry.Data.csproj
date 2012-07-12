@@ -55,7 +55,6 @@
     <Compile Include="Logger\TelemetryLogReader.cs" />
     <Compile Include="Logger\TelemetryLogWriter.cs" />
     <Compile Include="Logger\TelemetryLoggerSubscribedInstance.cs" />
-    <Compile Include="Logger\TelemetryPacketParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampledDriverGeneral.cs" />
     <Compile Include="SampledDriverPlayer.cs" />

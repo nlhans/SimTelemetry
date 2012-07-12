@@ -76,8 +76,6 @@ namespace SimTelemetry.Data.Logger
             if (new FileInfo(path_file).Extension == ".gz")
             {
                 // Uncompress it.
-
-                // Create the compressed file.
                 using (MemoryStream DatFile = new MemoryStream())
                 using (FileStream GzFile = File.OpenRead(path_file))
                 using (GZipStream Decompress = new GZipStream(GzFile, CompressionMode.Decompress))

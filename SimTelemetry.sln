@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Data", "SimTel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Objects", "SimTelemetry.Objects\SimTelemetry.Objects.csproj", "{9292F888-9ED7-42D3-A673-9D70D565FA4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Game.Rfactor", "SimTelemetry.Game.Rfactor\SimTelemetry.Game.Rfactor.csproj", "{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Game.rFactor", "SimTelemetry.Game.Rfactor\SimTelemetry.Game.rFactor.csproj", "{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveTelemetry", "LiveTelemetry\LiveTelemetry.csproj", "{8A946732-F275-449E-92D3-53FBDA69865E}"
 EndProject

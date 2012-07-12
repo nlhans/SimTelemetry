@@ -84,9 +84,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimTelemetry.Game.Rfactor\SimTelemetry.Game.Rfactor.csproj">
+    <ProjectReference Include="..\SimTelemetry.Game.Rfactor\SimTelemetry.Game.rFactor.csproj">
       <Project>{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}</Project>
-      <Name>SimTelemetry.Game.Rfactor</Name>
+      <Name>SimTelemetry.Game.rFactor</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
