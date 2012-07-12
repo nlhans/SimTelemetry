@@ -36,8 +36,6 @@ namespace LiveTelemetry
         private ucSessionInfo SessionData;
         private ucFuel FuelData;
 
-        private DataLogging DataLogger;
-
         private Joystick Joy;
 
 
@@ -179,8 +177,6 @@ namespace LiveTelemetry
             BackColor = Color.Black;
             InitializeComponent();
 
-            DataLogger = new DataLogging();
-
             ucLaps = new Gauge_Laps();
             ucSplits = new Gauge_Splits();
             ucA1GP = new Gauge_A1GP(Joy);
@@ -281,6 +277,7 @@ namespace LiveTelemetry
                 this.Padding = new System.Windows.Forms.Padding(35);
 
                 int columns = (int)Math.Ceiling(Math.Sqrt(Telemetry.m.Sims.Sims.Count));
+                if (columns == 0) columns = 1;
                 if (Telemetry.m.Sims.Sims.Count % columns == 1)
                     columns++;
                 if (this.Width > 233)

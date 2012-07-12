@@ -632,7 +632,7 @@ namespace SimTelemetry.Game.GTR2
             set { throw new NotImplementedException(); }
         }
 
-        public PowerTrain_DrivenWheels Powertrain_DrivenWheels
+        public PowerTrainDrivenWheels Powertrain_DrivenWheels
         {
             get { return 0; throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }

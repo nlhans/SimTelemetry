@@ -54,7 +54,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataLogging.cs" />
     <Compile Include="Gauge_A1GP.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -143,6 +142,18 @@
     <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">
       <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
       <Name>SimTelemetry.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Game.GTR2\SimTelemetry.Game.GTR2.csproj">
+      <Project>{705CD38F-897F-4AE3-8461-739A84657D23}</Project>
+      <Name>SimTelemetry.Game.GTR2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Game.rFactor2\SimTelemetry.Game.rFactor2.csproj">
+      <Project>{BE808CB9-AF50-43A3-83D0-D719E52957B8}</Project>
+      <Name>SimTelemetry.Game.rFactor2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Game.Rfactor\SimTelemetry.Game.rFactor.csproj">
+      <Project>{07B7CC09-D45E-44E9-91A8-5F7A4085B96F}</Project>
+      <Name>SimTelemetry.Game.rFactor</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>

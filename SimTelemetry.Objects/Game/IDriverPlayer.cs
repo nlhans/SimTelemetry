@@ -315,7 +315,7 @@
         double Engine_Torque { set; get; }
 
         [Loggable(0.01)]
-        PowerTrain_DrivenWheels Powertrain_DrivenWheels { set; get; }
+        PowerTrainDrivenWheels Powertrain_DrivenWheels { set; get; }
 
         [Loggable(0.01)]
         double Powertrain_DriverDistribution { set; get; }

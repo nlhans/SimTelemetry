@@ -43,9 +43,14 @@
   <ItemGroup>
     <Compile Include="ByteMethods.cs" />
     <Compile Include="Conversions.cs" />
-    <Compile Include="Device.cs" />
-    <Compile Include="Devices.cs" />
+    <Compile Include="ITrackParser.cs" />
+    <Compile Include="Peripherals\Device.cs" />
+    <Compile Include="Peripherals\Devices.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="Game\PowerTrainDrivenWheels.cs" />
+    <Compile Include="Peripherals\DashboardPackages.cs" />
+    <Compile Include="Peripherals\DashboardPacket.cs" />
+    <Compile Include="SimulatorModules.cs" />
     <Compile Include="Track\ApexCollection.cs" />
     <Compile Include="Logger\DataConversions.cs" />
     <Compile Include="Logger\DisplayConversion.cs" />

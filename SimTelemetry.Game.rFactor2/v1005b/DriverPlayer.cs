@@ -630,7 +630,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
             set { throw new NotImplementedException(); }
         }
 
-        public PowerTrain_DrivenWheels Powertrain_DrivenWheels
+        public PowerTrainDrivenWheels Powertrain_DrivenWheels
         {
             get { return 0; }
             set { throw new NotImplementedException(); }

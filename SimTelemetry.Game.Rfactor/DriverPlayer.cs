@@ -367,7 +367,7 @@ namespace SimTelemetry.Game.Rfactor
 
         // Driving wheels
         [Loggable(0.01)]
-        public PowerTrain_DrivenWheels Powertrain_DrivenWheels { set { } get { return (PowerTrain_DrivenWheels)rFactor.Game.ReadByte(new IntPtr(0x00ADC10C)); } }
+        public PowerTrainDrivenWheels Powertrain_DrivenWheels { set { } get { return (PowerTrainDrivenWheels)rFactor.Game.ReadByte(new IntPtr(0x00ADC10C)); } }
         [Loggable(0.01)]
         public double Powertrain_DriverDistribution { set { } get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC130)); } }
 
