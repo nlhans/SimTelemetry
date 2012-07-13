@@ -44,6 +44,9 @@
     <Reference Include="Triton">
       <HintPath>..\..\..\Projects\Triton\Triton\bin\Debug\Triton.dll</HintPath>
     </Reference>
+    <Reference Include="Triton.Database">
+      <HintPath>..\..\..\Projects\Triton\Triton.Database\bin\Debug\Triton.Database.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />

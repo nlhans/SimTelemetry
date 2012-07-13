@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.OleDb;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Triton.Controls;
 using Triton.Database;
@@ -18,34 +9,22 @@ namespace SimTelemetry
 {
     public partial class FileManager : Form
     {
-        private Timer _tStatus = new Timer { Interval = 10 };
-
         #region Laptimes
 
         private VisualListDetails _vldLaptimes;
         private Timer _tList = new Timer { Interval = 20 };
+        public string Datafile { set; get; }
+        public bool DatafileNew { get; set; }
         #endregion
-        #region Clean up
-        private Timer _tCleanup = new Timer { Interval = 120000 };
-        private bool _bCleanup = false;
-
-        private int _iDirs = 0;
-        private int _iDirsDone = 0;
-
-        #endregion
-
-        private IDbConnection GetConnection()
-        {
-            OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data source=Laptimes.accdb");
-            return con;
-        }
-
-        public FileManager()
+        public FileManager(string CurrentFile)
         {
             InitializeComponent();
 
-            DatabaseOleDbConnectionPool.MaxConnections = 4;
-            DatabaseOleDbConnectionPool.Boot(GetConnection);
+            if (CurrentFile == "")
+                this.lbCurrent.Text = "Current file: none";
+            else
+                this.lbCurrent.Text = "Current file: " + CurrentFile;
+
 
             _vldLaptimes = new VisualListDetails(true);
             _vldLaptimes.Columns.Add("id", "#", 30);
@@ -55,27 +34,53 @@ namespace SimTelemetry
             _vldLaptimes.Columns.Add("s1", "S1",80);
             _vldLaptimes.Columns.Add("s2", "S2",80);
             _vldLaptimes.Columns.Add("s3", "S3",80);
-            _vldLaptimes.Columns.Add("laptime", "Laptime",100);
-            _vldLaptimes.Columns.Add("date", "Driven at",130);
-            Controls.Add(_vldLaptimes);
+            _vldLaptimes.Columns.Add("laptime", "Laptime", 100);
+            _vldLaptimes.Columns.Add("date", "Driven at", 130);
+            _vldLaptimes.Columns.Add("file", "File", 20);
+            _vldLaptimes.ItemActivate += new EventHandler(_vldLaptimes_ItemActivate);
+            split.Panel2.Controls.Add(_vldLaptimes);
 
-            _tCleanup.Tick += new EventHandler(_tCleanup_Tick);
-            _tStatus.Tick += new EventHandler(_tStatus_Tick);
             _tList.Tick += new EventHandler(_tList_Tick);
-            _tStatus.Start();
-            _tCleanup.Start();
             _tList.Start();
-            ThreadPool.QueueUserWorkItem(new WaitCallback((n) => _tCleanup_Tick(null, new EventArgs())));
+        }
+
+        void _vldLaptimes_ItemActivate(object sender, EventArgs e)
+        {
+            Datafile = _vldLaptimes.SelectedItems[0].SubItems[9].Text;
+            DatafileNew = true;
+            this.Close();
+        }
+
+        private void btOK_Click(object sender, EventArgs e)
+        {
+            if(_vldLaptimes.SelectedItems.Count == 0)
+            {
+                btCancel_Click(sender, e);
+                return;
+            }
+            else{
+            Datafile = _vldLaptimes.SelectedItems[0].SubItems[9].Text;
+            DatafileNew = true;
+            this.Close();
+            }
+        }
+
+        private void btCancel_Click(object sender, EventArgs e)
+        {
+            DatafileNew = false;
+            this.Close();
         }
 
         private string FormatTime(double time)
         {
+            if (time <= 0)
+                return "-";
             if(time < 60)
             {
-                double ms = time%1.0;
-                double s = time - ms;
+                double s = Math.Floor(time);
+                double ms = time -s;
 
-                return String.Format("{0:00}.{1:000}", s, ms);
+                return String.Format("00:{0:00}.{1:000}", s, ms*1000);
             }
             else
             {
@@ -83,7 +88,7 @@ namespace SimTelemetry
                 double s = Math.Floor(time - min*60);
                 double ms = time%1.0;
 
-                return String.Format("{2:00}:{0:00}.{1:000}", s, ms,min);
+                return String.Format("{2:00}:{0:00}.{1:000}", s, ms*1000,min);
             }
             return time.ToString();
         }
@@ -111,14 +116,15 @@ namespace SimTelemetry
                     if (!exists)
                     {
 
-                        _vldLaptimes.Items.Add(new ListViewItem(new string[9] {id.ToString(), rLaps.GetString(2),
+                        _vldLaptimes.Items.Add(new ListViewItem(new string[10] {id.ToString(), rLaps.GetString(2),
                                                                 rLaps.GetString(4), 
                                                                 rLaps.GetInt32(10).ToString(),
                                                                 FormatTime(rLaps.GetDouble(6)),
                                                                 FormatTime(rLaps.GetDouble(7)),
                                                                 FormatTime(rLaps.GetDouble(8)),
                                                                 FormatTime(rLaps.GetDouble(5)),
-                                                                rLaps.GetDateTime(9).ToShortDateString() + " " + rLaps.GetDateTime(9).ToShortTimeString()
+                                                                rLaps.GetDateTime(9).ToShortDateString() + " " + rLaps.GetDateTime(9).ToShortTimeString(),
+                                                                rLaps.GetString(11)
                     }
                     ))
                         ;
@@ -128,89 +134,6 @@ namespace SimTelemetry
             }
 
             DatabaseOleDbConnectionPool.Freeup();
-        }
-
-        void _tStatus_Tick(object sender, EventArgs e)
-        {
-            if (_bCleanup)
-            {
-                if (_iDirs > 0 && _iDirs > _iDirsDone)
-                    statusProgress.Value = _iDirsDone * 1000 / _iDirs;
-                else
-                    statusProgress.Value = 0;
-                txtStatus.Text = "Cleaning up logs..";
-                statusProgress.Size = new Size(300, 10);
-            }
-            else
-            {
-                statusProgress.Value = 0;
-                statusProgress.Size = new Size(1,10);
-                txtStatus.Text = "Idle";
-            }
-        }
-
-        void _tCleanup_Tick(object sender, EventArgs e)
-        {
-            _bCleanup = true;
-
-            Task t = new Task(() =>
-            {
-                System.Threading.Thread.Sleep(500);
-                string[] sims = Directory.GetDirectories("Logs/");
-                _iDirs = 0;
-                _iDirsDone = 0;
-                foreach (string sim in sims)
-                {
-                    _iDirs += Directory.GetDirectories(sim + "/").Length;
-                }
-                // remove empty directories
-                foreach (string sim in sims)
-                {
-                    foreach (string directory in Directory.GetDirectories(sim + "/"))
-                    {
-                        string[] files = Directory.GetFiles(directory + "/");
-                        if (files.Length == 0)
-                            Directory.Delete(directory + "/");
-
-                        if (files.Length <= 2)
-                        {
-                            bool mark_deletion = true;
-                            foreach (string file in files)
-                            {
-                                if (file.EndsWith(".gz"))
-                                {
-                                    mark_deletion = false;
-                                    break;
-                                }
-
-                                DateTime created =
-                                    new FileInfo(file).CreationTime;
-                                if (file.EndsWith(".dat") &&
-                                    DateTime.Now.Subtract(created).TotalHours > 2)
-                                {
-                                    mark_deletion = true;
-                                }
-
-
-                            }
-                            if (mark_deletion)
-                            {
-                                foreach (string file in files)
-                                    File.Delete(file);
-
-                                Directory.Delete(directory);
-                            }
-                        }
-
-                        _iDirsDone++;
-                        System.Threading.Thread.Sleep(25);
-                    }
-                    //TODO: Compress all files
-
-                }
-                _bCleanup = false;
-            });
-            t.Start();
         }
     }
 }

@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using SimTelemetry.Controls;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
 using Triton;
@@ -33,6 +28,9 @@ namespace SimTelemetry
 
         private PlotterConfigurations _PlotterConfiguration;
 
+        /**** TELEMETRY ****/
+        protected string TelemetryFile { get; set; }
+        private Timer _mTelemetryLoading = new Timer {Interval = 10};
 
 
         public double[] TimeLine
@@ -42,11 +40,14 @@ namespace SimTelemetry
                 return new double[2] { _timeScaleOffset * (_timeLineEnd - _timeLineStart), (_timeScaleOffset + _timeScaleFactor) * +(_timeLineEnd - _timeLineStart) };
             }
         }
-        public Dictionary<double, TelemetrySample> Data
+        public TelemetryLogReader Data
         {
             get
             {
-                return _logReader.Samples;
+                if (_logReader == null)
+                    return null;
+                else
+                return _logReader;
             }
         }
 
@@ -54,6 +55,8 @@ namespace SimTelemetry
         {
             get { return new double[2] {0, cPlotter.TimeCursor }; }
         }
+
+
 
         public TelemetryViewer()
         {
@@ -66,8 +69,6 @@ namespace SimTelemetry
             cTrackMap.Dock = DockStyle.Fill;
             this.GraphSplit.Panel1.Controls.Add(cTrackMap);
 
-
-
             // Plotter
             cPlotter = new Plotter { Dock = DockStyle.Fill };
             cPlotter.Drawn += cPlotter_Drawn;
@@ -76,16 +77,50 @@ namespace SimTelemetry
 
             // Plotter configuration
             _PlotterConfiguration = new PlotterConfigurations();
-            _PlotterConfiguration.Load("ChartSetup.txt");
+            _PlotterConfiguration.Load("ChartSetup.txt"); // TODO: Make this independant.
             _PlotterConfiguration.Configure(cPlotter);
 
             this.GraphSplit.Panel2.Controls.Add(cPlotter);
-            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Silverstone-TEST_DAY-2012-07-13-33\Lap 8.gz");
-            _logReader.Read();
-            while (_logReader.Progress == 0) ;
-            while (_logReader.Progress != 1000) ;
+
+            // Loading.
+            _mTelemetryLoading.Tick += new EventHandler(_mTelemetryLoading_Tick);
+            _mTelemetryLoading.Start();
+        }
+
+        void _mTelemetryLoading_Tick(object sender, EventArgs e)
+        {
+            if(_logReader != null && _logReader.Progress != 1000)
+            {
+                this.lbLoading.Visible = true;
+                this.lbLoadingbar.Visible = true;
+
+                this.lbLoadingbar.Value = Limits.Clamp((int)_logReader.Progress, 0, 1000);
+                this.btOpen.Enabled = false;
+            }
+            else
+            {
+                this.lbLoading.Visible = false;
+                this.lbLoadingbar.Visible = false;
+                this.btOpen.Enabled = true;
+            }
+        }
+
+
+        /**** PLOTTER FUNCTIONS ****/ 
+        void GraphFill()
+        {
+
 
             double timeMin = 100000, timeMax = 0;
+            if(_logReader != null)
+            {
+                foreach(PlotterGraph graph in cPlotter.Graphs)
+                {
+                    foreach(PlotterCurves curve in graph.Curves)
+                    {
+                        curve.Data.Clear();
+                    }
+                }
             lock (_logReader.Samples)
             {
                 foreach (KeyValuePair<double, TelemetrySample> sp in _logReader.Samples)
@@ -101,11 +136,13 @@ namespace SimTelemetry
 
                 }
             }
+            }
             _timeLineStart = timeMin;
             _timeLineEnd = timeMax;
 
             DrawPlotbounds();
         }
+
         void cPlotter_TimelineScroll(object sender, ScrollEventArgs e)
         {
             if (_timeLineIgnoreEvents == false)
@@ -151,7 +188,6 @@ namespace SimTelemetry
 
         void cPlotter_Drawn()
         {
-
             cTrackMap.Invalidate();
         }
         private void DrawPlotbounds()
@@ -190,7 +226,38 @@ namespace SimTelemetry
 
             cPlotter.AutoScale();
             cPlotter.Draw();
-           //cTrackMap.Draw();
+        }
+
+        private void btOpen_Click(object sender, EventArgs e)
+        {
+            FileManager fileman = new FileManager(TelemetryFile);
+            fileman.ShowDialog();
+
+            if(fileman.DatafileNew)
+            {
+                OpenFile(fileman.Datafile);
+            }
+        }
+
+        private void OpenFile(string datafile)
+        {
+            Task t = new Task(() =>
+                                  {
+                                      try
+                                      {
+                                          _logReader = new TelemetryLogReader(datafile);
+                                          _logReader.Read();
+                                          while (_logReader.Progress == 0) ;
+                                          while (_logReader.Progress != 1000) ;
+                                          TelemetryFile = datafile;
+                                          GraphFill();
+                                          DrawPlotbounds();
+                                      }catch(Exception ex)
+                                      {
+                                          _logReader = null;
+                                      }
+                                  });
+            t.Start();
         }
     }
 }

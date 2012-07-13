@@ -26,11 +26,15 @@ namespace SimTelemetry
         }
 
         protected override void OnPaint(PaintEventArgs e)
-        {
+         {
             AutoPosition = false;// let us do that!
             AccurateTrackWidth = true;
 
-
+            if (_mMaster.Data == null)
+            {
+                e.Graphics.FillRectangle(Brushes.Black, e.ClipRectangle);
+                return;
+            }
             pos_x_max = -100000;
             pos_x_min = 100000;
             pos_y_max = -100000;
@@ -40,30 +44,33 @@ namespace SimTelemetry
             try
             {
                 // Search for buonds
-                lock (_mMaster.Data)
+                if (_mMaster.Data != null)
                 {
-                    foreach (KeyValuePair<double, TelemetrySample> s in _mMaster.Data)
+                    lock (_mMaster.Data)
                     {
-                        if (_mMaster.TimeLine[1] >= s.Key / 1000.0 && s.Key / 1000.0 >= _mMaster.TimeLine[0])
+                        foreach (KeyValuePair<double, TelemetrySample> s in _mMaster.Data.Samples)
                         {
-                            pos_x_max = Math.Max(s.Value["Drivers.Coordinate_Z"], pos_x_max);
-                            pos_x_min = Math.Min(s.Value["Drivers.Coordinate_Z"], pos_x_min);
+                            if (_mMaster.TimeLine[1] >= s.Key/1000.0 && s.Key/1000.0 >= _mMaster.TimeLine[0])
+                            {
+                                pos_x_max = Math.Max(s.Value["Drivers.Coordinate_Z"], pos_x_max);
+                                pos_x_min = Math.Min(s.Value["Drivers.Coordinate_Z"], pos_x_min);
 
-                            pos_y_max = Math.Max(s.Value["Drivers.Coordinate_X"], pos_y_max);
-                            pos_y_min = Math.Min(s.Value["Drivers.Coordinate_X"], pos_y_min);
+                                pos_y_max = Math.Max(s.Value["Drivers.Coordinate_X"], pos_y_max);
+                                pos_y_min = Math.Min(s.Value["Drivers.Coordinate_X"], pos_y_min);
+                            }
                         }
+
+                        //:???
+                        double x_d = pos_x_max - pos_x_min;
+                        double y_d = pos_y_max - pos_y_min;
+                        double d = Math.Max(y_d, x_d);
+
+                        pos_x_min -= (x_d - d)/2;
+                        pos_x_min += (x_d - d)/2;
+
+                        pos_y_min -= (x_d - d)/2;
+                        pos_y_min += (x_d - d)/2;
                     }
-
-                    //:???
-                    double x_d = pos_x_max - pos_x_min;
-                    double y_d = pos_y_max - pos_y_min;
-                    double d = Math.Max(y_d, x_d);
-
-                    pos_x_min -= (x_d - d) / 2;
-                    pos_x_min += (x_d - d) / 2;
-
-                    pos_y_min -= (x_d - d) / 2;
-                    pos_y_min += (x_d - d) / 2;
                 }
             }
             catch (Exception ex)
@@ -102,54 +109,59 @@ namespace SimTelemetry
                 int i = 0;
                 double TimeOffset = double.NegativeInfinity;
 
-                foreach (KeyValuePair<double, TelemetrySample> s in _mMaster.Data)
+                if (_mMaster.Data != null)
                 {
-                    if (TimeOffset == double.NegativeInfinity)
-                        TimeOffset = s.Key / 1000.0;
-                    if (_mMaster.TimeLine[1] >= s.Key / 1000.0 && s.Key / 1000.0 >= _mMaster.TimeLine[0])
+                    lock (_mMaster.Data.Samples)
                     {
-                        double dt = _mMaster.TimeCursor[1] - (s.Key / 1000.0 - TimeOffset);
 
-                        if (Math.Abs(dt) < Leastdt)
+                        foreach (KeyValuePair<double, TelemetrySample> s in _mMaster.Data.Samples)
                         {
-                            Leastdt = Math.Abs(dt);
-                            LeastTime = s.Key;
+                            if (TimeOffset == double.NegativeInfinity)
+                                TimeOffset = s.Key / 1000.0;
+                            if (_mMaster.TimeLine[1] >= s.Key / 1000.0 && s.Key / 1000.0 >= _mMaster.TimeLine[0])
+                            {
+                                double dt = _mMaster.TimeCursor[1] - (s.Key / 1000.0 - TimeOffset);
 
+                                if (Math.Abs(dt) < Leastdt)
+                                {
+                                    Leastdt = Math.Abs(dt);
+                                    LeastTime = s.Key;
+
+                                }
+
+                                double x = 10 + ((s.Value["Drivers.Coordinate_Z"] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
+                                double y = 100 + (1 - (s.Value["Drivers.Coordinate_X"] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+
+                                if (px == 0 || Math.Abs(x - px) > 4 || Math.Abs(y - py) > 4)
+                                {
+                                    if (px != 0 && py != 0)
+                                    {
+                                        g.DrawLine(new Pen(Color.FromArgb(Convert.ToInt32(s.Value["Drivers.Pedals_Brake"] * 255), Convert.ToInt32(s.Value["Drivers.Pedals_Throttle"] * 255), 0), 3f), x, y, px, py);
+                                    }
+
+                                    px = x;
+                                    py = y;
+                                }
+                            }
+                            i++;
                         }
 
-                        double x = 10 + ((s.Value["Drivers.Coordinate_Z"] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                        double y = 100 + (1 - (s.Value["Drivers.Coordinate_X"] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
-
-                        if (px == 0 || Math.Abs(x - px) > 4 || Math.Abs(y - py) > 4)
+                        if (_mMaster.TimeCursor[1] > 0 && Math.Abs(Leastdt) < 2000)
                         {
-                            if (px != 0 && py != 0)
-                            {
-                                g.DrawLine(new Pen(Color.FromArgb(Convert.ToInt32(s.Value["Drivers.Pedals_Brake"] * 255), Convert.ToInt32(s.Value["Drivers.Pedals_Throttle"] * 255), 0), 3f), x, y, px, py);
-                            }
+                            TelemetrySample cursor = _mMaster.Data.Samples[LeastTime];
 
-                            px = x;
-                            py = y;
+                            double x = 10 + ((cursor["Drivers.Coordinate_Z"] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
+                            double y = 100 + (1 - (cursor["Drivers.Coordinate_X"] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+                            g.FillEllipse(new SolidBrush(Color.Yellow), x - 3, y - 3, 6, 6);
+
                         }
                     }
-                    i++;
-                }
-
-                if (_mMaster.TimeCursor[1] > 0 && Math.Abs(Leastdt) < 2000)
-                {
-                    TelemetrySample cursor = _mMaster.Data[LeastTime];
-
-                    double x = 10 + ((cursor["Drivers.Coordinate_Z"] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                    double y = 100 + (1 - (cursor["Drivers.Coordinate_X"] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
-                    g.FillEllipse(new SolidBrush(Color.Yellow), x - 3, y - 3, 6, 6);
-
                 }
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
-                MessageBox.Show(ex.StackTrace);
             }
-        }
+         }
     }
 }

@@ -131,6 +131,9 @@ namespace SimTelemetry.Controls
                 float x = Convert.ToSingle(10 + ((wp.X - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
                 float y = Convert.ToSingle(100 + (1 - (wp.Z - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
 
+                // This is for your own safety :)
+                x = Limits.Clamp(x, -100000, 100000);
+                y = Limits.Clamp(y, -100000, 100000);
 
                 PointF p = new PointF(x, y);
                 Brush b = brush_sector1;
@@ -147,9 +150,13 @@ namespace SimTelemetry.Controls
                         break;
                 }
 
+                float trackwidth = 2.0f;
+                Pen pennetje = new Pen(b, trackwidth);
+
                 if (pv.X != float.MinValue)
                 {
                     g.FillEllipse(b, p.X, p.Y, pitlane_width, pitlane_width);
+                    //g.DrawLine(pennetje, p, pv);
 
                 }
                 else fpv = p;
@@ -171,6 +178,10 @@ namespace SimTelemetry.Controls
             {
                 float x = Convert.ToSingle(10 + ((wp.X - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
                 float y = Convert.ToSingle(100 + (1 - (wp.Z - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
+
+                // This is for your own safety :)
+                x = Limits.Clamp(x, -100000, 100000);
+                y = Limits.Clamp(y, -100000, 100000);
 
                 PointF p = new PointF(x, y);
                 Brush b = brush_sector1;

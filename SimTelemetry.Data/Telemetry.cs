@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
 using System.Diagnostics;
 using System.Threading;
 using SimTelemetry.Data.Logger;
@@ -7,6 +9,7 @@ using SimTelemetry.Data.Track;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Peripherals;
 using Triton;
+using Triton.Database;
 
 namespace SimTelemetry.Data
 {
@@ -50,6 +53,20 @@ namespace SimTelemetry.Data
         public event Signal Track_Load;
 
         #endregion
+        private IDbConnection GetConnection()
+        {
+            OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data source=Laptimes.accdb");
+            return con;
+        }
+
+        public Telemetry()
+        {
+            // We always need database connection.
+
+            DatabaseOleDbConnectionPool.MaxConnections = 4;
+            DatabaseOleDbConnectionPool.Boot(GetConnection);
+
+        }
 
         void TritonBase_PreExit()
         {

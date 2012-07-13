@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Triton.Database;
 using Timer = System.Timers.Timer;
 using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
 using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
@@ -55,6 +57,19 @@ namespace SimTelemetry.Data.Logger
 
                 // Delete uncompressed
                 File.Delete(AnnotationFileCompress);
+
+                // Get the PREVIOUS last lap:
+                List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
+                ILap LastLap = AllLaps[AllLaps.Count -1];
+
+                // Insert into log
+                OleDbConnection con = DatabaseOleDbConnectionPool.GetOleDbConnection();
+                using(OleDbCommand newTime = new OleDbCommand("INSERT INTO laptimes (simulator,circuit,series,car,laptime,s1,s2,s3,driven,lapno,filepath) " +
+                    "VALUES ('"+Telemetry.m.Sim.ProcessName+"','"+Telemetry.m.Track.Name+"','"+Telemetry.m.Sim.Drivers.Player.CarModel+"','"+Telemetry.m.Sim.Drivers.Player.CarClass+"',"+LastLap.LapTime+","+LastLap.Sector1+","+LastLap.Sector2+","+LastLap.Sector3+",NOW(), "+(Telemetry.m.Sim.Drivers.Player.Laps-1).ToString()+",'"+AnnotationFileCompress.Replace(".dat",".gz")+"')",con))
+                {
+                    newTime.ExecuteNonQuery();
+                }
+                DatabaseOleDbConnectionPool.Freeup();
             }
             catch (Exception ex)
             {
