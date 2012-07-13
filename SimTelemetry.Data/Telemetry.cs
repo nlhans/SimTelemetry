@@ -28,8 +28,12 @@ namespace SimTelemetry.Data
         public Simulators Sims;
 
         public ISimulator Sim { get { return Sims.GetRunning(); } }
-        public bool Active_Sim { get { return Sims.Available; } }
-        public bool Active_Session { get { return Active_Sim && Sim.Session.Active; } }
+        public bool Active_Sim { get { if (Sims == null) return false;
+            else
+            return Sims.Available; } }
+        public bool Active_Session { get {  if (Sims == null) return false;
+            else
+            return Active_Sim && Sim.Session.Active; } }
 
         private Dictionary<string, Telemetry_SimState> State = new Dictionary<string, Telemetry_SimState>();
         private bool AppActive = true;
@@ -46,15 +50,6 @@ namespace SimTelemetry.Data
         public event Signal Track_Load;
 
         #endregion
-
-        public Telemetry()
-        {
-            if(m != null)
-                throw new Exception("Already initialized");
-
-            Peripherals = new Devices();
-            ThreadPool.QueueUserWorkItem(new WaitCallback(Bootup));
-        }
 
         void TritonBase_PreExit()
         {
@@ -164,6 +159,22 @@ namespace SimTelemetry.Data
             Debug.WriteLine("SessionStop fired");
             if (Session_Stop != null)
                 Session_Stop(me);
+        }
+
+        public void LoadTrack(string gamedir, string track)
+        {
+            Track = new TrackParser(gamedir, track);
+        }
+
+        public void UnloadTrack()
+        {
+            Track = null;
+        }
+
+        public void Run()
+        {
+            Peripherals = new Devices();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(Bootup));
         }
     }
 }

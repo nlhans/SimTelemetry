@@ -101,7 +101,7 @@ namespace LiveTelemetry
             SimTelem.ShowDialog();
             //Application.Exit();
            // return;
-
+            SimTelemetry.Data.Telemetry.m.Run();
             while (SimTelemetry.Data.Telemetry.m.Sims == null) System.Threading.Thread.Sleep(1);
             SimTelemetry.Data.Telemetry.m.Sim_Start += mUpdateUI;
             SimTelemetry.Data.Telemetry.m.Sim_Stop += mUpdateUI;

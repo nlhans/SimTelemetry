@@ -80,7 +80,7 @@ namespace SimTelemetry
             _PlotterConfiguration.Configure(cPlotter);
 
             this.GraphSplit.Panel2.Controls.Add(cPlotter);
-            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Silverstone-TEST_DAY-2012-07-11-3\Lap 0.dat");
+            _logReader = new TelemetryLogReader(@"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\Logs\rfactor\Silverstone-TEST_DAY-2012-07-12-8\Lap 7.gz");
             _logReader.Read();
             while (_logReader.Progress == 0) ;
             while (_logReader.Progress != 1000) ;

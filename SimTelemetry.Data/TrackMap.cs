@@ -18,13 +18,20 @@ namespace SimTelemetry.Controls
 {
     public partial class TrackMap : UserControl
     {
-        public static bool StaticTrackMap=false;
+        public static bool StaticTrackMap = false; // only static atm
+
         public string AIW_File = "";
+
+        // Settings for inherited classes
+        protected bool AutoPosition = true;
+        protected bool AccurateTrackWidth = false;
 
         protected double pos_x_max = 1000000000.0;
         protected double pos_x_min = -1000000000.0;
         protected double pos_y_max = 1000000000.0;
         protected double pos_y_min = -1000000000.0;
+        protected double map_width = 0;
+        protected double map_height = 0;
         protected WayPoint[] waypoints = new WayPoint[25001];
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -42,91 +49,75 @@ namespace SimTelemetry.Controls
             base.OnPaint(e);
         }
 
-        protected double x_offset, y_offset, x_scale, y_scale;
-
         protected Bitmap BackgroundImage;
 
 
+        #region Settings
+        float track_width = 6f;
+        float pitlane_width = 4f;
+
+        Pen brush_start = new Pen(Color.FromArgb(200, 50, 30), 6f); // 6f=track_width
+        Brush brush_sector1 = new SolidBrush(Color.FromArgb(105, 105, 105));
+        Brush brush_sector2 = new SolidBrush(Color.FromArgb(47, 79, 79));
+        Brush brush_sector3 = new SolidBrush(Color.FromArgb(85, 107, 47));
+        Brush brush_sector1_pits = new SolidBrush(Color.FromArgb(105 * 10 / 15, 105 * 10 / 15, 105 * 10 / 15));
+        Brush brush_sector2_pits = new SolidBrush(Color.FromArgb(47 * 10 / 15, 79 * 10 / 15, 79 * 10 / 15));
+        Brush brush_sector3_pits = new SolidBrush(Color.FromArgb(85 * 10 / 15, 107 * 10 / 15, 47 * 10 / 15));
+
+        System.Drawing.Font tf24 = new Font("calibri", 24f);
+        System.Drawing.Font tf16 = new Font("calibri", 16f);
+        System.Drawing.Font tf12 = new Font("calibri", 12f);
+        System.Drawing.Font tf18 = new Font("calibri", 18f);
+        #endregion
 
         public void UpdateTrackmap()
         {
-            BackgroundImage = new Bitmap(10+this.Size.Width, 10+this.Size.Height);
+            BackgroundImage = new Bitmap(10 + this.Size.Width, 10 + this.Size.Height);
             Graphics g = Graphics.FromImage(BackgroundImage);
             g.FillRectangle(Brushes.Black, 0, 0, this.Size.Width, this.Size.Height);
-            if (!Telemetry.m.Active_Session) return;
-            if (Telemetry.m.Track == null || Telemetry.m.Track.Route == null || Telemetry.m.Track.Route.Racetrack==null)
+
+            if (Telemetry.m.Track == null || Telemetry.m.Track.Route == null || Telemetry.m.Track.Route.Racetrack == null)
                 return;
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
-
-float track_width = 6f;
-            float pitlane_width =4f;
-
-            Pen brush_start = new Pen(Color.FromArgb(200, 50, 30), track_width);
-            Brush brush_sector1 = new SolidBrush(Color.FromArgb(105, 105, 105));
-            Brush brush_sector2 = new SolidBrush(Color.FromArgb(47, 79, 79));
-            Brush brush_sector3 = new SolidBrush(Color.FromArgb(85, 107, 47));
-            Brush brush_sector1_pits = new SolidBrush(Color.FromArgb(105 * 10 / 15, 105 * 10 / 15, 105 * 10 / 15));
-            Brush brush_sector2_pits = new SolidBrush(Color.FromArgb(47 * 10 / 15, 79 * 10 / 15, 79 * 10 / 15));
-            Brush brush_sector3_pits = new SolidBrush(Color.FromArgb(85 * 10 / 15, 107 * 10 / 15, 47 * 10 / 15));
-            double ZoomFactor = 20 + Math.Abs(Math.Max(Math.Max(Telemetry.m.Sim.Player.Speed, Telemetry.m.Sim.Drivers.Player.Speed), Telemetry.m.Sim.Player.SpeedSlipping) * 3.6 * 1.5);
-            ZoomFactor = 200 + Math.Max(25, ZoomFactor);
-                track_width = Convert.ToSingle(200/ZoomFactor*30);
-                pitlane_width = Convert.ToSingle(200/ZoomFactor*20);
-                if (!StaticTrackMap)
-                {
-                    Telemetry.m.Track.Route.x_max = Telemetry.m.Sim.Drivers.Player.CoordinateX + ZoomFactor;
-                    Telemetry.m.Track.Route.x_min = Telemetry.m.Sim.Drivers.Player.CoordinateX - ZoomFactor;
-
-                    Telemetry.m.Track.Route.y_max = Telemetry.m.Sim.Drivers.Player.CoordinateZ + ZoomFactor;
-                    Telemetry.m.Track.Route.y_min = Telemetry.m.Sim.Drivers.Player.CoordinateZ - ZoomFactor;
-                }
-
-            x_scale = (this.Size.Width - 40) / (Telemetry.m.Track.Route.x_max - Telemetry.m.Track.Route.x_min);
-            y_scale = -1 * (this.Size.Width - 40) / (Telemetry.m.Track.Route.y_max - Telemetry.m.Track.Route.y_min);
-            x_offset = 20+x_scale * (0 - Telemetry.m.Track.Route.x_min);
-            y_offset = this.Size.Height -20+y_scale * (0 - Telemetry.m.Track.Route.y_min);
-            if (StaticTrackMap)
+            if (AutoPosition)
             {
-                // TODO: Dit is verrot.
-                double max = Math.Abs((Telemetry.m.Track.Route.y_max - Telemetry.m.Track.Route.y_min) * y_scale);
-                if (max + 100 > this.Size.Height)
-                {
-                    y_scale *= this.Size.Height / (max + 200);
-                    x_scale *= this.Size.Height / (max + 200);
-                }
 
-                if (this.Size.Height > this.Size.Width)
-                {
-                    double offset = 100 - (this.Size.Height - this.Size.Width);
+            pos_x_max = -100000;
+            pos_x_min = 100000;
+            pos_y_max = -100000;
+            pos_y_min = 1000000;
 
-                    y_scale = y_scale / this.Size.Height * (this.Size.Height + offset);
-                    x_scale = x_scale / this.Size.Height * (this.Size.Height + offset);
-
-                    y_offset += offset;
-                }
-                else
-                {
-                    double offset = 100;
-
-                    y_offset += 100;
-                }
-            }
-            x_scale = Math.Min(x_scale, -1 * y_scale);
-            y_scale = -1*Math.Min(x_scale, -1 * y_scale);
-
-            double zmax = double.MinValue, zmin = double.MaxValue;
             foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
             {
-                zmax = Math.Max(wp.Y, zmax);
-                zmin = Math.Min(wp.Y, zmin);
+                pos_x_max = Math.Max(wp.X, pos_x_max);
+                pos_x_min = Math.Min(wp.X, pos_x_min);
+                pos_y_max = Math.Max(wp.Z, pos_y_max);
+                pos_y_min = Math.Min(wp.Z, pos_y_min);
             }
             foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
             {
-                zmax = Math.Max(wp.Y, zmax);
-                zmin = Math.Min(wp.Y, zmin);
+                pos_x_max = Math.Max(wp.X, pos_x_max);
+                pos_x_min = Math.Min(wp.X, pos_x_min);
+                pos_y_max = Math.Max(wp.Z, pos_y_max);
+                pos_y_min = Math.Min(wp.Z, pos_y_min);
             }
 
+
+            }
+
+            if (this.Height > this.Width)
+            {
+                map_width = this.Width;
+                map_height = this.Height - 150;
+                if (map_height / map_width > 1.2)
+                    map_height = Math.Min(this.Height, this.Width);
+            }
+            else
+            {
+                map_width = Math.Min(this.Height, this.Width);
+                map_height = this.Height-200;
+            }
 
             PointF pv = new PointF(float.MinValue, float.MinValue);
             PointF fpv = new PointF(float.MinValue, float.MinValue);
@@ -136,8 +127,10 @@ float track_width = 6f;
             List<PointF> sector3 = new List<PointF>();
             foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
             {
-                float x = Convert.ToSingle(x_offset + x_scale * wp.X);
-                float y = Convert.ToSingle(y_offset + y_scale * wp.Z);
+
+                float x = Convert.ToSingle(10 + ((wp.X - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
+                float y = Convert.ToSingle(100 + (1 - (wp.Z - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
+
 
                 PointF p = new PointF(x, y);
                 Brush b = brush_sector1;
@@ -156,7 +149,7 @@ float track_width = 6f;
 
                 if (pv.X != float.MinValue)
                 {
-                            g.FillEllipse(b, p.X, p.Y, pitlane_width, pitlane_width);
+                    g.FillEllipse(b, p.X, p.Y, pitlane_width, pitlane_width);
 
                 }
                 else fpv = p;
@@ -173,19 +166,12 @@ float track_width = 6f;
             double wp_lastMeters = 0;
             //Lap CurrentLap = Telemetry.m.Track.GetCurrentLap();
             //Lap LastLap = Telemetry.m.Track.GetLastLap();
-            Font f = new Font("Tahoma",9f);
+            Font f = new Font("Tahoma", 9f);
             foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
             {
-                float x = Convert.ToSingle(x_offset + x_scale * wp.X);
-                float y = Convert.ToSingle(y_offset + y_scale * wp.Z);
+                float x = Convert.ToSingle(10 + ((wp.X - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
+                float y = Convert.ToSingle(100 + (1 - (wp.Z - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
 
-                /*Pen mypen = new Pen(Color.FromArgb(100, Convert.ToInt32(Math.Round((wp.Y - zmin) / (zmax - zmin) * -110)) + 130, 20), 6);
-                brush_sector1_pits = mypen;
-                brush_sector2_pits = mypen;
-                brush_sector3_pits = mypen;
-                brush_sector1 = mypen;
-                brush_sector2 = mypen;
-                brush_sector3 = mypen;*/
                 PointF p = new PointF(x, y);
                 Brush b = brush_sector1;
                 switch (wp.Sector)
@@ -200,8 +186,8 @@ float track_width = 6f;
                         b = brush_sector3;
                         break;
                 }
-                Pen pennetje = new Pen(b, 10f);
-
+                float trackwidth = ((!AccurateTrackWidth) ? 6.0f : Convert.ToSingle(wp.Width));
+                Pen pennetje = new Pen(b, trackwidth);
 
                 if (pv.X != float.MinValue)
                 {
@@ -211,8 +197,7 @@ float track_width = 6f;
                 }
                 else fpv = p;
 
-
-                
+                #region Hideme
                 // Is there a checkpoint of apexpoint here?
                 /*int i = 0;
                 foreach (KeyValuePair<double, string> chkpoint in Telemetry.m.Track.Sections.Lines)
@@ -254,21 +239,17 @@ float track_width = 6f;
                     }
                     i++;
                 }*/
+                #endregion
 
                 pv = p;
                 wp_lastMeters = wp.Meters;
             }
 
             g.DrawPolygon(brush_start, new PointF[3] { fpv, pv, fpv });
-            // draw track name);
+
+            // draw track name
             try
             {
-
-                System.Drawing.Font tf24 = new Font("calibri", 24f);
-                System.Drawing.Font tf16 = new Font("calibri", 16f);
-                System.Drawing.Font tf12 = new Font("calibri", 12f);
-                System.Drawing.Font tf18 = new Font("calibri", 18f);
-
                 g.DrawString(Telemetry.m.Track.Name, tf24, Brushes.White, 10f, 10f);
                 g.DrawString(Telemetry.m.Track.Location, tf18, Brushes.White, 10f, 40f);
                 g.DrawString(Telemetry.m.Track.Length.ToString("0000.0m") + " , " + Telemetry.m.Track.Type, tf12, Brushes.White, 10f, 65f);
@@ -279,7 +260,6 @@ float track_width = 6f;
 
 
             }
-            //BackgroundImage.Save("current.png");
 
             this.Invalidate();
 
@@ -313,9 +293,9 @@ float track_width = 6f;
 
         void m_Track_Load(object sender)
         {
-            if(this.InvokeRequired)
+            if (this.InvokeRequired)
             {
-                this.Invoke(new Signal(m_Track_Load), new object[1] {sender});
+                this.Invoke(new Signal(m_Track_Load), new object[1] { sender });
                 return;
             }
             UpdateTrackmap();

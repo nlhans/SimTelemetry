@@ -5,7 +5,7 @@
         [Unloggable]
         [LogProperty("Track Location", "Used for track loader. Location of track AIW.")]
         string GameData_TrackFile { get; set; }
-        [Unloggable]
+        [Loggable(true)]
         [LogProperty("Game Location", "Used for track loader. Location of game directory.")]
         string GameDirectory { get; set; }
 

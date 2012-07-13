@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Triton.Maths;
 using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
 using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
 using Timer = System.Timers.Timer;
@@ -113,7 +114,6 @@ namespace SimTelemetry.Data.Track
                                 continue;
                             }
 
-                            // do stuffz
                             // Apex speeds
                             int i = 0;
                             foreach (KeyValuePair<double, string> apex in Apexes.Positions)
@@ -160,9 +160,9 @@ namespace SimTelemetry.Data.Track
             try
             {
                 data = File.ReadAllLines(path);
-            
+
             }
-            catch(Exception)
+            catch (Exception)
             {
                 // File not found?
                 Debug.WriteLine("[Track] Could not find AIW file");
@@ -171,7 +171,7 @@ namespace SimTelemetry.Data.Track
 
             TrackWaypoint temp = new TrackWaypoint();
             _Length = 0;
-
+            IIR WidthFilter = new IIR(new double[3] { 0.3, 0.25, 0.15}, new double[2] {0.2, 0.1});
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US"); 
             foreach(string line in data)
             {
@@ -217,6 +217,33 @@ namespace SimTelemetry.Data.Track
                                 temp.Route = TrackRoute.OTHER;
                                 break;
                         }
+                    }
+
+                    if(key == "perp" && values.Length == 3)
+                    {
+                        temp.PerpVector = new double[2] { Convert.ToDouble(values[0]), Convert.ToDouble(values[2]) };
+                    }
+
+                    if(key == "width" && values.Length == 4)
+                    {
+                        double[] Edge1 = new double[2]
+                                             {
+                                                temp.PerpVector[0]*Convert.ToDouble(values[0]),
+                                                temp.PerpVector[1]*Convert.ToDouble(values[0])
+                                             };
+                        double[] Edge2 = new double[2]
+                                             {
+                                                temp.PerpVector[0]*Convert.ToDouble(values[1]),
+                                                temp.PerpVector[1]*Convert.ToDouble(values[1])
+                                             };
+
+                        temp.Width = Math.Pow(Edge1[0] - Edge2[0], 2) + Math.Pow(Edge1[1] - Edge2[1], 2);
+                        temp.Width = Math.Sqrt(temp.Width);
+                        temp.Width = Convert.ToDouble(values[0]) + Convert.ToDouble(values[1]);
+                       if (temp.Width > 18) temp.Width = 18;
+                        WidthFilter.Add(temp.Width);
+                        temp.Width = WidthFilter.Value;
+                        if (temp.Width < 8) temp.Width = 8;
                     }
 
                     // ptrs = next path, previous path, pitbox route (-1 for no pitbox), following branchID

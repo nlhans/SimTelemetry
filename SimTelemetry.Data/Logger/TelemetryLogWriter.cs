@@ -155,16 +155,16 @@ namespace SimTelemetry.Data.Logger
                     data = new byte[68];
                     short type = 0xFF;
                     Type t = tel_instance.Value.PropertyDescriptors.Find(properyMap.Key, true).PropertyType;
-                    if (t == typeof (double)) type = 0;
-                    if (t == typeof (float)) type = 1;
-                    if (t == typeof (Int32)) type = 2;
-                    if (t == typeof (Int16)) type = 3;
-                    if (t == typeof (byte)) type = 4;
-                    if (t == typeof (UInt32)) type = 5;
-                    if (t == typeof (UInt16)) type = 6;
-                    if (t == typeof (char)) type = 7;
-                    if (t == typeof (string)) type = 8;
-                    if (t == typeof (bool)) type = 9;
+                    if (t == typeof(double)) type = 0;
+                    if (t == typeof(float)) type = 1;
+                    if (t == typeof(Int32)) type = 2;
+                    if (t == typeof(Int16)) type = 3;
+                    if (t == typeof(byte)) type = 4;
+                    if (t == typeof(UInt32)) type = 5;
+                    if (t == typeof(UInt16)) type = 6;
+                    if (t == typeof(char)) type = 7;
+                    if (t == typeof(string)) type = 8;
+                    if (t == typeof(bool)) type = 9;
                     if (type < 0xFF)
                     {
                         ByteMethods.memcpy(data, BitConverter.GetBytes(type), 2, 0, 0);
@@ -197,52 +197,61 @@ namespace SimTelemetry.Data.Logger
         {
             if (_mWrite != null)
             {
-                AnnotationWaiter.Reset();
                 lock (_mWrite)
                 {
 
-                    /************** TIME SYNC *************/
-                    byte[] data = new byte[8];
-                    byte[] header = new byte[10];
-                    header[0] = (byte)'$';
-                    header[1] = (byte)'#';                                                                      // Sync
-                    ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Time), 2, 4, 0); // Packet ID
-                    ByteMethods.memcpy(header, BitConverter.GetBytes(0), 2, 6, 0);          // Instance ID
-                    ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)8), 2, 8, 0);            // Data length
-
-                    // Write time sync packet.
-                    // TODO: NEed better syncing with game.
-                    TimeSpan dt = DateTime.Now.Subtract(AnnotationStart);
-                    double dt_ms = dt.TotalMilliseconds;
-                    data = BitConverter.GetBytes(dt_ms);
-
-                    _mWrite.BaseStream.Write(header, 0, header.Length);
-                    _mWrite.BaseStream.Write(data, 0, data.Length);
-
-
-                    /************** DATA *************/
-                    foreach (KeyValuePair<string, TelemetryLoggerSubscribedInstance> tel_instance in Instances)
+                    try
                     {
-                        data = tel_instance.Value.Dump(new List<string>());
-                        if (data.Length > 0)
-                        {
+                        /************** TIME SYNC *************/
+                        byte[] data = new byte[8];
+                        byte[] header = new byte[10];
+                        header[0] = (byte)'$';
+                        header[1] = (byte)'#'; // Sync
+                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Time), 2, 4, 0);
+                        // Packet ID
+                        ByteMethods.memcpy(header, BitConverter.GetBytes(0), 2, 6, 0); // Instance ID
+                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)8), 2, 8, 0); // Data length
 
-                            // Write a packet to the stream.
-                            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort) TelemetryLogPacket.Data), 2, 4, 0);
+                        // Write time sync packet.
+                        // TODO: NEed better syncing with game.
+                        TimeSpan dt = DateTime.Now.Subtract(AnnotationStart);
+                        double dt_ms = dt.TotalMilliseconds;
+                        data = BitConverter.GetBytes(dt_ms);
+
+                        _mWrite.BaseStream.Write(header, 0, header.Length);
+                        _mWrite.BaseStream.Write(data, 0, data.Length);
+
+
+                        /************** DATA *************/
+                        foreach (KeyValuePair<string, TelemetryLoggerSubscribedInstance> tel_instance in Instances)
+                        {
+                            data = tel_instance.Value.Dump(new List<string>());
+                            if (data.Length > 0)
+                            {
+
+                                // Write a packet to the stream.
+                                ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Data), 2, 4,
+                                                   0);
                                 // Packet ID
-                            ByteMethods.memcpy(header, BitConverter.GetBytes(tel_instance.Value.ID), 2, 6, 0);
+                                ByteMethods.memcpy(header, BitConverter.GetBytes(tel_instance.Value.ID), 2, 6, 0);
                                 // Instance ID
-                            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort) data.Length), 2, 8, 0);
+                                ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)data.Length), 2, 8, 0);
                                 // Data length
 
 
-                            _mWrite.BaseStream.Write(header, 0, header.Length);
-                            _mWrite.BaseStream.Write(data, 0, data.Length);
+                                _mWrite.BaseStream.Write(header, 0, header.Length);
+                                _mWrite.BaseStream.Write(data, 0, data.Length);
+                            }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                    }
                 }
+
                 AnnotationWaiter.Set();
             }
         }
     }
+
 }

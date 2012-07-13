@@ -159,9 +159,7 @@ namespace SimTelemetry.Data.Logger
                             last_type_id = packet.InstanceID;
                             Instances.Add(last_type_id, last_type);
                             Types.Add(last_type, new Dictionary<int, int>());
-                            ;
                             Properties.Add(last_type, new Dictionary<int, string>());
-                            ;
                             break;
 
                         case TelemetryLogPacket.InstanceMember:
@@ -268,12 +266,12 @@ namespace SimTelemetry.Data.Logger
                             break;
 
                         case TelemetryLogPacket.Time:
-                            double t = time;
+
                             // Store previous samples.
-                            if (t != -1.0 && this.Data.ContainsKey(t) == false)
+                            if (time != -1.0 && this.Data.ContainsKey(time) == false)
                             {
-                                this.Data.Add(t, Sample.Clone());
-                                this.Data[t].Time = t;
+                                this.Data.Add(time, Sample.Clone());
+                                this.Data[time].Time = time;
                             }
                             time = BitConverter.ToDouble(packet.Data, 0);
                             break;
@@ -281,16 +279,22 @@ namespace SimTelemetry.Data.Logger
 
                 }
 
+
+                // Store last sample.
+                if (time != -1.0 && this.Data.ContainsKey(time) == false)
+                {
+                    this.Data.Add(time, Sample.Clone());
+                    this.Data[time].Time = time;
+                }
+
                 _ReadStage = 3;
 
-                string db = "";
-                foreach (KeyValuePair<double, TelemetrySample> sv in this.Data)
+                // Set the telemetry track.
+                if (Telemetry.m.Active_Session) return;
+                else
                 {
-                    TelemetrySample s = sv.Value;
-                    db += s.Time + "," + s.Data[3][48];
-                    db += "," + s.Data[3][47] + "\r\n";
+                    Telemetry.m.LoadTrack(Samples[time].GetString("Session.GameDirectory") + "GameData/Locations/", Samples[time].GetString("Session.Track"));
                 }
-                File.WriteAllText("test.csv", db);
             }
         }
     }

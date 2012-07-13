@@ -41,12 +41,9 @@ namespace LiveTelemetry
                         if (driver.Position != 0 && driver.Position <= 120 && Math.Abs( driver.CoordinateX)>=0.1)
                         {
                             //if (driver.Name.Trim() == "") continue;
-                            float a1 =
-                                Convert.ToSingle(x_offset + 
-                                                 driver.CoordinateX * x_scale );
-                            float a2 =
-                                 Convert.ToSingle(y_offset +
-                                                       driver.CoordinateZ * y_scale);
+                            float a1 = Convert.ToSingle(10 + ((driver.CoordinateX - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
+                            float a2 = Convert.ToSingle(100 + (1 - (driver.CoordinateZ - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
+
                             a1 -= bubblesize / 2f;
                             a2 -= bubblesize / 2f;
                             if (driver.Position == Telemetry.m.Sim.Drivers.Player.Position) // YOU
