@@ -5,7 +5,7 @@
         [Unloggable]
         [LogProperty("Track Location", "Used for track loader. Location of track AIW.")]
         string GameData_TrackFile { get; set; }
-        [Loggable(true)]
+        [Loggable(1)]
         [LogProperty("Game Location", "Used for track loader. Location of game directory.")]
         string GameDirectory { get; set; }
 
@@ -17,7 +17,7 @@
         [LogProperty("Is Race Session", "Indicates TRUE or FALSE whether this is a race session")]
         bool IsRace { get; set; }
 
-        [Loggable(true)]
+        [Loggable(1)]
         [LogProperty("Track", "Name of the track")]
         string CircuitName { get; set; }
 

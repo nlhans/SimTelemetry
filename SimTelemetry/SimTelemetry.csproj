@@ -50,6 +50,9 @@
     <Reference Include="Triton.Controls">
       <HintPath>..\..\..\Projects\Triton\Triton.Controls\bin\Debug\Triton.Controls.dll</HintPath>
     </Reference>
+    <Reference Include="Triton.Database">
+      <HintPath>..\..\..\Projects\Triton\Triton.Database\bin\Debug\Triton.Database.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataChannels.cs">
@@ -57,6 +60,12 @@
     </Compile>
     <Compile Include="DataChannels.Designer.cs">
       <DependentUpon>DataChannels.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FileManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileManager.Designer.cs">
+      <DependentUpon>FileManager.cs</DependentUpon>
     </Compile>
     <Compile Include="Plotter\Extensions.cs" />
     <Compile Include="Plotter\Plotter.cs">
@@ -86,6 +95,9 @@
     </Compile>
     <EmbeddedResource Include="DataChannels.resx">
       <DependentUpon>DataChannels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileManager.resx">
+      <DependentUpon>FileManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Plotter\Plotter.resx">
       <DependentUpon>Plotter.cs</DependentUpon>

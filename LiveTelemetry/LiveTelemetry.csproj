@@ -48,6 +48,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Triton\Triton\bin\Debug\Triton.dll</HintPath>
     </Reference>
+    <Reference Include="Triton.Database">
+      <HintPath>..\..\..\Projects\Triton\Triton.Database\bin\Debug\Triton.Database.dll</HintPath>
+    </Reference>
     <Reference Include="Triton.Joysticks, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Triton\Triton.Joysticks\bin\Debug\Triton.Joysticks.dll</HintPath>

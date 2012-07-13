@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using SimTelemetry;
 using SimTelemetry.Data;
 using SimTelemetry.Peripherals.Dashboard;
 using Triton;
@@ -96,9 +97,9 @@ namespace LiveTelemetry
         {
 
 
-            Application.CurrentCulture = new CultureInfo("en-US"); 
-            SimTelemetry.TelemetryViewer SimTelem = new SimTelemetry.TelemetryViewer();
-            SimTelem.ShowDialog();
+            Application.CurrentCulture = new CultureInfo("en-US");
+            SimTelemetry.FileManager fileman = new FileManager();
+            fileman.ShowDialog();
             //Application.Exit();
            // return;
             SimTelemetry.Data.Telemetry.m.Run();

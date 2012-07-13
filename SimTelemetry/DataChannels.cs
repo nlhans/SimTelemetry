@@ -19,7 +19,7 @@ namespace SimTelemetry
         {
             InitializeComponent();
 
-            channels = new VisualListDetails(false);
+            channels = new VisualListDetails(true);
             channels.Location = new Point(10, 10);
             channels.Size = new Size(350, 500);
 
