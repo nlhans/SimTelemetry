@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
 using Triton;
+using Timer = System.Windows.Forms.Timer;
 
 namespace SimTelemetry
 {
     public partial class TelemetryViewer : Form
     {
 
-        private TelemetryLogReader _logReader;
+        //private TelemetryLogReader _logReader;
+        private TelemetryLogReplay _logReader;
+        private ReplaySFX _logSound ;
 
         private DataChannels Channels;
         private Plotter cPlotter;
@@ -226,6 +230,8 @@ namespace SimTelemetry
 
             cPlotter.AutoScale();
             cPlotter.Draw();
+
+
         }
 
         private void btOpen_Click(object sender, EventArgs e)
@@ -239,19 +245,41 @@ namespace SimTelemetry
             }
         }
 
+        private void ReplaySoundStart(object n)
+        {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new WaitCallback(ReplaySoundStart), new object[1] {n});
+                return;
+            }
+            _logSound = new ReplaySFX(this, _logReader);
+            _logReader.Start();
+
+            Timer t = new Timer();
+            t.Interval = 50;
+            t.Tick += (e, b) =>
+                          {
+
+                          };
+            t.Start();
+        }
+
         private void OpenFile(string datafile)
         {
             Task t = new Task(() =>
                                   {
                                       try
                                       {
-                                          _logReader = new TelemetryLogReader(datafile);
+                                          //_logReader = new TelemetryLogReader(datafile);
+                                          _logReader = new TelemetryLogReplay(datafile);
                                           _logReader.Read();
                                           while (_logReader.Progress == 0) ;
                                           while (_logReader.Progress != 1000) ;
                                           TelemetryFile = datafile;
                                           GraphFill();
                                           DrawPlotbounds();
+                                          _logReader.Start();
+                                          ThreadPool.QueueUserWorkItem(new WaitCallback(ReplaySoundStart));
                                       }catch(Exception ex)
                                       {
                                           _logReader = null;

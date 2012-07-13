@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5897DD6E-1D95-4C28-9362-A96C084C903C}</ProjectGuid>
+    <ProjectGuid>{C6ACC942-B090-4B91-BD21-41C27486FF20}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimTelemetry.Data</RootNamespace>
-    <AssemblyName>SimTelemetry.Data</AssemblyName>
+    <RootNamespace>SimTelemetry.SFX</RootNamespace>
+    <AssemblyName>SimTelemetry.SFX</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,46 +31,43 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX.DirectSound, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectSound.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Triton">
-      <HintPath>..\..\..\Projects\Triton\Triton\bin\Debug\Triton.dll</HintPath>
-    </Reference>
-    <Reference Include="Triton.Database">
-      <HintPath>..\..\..\Projects\Triton\Triton.Database\bin\Debug\Triton.Database.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Logger\TelemetryLogger.cs" />
-    <Compile Include="Logger\TelemetryLogReader.cs" />
-    <Compile Include="Logger\TelemetryLogReplay.cs" />
-    <Compile Include="Logger\TelemetryLogWriter.cs" />
-    <Compile Include="Logger\TelemetryLoggerSubscribedInstance.cs" />
+    <Compile Include="Delegates.cs" />
+    <Compile Include="EngineRpmRegion.cs" />
+    <Compile Include="EngineRpmRegionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Telemetry.cs" />
-    <Compile Include="Simulators.cs" />
-    <Compile Include="TrackMap.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TrackMap.Designer.cs">
-      <DependentUpon>TrackMap.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Track\TrackParser.cs" />
+    <Compile Include="SFX.cs" />
+    <Compile Include="SoundPlayer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">
+      <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
+      <Name>SimTelemetry.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
       <Name>SimTelemetry.Objects</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

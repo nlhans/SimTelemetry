@@ -9,6 +9,42 @@ using Triton;
 
 namespace SimTelemetry.Data.Logger
 {
+    public static class DictionaryExtensions
+    {
+        // TODO: Move to function libraries
+        public static List<TKey> GetKeysByValue<TKey, TValue>(this Dictionary<TKey, TValue> dict, TValue value)
+        {
+            if (dict.ContainsValue(value) == false)
+                return new List<TKey>();
+            else
+            {
+                List<TKey> keys = new List<TKey>();
+                foreach (KeyValuePair<TKey, TValue> kvp in dict)
+                {
+                    if (kvp.Value.Equals(value))
+                        keys.Add(kvp.Key);
+                }
+                return keys;
+            }
+
+        }
+        public static TKey GetKeyByValue<TKey, TValue>(this Dictionary<TKey, TValue> dict, TValue value)
+        {
+            if (dict.ContainsValue(value) == false)
+                return (TKey) new object();
+            else
+            {
+                foreach (KeyValuePair<TKey, TValue> kvp in dict)
+                {
+                    if (kvp.Value.Equals(value))
+                        return kvp.Key;
+                }
+                return (TKey)new object();
+            }
+
+        }
+    }
+
     public class TelemetryLogReader
     {
         private List<TelemetryPacket> Packets = new List<TelemetryPacket>();
@@ -64,6 +100,34 @@ namespace SimTelemetry.Data.Logger
                         return 0;
                         break;
                 }
+            }
+        }
+
+        public object Get(double frame, string key)
+        {
+            // Get a value from logframe in particular frame and key
+            if (Samples.ContainsKey(frame))
+            {
+                TelemetrySample sample = Samples[frame];
+
+                string[] saKey = key.Split(".".ToCharArray());
+                string cls = saKey[0];
+                string obj = saKey[1];
+
+                // Look up the instance ID
+                List<int> ids = Instances.GetKeysByValue(cls);
+                List<int> parameters = Properties[cls].GetKeysByValue(obj);
+
+                if(ids.Count >= 1 && parameters.Count >= 1)
+                return sample.Data[ids[0]][parameters[0]];
+                else
+                {
+                    return new object();
+                }
+            }
+            else
+            {
+                return 0;
             }
         }
 
