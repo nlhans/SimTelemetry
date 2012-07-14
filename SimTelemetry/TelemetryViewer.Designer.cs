@@ -31,10 +31,10 @@
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.GraphSplit = new System.Windows.Forms.SplitContainer();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.lbLoading = new System.Windows.Forms.ToolStripLabel();
-            this.lbLoadingbar = new System.Windows.Forms.ToolStripProgressBar();
             this.btOpen = new System.Windows.Forms.ToolStripButton();
             this.btPlayPause = new System.Windows.Forms.ToolStripButton();
+            this.lbLoading = new System.Windows.Forms.ToolStripLabel();
+            this.lbLoadingbar = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
@@ -80,23 +80,9 @@
             this.lbLoadingbar});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(244, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(58, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
-            // 
-            // lbLoading
-            // 
-            this.lbLoading.Name = "lbLoading";
-            this.lbLoading.Size = new System.Drawing.Size(53, 22);
-            this.lbLoading.Text = "Loading:";
-            this.lbLoading.Visible = false;
-            // 
-            // lbLoadingbar
-            // 
-            this.lbLoadingbar.Maximum = 1000;
-            this.lbLoadingbar.Name = "lbLoadingbar";
-            this.lbLoadingbar.Size = new System.Drawing.Size(100, 22);
-            this.lbLoadingbar.Visible = false;
             // 
             // btOpen
             // 
@@ -118,6 +104,20 @@
             this.btPlayPause.Size = new System.Drawing.Size(23, 22);
             this.btPlayPause.Text = "Play/Pause";
             this.btPlayPause.Click += new System.EventHandler(this.btPlayPause_Click);
+            // 
+            // lbLoading
+            // 
+            this.lbLoading.Name = "lbLoading";
+            this.lbLoading.Size = new System.Drawing.Size(53, 22);
+            this.lbLoading.Text = "Loading:";
+            this.lbLoading.Visible = false;
+            // 
+            // lbLoadingbar
+            // 
+            this.lbLoadingbar.Maximum = 1000;
+            this.lbLoadingbar.Name = "lbLoadingbar";
+            this.lbLoadingbar.Size = new System.Drawing.Size(100, 22);
+            this.lbLoadingbar.Visible = false;
             // 
             // TelemetryViewer
             // 

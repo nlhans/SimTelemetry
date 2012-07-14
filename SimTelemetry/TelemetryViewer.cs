@@ -65,8 +65,6 @@ namespace SimTelemetry
 
         public TelemetryViewer()
         {
-            DataChannels c = new DataChannels();
-            c.ShowDialog();
             InitializeComponent();
 
             // Trackmap

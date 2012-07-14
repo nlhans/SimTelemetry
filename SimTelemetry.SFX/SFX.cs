@@ -48,6 +48,11 @@ namespace SimTelemetry
             // read the file!
             string SFX_File = @"C:\Program Files (x86)\rFactor\GameData\Vehicles\F1_2010_CODEMASTERS\2010\All_Teams\Vodafone McLaren\McLaren_Sounds10.sfx";
             SFX_File = @"C:\Program Files (x86)\rFactor\GameData\Vehicles\Rayzor\RC.sfx";
+            if(!File.Exists(SFX_File))
+            {
+                MessageBox.Show("Can't find audio file.");
+                return;
+            }
             string[] data = File.ReadAllLines(SFX_File);
             Dictionary<string, string> keys = new Dictionary<string, string>();
             for (int i = 0; i < data.Length; i++)

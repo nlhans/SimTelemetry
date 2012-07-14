@@ -59,22 +59,43 @@ namespace SimTelemetry.Data.Logger
                 File.Delete(AnnotationFileCompress);
 
                 // Get the PREVIOUS last lap:
-                List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
-                ILap LastLap = AllLaps[AllLaps.Count -1];
+                // Insert via task; sleep 1.5second for timing to appear in game
 
-                // Insert into log
-                OleDbConnection con = DatabaseOleDbConnectionPool.GetOleDbConnection();
-                using(OleDbCommand newTime = new OleDbCommand("INSERT INTO laptimes (simulator,circuit,series,car,laptime,s1,s2,s3,driven,lapno,filepath) " +
-                    "VALUES ('"+Telemetry.m.Sim.ProcessName+"','"+Telemetry.m.Track.Name+"','"+Telemetry.m.Sim.Drivers.Player.CarModel+"','"+Telemetry.m.Sim.Drivers.Player.CarClass+"',"+LastLap.LapTime+","+LastLap.Sector1+","+LastLap.Sector2+","+LastLap.Sector3+",NOW(), "+(Telemetry.m.Sim.Drivers.Player.Laps-1).ToString()+",'"+AnnotationFileCompress.Replace(".dat",".gz")+"')",con))
-                {
-                    newTime.ExecuteNonQuery();
-                }
-                DatabaseOleDbConnectionPool.Freeup();
+                ThreadPool.QueueUserWorkItem(new WaitCallback(InsertLapTime));
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Failed to compress file " + AnnotationFileCompress);
             }
+        }
+
+        private void InsertLapTime(object o)
+        {
+            System.Threading.Thread.Sleep(1500);
+            List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
+            ILap LastLap = AllLaps[AllLaps.Count - 2];
+
+            // Insert into log
+            OleDbConnection con =
+                DatabaseOleDbConnectionPool.GetOleDbConnection();
+            using (
+                OleDbCommand newTime =
+                    new OleDbCommand(
+                        "INSERT INTO laptimes (simulator,circuit,series,car,laptime,s1,s2,s3,driven,lapno,filepath) " +
+                        "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
+                        Telemetry.m.Track.Name + "','" +
+                        Telemetry.m.Sim.Drivers.Player.CarModel + "','" +
+                        Telemetry.m.Sim.Drivers.Player.CarClass + "'," +
+                        LastLap.LapTime + "," + LastLap.Sector1 + "," +
+                        LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
+                        (Telemetry.m.Sim.Drivers.Player.Laps).ToString() +
+                        ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
+                        "')", con))
+            {
+                newTime.ExecuteNonQuery();
+            }
+            DatabaseOleDbConnectionPool.Freeup();
         }
 
         /**
