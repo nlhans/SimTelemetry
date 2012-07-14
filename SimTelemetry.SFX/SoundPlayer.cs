@@ -49,7 +49,7 @@ namespace SimTelemetry
         public PullDouble PullVolume { set { this.pullVolume = value; } }
         private string samplefile = "";
         private Control _owner;
-        private System.IO.MemoryStream Streampje;
+
         public SoundPlayer(Control owner, PullAudio pullAudio, string sample, short channels)
         {
             if (sample == null || File.Exists(sample) == false)
@@ -82,7 +82,6 @@ namespace SimTelemetry
             bufferDesc.ControlFrequency = true;
             bufferDesc.ControlEffects = true;
             bufferDesc.ControlVolume = true;
-            Streampje = new System.IO.MemoryStream();
 
             this.soundBuffer = new SecondaryBuffer(samplefile, bufferDesc, this.soundDevice);
             this.soundBuffer.Volume = 0;
@@ -161,7 +160,7 @@ namespace SimTelemetry
 
                 // Start it playing
                 this.soundBuffer.Play(0, BufferPlayFlags.Looping);
-                int lastWritten = 0;
+
                 while (this.running)
                 {
                     if (this.halted)
@@ -173,20 +172,25 @@ namespace SimTelemetry
                     // Wait on one of the notification events
                     WaitHandle.WaitAny(this.fillEvent, 3, true);
 
-                    // Get the current play position (divide by two because we are using 16 bit samples)
-                    int tmp = this.soundBuffer.PlayPosition / 2;
-
                     // Save the position we were at
-                    lastWritten = tmp;
                     double freq = 1, vol = 0;
                     if (this.pullFrequency == null)
                         freq = 1;
                     else
+                    {
                         freq = this.pullFrequency();
+                        if(freq == -1)
+                        {
+                            this.soundBuffer.SetCurrentPosition(0);
+                            freq = this.pullFrequency();
+                        }
+                        
+                    }
                     if (pullVolume == null)
                         vol = 0;
                     else
                         vol = this.pullVolume();
+
                     if (vol > 1) vol = 1;
                     if (vol < 0) vol = 0;
                     if (freq < 0) freq = 0;
@@ -197,18 +201,6 @@ namespace SimTelemetry
                     if (double.IsInfinity(vol)) vol = 1;
                     int _freq = Convert.ToInt32(Math.Round(44100 * freq));
                     this.soundBuffer.Frequency = Math.Min(192000, Math.Max(1000, _freq));
-
-                    // Volume.max = 0dB
-                    // volume.min = -100dB
-
-                    // 0.5 volume = -3dB
-                    // 0.25 volume = -6dB
-                    // etc.
-
-                    // So :
-                    //
-
-                    //double thing = Math.Pow(10, 4 - 4 * vol);
 
                     double thing = (int)Volume.Min;
                     if (vol != 0)

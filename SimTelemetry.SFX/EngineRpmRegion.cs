@@ -27,7 +27,7 @@ namespace SimTelemetry
         public double FrequencyMultiplier = 1;
         public double Volume()
         {
-            FrequencyMultiplier = 9.54929659643;
+            FrequencyMultiplier = 1*9.54929659643;
             double factor = 0.02 * Math.Pow(VolumeMultiplier, 3) * 2;
             double RPM = _mMaster.GetDouble("Driver.RPM") * FrequencyMultiplier;
             double Throttle = _mMaster.GetDouble("Player.Pedals_Throttle");
@@ -92,8 +92,14 @@ namespace SimTelemetry
 
         }
 
+        private int lastGear = 0;
         public double Pitch()
         {
+            if (lastGear != this._mMaster.GetInt32("Driver.Gear"))
+            {
+                lastGear = this._mMaster.GetInt32("Driver.Gear");
+                return -1;
+            }
             return _mMaster.GetDouble("Driver.RPM") * FrequencyMultiplier / Nat;
 
 

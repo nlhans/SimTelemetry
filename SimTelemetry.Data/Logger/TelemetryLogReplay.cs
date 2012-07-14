@@ -12,7 +12,7 @@ namespace SimTelemetry.Data.Logger
         private Timer _mReplayTimer;
 
         private double FramedTime = 0;
-        private double Time = 0;
+        private DateTime Time;
 
         public double GetDouble(string key)
         {
@@ -42,7 +42,7 @@ namespace SimTelemetry.Data.Logger
 
         public void Start()
         {
-            Time = 0;
+            Time = DateTime.Now;
             _mReplayTimer.Start();
         }
 
@@ -53,23 +53,26 @@ namespace SimTelemetry.Data.Logger
 
         void t_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Time += 10;
             // Match frame.
+            double CurrentTime = DateTime.Now.Subtract(Time).TotalMilliseconds;
 
             double least_dt = 1000;
             double max_t = 0;
             double t = 0;
-            foreach(KeyValuePair<double, TelemetrySample> kvp in this.Samples)
+            lock (this.Samples)
             {
-                double dt = Math.Abs(kvp.Key - Time);
-                if (dt < least_dt)
+                foreach (KeyValuePair<double, TelemetrySample> kvp in this.Samples)
                 {
-                    least_dt = dt;
-                    t = kvp.Key;
+                    double dt = Math.Abs(kvp.Key - CurrentTime);
+                    if (dt < least_dt)
+                    {
+                        least_dt = dt;
+                        t = kvp.Key;
+                    }
+                    max_t = Math.Max(kvp.Key, max_t);
                 }
-                max_t = Math.Max(kvp.Key, max_t);
             }
-            if (max_t < Time)
+            if (max_t < CurrentTime)
                 Stop();
 
             FramedTime = t;
