@@ -9,7 +9,8 @@
         public TrackRoute Route;
         public int Sector;
         public double Meters;
-        public double Width;
+        public double[] CoordinateL;
+        public double[] CoordinateR;
         public double[] PerpVector;
     }
 }

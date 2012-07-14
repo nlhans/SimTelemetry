@@ -38,22 +38,28 @@ namespace SimTelemetry.Objects
 
         public void Finalize()
         {
-            Racetrack.Sort(delegate(TrackWaypoint wp1, TrackWaypoint wp2)
+            if (Racetrack != null)
             {
-                if (wp1.Meters > wp2.Meters) return 1;
-                if (wp2.Meters > wp1.Meters) return -1;
-                
-                return 0; // equal?
+                Racetrack.Sort(delegate(TrackWaypoint wp1, TrackWaypoint wp2)
+                                   {
+                                       if (wp1.Meters > wp2.Meters) return 1;
+                                       if (wp2.Meters > wp1.Meters) return -1;
 
-            });
-            Length = Racetrack[Racetrack.Count - 1].Meters;
-            Pitlane.Sort(delegate(TrackWaypoint wp1, TrackWaypoint wp2)
+                                       return 0; // equal?
+
+                                   });
+                Length = Racetrack[Racetrack.Count - 1].Meters;
+            }
+            if (Pitlane != null)
             {
-                if (wp1.Meters > wp2.Meters) return 1;
-                if (wp2.Meters > wp1.Meters) return -1;
-                return 0; // equal?
+                Pitlane.Sort(delegate(TrackWaypoint wp1, TrackWaypoint wp2)
+                                 {
+                                     if (wp1.Meters > wp2.Meters) return 1;
+                                     if (wp2.Meters > wp1.Meters) return -1;
+                                     return 0; // equal?
 
-            });
+                                 });
+            }
 
             // TODO: Check ascending order
         }

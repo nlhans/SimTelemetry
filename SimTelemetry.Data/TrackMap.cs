@@ -60,14 +60,12 @@ namespace SimTelemetry.Controls
         Brush brush_sector1 = new SolidBrush(Color.FromArgb(105, 105, 105));
         Brush brush_sector2 = new SolidBrush(Color.FromArgb(47, 79, 79));
         Brush brush_sector3 = new SolidBrush(Color.FromArgb(85, 107, 47));
-        Brush brush_sector1_pits = new SolidBrush(Color.FromArgb(105 * 10 / 15, 105 * 10 / 15, 105 * 10 / 15));
-        Brush brush_sector2_pits = new SolidBrush(Color.FromArgb(47 * 10 / 15, 79 * 10 / 15, 79 * 10 / 15));
-        Brush brush_sector3_pits = new SolidBrush(Color.FromArgb(85 * 10 / 15, 107 * 10 / 15, 47 * 10 / 15));
+        Brush brush_pitlane = new SolidBrush(Color.FromArgb(100, Color.Orange));
 
-        System.Drawing.Font tf24 = new Font("calibri", 24f);
-        System.Drawing.Font tf16 = new Font("calibri", 16f);
-        System.Drawing.Font tf12 = new Font("calibri", 12f);
-        System.Drawing.Font tf18 = new Font("calibri", 18f);
+        Font tf24 = new Font("calibri", 24f);
+        Font tf16 = new Font("calibri", 16f);
+        Font tf12 = new Font("calibri", 12f);
+        Font tf18 = new Font("calibri", 18f);
         #endregion
 
         public void UpdateTrackmap()
@@ -83,25 +81,28 @@ namespace SimTelemetry.Controls
             if (AutoPosition)
             {
 
-            pos_x_max = -100000;
-            pos_x_min = 100000;
-            pos_y_max = -100000;
-            pos_y_min = 1000000;
+                pos_x_max = -100000;
+                pos_x_min = 100000;
+                pos_y_max = -100000;
+                pos_y_min = 1000000;
 
-            foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
-            {
-                pos_x_max = Math.Max(wp.X, pos_x_max);
-                pos_x_min = Math.Min(wp.X, pos_x_min);
-                pos_y_max = Math.Max(wp.Z, pos_y_max);
-                pos_y_min = Math.Min(wp.Z, pos_y_min);
-            }
-            foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
-            {
-                pos_x_max = Math.Max(wp.X, pos_x_max);
-                pos_x_min = Math.Min(wp.X, pos_x_min);
-                pos_y_max = Math.Max(wp.Z, pos_y_max);
-                pos_y_min = Math.Min(wp.Z, pos_y_min);
-            }
+                if (Telemetry.m.Track.Route.Pitlane != null)
+                {
+                    foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
+                    {
+                        pos_x_max = Math.Max(wp.X, pos_x_max);
+                        pos_x_min = Math.Min(wp.X, pos_x_min);
+                        pos_y_max = Math.Max(wp.Z, pos_y_max);
+                        pos_y_min = Math.Min(wp.Z, pos_y_min);
+                    }
+                }
+                foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
+                {
+                    pos_x_max = Math.Max(wp.X, pos_x_max);
+                    pos_x_min = Math.Min(wp.X, pos_x_min);
+                    pos_y_max = Math.Max(wp.Z, pos_y_max);
+                    pos_y_min = Math.Min(wp.Z, pos_y_min);
+                }
 
 
             }
@@ -119,144 +120,91 @@ namespace SimTelemetry.Controls
                 map_height = this.Height-200;
             }
 
-            PointF pv = new PointF(float.MinValue, float.MinValue);
-            PointF fpv = new PointF(float.MinValue, float.MinValue);
-
-            List<PointF> sector1 = new List<PointF>();
-            List<PointF> sector2 = new List<PointF>();
-            List<PointF> sector3 = new List<PointF>();
-            foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
+            List<PointF> pitlane_a = new List<PointF>();
+            List<PointF> pitlane_b = new List<PointF>();
+            if (Telemetry.m.Track.Route.Pitlane != null)
             {
-
-                float x = Convert.ToSingle(10 + ((wp.X - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
-                float y = Convert.ToSingle(100 + (1 - (wp.Z - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
-
-                // This is for your own safety :)
-                x = Limits.Clamp(x, -100000, 100000);
-                y = Limits.Clamp(y, -100000, 100000);
-
-                PointF p = new PointF(x, y);
-                Brush b = brush_sector1;
-                switch (wp.Sector)
+                foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
                 {
-                    case 0:
-                        b = brush_sector1_pits;
-                        break;
-                    case 1:
-                        b = brush_sector2_pits;
-                        break;
-                    case 2:
-                        b = brush_sector3_pits;
-                        break;
-                }
+                    float x1 =
+                        Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
+                    float y1 =
+                        Convert.ToSingle(100 +
+                                         (1 - (wp.CoordinateL[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
+                    float x2 =
+                        Convert.ToSingle(10 + ((wp.CoordinateR[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
+                    float y2 =
+                        Convert.ToSingle(100 +
+                                         (1 - (wp.CoordinateR[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
 
-                float trackwidth = 2.0f;
-                Pen pennetje = new Pen(b, trackwidth);
+                    // This is for your own safety :)
+                    x1 = Limits.Clamp(x1, -100000, 100000);
+                    y1 = Limits.Clamp(y1, -100000, 100000);
+                    x2 = Limits.Clamp(x2, -100000, 100000);
+                    y2 = Limits.Clamp(y2, -100000, 100000);
 
-                if (pv.X != float.MinValue)
-                {
-                    g.FillEllipse(b, p.X, p.Y, pitlane_width, pitlane_width);
-                    //g.DrawLine(pennetje, p, pv);
+                    g.FillEllipse(brush_pitlane, x1, y1, 6.0f, 6.0f);
+
+                    //pitlane_a.Add(new PointF(x1, y1));
+                    //pitlane_b.Add(new PointF(x2, y2));
 
                 }
-                else fpv = p;
-                pv = p;
             }
-
-
-            sector1 = new List<PointF>();
-            sector2 = new List<PointF>();
-            sector3 = new List<PointF>();
-            fpv = new PointF(float.MinValue, float.MinValue);
-            pv = new PointF(float.MinValue, float.MinValue);
-
             double wp_lastMeters = 0;
-            //Lap CurrentLap = Telemetry.m.Track.GetCurrentLap();
-            //Lap LastLap = Telemetry.m.Track.GetLastLap();
             Font f = new Font("Tahoma", 9f);
+            List<PointF> sector1a = new List<PointF>();
+            List<PointF> sector2a = new List<PointF>();
+            List<PointF> sector3a = new List<PointF>();
+            List<PointF> sector1b = new List<PointF>();
+            List<PointF> sector2b = new List<PointF>();
+            List<PointF> sector3b = new List<PointF>();
+            
             foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
             {
-                float x = Convert.ToSingle(10 + ((wp.X - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
-                float y = Convert.ToSingle(100 + (1 - (wp.Z - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
+                float x1 = Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
+                float y1 = Convert.ToSingle(100 + (1 - (wp.CoordinateL[1] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
+                float x2 = Convert.ToSingle(10 + ((wp.CoordinateR[0] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
+                float y2 = Convert.ToSingle(100 + (1 - (wp.CoordinateR[1] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
 
                 // This is for your own safety :)
-                x = Limits.Clamp(x, -100000, 100000);
-                y = Limits.Clamp(y, -100000, 100000);
+                x1 = Limits.Clamp(x1, -100000, 100000);
+                y1 = Limits.Clamp(y1, -100000, 100000);
+                x2 = Limits.Clamp(x2, -100000, 100000);
+                y2 = Limits.Clamp(y2, -100000, 100000);
 
-                PointF p = new PointF(x, y);
-                Brush b = brush_sector1;
-                switch (wp.Sector)
+                switch(wp.Sector+1)
                 {
-                    case 0:
-                        b = brush_sector1;
-                        break;
                     case 1:
-                        b = brush_sector2;
+                        sector1a.Add(new PointF(x1, y1));
+                        sector1b.Add(new PointF(x2, y2));
                         break;
                     case 2:
-                        b = brush_sector3;
+                        sector2a.Add(new PointF(x1, y1));
+                        sector2b.Add(new PointF(x2, y2));
+                        break;
+                    case 3:
+                        sector3a.Add(new PointF(x1, y1));
+                        sector3b.Add(new PointF(x2, y2));
                         break;
                 }
-                float trackwidth = ((!AccurateTrackWidth) ? 6.0f : Convert.ToSingle(wp.Width));
-                Pen pennetje = new Pen(b, trackwidth);
-
-                if (pv.X != float.MinValue)
-                {
-                    //g.FillEllipse(b, p.X - track_width / 2, p.Y - track_width / 2, track_width, track_width);
-                    g.DrawLine(pennetje, p, pv);
-
-                }
-                else fpv = p;
-
-                #region Hideme
-                // Is there a checkpoint of apexpoint here?
-                /*int i = 0;
-                foreach (KeyValuePair<double, string> chkpoint in Telemetry.m.Track.Sections.Lines)
-                {
-                    if (wp_lastMeters < chkpoint.Key && wp.Meters >= chkpoint.Key)
-                    {
-                        g.FillEllipse(Brushes.Purple, pv.X - track_width / 2, pv.Y - track_width / 2, track_width, track_width);
-                        g.DrawString(chkpoint.Value, f, Brushes.Yellow, pv.X- 5*track_width, pv.Y - 48);
-                        if (CurrentLap.Checkpoints != null && CurrentLap.Checkpoints[i] != -1 && i > 1)
-                            g.DrawString(
-                                String.Format("{0:00.000}", CurrentLap.Checkpoints[i] - CurrentLap.Checkpoints[i - 1]),
-                                f, Brushes.White, pv.X -4*track_width, pv.Y - 35);
-                        if (LastLap.Checkpoints != null && LastLap.Checkpoints[i] != -1)
-                            g.DrawString(
-                                String.Format("{0:00.000}", LastLap.Checkpoints[i] - LastLap.Checkpoints[i - 1]),
-                                f, Brushes.DarkGray, pv.X -4*track_width, pv.Y - 20);
-
-                    }
-                    i++;
-
-                }
-                i = 0;
-                foreach (KeyValuePair<double, string> apex in Telemetry.m.Track.Apexes.Positions)
-                {
-                    if (wp_lastMeters < apex.Key && wp.Meters >= apex.Key)
-                    {
-                        g.FillEllipse(Brushes.Blue, pv.X - track_width / 2, pv.Y - track_width / 2, track_width, track_width);
-
-                        g.DrawString(apex.Value, f, Brushes.Yellow, pv.X-5*track_width, pv.Y - 48);
-                        if (CurrentLap.ApexSpeeds != null  && CurrentLap.ApexSpeeds[i] != -1)
-                            g.DrawString(
-                                String.Format("{0:000.0}km/h", CurrentLap.ApexSpeeds[i] * 3.6),
-                                f, Brushes.White, pv.X -4* track_width, pv.Y - 35);
-                        if (LastLap.ApexSpeeds != null && LastLap.ApexSpeeds[i] != -1)
-                            g.DrawString(
-                                String.Format("{0:000.0}km/h", LastLap.ApexSpeeds[i] * 3.6),
-                                f, Brushes.DarkGray, pv.X -4* track_width, pv.Y - 20);
-
-                    }
-                    i++;
-                }*/
-                #endregion
-
-                pv = p;
                 wp_lastMeters = wp.Meters;
             }
 
-            g.DrawPolygon(brush_start, new PointF[3] { fpv, pv, fpv });
+            // Combine both a&b polygon , but in reverse (i.e. a + reverse b)
+            sector1b.Reverse();
+            sector2b.Reverse();
+            sector3b.Reverse();
+            pitlane_b.Reverse();
+            sector1a.AddRange(sector1b);
+            sector2a.AddRange(sector2b);
+            sector3a.AddRange(sector3b);
+            pitlane_a.AddRange(pitlane_b);
+
+            // Draw polygons!
+            if (pitlane_a.Count > 0) g.FillPolygon(brush_pitlane, pitlane_a.ToArray());
+            if(sector1a.Count > 0)g.FillPolygon(brush_sector1, sector1a.ToArray());
+            if (sector2a.Count > 0) g.FillPolygon(brush_sector2, sector2a.ToArray());
+            if (sector3a.Count > 0) g.FillPolygon(brush_sector3, sector3a.ToArray());
 
             // draw track name
             try

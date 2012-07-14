@@ -52,11 +52,11 @@ namespace SimTelemetry
                         {
                             if (_mMaster.TimeLine[1] >= s.Key/1000.0 && s.Key/1000.0 >= _mMaster.TimeLine[0])
                             {
-                                pos_x_max = Math.Max(s.Value["Drivers.Coordinate_Z"], pos_x_max);
-                                pos_x_min = Math.Min(s.Value["Drivers.Coordinate_Z"], pos_x_min);
+                                pos_x_max = Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_max);
+                                pos_x_min = Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_min);
 
-                                pos_y_max = Math.Max(s.Value["Drivers.Coordinate_X"], pos_y_max);
-                                pos_y_min = Math.Min(s.Value["Drivers.Coordinate_X"], pos_y_min);
+                                pos_y_max = Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_max);
+                                pos_y_min = Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_min);
                             }
                         }
 
@@ -129,14 +129,14 @@ namespace SimTelemetry
 
                                 }
 
-                                double x = 10 + ((s.Value["Drivers.Coordinate_Z"] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                                double y = 100 + (1 - (s.Value["Drivers.Coordinate_X"] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+                                double x = 10 + ((_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX") - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
+                                double y = 100 + (1 - (_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
 
                                 if (px == 0 || Math.Abs(x - px) > 4 || Math.Abs(y - py) > 4)
                                 {
                                     if (px != 0 && py != 0)
                                     {
-                                        g.DrawLine(new Pen(Color.FromArgb(Convert.ToInt32(s.Value["Drivers.Pedals_Brake"] * 255), Convert.ToInt32(s.Value["Drivers.Pedals_Throttle"] * 255), 0), 3f), x, y, px, py);
+                                        g.DrawLine(new Pen(Color.FromArgb(Convert.ToInt32(_mMaster.Data.GetDouble(s.Key, "Player.Pedals_Brake") * 255), Convert.ToInt32(_mMaster.Data.GetDouble(s.Key, "Player.Pedals_Throttle") * 255), 0), 3f), x, y, px, py);
                                     }
 
                                     px = x;
@@ -148,10 +148,8 @@ namespace SimTelemetry
 
                         if (_mMaster.TimeCursor[1] > 0 && Math.Abs(Leastdt) < 2000)
                         {
-                            TelemetrySample cursor = _mMaster.Data.Samples[LeastTime];
-
-                            double x = 10 + ((cursor["Drivers.Coordinate_Z"] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                            double y = 100 + (1 - (cursor["Drivers.Coordinate_X"] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+                            double x = 10 + ((_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateX") - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
+                            double y = 100 + (1 - (_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateZ") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
                             g.FillEllipse(new SolidBrush(Color.Yellow), x - 3, y - 3, 6, 6);
 
                         }

@@ -177,8 +177,11 @@ namespace SimTelemetry.Data.Track
             {
                 if(line.Contains("=") && line.Contains("(") && line.Contains(")"))
                 {
+                    // TODO: remove pit garages and start spots.
                     string key = line.Substring(0, line.IndexOf("=")).ToLower();
-                    string[] values = line.Substring(line.IndexOf("(")+1, line.IndexOf(")") - line.IndexOf("(")-1).Split(",".ToCharArray());
+                    string[] values =
+                        line.Substring(line.IndexOf("(") + 1, line.IndexOf(")") - line.IndexOf("(") - 1).Split(
+                            ",".ToCharArray());
 
                     if (key.StartsWith("wp_"))
                         key = key.Substring(3);
@@ -201,49 +204,46 @@ namespace SimTelemetry.Data.Track
                     }
 
                     // branchID = path ID, 0=main, 1=pitlane
-                    if(key == "branchid" && values.Length == 1)
+                    if (key == "branchid")
                     {
-                        switch(values[0])
+                        if (values.Length == 1)
                         {
-                            case "0":
-                                temp.Route = TrackRoute.MAIN;
-                                break;
+                            switch (values[0])
+                            {
+                                case "0":
+                                    temp.Route = TrackRoute.MAIN;
+                                    break;
 
-                            case "1":
-                                temp.Route = TrackRoute.PITLANE;
-                                break;
+                                case "1":
+                                    temp.Route = TrackRoute.PITLANE;
+                                    break;
 
-                            default:
-                                temp.Route = TrackRoute.OTHER;
-                                break;
+                                default:
+                                    temp.Route = TrackRoute.OTHER;
+                                    break;
+                            }
                         }
-                    }
+                        else
+                            temp.Route = TrackRoute.OTHER;
+                }
 
-                    if(key == "perp" && values.Length == 3)
+                if(key == "perp" && values.Length == 3)
                     {
                         temp.PerpVector = new double[2] { Convert.ToDouble(values[0]), Convert.ToDouble(values[2]) };
                     }
 
                     if(key == "width" && values.Length == 4)
                     {
-                        double[] Edge1 = new double[2]
-                                             {
-                                                temp.PerpVector[0]*Convert.ToDouble(values[0]),
-                                                temp.PerpVector[1]*Convert.ToDouble(values[0])
-                                             };
-                        double[] Edge2 = new double[2]
-                                             {
-                                                temp.PerpVector[0]*Convert.ToDouble(values[1]),
-                                                temp.PerpVector[1]*Convert.ToDouble(values[1])
-                                             };
-
-                        temp.Width = Math.Pow(Edge1[0] - Edge2[0], 2) + Math.Pow(Edge1[1] - Edge2[1], 2);
-                        temp.Width = Math.Sqrt(temp.Width);
-                        temp.Width = Convert.ToDouble(values[0]) + Convert.ToDouble(values[1]);
-                       if (temp.Width > 18) temp.Width = 18;
-                        WidthFilter.Add(temp.Width);
-                        temp.Width = WidthFilter.Value;
-                        if (temp.Width < 8) temp.Width = 8;
+                        temp.CoordinateL = new double[2]
+                                               {
+                                                   temp.X - temp.PerpVector[0]*Convert.ToDouble(values[0]),
+                                                   temp.Z - temp.PerpVector[1]*Convert.ToDouble(values[0])
+                                               };
+                        temp.CoordinateR = new double[2]
+                                               {
+                                                   temp.X + temp.PerpVector[0]*Convert.ToDouble(values[1]),
+                                                   temp.Z + temp.PerpVector[1]*Convert.ToDouble(values[1])
+                                               };
                     }
 
                     // ptrs = next path, previous path, pitbox route (-1 for no pitbox), following branchID

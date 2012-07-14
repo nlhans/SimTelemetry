@@ -56,6 +56,15 @@ namespace SimTelemetry.Data.Logger
         private int _ReadStage = 0;
         public Signal Done;
 
+
+        struct ParameterLookUp
+        {
+            public int id { get; set; }
+            public int parameter { get; set; }
+        }
+
+        private Dictionary<string, ParameterLookUp> ParameterCache = new Dictionary<string, ParameterLookUp>();
+
         public Dictionary<double, TelemetrySample> Samples { get { return Data; } }
         public Dictionary<int, string> Instances { get; set; }
 
@@ -96,7 +105,7 @@ namespace SimTelemetry.Data.Logger
                     case 3:
                         return 1000;
                         break;
-                    default:
+                    default: 
                         return 0;
                         break;
                 }
@@ -109,20 +118,35 @@ namespace SimTelemetry.Data.Logger
             if (Samples.ContainsKey(frame))
             {
                 TelemetrySample sample = Samples[frame];
-
-                string[] saKey = key.Split(".".ToCharArray());
-                string cls = saKey[0];
-                string obj = saKey[1];
-
-                // Look up the instance ID
-                List<int> ids = Instances.GetKeysByValue(cls);
-                List<int> parameters = Properties[cls].GetKeysByValue(obj);
-
-                if(ids.Count >= 1 && parameters.Count >= 1)
-                return sample.Data[ids[0]][parameters[0]];
+                if (ParameterCache.ContainsKey(key))
+                    return sample.Data[ParameterCache[key].id][ParameterCache[key].parameter];
                 else
                 {
-                    return new object();
+                    string[] saKey = key.Split(".".ToCharArray());
+                    string cls = saKey[0];
+                    string obj = saKey[1];
+
+                    // Look up the instance ID
+                    List<int> ids = Instances.GetKeysByValue(cls);
+                    if (ids.Count >= 1)
+                    {
+                        List<int> parameters = Properties[cls].GetKeysByValue(obj);
+
+                        if (parameters.Count >= 1)
+                        {
+                            ParameterLookUp plk = new ParameterLookUp { id = ids[0], parameter = parameters[0] };
+                            ParameterCache.Add(key, plk);
+                            return sample.Data[ids[0]][parameters[0]];
+                        }
+                        else
+                        {
+                            return new object();
+                        }
+                    }
+                    else
+                    {
+                        return new object();
+                    }
                 }
             }
             else
@@ -357,9 +381,28 @@ namespace SimTelemetry.Data.Logger
                 if (Telemetry.m.Active_Session) return;
                 else
                 {
-                    Telemetry.m.LoadTrack(Samples[time].GetString("Session.GameDirectory") + "GameData/Locations/", Samples[time].GetString("Session.Track"));
+                    Telemetry.m.LoadTrack(GetString(time, "Session.GameDirectory") + "GameData/Locations/", GetString(time, "Session.CircuitName"));
                 }
             }
+        }
+
+        private string GetString(TelemetrySample frame, string key)
+        {
+            return Get(frame.Time, key).ToString();
+        }
+
+        private string GetString(double frame, string key)
+        {
+            return Get(frame, key).ToString();
+        }
+
+        public double GetDouble(TelemetrySample frame, string key)
+        {
+            return (double)Get(frame.Time, key);
+        }
+        public double GetDouble(double frame, string key)
+        {
+            return (double)Get(frame, key);
         }
     }
 }

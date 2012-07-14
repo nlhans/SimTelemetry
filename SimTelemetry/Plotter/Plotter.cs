@@ -174,6 +174,7 @@ namespace SimTelemetry
                         double Best_dX = 78990;
                         double pp_x = 0, pp_y = 0;
                         Pen line = new Pen(c.LineColor, Convert.ToSingle(c.LineThickness));
+                        List<PointF> GraphPolygon = new List<PointF>();
                         foreach (KeyValuePair<double, double> point in c.Data)
                         {
 
@@ -212,19 +213,28 @@ namespace SimTelemetry
                                     Best_Y = p_y;
                                 }
 
-                                if (pp_x != 0 && pp_y != 0)
+                                if(GraphPolygon.Count == 0)
                                 {
-                                    gfx.DrawLine(line, pp_x, pp_y, p_x, p_y);
+                                    GraphPolygon.Add(new PointF((float)p_x, (float)(base_y+height)));
                                 }
 
-                                pp_x = p_x;
-                                pp_y = p_y;
+                                if (Math.Abs(pp_x - p_x) >= 0.5)
+                                {
+                                    GraphPolygon.Add(new PointF((float)p_x, (float)p_y));
+                                    pp_x = p_x;
+                                    pp_y = p_y;
+                                }
+
 
                             }
 
-
                         }
 
+                        GraphPolygon.Add(new PointF((float)pp_x, (float)(base_y + height)));
+                        if (GraphPolygon.Count > 4)
+                        {
+                            gfx.DrawPolygon(line, GraphPolygon.ToArray());
+                        }
                         if (Mouse_X > base_x && Mouse_X < bounds.Width - Rightsize && Best_X != 0)
                         {
                             gfx.DrawString(Math.Round(Best_Value, yx.digits_comma).ToString(), f, new SolidBrush(c.LineColor), Best_X, Best_Y - 15);
