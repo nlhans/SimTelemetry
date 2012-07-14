@@ -286,5 +286,19 @@ namespace SimTelemetry
 
         }
 
+        public void Stop()
+        {
+            // Do what it says..
+            foreach(EngineRpmRegion region in Regions)
+            {
+                region.player.Close();
+                region.player.Dispose();
+                region.player = null;
+                region.VolumeMultiplier = 0;
+            }
+            Regions = new List<EngineRpmRegion>();
+
+
+        }
     }
 }

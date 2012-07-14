@@ -73,7 +73,10 @@ namespace SimTelemetry.Data.Logger
                 }
             }
             if (max_t < CurrentTime)
-                Stop();
+            {
+
+                Time = DateTime.Now;
+            }
 
             FramedTime = t;
         }

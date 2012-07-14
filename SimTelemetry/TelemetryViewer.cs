@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
+using SimTelemetry.Properties;
 using Triton;
 using Timer = System.Windows.Forms.Timer;
 
@@ -89,6 +90,13 @@ namespace SimTelemetry
             // Loading.
             _mTelemetryLoading.Tick += new EventHandler(_mTelemetryLoading_Tick);
             _mTelemetryLoading.Start();
+
+            this.FormClosing += new FormClosingEventHandler(TelemetryViewer_FormClosing);
+        }
+
+        void TelemetryViewer_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ReplayStop();
         }
 
         void _mTelemetryLoading_Tick(object sender, EventArgs e)
@@ -145,6 +153,7 @@ namespace SimTelemetry
             _timeLineEnd = timeMax;
 
             DrawPlotbounds();
+
         }
 
         void cPlotter_TimelineScroll(object sender, ScrollEventArgs e)
@@ -232,6 +241,7 @@ namespace SimTelemetry
             cPlotter.Draw();
 
 
+            btPlayPause.Enabled = true;
         }
 
         private void btOpen_Click(object sender, EventArgs e)
@@ -245,27 +255,34 @@ namespace SimTelemetry
             }
         }
 
+        private bool ReplayRunning = false;
         private void ReplaySoundStart(object n)
         {
-            if(this.InvokeRequired)
+            if (this.InvokeRequired)
             {
                 this.Invoke(new WaitCallback(ReplaySoundStart), new object[1] {n});
                 return;
             }
-            _logSound = new ReplaySFX(this, _logReader);
-            _logReader.Start();
 
-            Timer t = new Timer();
-            t.Interval = 50;
-            t.Tick += (e, b) =>
-                          {
+            if (_logReader != null)
+            {
+                _logSound = new ReplaySFX(this, _logReader);
+                _logReader.Start();
 
-                          };
-            t.Start();
+                Timer t = new Timer();
+                t.Interval = 50;
+                t.Tick += (e, b) =>
+                              {
+
+                              };
+                t.Start();
+            }
         }
 
         private void OpenFile(string datafile)
         {
+            ReplayStop();
+
             Task t = new Task(() =>
                                   {
                                       try
@@ -279,13 +296,45 @@ namespace SimTelemetry
                                           GraphFill();
                                           DrawPlotbounds();
                                           _logReader.Start();
-                                          ThreadPool.QueueUserWorkItem(new WaitCallback(ReplaySoundStart));
                                       }catch(Exception ex)
                                       {
                                           _logReader = null;
                                       }
                                   });
             t.Start();
+        }
+
+        private void ReplayStop()
+        {
+
+            if (_logSound != null)
+            {
+                _logSound.Stop();
+                _logSound = null;
+            }
+            if (_logReader != null)
+                _logReader.Stop();
+
+            ReplayRunning = false;
+            btPlayPause.Image = Resources.Play_icon;
+        
+    }
+        private void ReplayStart()
+        {
+            ReplayRunning = true;
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ReplaySoundStart));
+            btPlayPause.Image = Resources.Pause_Pressed_icon;
+        }
+        private void btPlayPause_Click(object sender, EventArgs e)
+        {
+            if(ReplayRunning)
+            {
+                ReplayStop();
+            }
+            else
+            {
+                ReplayStart();
+            }
         }
     }
 }

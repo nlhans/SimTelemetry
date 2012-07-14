@@ -66,5 +66,19 @@ namespace SimTelemetry.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        internal static System.Drawing.Bitmap Pause_Pressed_icon {
+            get {
+                object obj = ResourceManager.GetObject("Pause_Pressed_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Play_icon {
+            get {
+                object obj = ResourceManager.GetObject("Play_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
