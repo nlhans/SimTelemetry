@@ -44,16 +44,14 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Triton\Triton\bin\Debug\Triton.dll</HintPath>
+    <Reference Include="Triton">
+      <HintPath>..\Binaries\Triton.dll</HintPath>
     </Reference>
     <Reference Include="Triton.Database">
-      <HintPath>..\..\..\Projects\Triton\Triton.Database\bin\Debug\Triton.Database.dll</HintPath>
+      <HintPath>..\Binaries\Triton.Database.dll</HintPath>
     </Reference>
-    <Reference Include="Triton.Joysticks, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Triton\Triton.Joysticks\bin\Debug\Triton.Joysticks.dll</HintPath>
+    <Reference Include="Triton.Joysticks">
+      <HintPath>..\Binaries\Triton.Joysticks.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

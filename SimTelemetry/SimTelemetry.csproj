@@ -45,13 +45,13 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Triton">
-      <HintPath>..\..\..\Projects\Triton\Triton\bin\Debug\Triton.dll</HintPath>
+      <HintPath>..\Binaries\Triton.dll</HintPath>
     </Reference>
     <Reference Include="Triton.Controls">
-      <HintPath>..\..\..\Projects\Triton\Triton.Controls\bin\Debug\Triton.Controls.dll</HintPath>
+      <HintPath>..\Binaries\Triton.Controls.dll</HintPath>
     </Reference>
     <Reference Include="Triton.Database">
-      <HintPath>..\..\..\Projects\Triton\Triton.Database\bin\Debug\Triton.Database.dll</HintPath>
+      <HintPath>..\Binaries\Triton.Database.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

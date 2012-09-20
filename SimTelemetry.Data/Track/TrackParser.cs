@@ -171,7 +171,8 @@ namespace SimTelemetry.Data.Track
 
             TrackWaypoint temp = new TrackWaypoint();
             _Length = 0;
-            IIR WidthFilter = new IIR(new double[3] { 0.3, 0.25, 0.15}, new double[2] {0.2, 0.1});
+            // Old test filter
+            //IIR WidthFilter = new IIR(new double[3] { 0.3, 0.25, 0.15}, new double[2] {0.2, 0.1});
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US"); 
             foreach(string line in data)
             {

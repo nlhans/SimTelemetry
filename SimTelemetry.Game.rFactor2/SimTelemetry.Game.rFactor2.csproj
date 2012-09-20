@@ -39,8 +39,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Triton">
-      <HintPath>..\..\..\Projects\Triton\Triton\bin\Debug\Triton.dll</HintPath>
+    <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Binaries\Triton.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
