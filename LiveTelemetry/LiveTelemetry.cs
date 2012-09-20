@@ -98,8 +98,8 @@ namespace LiveTelemetry
 
 
             Application.CurrentCulture = new CultureInfo("en-US");
-            SimTelemetry.TelemetryViewer fileman = new TelemetryViewer();
-            fileman.ShowDialog();
+            //SimTelemetry.TelemetryViewer fileman = new TelemetryViewer();
+            //fileman.ShowDialog();
             //Application.Exit();
            // return;
             SimTelemetry.Data.Telemetry.m.Run();
