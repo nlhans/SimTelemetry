@@ -13,9 +13,9 @@ Curve=DSpeed,Green,1,0
 Yaxis=0,0,360,20,5,1
 
 [Chart]
-Curve=_DSpeed,Green,1,0
-Curve=_DSpeed,Green,1,0
-Yaxis=0,-5,5,1,0.5,1
+Curve=Throttle,Green,1,0
+Curve=Brake,Red,1,0
+Yaxis=0,0,100,10,5,0
 
 [Chart]
 Curve=PSuspension_RideHeight_LF,Green,1,0
