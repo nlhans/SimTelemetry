@@ -14,6 +14,7 @@ Yaxis=0,0,360,20,5,1
 
 [Chart]
 Curve=_DSpeed,Green,1,0
+Curve=_DSpeed,Green,1,0
 Yaxis=0,-5,5,1,0.5,1
 
 [Chart]

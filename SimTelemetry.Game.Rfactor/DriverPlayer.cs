@@ -5,7 +5,6 @@ namespace SimTelemetry.Game.Rfactor
 {
     public class DriverPlayer : IDriverPlayer
     {
-        // Engine lifetime
         [Loggable(1)]
         public double Engine_Lifetime_Live
         {
@@ -24,12 +23,13 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADF244)); }
         }
+
+
         [Loggable(0.01)]
         public double Engine_Lifetime_Oil_Base
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC0C4)) - 273.15; }
-            //get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADC04C)) - 273.15 + 12; }
         }
         [Loggable(0.01)]
         public double Engine_Lifetime_RPM_Base

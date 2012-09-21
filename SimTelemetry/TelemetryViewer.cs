@@ -139,6 +139,7 @@ namespace SimTelemetry
                     timeMax = Math.Max(sp.Key / 1000.0, timeMax);
                     TelemetrySample sample = sp.Value;
 
+                    // TODO: Make this work from the configuration data (or files)
                     cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][48]);
                     cPlotter.Graphs[1].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][47] * 3.6);
                     cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][10] * 100);

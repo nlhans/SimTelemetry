@@ -566,6 +566,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
+                // TODO: If the  player is driving, do max function of SpeedSlipping (aero effective speed and the pointer)
+                // Remove the player name in this equation.
                 if (this.Name == "Hans")
                     return Math.Max(rFactor.Player.SpeedSlipping,
                                     rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x57C0)));
@@ -649,6 +651,8 @@ namespace SimTelemetry.Game.Rfactor
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 7 + 0x31F8)); }
         }
 
+        // TODO: Add support for 8-10 gears
+
         [Loggable(0.05)]
         public float GearRatioR
         {
@@ -725,11 +729,8 @@ namespace SimTelemetry.Game.Rfactor
     public class rFactorLap : ILap
     {
         private int _lap;
-
         private float _sector1;
-
         private float _sector2;
-
         private float _sector3;
 
         public rFactorLap(int lap, float s1, float s2, float s3)
@@ -740,25 +741,11 @@ namespace SimTelemetry.Game.Rfactor
             _sector3 = s3;
         }
 
-        public int Lap
-        {
-            get { return _lap; }
-        }
+        public int Lap { get { return _lap; } }
 
-        public float Sector1
-        {
-            get { return _sector1; }
-        }
-
-        public float Sector2
-        {
-            get { return _sector2; }
-        }
-
-        public float Sector3
-        {
-            get { return _sector3; }
-        }
+        public float Sector1 { get { return _sector1; } }
+        public float Sector2 { get { return _sector2; } }
+        public float Sector3 { get { return _sector3; } }
 
         public float LapTime
         {
