@@ -133,8 +133,8 @@ namespace SimTelemetry
                 }
             lock (_logReader.Samples)
             {
-                double px = Double.MinValue, py= Double.MinValue, pz = Double.MinValue, pt = -1;
-                Triton.Maths.Filter spdFilter = new Triton.Maths.Filter(25);
+                //double px = Double.MinValue, py= Double.MinValue, pz = Double.MinValue, pt = -1;
+                //Triton.Maths.Filter spdFilter = new Triton.Maths.Filter(25);
                 foreach (KeyValuePair<double, TelemetrySample> sp in _logReader.Samples)
                 {
                     timeMin = Math.Min(sp.Key / 1000.0, timeMin);
@@ -145,7 +145,7 @@ namespace SimTelemetry
                     cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][48]);
                     cPlotter.Graphs[1].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][47] * 3.6);
 
-                    double x = (double)sample.Data[3][7];
+                    /*double x = (double)sample.Data[3][7];
                     double y = (double)sample.Data[3][8];
                     double z = (double)sample.Data[3][9];
                     if (pt > 0)
@@ -167,9 +167,9 @@ namespace SimTelemetry
                     pt = sample.Time;
                     px = x;
                     py = y;
-                    pz = z;
-                   // cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][10] * 100);
-                    //cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][11] * 100);
+                    pz = z;*/
+                    cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][10] * 100);
+                    cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][11] * 100);
 
                 }
             }
