@@ -74,6 +74,8 @@ namespace GTech_Pro
                 }
             }
 
+            SimTelemetry.Data.Telemetry.m.Run();
+            while (SimTelemetry.Data.Telemetry.m.Sims == null) System.Threading.Thread.Sleep(1);
             /*
             List<JoystickDevice> devices = JoystickDevice.GetDevices();
             StringBuilder devicedata = new StringBuilder();
@@ -134,6 +136,8 @@ namespace GTech_Pro
         
         void t_Tick(object sender, EventArgs e)
         {
+            if (rFactor.Player 
+                == null) return;
             double spd = 3.6 * Math.Max(rFactor.Player.Speed, Math.Abs(rFactor.Player.SpeedSlipping));
             double time = rFactor.Session.Time;
             spd = Math.Abs(spd);
@@ -164,12 +168,14 @@ namespace GTech_Pro
                     if (BestAcc_Times[ispd] > Acc_Times[ispd])
                         BestAcc_Times[ispd] = Acc_Times[ispd];
                 }
+                StatusMenu = 0;
 
-                if (spd > 400 || spd < 0.1  ||
+                if (spd > 300 || spd < 0.1  ||
                     rFactor.Player.Pedals_Brake > 0.2)
                     // done!
                 {
                     recording = false;
+                    StatusMenu = 1;
 
                 }
             }
