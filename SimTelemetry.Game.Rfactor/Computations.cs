@@ -6,6 +6,8 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Game.Rfactor
 {
+    // TODO: The functions in this class are not scalable.
+
     public class Computations
     {
         public static double GetAeroDrag()

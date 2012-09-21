@@ -18,6 +18,7 @@ namespace SimTelemetry.Data.Logger
     {
         private Dictionary<string, TelemetryLoggerSubscribedInstance> Instances = new Dictionary<string, TelemetryLoggerSubscribedInstance>();
         private ushort InstanceID = 1;
+        private double AnnotationStartTime = 0;
         private string AnnotationFile = ""; // File to dump in.
         private string AnnotationFileCompress = ""; // File to compress after annotation.
         private StreamWriter _mWrite;
@@ -27,6 +28,10 @@ namespace SimTelemetry.Data.Logger
 
         private Timer _Worker;
         public bool Active { get; protected set; }
+
+        // Variable containing events that were fired since last log.
+        // These are saved next Tick()
+        private List<string> EventsFired = new List<string>();
 
         public void Subscribe<T>(string name, object instance)
         {
@@ -74,28 +79,31 @@ namespace SimTelemetry.Data.Logger
         {
             System.Threading.Thread.Sleep(1500);
             List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
-            ILap LastLap = AllLaps[AllLaps.Count - 2];
-
-            // Insert into log
-            OleDbConnection con =
-                DatabaseOleDbConnectionPool.GetOleDbConnection();
-            using (
-                OleDbCommand newTime =
-                    new OleDbCommand(
-                        "INSERT INTO laptimes (simulator,circuit,series,car,laptime,s1,s2,s3,driven,lapno,filepath) " +
-                        "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
-                        Telemetry.m.Track.Name + "','" +
-                        Telemetry.m.Sim.Drivers.Player.CarModel + "','" +
-                        Telemetry.m.Sim.Drivers.Player.CarClass + "'," +
-                        LastLap.LapTime + "," + LastLap.Sector1 + "," +
-                        LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
-                        (Telemetry.m.Sim.Drivers.Player.Laps).ToString() +
-                        ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
-                        "')", con))
+            if (AllLaps.Count > 2)
             {
-                newTime.ExecuteNonQuery();
+                ILap LastLap = AllLaps[AllLaps.Count - 2];
+
+                // Insert into log
+                OleDbConnection con =
+                    DatabaseOleDbConnectionPool.GetOleDbConnection();
+                using (
+                    OleDbCommand newTime =
+                        new OleDbCommand(
+                            "INSERT INTO laptimes (simulator,circuit,series,car,laptime,s1,s2,s3,driven,lapno,filepath) " +
+                            "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
+                            Telemetry.m.Track.Name + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass + "'," +
+                            LastLap.LapTime + "," + LastLap.Sector1 + "," +
+                            LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
+                            (Telemetry.m.Sim.Drivers.Player.Laps).ToString() +
+                            ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
+                            "')", con))
+                {
+                    newTime.ExecuteNonQuery();
+                }
+                DatabaseOleDbConnectionPool.Freeup();
             }
-            DatabaseOleDbConnectionPool.Freeup();
         }
 
         /**
@@ -123,6 +131,7 @@ namespace SimTelemetry.Data.Logger
             _mWrite.Flush();
 
             AnnotationStart = DateTime.Now;
+            AnnotationStartTime = Telemetry.m.Sim.Session.Time;
             AnnotationFile = name;
             // Yay
 
@@ -239,44 +248,61 @@ namespace SimTelemetry.Data.Logger
                     try
                     {
                         /************** TIME SYNC *************/
-                        byte[] data = new byte[8];
-                        byte[] header = new byte[10];
-                        header[0] = (byte)'$';
-                        header[1] = (byte)'#'; // Sync
-                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Time), 2, 4, 0);
-                        // Packet ID
-                        ByteMethods.memcpy(header, BitConverter.GetBytes(0), 2, 6, 0); // Instance ID
-                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)8), 2, 8, 0); // Data length
 
-                        // Write time sync packet.
-                        // TODO: NEed better syncing with game.
-                        TimeSpan dt = DateTime.Now.Subtract(AnnotationStart);
-                        double dt_ms = dt.TotalMilliseconds;
-                        data = BitConverter.GetBytes(dt_ms);
-
-                        _mWrite.BaseStream.Write(header, 0, header.Length);
-                        _mWrite.BaseStream.Write(data, 0, data.Length);
-
-
-                        /************** DATA *************/
-                        foreach (KeyValuePair<string, TelemetryLoggerSubscribedInstance> tel_instance in Instances)
+                        double dt_ms = 0;
+                        if (Telemetry.m.Sim.Modules.Time_Available)
                         {
-                            data = tel_instance.Value.Dump(new List<string>());
-                            if (data.Length > 0)
+                            dt_ms = Telemetry.m.Sim.Session.Time - AnnotationStartTime;
+                            dt_ms *= 1000.0;
+                        }
+                        else
+                        {
+                            TimeSpan dt = DateTime.Now.Subtract(AnnotationStart);
+                            dt_ms = dt.TotalMilliseconds;
+                        }
+                        if (dt_ms > 0)
+                        {
+
+                            byte[] data = new byte[8];
+                            byte[] header = new byte[10];
+                            header[0] = (byte)'$';
+                            header[1] = (byte)'#'; // Sync
+                            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Time), 2, 4, 0);
+                            // Packet ID
+                            ByteMethods.memcpy(header, BitConverter.GetBytes(0), 2, 6, 0); // Instance ID
+                            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)8), 2, 8, 0); // Data length
+
+                            data = BitConverter.GetBytes(dt_ms);
+                            _mWrite.BaseStream.Write(header, 0, header.Length);
+                            _mWrite.BaseStream.Write(data, 0, data.Length);
+
+
+                            /************** DATA *************/
+                            lock (EventsFired)
                             {
+                                foreach (KeyValuePair<string, TelemetryLoggerSubscribedInstance> tel_instance in Instances)
+                                {
+                                    data = tel_instance.Value.Dump(EventsFired);
+                                    if (data.Length > 0)
+                                    {
 
-                                // Write a packet to the stream.
-                                ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Data), 2, 4,
-                                                   0);
-                                // Packet ID
-                                ByteMethods.memcpy(header, BitConverter.GetBytes(tel_instance.Value.ID), 2, 6, 0);
-                                // Instance ID
-                                ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)data.Length), 2, 8, 0);
-                                // Data length
+                                        // Write a packet to the stream.
+                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Data), 2, 4,
+                                                           0);
+                                        // Packet ID
+                                        ByteMethods.memcpy(header, BitConverter.GetBytes(tel_instance.Value.ID), 2, 6, 0);
+                                        // Instance ID
+                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)data.Length), 2, 8, 0);
+                                        // Data length
 
 
-                                _mWrite.BaseStream.Write(header, 0, header.Length);
-                                _mWrite.BaseStream.Write(data, 0, data.Length);
+                                        _mWrite.BaseStream.Write(header, 0, header.Length);
+                                        _mWrite.BaseStream.Write(data, 0, data.Length);
+                                    }
+                                }
+
+                                // Reset the events fired.
+                                EventsFired = new List<string>();
                             }
                         }
                     }

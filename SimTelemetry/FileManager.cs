@@ -46,9 +46,12 @@ namespace SimTelemetry
 
         void _vldLaptimes_ItemActivate(object sender, EventArgs e)
         {
-            Datafile = _vldLaptimes.SelectedItems[0].SubItems[9].Text;
-            DatafileNew = true;
-            this.Close();
+            if (_vldLaptimes.SelectedItems.Count > 0)
+            {
+                Datafile = _vldLaptimes.SelectedItems[0].SubItems[9].Text;
+                DatafileNew = true;
+                this.Close();
+            }
         }
 
         private void btOK_Click(object sender, EventArgs e)

@@ -133,6 +133,8 @@ namespace SimTelemetry
                 }
             lock (_logReader.Samples)
             {
+                double px = Double.MinValue, py= Double.MinValue, pz = Double.MinValue, pt = -1;
+                Triton.Maths.Filter spdFilter = new Triton.Maths.Filter(25);
                 foreach (KeyValuePair<double, TelemetrySample> sp in _logReader.Samples)
                 {
                     timeMin = Math.Min(sp.Key / 1000.0, timeMin);
@@ -142,8 +144,32 @@ namespace SimTelemetry
                     // TODO: Make this work from the configuration data (or files)
                     cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][48]);
                     cPlotter.Graphs[1].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][47] * 3.6);
-                    cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][10] * 100);
-                    cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][11] * 100);
+
+                    double x = (double)sample.Data[3][7];
+                    double y = (double)sample.Data[3][8];
+                    double z = (double)sample.Data[3][9];
+                    if (pt > 0)
+                    {
+                        double dx = x - px, dy = y - py, dz = z - pz, spd = 0;
+                        dx /= (sample.Time - pt) / 1000;
+                        dy /= (sample.Time - pt) / 1000;
+                        dz /= (sample.Time - pt) / 1000;
+                        if(Math.Abs(dx)>200) dx = 0;
+                                                if(Math.Abs(dy)>200) dy = 0;
+                                                if(Math.Abs(dz)>200) dz = 0;
+                        //cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)dx);
+                        //cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, (double)dz);
+                        spd = Math.Sqrt(dx*dx+dy*dy+dz*dz);
+                        spdFilter.Add(spd);
+                        cPlotter.Graphs[2].Curves[2].Data.Add(sample.Time / 1000.0, spdFilter.Average*3.6);
+                    }
+
+                    pt = sample.Time;
+                    px = x;
+                    py = y;
+                    pz = z;
+                   // cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][10] * 100);
+                    //cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, (double)sample.Data[3][11] * 100);
 
                 }
             }
@@ -295,7 +321,8 @@ namespace SimTelemetry
                                           GraphFill();
                                           DrawPlotbounds();
                                           _logReader.Start();
-                                      }catch(Exception ex)
+                                      }
+                                      catch(Exception ex)
                                       {
                                           _logReader = null;
                                       }
@@ -334,6 +361,12 @@ namespace SimTelemetry
             {
                 ReplayStart();
             }
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            DataChannels ch = new DataChannels();
+            ch.ShowDialog();
         }
     }
 }

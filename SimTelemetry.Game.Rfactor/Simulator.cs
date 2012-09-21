@@ -19,6 +19,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             new rFactor(this);
             _Modules = new SimulatorModules();
+            _Modules.Time_Available = true;             // The plug-in knows the session time.
             _Modules.Track_Coordinates = true;
             _Modules.Track_MapFile = true;
             _Modules.Times_LapsBasic = true;

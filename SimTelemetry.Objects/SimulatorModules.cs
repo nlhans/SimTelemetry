@@ -2,6 +2,8 @@
 {
     public struct SimulatorModules
     {
+        public bool Time_Available; // Use simulator time or Windows time?
+
         public bool Times_LapsBasic;
         public bool Times_BestSectors;
         public bool Times_LastSectors;

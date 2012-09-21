@@ -178,6 +178,7 @@ namespace LiveTelemetry
             BackColor = Color.Black;
             InitializeComponent();
 
+            this.SuspendLayout();
             ucLaps = new Gauge_Laps();
             ucSplits = new Gauge_Splits();
             ucA1GP = new Gauge_A1GP(Joy);
@@ -209,6 +210,7 @@ namespace LiveTelemetry
             System.Threading.Thread.Sleep(500);
 
             SetupUI(true);
+            this.ResumeLayout(false);
         }
 
         void mUpdateUI(object sender)
@@ -334,35 +336,42 @@ namespace LiveTelemetry
 
         void LiveTelemetry_SizeChanged(object sender, EventArgs e)
         {
-            if (Telemetry.m.Active_Session)
+            try
             {
-                int tmp = StatusMenu;
-                StatusMenu = 0;
+                if (Telemetry.m.Active_Session)
+                {
+                    int tmp = StatusMenu;
+                    StatusMenu = 0;
 
-                ucA1GP.Size = new Size(450, 325);
-                this.ucA1GP.Location = new Point(this.Size.Width - ucA1GP.Size.Width - 20, this.Size.Height - ucA1GP.Height - 40);
+                    ucA1GP.Size = new Size(450, 325);
+                    this.ucA1GP.Location = new Point(this.Size.Width - ucA1GP.Size.Width - 20, this.Size.Height - ucA1GP.Height - 40);
 
 
-                this.ucLapChart.Location = new Point(this.Size.Width - ucLapChart.Size.Width - 30, 10);
-                this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 20, this.Size.Height);
-                this.ucTrackmap.Location = new Point(10, 10);
-                SessionData.Location = new Point(ucA1GP.Location.X, ucA1GP.Location.Y - SessionData.Size.Height - 10);
+                    this.ucLapChart.Location = new Point(this.Size.Width - ucLapChart.Size.Width - 30, 10);
+                    this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 20, this.Size.Height);
+                    this.ucTrackmap.Location = new Point(10, 10);
+                    SessionData.Location = new Point(ucA1GP.Location.X, ucA1GP.Location.Y - SessionData.Size.Height - 10);
 
-                this.ucTyres.Size = ucA1GP.Size;
-                this.ucTyres.Location = ucA1GP.Location;
+                    this.ucTyres.Size = ucA1GP.Size;
+                    this.ucTyres.Location = ucA1GP.Location;
 
-                this.ucLaps.Size = ucA1GP.Size;
-                this.ucLaps.Location = ucA1GP.Location;
+                    this.ucLaps.Size = ucA1GP.Size;
+                    this.ucLaps.Location = ucA1GP.Location;
 
-                //this.FuelData.Location = new Point(110, 10);
+                    //this.FuelData.Location = new Point(110, 10);
 
-                ucSplits.Size = ucA1GP.Size;
-                ucSplits.Location = ucA1GP.Location;
-                StatusMenu = tmp;
+                    ucSplits.Size = ucA1GP.Size;
+                    ucSplits.Location = ucA1GP.Location;
+                    StatusMenu = tmp;
+                }
+                else
+                {
+                    SetupUI(false);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                SetupUI(false);
+                // This exception is often fired because the resize event is fired before the panels are placed.
             }
         }
 

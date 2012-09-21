@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TelemetryViewer));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.GraphSplit = new System.Windows.Forms.SplitContainer();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -35,6 +36,7 @@
             this.btPlayPause = new System.Windows.Forms.ToolStripButton();
             this.lbLoading = new System.Windows.Forms.ToolStripLabel();
             this.lbLoadingbar = new System.Windows.Forms.ToolStripProgressBar();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
@@ -77,10 +79,11 @@
             this.btOpen,
             this.btPlayPause,
             this.lbLoading,
-            this.lbLoadingbar});
+            this.lbLoadingbar,
+            this.toolStripButton1});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(58, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(260, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -108,7 +111,7 @@
             // lbLoading
             // 
             this.lbLoading.Name = "lbLoading";
-            this.lbLoading.Size = new System.Drawing.Size(53, 22);
+            this.lbLoading.Size = new System.Drawing.Size(48, 22);
             this.lbLoading.Text = "Loading:";
             this.lbLoading.Visible = false;
             // 
@@ -118,6 +121,16 @@
             this.lbLoadingbar.Name = "lbLoadingbar";
             this.lbLoadingbar.Size = new System.Drawing.Size(100, 22);
             this.lbLoadingbar.Visible = false;
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton1.Text = "channels";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
             // TelemetryViewer
             // 
@@ -149,6 +162,7 @@
         private System.Windows.Forms.ToolStripLabel lbLoading;
         private System.Windows.Forms.ToolStripProgressBar lbLoadingbar;
         private System.Windows.Forms.ToolStripButton btPlayPause;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }
 

@@ -12,14 +12,20 @@ namespace SimTelemetry.Data.Logger
         public Type type { get; protected set; }
         public object instance { get; protected set; }
 
+        // Analysis of class
+        public PropertyDescriptorCollection PropertyDescriptors { get; set; }
+
+        // TODO: Place all these dictionaries to 1 struct.
+
         // Property <> Event Sensitivity
-        public Dictionary<string, List<string>> Events { get; set; }
+        public Dictionary<string, List<List<string>>> Events { get; set; }
+
+        // Property <> Log on change
+        public Dictionary<string, bool> LogOnChange { get; set; }
+        public Dictionary<string, object> LogOnChangePreviousValue { get; set; }
 
         // Property <> ID
         public Dictionary<string, int> Mapping { get; set; }
-
-        // Analysis of class
-        public PropertyDescriptorCollection PropertyDescriptors { get; set; }
 
         // Property <> Log Frequency
         public Dictionary<string, double> Frequencies { get; set; }
@@ -35,13 +41,17 @@ namespace SimTelemetry.Data.Logger
             this.type = type;
             this.instance = instance;
 
-            Events = new Dictionary<string, List<string>>();
+            Events = new Dictionary<string, List<List<string>>>();
+            LogOnChange = new Dictionary<string, bool>();
+            LogOnChangePreviousValue = new Dictionary<string, object>();
             Mapping = new Dictionary<string, int>();
             Frequencies = new Dictionary<string, double>();
             FrequencyCounter = new Dictionary<string, int>();
 
             // Fill things.
             int indexer = 0;
+            double Frequency; 
+
             PropertyDescriptors = TypeDescriptor.GetProperties(type);
             PropertyInfo[] pic = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo pi in pic)
@@ -56,20 +66,30 @@ namespace SimTelemetry.Data.Logger
                     continue;
 
                 // ---------- Frequency ----------
-                double Frequency = 100.0; // 100Hz normal
                 attrs = pi.GetCustomAttributes(typeof(Loggable), false);
+
                 if (attrs.Length == 1)
                     Frequency = ((Loggable)attrs[0]).Freqency;
+                else
+                    Frequency = 100.0; // 100Hz normal
 
                 Frequencies.Add(fi.Name, Frequency);
                 FrequencyCounter.Add(fi.Name, 0);
 
                 // ---------- Log on change ----------
                 attrs = pi.GetCustomAttributes(typeof(LogOnChange), false);
-                // TODO: Implement this.
+                LogOnChange.Add(fi.Name, ((attrs.Length == 1) ? true : false));
+                LogOnChangePreviousValue.Add(fi.Name, null);
                 
                 // ---------- Events ----------
                 attrs = pi.GetCustomAttributes(typeof(LogOnEvent), false);
+                Events.Add(fi.Name, new List<List<string>>());
+                if (attrs.Length > 0)
+                {
+                    foreach(LogOnEvent logEvent in attrs)
+                        Events[fi.Name].Add(logEvent.Events);
+                }
+
 
                 // ---------- Mapping ----------
                 indexer++;
@@ -84,8 +104,12 @@ namespace SimTelemetry.Data.Logger
 
             output.AddRange(BitConverter.GetBytes(ID));
 
+            object data = -10293812;
+            bool data_read = false;
             foreach (PropertyDescriptor fi in PropertyDescriptors)
             {
+                data_read = false;
+
                 // ---------- ID ----------
                 if (Mapping.ContainsKey(fi.Name) == false) continue;
                 int id = Mapping[fi.Name];
@@ -103,18 +127,56 @@ namespace SimTelemetry.Data.Logger
                     dump = true;
                 }
 
+                // ---------- Log on change ----------
+                if (LogOnChange[fi.Name])
+                {
+                    data = fi.GetValue(instance);
+                    data_read = true;
+
+                    // The on-change event overrules frequency events.
+                    dump = !data.Equals(LogOnChangePreviousValue[fi.Name]);
+
+                    LogOnChangePreviousValue[fi.Name] = data;
+                }
+
 
                 // ---------- Event ----------
-                // TODO: Implement this.
 
-                // ---------- Log on change ----------
-                // TODO: Implement this.
+                // It is possible to enter multiple LogOnEvents lists.
+                // The multiple lists are OR'ed.
+                // All elements in 1 list are AND'ed.
+                if (Events.ContainsKey(fi.Name))
+                {
+                    foreach (List<string> evts in Events[fi.Name])
+                    {
+                        bool log = true;
+
+                        // AND all elements in this list.
+                        foreach (string evt in evts)
+                        {
+                            if (EventsFired.Contains(evt) == false)
+                            {
+                                log = false;
+                                break;
+                            }
+                        }
+
+                        // OR elements from the lists (one event must be fired)
+                        if (log)
+                        {
+                            dump = true;
+                            break;
+                        }
+                    }
+                }
 
                 // ---------- Dumping ----------
                 if (dump)
-                {
+                 {
                     byte[] b = new byte[0];
-                    object data = fi.GetValue(instance);
+                    if(!data_read)
+                        data = fi.GetValue(instance);
+
                     Type t = fi.PropertyType;
 
                     if (t == typeof(double))
@@ -134,7 +196,6 @@ namespace SimTelemetry.Data.Logger
 
                     if (t == typeof(string))
                         b = ASCIIEncoding.ASCII.GetBytes((string)data);
-
 
                     output.AddRange(BitConverter.GetBytes((Int32)id));
                     output.AddRange(b);
