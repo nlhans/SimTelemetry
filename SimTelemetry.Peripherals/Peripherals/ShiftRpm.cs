@@ -44,32 +44,44 @@ namespace SimTelemetry.Peripherals.Dashboard
                     return Telemetry.m.Sim.Drivers.Player.GearRatio5;
                     break;
                 case 6:
-                    if (Telemetry.m.Sim.Drivers.Player.Gears == 5)
-                        return Telemetry.m.Sim.Drivers.Player.GearRatio5 * 0.9;
-
                     return Telemetry.m.Sim.Drivers.Player.GearRatio6;
                     break;
                 case 7:
-                    if (Telemetry.m.Sim.Drivers.Player.Gears == 5)
-                        return Telemetry.m.Sim.Drivers.Player.GearRatio5 * 0.9 * 0.9;
-                    if (Telemetry.m.Sim.Drivers.Player.Gears == 6)
-                        return Telemetry.m.Sim.Drivers.Player.GearRatio6 * 0.9;
                     return Telemetry.m.Sim.Drivers.Player.GearRatio7;
                     break;
                 case 8:
-                    if (Telemetry.m.Sim.Drivers.Player.Gears == 5)
-                        return Telemetry.m.Sim.Drivers.Player.GearRatio5 * 0.9 * 0.9 * 0.9;
-                    else if (Telemetry.m.Sim.Drivers.Player.Gears == 6)
-                        return Telemetry.m.Sim.Drivers.Player.GearRatio6 * 0.9 * 0.9;
-                    else if (Telemetry.m.Sim.Drivers.Player.Gears == 7)
-                        return Telemetry.m.Sim.Drivers.Player.GearRatio7 * 0.9;
-                    else
-                    {
-                        return Telemetry.m.Sim.Drivers.Player.GearRatio7;
-                    }
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio8;
                     break;
                 case 9:
-                    return Telemetry.m.Sim.Drivers.Player.GearRatio6 * 0.9 * 0.9 * 0.9;
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio9;
+                    break;
+                case 10:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio10;
+                    break;
+                case 11:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio11;
+                    break;
+                case 12:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio12;
+                    break;
+                case 13:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio13;
+                    break;
+                case 14:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio14;
+                    break;
+                case 15:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio15;
+                    break;
+                case 16:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio16;
+                    break;
+                case 17:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio17;
+                    break;
+                case 18:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio18;
+                    break;
                 default:
                     return 1;
                     break;
