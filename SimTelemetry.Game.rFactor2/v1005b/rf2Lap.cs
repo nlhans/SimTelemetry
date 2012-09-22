@@ -14,7 +14,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         private float _lapTime;
 
-        public int Lap
+        public int LapNumber
         {
             get { return _lap; }
         }

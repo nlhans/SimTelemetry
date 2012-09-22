@@ -228,6 +228,39 @@ namespace SimTelemetry.Objects
         float GearRatio7 { set; get; }
 
         [LogOnChange]
+        float GearRatio8 { set; get; }
+
+        [LogOnChange]
+        float GearRatio9 { set; get; }
+
+        [LogOnChange]
+        float GearRatio10 { set; get; }
+
+        [LogOnChange]
+        float GearRatio11 { set; get; }
+
+        [LogOnChange]
+        float GearRatio12 { set; get; }
+
+        [LogOnChange]
+        float GearRatio13 { set; get; }
+
+        [LogOnChange]
+        float GearRatio14 { set; get; }
+
+        [LogOnChange]
+        float GearRatio15 { set; get; }
+
+        [LogOnChange]
+        float GearRatio16 { set; get; }
+
+        [LogOnChange]
+        float GearRatio17 { set; get; }
+
+        [LogOnChange]
+        float GearRatio18 { set; get; }
+
+        [LogOnChange]
         float GearRatioR { set; get; }
 
         [Loggable(1)]

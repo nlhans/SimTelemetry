@@ -3,7 +3,7 @@
 
     public interface ILap
     {
-        int Lap { get; }
+        int LapNumber { get; }
         float Sector1 { get; }
         float Sector2 { get; }
         float Sector3 { get; }

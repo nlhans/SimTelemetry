@@ -49,7 +49,7 @@
     <Compile Include="v1005b\DriverPlayer.cs" />
     <Compile Include="v1005b\Drivers.cs" />
     <Compile Include="v1005b\rf2Lap.cs" />
-    <Compile Include="v1005b\rFactor2.cs" />
+    <Compile Include="rFactor2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="v1005b\Session.cs" />
     <Compile Include="v1005b\Simulator.cs" />

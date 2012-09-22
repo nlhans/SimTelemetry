@@ -49,6 +49,7 @@
     <Compile Include="Driver.cs" />
     <Compile Include="DriverPlayer.cs" />
     <Compile Include="Drivers.cs" />
+    <Compile Include="Lap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="rFactor.cs" />

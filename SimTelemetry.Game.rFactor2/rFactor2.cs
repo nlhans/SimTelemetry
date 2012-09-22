@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SimTelemetry.Game.rFactor2.v1005b;
 using SimTelemetry.Objects.Utilities;
 
-namespace SimTelemetry.Game.rFactor2.v1005b
+namespace SimTelemetry.Game.rFactor2
 {
     public class rFactor2
     {
@@ -15,6 +12,9 @@ namespace SimTelemetry.Game.rFactor2.v1005b
         public static MemoryPolledReader Game;
         private static Simulator Sim;
 
+
+        // TODO: This class should do version detect first before initializing session, drivers and driverplayer classes.
+        
         public rFactor2(Simulator simulator)
         {
             Sim = simulator;

@@ -14,35 +14,35 @@ namespace SimTelemetry.Game.Rfactor
             this.Base = i;
         }
 
-        /*[Loggable(1)]
+        /*
         public bool Retired
         {
             get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x27A8)) == 1) ? true : false); }
             set { }
         }*/
 
-        [Loggable(1)]
+        
         public bool Ignition
         {
             get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0xAA)) > 0) ? true : false); }
             set { }
         }
 
-        [Loggable(1)]
+        
         public int MemoryBlock
         {
             set { }
             get { return ((Base - 0x7154C0)/0x5F48); }
         }
 
-        [Loggable(1)]
+        
         public int SectorsDriven
         {
             set { }
             get { return rFactor.Game.ReadInt32(new IntPtr(0x0070F988 + 0x04 + 0x04*3*MemoryBlock)); }
         }
 
-        [Loggable(1)]
+        
         public bool Active
         {
             set { }
@@ -56,28 +56,28 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(0.01)]
+        
         public bool IsPlayer
         {
             set { }
             get { return ((rFactor.Game.ReadInt32(new IntPtr(0x0071528C)) == BaseAddress) ? true : false); }
         }
 
-        [Loggable(0.05)]
+
         public string Name
         {
             set { }
             get { return rFactor.Game.ReadString(new IntPtr(this.BaseAddress + 0x5B08), 64); }
         }
 
-        [Unloggable()]
+        
         public int BaseAddress
         {
             set { }
             get { return Base; }
         }
 
-        [Loggable(5)]
+        
         public double CoordinateX
         {
             //set {} get {return rFactor.Game.ReadDouble(new IntPtr(this.BaseAddress + 0x289C)); }
@@ -85,7 +85,7 @@ namespace SimTelemetry.Game.Rfactor
             get { return rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0x10)); }
 
         }
-        [Loggable(5)]
+        
         public double CoordinateY
         {
             //get { return rFactor.Game.ReadDouble(new IntPtr(this.BaseAddress + 0x28A0)); }
@@ -93,7 +93,7 @@ namespace SimTelemetry.Game.Rfactor
             get { return rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0x14)); }
 
         }
-        [Loggable(5)]
+        
         public double CoordinateZ
         {
             //get { return rFactor.Game.ReadDouble(new IntPtr(this.BaseAddress + 0x28A4)); }
@@ -101,20 +101,20 @@ namespace SimTelemetry.Game.Rfactor
             get { return rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0x18)); }
         }
 
-        [Loggable(25)]
+        
         public double Throttle
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0xA8)); }
         }
-        [Loggable(25)]
+        
         public double Brake
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0x2940)); }
         }
 
-        [Loggable(1)]
+        
         public double Fuel
         {
             set { }
@@ -123,75 +123,75 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public double Fuel_Max
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(this.BaseAddress + 0x3160)); }
         }
 
-        [Loggable(0.05)]
+
         public string CarModel
         {
             set { }
             get { return rFactor.Game.ReadString(new IntPtr(this.BaseAddress + 0x5C82), 128); }
         }
 
-        [Loggable(0.05)]
+
         public string CarClass
         {
             set { }
             get { return rFactor.Game.ReadString(new IntPtr(this.BaseAddress + 0x5C62), 0x20); }
         }
 
-        [Loggable(0.05)]
+
         public bool Control_AI_Aid
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(this.BaseAddress + 0x1FB4)) == 1; }
         }
 
-        [Loggable(1)]
+        
         public bool PitLimiter
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(this.BaseAddress + 0x17B1)) == 1; }
         }
-        [Loggable(1)]
+        
         public bool Pits
         {
             set { }
             get { return this.Speed < 120 / 3.6 && rFactor.Game.ReadByte(new IntPtr(this.BaseAddress + 0x27A8)) == 1; }
         }
-        [Loggable(1)]
+        
         public bool HeadLights
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(this.BaseAddress + 0x17AD)) == 1; }
         }
 
-        [Loggable(25)]
+        
         public int Laps
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(this.BaseAddress + 0x3CF8)); }
         }
 
-        [Loggable(0.05)]
+
         public float LapTime_Best
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x3D6C)); }
         }
 
-        [Loggable(1)]
+        
         public float LapTime_Last
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x3D0C)); }
         }
 
-        [Loggable(1)]
+        
         public float LapTime_Best_Sector1
         {
             set { }
@@ -210,7 +210,7 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public float LapTime_Best_Sector2
         {
             set { }
@@ -229,7 +229,7 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public float LapTime_Best_Sector3
         {
             set { }
@@ -247,7 +247,7 @@ namespace SimTelemetry.Game.Rfactor
                 return best;
             }
         }
-        [Loggable(1)]
+        
         public float Sector_1_Best
         {
             set { }
@@ -258,7 +258,7 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public float Sector_2_Best
         {
             set { }
@@ -269,7 +269,7 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public float Sector_3_Best
         {
             set { }
@@ -280,7 +280,7 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public float Sector_1_Last
         {
             set { }
@@ -297,7 +297,7 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public float Sector_2_Last
         {
             set { }
@@ -314,7 +314,7 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(1)]
+        
         public float Sector_3_Last
         {
             set { }
@@ -334,7 +334,7 @@ namespace SimTelemetry.Game.Rfactor
         public ILap GetBestLap()
         {
             List<ILap> laps = GetLapTimes();
-            if (laps.Count == 0) return new rFactorLap(0, 0, 0, 0);
+            if (laps.Count == 0) return new Lap(0, 0, 0, 0);
             ILap best = laps[0];
             foreach (ILap l in laps)
             {
@@ -346,27 +346,27 @@ namespace SimTelemetry.Game.Rfactor
             return best;
         }
 
-        [Loggable(50)]
+        
         public double MetersDriven
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(Base + 0x3D04)); }
         }
 
-        [Loggable(1)]
+        
         public int PitStopRuns
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(Base + 0x3D2C)); }
         }
-        [Loggable(1)]
+        
         public bool Retired
         { // 0x604E
             set { }
             get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x4160)) == 1) ? true : false); } // 0x629C. 27A8
         }
 
-        [Loggable(1)]
+        
         public TrackPosition TrackPosition
         {
             set { }
@@ -479,7 +479,7 @@ namespace SimTelemetry.Game.Rfactor
                 float s3 = rFactor.Game.ReadFloat(new IntPtr(lapsbase + 0x0C + l * 0x04 * 0x06));
                 s3 -= s2;
                 s2 -= s1;
-                rFactorLap lap = new rFactorLap(l, s1, s2, s3);
+                Lap lap = new Lap(l, s1, s2, s3);
                 laps.Add(lap);
             }
             LastLapTimes = laps;
@@ -487,80 +487,80 @@ namespace SimTelemetry.Game.Rfactor
             return laps;
         }
 
-        [Loggable(0.05)]
+
         public LevelIndicator SteeringHelp
         {
             set { }
             get { return (LevelIndicator)rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x1CFC)); }
         }
 
-        [Loggable(0.05)]
+
         public int PitStop_FrontWingSetting
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x2324)); }
         }
-        [Loggable(0.05)]
+
         public int PitStop_RearWingSetting
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x2364)); }
         }
-        [Loggable(0.05)]
+
         public int PitStop_FuelSetting
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x2024)); }
         }
 
-        [Loggable(0.05)]
+
         public double FuelSetting_Offset
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(BaseAddress + 0x2010)); }
         }
 
-        [Loggable(0.05)]
+
         public double FuelSetting_Scale
         {
             set { }
             get { return rFactor.Game.ReadDouble(new IntPtr(BaseAddress + 0x2018)); }
         }
 
-        [Loggable(0.05)]
+
         public double MassEmpty
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x28D8)); }
         }
 
-        [Loggable(0.05)]
+
         public double Mass
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x28DC)); }
         }
 
-        [Loggable(0.05)]
+
         public double RPM_Stationary
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x09E4)); }
         }
-        [Loggable(0.05)]
+
         public double RPM_Max_Offset
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x3180)); }
         }
-        [Loggable(0.05)]
+
         public double RPM_Max_Scale
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x31C0)); }
         }
 
-        [Loggable(10)]
+        
         public double Speed
         {
             set { }
@@ -575,132 +575,142 @@ namespace SimTelemetry.Game.Rfactor
             }
         }
 
-        [Loggable(10)]
+        
         public double RPM
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0xA4)); }
         }
 
-        [Loggable(0.2)]
+        
         public int Position
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x3D20)); }
         }
-        [Loggable(10)]
+        
         public int Gear
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x321C)); }
         }
 
-        [Loggable(0.05)]
+
         public int Gears
         {
             set { }
             get { return rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x3224)); }
         }
 
-        [Loggable(0.05)]
+
         public float GearRatio1
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 1 + 0x31F8)); }
         }
 
-        [Loggable(0.05)]
+
         public float GearRatio2
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 2 + 0x31F8)); }
         }
 
-        [Loggable(0.05)]
+
         public float GearRatio3
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 3 + 0x31F8)); }
         }
 
-        [Loggable(0.05)]
+
         public float GearRatio4
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 4 + 0x31F8)); }
         }
 
-        [Loggable(0.05)]
+
         public float GearRatio5
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 5 + 0x31F8)); }
         }
 
-        [Loggable(0.05)]
+
         public float GearRatio6
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 6 + 0x31F8)); }
         }
 
-        [Loggable(0.05)]
+
         public float GearRatio7
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 7 + 0x31F8)); }
         }
 
-        // TODO: Add support for 8-10 gears
+        public float GearRatio8 { get { return 0; } set { } }
+        public float GearRatio9 { get { return 0; } set { } }
+        public float GearRatio10 { get { return 0; } set { } }
+        public float GearRatio11 { get { return 0; } set { } }
+        public float GearRatio12 { get { return 0; } set { } }
+        public float GearRatio13 { get { return 0; } set { } }
+        public float GearRatio14 { get { return 0; } set { } }
+        public float GearRatio15 { get { return 0; } set { } }
+        public float GearRatio16 { get { return 0; } set { } }
+        public float GearRatio17 { get { return 0; } set { } }
+        public float GearRatio18 { get { return 0; } set { } }
 
-        [Loggable(0.05)]
+
         public float GearRatioR
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x4 * 0 + 0x31F8)); }
         }
 
-        [Loggable(0.5)]
+        
         public float TyreWear_LF
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2A34)); }
         }
 
-        [Loggable(0.5)]
+        
         public float TyreWear_RF
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2C1C)); }
         }
 
-        [Loggable(0.5)]
+        
         public float TyreWear_LR
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2E04)); }
         }
 
-        [Loggable(0.5)]
+        
         public float TyreWear_RR
         {
             set { }
             get { return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2FEC)); }
         }
 
-        [Loggable(1)]
+        
         public bool Flag_Yellow
         {
             set { }
             get { return ((rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0xCD8)) == 2) ? false : true); }
         }
-        [Loggable(1)]
+        
         public bool Flag_Blue
         {
             set { }
             get { return ((rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x3E39)) == 0) ? false : true); }
         }
-        [Loggable(1)]
+        
         public bool Flag_Black
         {
             set { }
@@ -708,7 +718,7 @@ namespace SimTelemetry.Game.Rfactor
         }
 
         private int __LapsDataCached;
-        [Unloggable()]
+        
         public IntPtr __LapsData
         {
             set { }
@@ -723,33 +733,6 @@ namespace SimTelemetry.Game.Rfactor
                 }
                 return new IntPtr(__LapsDataCached);
             }
-        }
-    }
-
-    public class rFactorLap : ILap
-    {
-        private int _lap;
-        private float _sector1;
-        private float _sector2;
-        private float _sector3;
-
-        public rFactorLap(int lap, float s1, float s2, float s3)
-        {
-            _lap = lap;
-            _sector1 = s1;
-            _sector2 = s2;
-            _sector3 = s3;
-        }
-
-        public int Lap { get { return _lap; } }
-
-        public float Sector1 { get { return _sector1; } }
-        public float Sector2 { get { return _sector2; } }
-        public float Sector3 { get { return _sector3; } }
-
-        public float LapTime
-        {
-            get { return _sector1 + _sector2 + _sector3; }
         }
     }
 }

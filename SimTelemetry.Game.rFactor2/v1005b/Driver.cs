@@ -386,6 +386,20 @@ namespace SimTelemetry.Game.rFactor2.v1005b
             set { throw new NotImplementedException(); }
         }
 
+        // TODO: Implement gears 8-10? (Not sure how many rFactor 2 supports)
+        public float GearRatio8 { get; set; }
+        public float GearRatio9 { get; set; }
+
+        public float GearRatio10 { get { return 0; } set { } }
+        public float GearRatio11 { get { return 0; } set { } }
+        public float GearRatio12 { get { return 0; } set { } }
+        public float GearRatio13 { get { return 0; } set { } }
+        public float GearRatio14 { get { return 0; } set { } }
+        public float GearRatio15 { get { return 0; } set { } }
+        public float GearRatio16 { get { return 0; } set { } }
+        public float GearRatio17 { get { return 0; } set { } }
+        public float GearRatio18 { get { return 0; } set { } }
+
         public float GearRatioR
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C - 0x4 * 1)); }
