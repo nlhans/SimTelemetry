@@ -194,7 +194,7 @@ namespace LiveTelemetry
             Tmr_MdSpeed = new Timer();
             Tmr_LwSpeed = new Timer();
 
-            Tmr_HiSpeed.Interval = 75;   // 10Hz
+            Tmr_HiSpeed.Interval = 30;   // 10Hz
             Tmr_MdSpeed.Interval = 600;  // 4 Hz
             Tmr_LwSpeed.Interval = 1000;  // 1 Hz
 
@@ -348,6 +348,9 @@ namespace LiveTelemetry
 
 
                     this.ucLapChart.Location = new Point(this.Size.Width - ucLapChart.Size.Width - 30, 10);
+                    if (this.ucLapChart.Height + this.ucA1GP.Height > this.Height - 40)
+                        this.ucLapChart.Size = new Size(this.ucLapChart.Width, this.Height - this.ucA1GP.Height - 40);
+
                     this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 20, this.Size.Height);
                     this.ucTrackmap.Location = new Point(10, 10);
                     SessionData.Location = new Point(ucA1GP.Location.X, ucA1GP.Location.Y - SessionData.Size.Height - 10);

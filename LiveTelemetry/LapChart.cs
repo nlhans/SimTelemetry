@@ -57,7 +57,7 @@ namespace LiveTelemetry
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            this.Size = new Size(460, 500);
+            this.Size = new Size(460, this.Size.Height);
             Graphics g = e.Graphics;
             g.FillRectangle(Brushes.Black, e.ClipRectangle);
             if (!Telemetry.m.Active_Session) return;

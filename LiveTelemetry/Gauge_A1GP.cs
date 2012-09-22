@@ -644,7 +644,7 @@ namespace LiveTelemetry
                 g.DrawString("Split", sf, DimBrush, this.Width - 30, this.Height - 15);
 
                 TimeSpan dt = DateTime.Now.Subtract(lastrender);
-                fps = fps*0.98 + 0.02*(1000/dt.TotalMilliseconds);
+                fps = fps*0.7 + 0.3*(1000/dt.TotalMilliseconds);
                 g.DrawString(fps.ToString("00fps"), sf, Brushes.White, 0, 0);
                 lastrender = DateTime.Now;
             }
