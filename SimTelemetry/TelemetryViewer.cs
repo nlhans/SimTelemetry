@@ -80,7 +80,7 @@ namespace SimTelemetry
 
             // Plotter configuration
             _PlotterConfiguration = new PlotterConfigurations();
-            _PlotterConfiguration.Load("ChartSetup.txt"); // TODO: Make this independant.
+            _PlotterConfiguration.Load("ChartSetup.txt"); // TODO: Make this independant of configuration files.
             _PlotterConfiguration.Configure(cPlotter);
 
             this.GraphSplit.Panel2.Controls.Add(cPlotter);

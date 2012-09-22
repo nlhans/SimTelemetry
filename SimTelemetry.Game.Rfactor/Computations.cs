@@ -100,7 +100,7 @@ namespace SimTelemetry.Game.Rfactor
 
         public static double Get_Engine_Torque(double RPM, double throttle, double boost)
         {
-            int BaseEngineCurve = 0x00ADD94C; // TODO: MAP TO SIMULATOR MAPPING
+            int BaseEngineCurve = 0x00ADD94C; // TODO: Map to simulator plug-in, add local torque curve read-outs.
 
             // get engine torque figures (at this engine RPM)
             // this is directly from memory based engine curves.

@@ -138,13 +138,13 @@ namespace SimTelemetry.Data.Logger
 
         }
 
+        /* DEPRECATED
         public void Start()
         {
             if (Active == false)
             {
                 Active = true;
 
-                // TODO: Build & Dump header
 
                 _Worker = new Timer();
                 _Worker.Elapsed += new ElapsedEventHandler(_Worker_Elapsed);
@@ -153,7 +153,7 @@ namespace SimTelemetry.Data.Logger
                 _Worker.Start();
             }
 
-        }
+        }*/
 
         public void Start(string file)
         {
@@ -161,7 +161,6 @@ namespace SimTelemetry.Data.Logger
             {
                 Active = true;
 
-                // TODO: Build & Dump header
                 BuildHeader();
                 Annotate(file);
 

@@ -108,7 +108,7 @@ namespace SimTelemetry.Game.GTR2
 
         public double Fuel_Max
         {
-            get { return 100; throw new NotImplementedException(); } // TODO
+            get { return 100; throw new NotImplementedException(); } // TODO: Search memory address.
             set { }
         }
 

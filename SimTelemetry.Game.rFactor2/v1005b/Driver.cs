@@ -112,7 +112,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public double Fuel_Max
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x3ED4 + BaseAddress)); } // TODO
+            get { return rFactor2.Game.ReadFloat(new IntPtr(0x3ED4 + BaseAddress)); } // TODO: Search memory address.
             set { throw new NotImplementedException(); }
         }
 

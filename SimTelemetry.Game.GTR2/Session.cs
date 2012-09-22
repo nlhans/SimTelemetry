@@ -93,7 +93,7 @@ namespace SimTelemetry.Game.GTR2
         {
             get
             {
-                // TODO:
+                // TODO: Search memory addresses
                 SessionInfo inf = new SessionInfo();
                 inf.Type = SessionType.TEST_DAY;
                 inf.Number = 1;
