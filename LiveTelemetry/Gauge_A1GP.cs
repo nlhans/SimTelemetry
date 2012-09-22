@@ -106,13 +106,13 @@ namespace LiveTelemetry
             try
             {
                 int border_bounds = 60;
-                int width = e.ClipRectangle.Width;
-                int height = e.ClipRectangle.Height;
+                int width = this.Width;
+                int height = this.Height;
                 width -= border_bounds;
                 height -= border_bounds;
                 base.OnPaint(e);
                 Graphics g = e.Graphics;
-                g.FillRectangle(Brushes.Black, e.ClipRectangle);
+                g.FillRectangle(Brushes.Black, 0,0,this.Width, this.Height);
                 if (!Telemetry.m.Active_Session) return;
 
 
@@ -460,12 +460,12 @@ namespace LiveTelemetry
                 if (Telemetry.m.Sim.Drivers.Player.Brake > Telemetry.m.Sim.Drivers.Player.Throttle)
                 {
                     g.DrawString(Telemetry.m.Sim.Drivers.Player.Brake.ToString("000%"), f, Brushes.DarkRed,
-                                 e.ClipRectangle.Width - 45, 119);
+                                 width+border_bounds - 45, 119);
                 }
                 else
                 {
                     g.DrawString(Telemetry.m.Sim.Drivers.Player.Throttle.ToString("000%"), f, Brushes.DarkGreen,
-                                 e.ClipRectangle.Width - 45, 119);
+                                 width + border_bounds - 45, 119);
                 }
                 
                 // Fuel remaining / estimated laps.
@@ -484,10 +484,10 @@ namespace LiveTelemetry
                 }
                 if (fuel_state < 0.1)
                     g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("00.0").Replace(".","L"), f, Brushes.Red,
-                                 e.ClipRectangle.Width - 45, 139);
+                                 width + border_bounds - 45, 139);
                 else
                     g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("000.0").Replace(".", "L"), f, Brushes.DarkOrange,
-                                 e.ClipRectangle.Width - 45, 139);
+                                 width + border_bounds - 45, 139);
 
                 // Laps estimation.
                 if (FuelUsage.Count > 5)
@@ -498,12 +498,12 @@ namespace LiveTelemetry
                     if (avg > 0)
                     {
                         double laps = Telemetry.m.Sim.Player.Fuel/avg;
-                        g.DrawString(laps.ToString("(000)"), f, Brushes.DarkOrange, e.ClipRectangle.Width - 45, 159);
+                        g.DrawString(laps.ToString("(000)"), f, Brushes.DarkOrange, width+border_bounds - 45, 159);
                         g.DrawString(avg.ToString("0.00L") + " per lap", f, Brushes.DarkOrange, height + 10, 159);
                     }
                 }
                 else
-                    g.DrawString("(???)", f, DimBrush, e.ClipRectangle.Width - 45, 159);
+                    g.DrawString("(???)", f, DimBrush, width + border_bounds - 45, 159);
 
                 // Engine wear / laps estimation
                 double engine_live = Telemetry.m.Sim.Player.Engine_Lifetime_Live;
@@ -524,13 +524,13 @@ namespace LiveTelemetry
 
 
                 if (engine_perc < 0.4)
-                    g.DrawString((100*engine_perc).ToString("00.0").Replace(".","%"), f, Brushes.Red, e.ClipRectangle.Width - 45, 179);
+                    g.DrawString((100 * engine_perc).ToString("00.0").Replace(".", "%"), f, Brushes.Red, width + border_bounds - 45, 179);
                 else
-                   g.DrawString((100*engine_perc).ToString("000.0").Replace(".","%"), f, Brushes.DarkOrange, e.ClipRectangle.Width - 45,  179);
+                    g.DrawString((100 * engine_perc).ToString("000.0").Replace(".", "%"), f, Brushes.DarkOrange, width + border_bounds - 45, 179);
 
                 // Laps estimation.
                 if (Counter == 10)
-                    g.DrawString("Refreshed!", f, Brushes.Yellow, e.ClipRectangle.Width - 75, 199);
+                    g.DrawString("Refreshed!", f, Brushes.Yellow, width + border_bounds - 75, 199);
                 else
                 {
                 if (EngineUsage.Count > 5)
@@ -542,7 +542,7 @@ namespace LiveTelemetry
                     {
                         double engine_laps = Engine_LastLap / avg;
                         g.DrawString(engine_laps.ToString("(000)"), f, Brushes.DarkOrange,
-                                     e.ClipRectangle.Width - 45, 199);
+                                     width + border_bounds - 45, 199);
                         g.DrawString(avg.ToString("0.00%") + " per lap", f, Brushes.DarkOrange,
                                       height +10, 199);
                     }
@@ -550,7 +550,7 @@ namespace LiveTelemetry
                 else
 
                     g.DrawString("(???)", f, DimBrush,
-                                 e.ClipRectangle.Width - 45, 199);
+                                 width + border_bounds - 45, 199);
                 }
 
                 // Power bar.
@@ -574,7 +574,7 @@ namespace LiveTelemetry
 
                 g.DrawString("POWER", f, DimBrush, height - 50, 219);
                 g.FillRectangle(Brushes.Yellow, height + 10, 220, power_factor * 120f, 13);
-                g.DrawString((power).ToString("0000"), f, Brushes.Yellow, e.ClipRectangle.Width - 45, 220);
+                g.DrawString((power).ToString("0000"), f, Brushes.Yellow, width+border_bounds - 45, 220);
                 
                 Font sf = new Font("Arial", 8f);
 
@@ -588,6 +588,8 @@ namespace LiveTelemetry
                 // ---------------------------------      FPS     ---------------------------------
                 TimeSpan dt = DateTime.Now.Subtract(lastrender);
                 fps = fps*0.7 + 0.3*(1000/dt.TotalMilliseconds);
+                if (double.IsInfinity(fps) || double.IsNaN(fps))
+                    fps = 0;
                 g.DrawString(fps.ToString("00fps"), sf, Brushes.White, 0, 0);
                 lastrender = DateTime.Now;
             }

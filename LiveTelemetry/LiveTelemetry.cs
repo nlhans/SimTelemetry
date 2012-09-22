@@ -109,13 +109,23 @@ namespace LiveTelemetry
             SimTelemetry.Data.Telemetry.m.Session_Start += mUpdateUI;
             SimTelemetry.Data.Telemetry.m.Session_Stop += mUpdateUI;
 
-            GameData g = new GameData();
+            // TODO: Detect hardware devices (COM-ports or USB devices)
+            // This class is used for my own hardware extension projects.
+            // Race dashboard:
+            // https://dl.dropbox.com/u/207647/IMAG0924.jpg
+            // https://dl.dropbox.com/u/207647/IMAG1204.jpg
+            // Switchboard:
+            // https://dl.dropbox.com/u/207647/IMAG0928.jpg
+            // https://dl.dropbox.com/u/207647/IMAG0934.jpg
+            //GameData g = new GameData();
 
-
+            // Form of singleton.
             myself = this;
 
             this.FormClosing += LiveTelemetry_FormClosing;
 
+            // Read joystick configuration.
+            // Needs fancy dialogs to first-time setup.
             string[] lines = File.ReadAllLines("config.txt");
             string controller = "";
             bool controlleruseindex = false;
@@ -145,11 +155,12 @@ namespace LiveTelemetry
                 }
 
             }
-
+            
+            // Search for the joystick.
             List<JoystickDevice> devices = JoystickDevice.Search();
             if (devices.Count == 0)
             {
-                MessageBox.Show("Cycling through panels disabled, no suitable joystick found?");
+                MessageBox.Show("No (connected) joystick found for display panel control.\r\nTo utilize this please connect a joystick, configure and restart this program.");
             }
             else
             {

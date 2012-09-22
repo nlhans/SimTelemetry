@@ -178,7 +178,7 @@ namespace SimTelemetry.Game.Rfactor
                 int count = 0;
                 foreach (DriverGeneral d in rFactor.Drivers.AllDrivers)
                 {
-                    if (d.Active && d.Pits) count++;
+                    if (d != null && d.Active && d.Pits) count++;
                 }
                 return count;
             }
