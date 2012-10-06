@@ -43,7 +43,9 @@ namespace SimTelemetry.Game.Rfactor
 
             double Drag_Brakes = rFactor.Player.Aerodynamics_BrakeDuct_Drag *
                                    rFactor.Player.Aerodynamics_BrakeDuct_Setting;
-
+            // general formula: BodyDragBase + BrakeDuctSetting*BrakeDuctDrag + RadiatorSetting*RadiatorDrag + BodyDragHeightAvg*ARH + BodyDragHeightDiff*Rake
+            // http://isiforums.net/f/showthread.php/287-Differences-in-aero-calculations-in-CarFactory-vs-rFactor-telemetry
+            // http://koti.mbnet.fi/tspartan/gp1975/airoopas/index.php?id=functions.php
             return Drag_FW + Drag_BodyHeight + Drag_Body + Drag_RW + Drag_Fenders + Drag_Radiator + Drag_Brakes;
 
         }
@@ -65,7 +67,7 @@ namespace SimTelemetry.Game.Rfactor
             double Torq_Min = rFactor.Game.ReadDouble(new IntPtr(0x00ADBF28));
             double Torq_Max = rFactor.Game.ReadDouble(new IntPtr(0x00ADBF30));
             double torque = Torq_Max * throttle + Torq_Min;
-            torque = rFactor.Game.ReadDouble(new IntPtr(0x00ADC224));
+            torque = rFactor.Game.ReadDouble(new IntPtr(0x00ADC224)); // This seems to be the *real* torque figure.
             double HP = rpm * torque / 5252;
             return HP;
 
@@ -155,23 +157,30 @@ namespace SimTelemetry.Game.Rfactor
         public static double GetTheoraticalTopSpeed()
         {
             // Get areo drag
-            // Get engine powerrrr
-            double aero = Computations.GetAeroDrag();
-
-            double max_hp = Computations.Get_Engine_MaxHP();
+            double aero = GetAeroDrag(); // 2.07m^2 surface area? Dunno
+            // Get engine power
+            double max_hp = Get_Engine_MaxHP();
+            // TODO: Rolling resistance / speed effects
 
             // calculate power
             // double pd = 0.5 * p * v^3 * Cd * A
             // Cd * a = aero
             // p = air density (1.204kg/m^3 at 20C)
             // v = velocity
-            max_hp = Power.HP_KW(max_hp)*0.8;
-            double AeroLolWut = 0.5 * GetAirDensity() * aero * 1.64 * Math.Pow(300 / 3.6, 2);
-            double AeroFactor = 0.5 * GetAirDensity() * aero * 1.6393626354445614/1000.0;
-            double TopSpeed = max_hp/AeroFactor;
-            TopSpeed = Math.Pow(TopSpeed, 1/3.0);
-            
-            //RequiredPower *= 1.6602826720210546;)
+            //max_hp = 1100;
+            max_hp = Power.HP_KW(max_hp);
+
+            double spd = 300/3.6;
+            double F = max_hp*1000/spd;
+            double Fd = (F - 300)/spd/spd;
+
+            double AeroFactor = 0.5 * GetAirDensity() * rFactor.Game.ReadFloat(new IntPtr(0xAE89A4));//2.26 m^2, F1 2010 CM
+            //double diff = Fd/AeroFactor;
+            //AeroFactor = 0.5*rFactor.Game.ReadFloat(new IntPtr(rFactor.Drivers.Player.BaseAddress + 0x37F8)); // Aero Cw
+            //AeroFactor *= GetAirDensity();
+            //AeroFactor = rFactor.Game.ReadFloat(new IntPtr(0xAE755C));
+            //AeroFactor *= rFactor.Game.ReadFloat(new IntPtr(rFactor.Drivers.Player.BaseAddress + 0x3800));
+            double TopSpeed = 3.6*Math.Pow(max_hp/AeroFactor*1000, 1/3.0);
             return TopSpeed;
         }
         public static double GetPracticalTopSpeed()
@@ -182,7 +191,7 @@ namespace SimTelemetry.Game.Rfactor
 
             // get spd-rpm factor for last gear*
             double rpm_spd = 8500/300*3.6;
-            double AeroLolWut = 0.5*GetAirDensity()*aero*1.64;
+            double Aero = 0.5*GetAirDensity()*aero*1.64;
             double max_spd = 0;
             double RPM_Max = Rotations.Rads_RPM(rFactor.Player.Engine_RPM_Max_Live);
             for (int spd = 0; spd < 100; spd++ )
@@ -190,7 +199,7 @@ namespace SimTelemetry.Game.Rfactor
                 double rpm = rpm_spd*spd;
                 if (rpm > RPM_Max) continue;
                 double pwr = Power.HP_KW(Get_Engine_Hp(rpm));
-                double req_pwr = AeroLolWut*Math.Pow(spd, 3)/1000;
+                double req_pwr = Aero*Math.Pow(spd, 3)/1000;
 
                 if (req_pwr > pwr) continue;
                 else max_spd = spd;
