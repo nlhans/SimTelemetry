@@ -5,6 +5,9 @@ using System.Text;
 
 namespace SimTelemetry.Data
 {
+    /// <summary>
+    /// Multiple extensions used around the program.
+    /// </summary>
     public static partial class Extensions
     {
 

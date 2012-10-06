@@ -28,7 +28,7 @@ namespace SimTelemetry.Game.Rfactor
             _Modules.Times_History_SectorTimes = true;
             _Modules.Engine_Power = true;
             _Modules.Engine_PowerCurve = true;
-            _Modules.Aero_Drag_Cw = true;
+            _Modules.Aero_Drag = true;
         }
 
         public void Deinitialize()

@@ -54,7 +54,7 @@ namespace SimTelemetry.Game.GTR2
             _Modules.Times_History_LapTimes = true;
             _Modules.Engine_Power = true;
             _Modules.Engine_PowerCurve = true;
-            _Modules.Aero_Drag_Cw = true;
+            _Modules.Aero_Drag = false;
         }
 
         public void Deinitialize()

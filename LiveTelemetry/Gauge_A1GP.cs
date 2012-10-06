@@ -52,7 +52,7 @@ namespace LiveTelemetry
         #region Joystick Engine Wear control
         private void j_Release(Joystick joystick, int button)
         {
-            if(Counter == 10 && button == LiveTelemetry.TheButton)
+            if(Counter == 10 && button == LiveTelemetry.Joystick_Button)
             {
                 Counter = 0;
                 LiveTelemetry.StatusMenu = 0;
@@ -60,7 +60,7 @@ namespace LiveTelemetry
         }
         private void t_Tick(object sender, EventArgs e)
         {
-            if (joy != null && joy.GetButton(LiveTelemetry.TheButton))
+            if (joy != null && joy.GetButton(LiveTelemetry.Joystick_Button))
             {
                 Counter++;
                 if (Counter >= 4 && Counter != 10) // Timer for resetting engine wear.
@@ -120,10 +120,10 @@ namespace LiveTelemetry
 
                 // ---------------------------------       Speed      ---------------------------------
                 double SpeedTop;
-                if (Telemetry.m.Sim.Modules.Aero_Drag_Cw == false || Telemetry.m.Sim.Modules.Engine_Power == false)
+                if (Telemetry.m.Sim.Modules.Aero_Drag == false || Telemetry.m.Sim.Modules.Engine_Power == false)
                     SpeedTop = 400; // Considered as a typical topspeed for most driving simulators..
                 else
-                    SpeedTop = 400; // TODO: Add interface to simulators to calculate this.
+                    SpeedTop = 360;// SimTelemetry.Game.Rfactor.Computations.GetTheoraticalTopSpeed();// TODO: Add interface to simulators to calculate this.
                 
                 if (double.IsNaN(SpeedTop) || double.IsInfinity(SpeedTop))
                     SpeedTop = 400;
@@ -432,6 +432,7 @@ namespace LiveTelemetry
                 // ---------------------------------    Gear/Speed    ---------------------------------
                 System.Drawing.Font gear_f = new Font("Arial", 30f);
                 System.Drawing.Font speed_f = new Font("Arial", 18f);
+                System.Drawing.Font dist_f = new Font("Arial", 12f);
 
                 if (Telemetry.m.Sim.Player.Gear == -1 || Telemetry.m.Sim.Player.Gear == 0xFF)
                     g.DrawString("R", gear_f, Brushes.White, border_bounds/2 + height/2 + 5,
@@ -450,6 +451,7 @@ namespace LiveTelemetry
                 g.DrawString(Math.Abs(Telemetry.m.Sim.Player.Speed*3.6).ToString("000") + "km/h", speed_f, Brushes.White,
                              border_bounds/2 + height/2 + 10, border_bounds/2 + height/2 + 80);
 
+                g.DrawString(Math.Round(Telemetry.m.Stats.GlobalOdometer, 1).ToString("00000.0km"), dist_f, Brushes.LightGray, border_bounds / 2 + height / 2 + 10, border_bounds / 2 + height / 2 + 110);
                 // ---------------------------------    Labels   ---------------------------------
 
                 // Throttle/brake

@@ -15,24 +15,50 @@ namespace SimTelemetry.Data
 {
     public sealed class Simulators
     {
-        #if DEBUG
+
+        /// <summary>
+        /// DLL catalog containing all simulator plug-ins. In debug the bin/ directory is used, because the program
+        /// has direct references to all plug-ins (meaning on compile they will be automatically recompiled and copied)
+        /// In release mode the simulators should be placed in the directory Simulators.
+        /// </summary>
+#if DEBUG
         DirectoryCatalog catalog = new DirectoryCatalog("./", "SimTelemetry.Game.*.dll");
-        #else
+#else
         DirectoryCatalog catalog = new DirectoryCatalog("simulators/", "SimTelemetry.Game.*.dll");
-        #endif
+#endif
 
-
+        /// <summary>
+        /// List of simulator objects available in catalog. Searches for objects implementing ISimulator.
+        /// </summary>
         [ImportMany(typeof(ISimulator))]
         public List<ISimulator> Sims { get; set; }
-        
-        #region Initializing & Plugins
+
+        /// <summary>
+        /// Upon initializing try loading all simulators from the catalog.
+        /// </summary>
         public Simulators()
         {
+            Sims = new List<ISimulator>();
+            Refresh();
+            
+        }
 
+        /// <summary>
+        /// Refreshes the catalog and initializes all simulators with the host (Telemetry class).
+        /// </summary>
+        private void Refresh()
+        {
             try
             {
-                Sims = new List<ISimulator>();
-                Refresh();
+                catalog.Refresh();
+                CompositionContainer container = new CompositionContainer(catalog);
+                container.ComposeParts(this);
+
+                foreach (ISimulator sim in Sims)
+                {
+                    sim.Host = Telemetry.m;
+                    sim.Initialize();
+                }
             }
             catch (Exception ex)
             {
@@ -40,46 +66,42 @@ namespace SimTelemetry.Data
                 Debug.WriteLine(ex.Message);
                 Debug.WriteLine(ex.StackTrace);
             }
-
         }
 
-        private void Refresh()
-        {
-            catalog.Refresh();
-            CompositionContainer container = new CompositionContainer(catalog);
-            container.ComposeParts(this);
-
-            foreach (ISimulator sim in Sims)
-            {
-                sim.Host = Telemetry.m;
-                sim.Initialize();
-            }
-        }
-        #endregion
-        #region Helpers
-        internal string _GetWithoutFileName(string f)
-        {
-            string file = Path.GetFileName(f);
-            return f.Substring(0, f.Length - file.Length);
-        }
-        #endregion
-
+        /// <summary>
+        /// Returns whether a simulator is available that is active (memory reader is attached).
+        /// </summary>
         public bool Available
         {
-            get { return ((Sims.FindAll(delegate(ISimulator sim) { return sim.Memory.Attached; }).Count == 0) ? false : true); }
+            get
+            {
+                return ((GetAllRunning().Count == 0) ? false : true);
+            }
         }
 
+        /// <summary>
+        /// Gets all simulators that are running(in case of collisions).
+        /// </summary>
+        /// <returns></returns>
         public List<ISimulator> GetAllRunning()
         {
-            return Sims.FindAll(delegate(ISimulator sim) { return sim.Memory.Attached; });
+            return Sims.FindAll(delegate(ISimulator sim)
+                                    {
+                                        return sim.Memory.Attached; // TODO: Use localized detection; not all may use memory.
+                                    });
         }
 
+        /// <summary>
+        /// Gets the simulator that is running. If mutltiple are; the first one is picked.
+        /// </summary>
+        /// <returns></returns>
         public ISimulator GetRunning()
         {
-            List<ISimulator> sms = Sims.FindAll(delegate(ISimulator sim) { return sim.Memory.Attached; });
-            ;
-            if (sms.Count > 0) return sms[0];
-            else return null;
+            List<ISimulator> sms = GetAllRunning();
+            if (sms.Count > 0) 
+                return sms[0];
+            else 
+                return null;
         }
 
     }

@@ -16,6 +16,6 @@ namespace SimTelemetry.Objects
         event Signal Session_Start;
         event Signal Session_Stop;
 
-        event Signal Track_Load;
+        event Signal Track_Loaded;
     }
 }

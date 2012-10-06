@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace LiveTelemetry
@@ -28,11 +23,9 @@ namespace LiveTelemetry
             InitializeComponent();
 
             imagePath = image;
-
             imageBMP = (Bitmap)Bitmap.FromFile(image);
 
-
-            this.SetStyle(
+            SetStyle(
               ControlStyles.AllPaintingInWmPaint |
               ControlStyles.UserPaint |
               ControlStyles.DoubleBuffer, true);
@@ -48,27 +41,31 @@ namespace LiveTelemetry
             if (h > imageBMP.Size.Height)
                 h = imageBMP.Size.Height;
 
-            this.Size = new Size(w, h);
+            Size = new Size(w, h);
             if (w > imageBMP.Size.Width)
                 w = imageBMP.Size.Width;
-            this.bmpSize = new Size(w, h);
+            
+            bmpSize = new Size(w, h);
+            
             if (w < imageBMP.Size.Height)
             {
-                this.bmpSize = new System.Drawing.Size(h * imageBMP.Size.Width / imageBMP.Size.Height, h);
+                bmpSize = new Size(h * imageBMP.Size.Width / imageBMP.Size.Height, h);
             }
+            
             if (imageBMP.Size.Width > w || w < imageBMP.Size.Width)
             {
-                this.bmpSize = new System.Drawing.Size(w, w * imageBMP.Size.Height / imageBMP.Size.Width);
+                bmpSize = new Size(w, w * imageBMP.Size.Height / imageBMP.Size.Width);
             }
+            
             if (this.bmpSize.Height > h)
             {
                 // back to original..
-                this.bmpSize = new System.Drawing.Size(h * imageBMP.Size.Width / imageBMP.Size.Height, h);
+                bmpSize = new Size(h * imageBMP.Size.Width / imageBMP.Size.Height, h);
             }
 
             if (resize)
             {
-                this.Invalidate();
+                Invalidate();
                 OnResize(null);
             }
         }

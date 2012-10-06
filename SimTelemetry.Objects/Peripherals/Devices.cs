@@ -12,12 +12,13 @@ namespace SimTelemetry.Objects
 
         public Devices()
         {
-            // Try looking for..
+            // Try looking for devices (Serial Ports)
             string[] com_ports = SerialPort.GetPortNames();
 
             foreach (string port in com_ports)
             {
                 string name = "";
+                // TODO: Auto detect device type
                 if (port == "COM1") continue;
                 if (port == "COM4")
                     name = "Dashboard";

@@ -1,60 +1,188 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
-using SimTelemetry;
 using SimTelemetry.Data;
-using SimTelemetry.Peripherals.Dashboard;
 using Triton;
 using Triton.Joysticks;
 using SimTelemetry.Objects;
-using SimTelemetry.Data;
 using System.Globalization;
 
 namespace LiveTelemetry
 {
     public partial class LiveTelemetry : Form
     {
-        private static LiveTelemetry myself;
-        public static int TheButton = 6;
+        private static LiveTelemetry _liveTelemetry;
+        private Simulators Sims;
+        
+        // Joystick data for cycling through panels.
+        private Joystick Joystick_Instance;
+        public static int Joystick_Button;
 
-
-        private Timer Tmr_HiSpeed;
+        // Interface update timers.
+        // See end of init function for speed settings.
+        private Timer Tmr_HiSpeed; 
         private Timer Tmr_MdSpeed;
         private Timer Tmr_LwSpeed;
 
-        private LapChart ucLapChart = new LapChart();
-
+        // User interface controls.
+        private LapChart ucLapChart;
         private LiveTrackMap ucTrackmap;
         private Gauge_A1GP ucA1GP;
         private Gauge_Tyres ucTyres;
         private Gauge_Laps ucLaps;
         private Gauge_Splits ucSplits;
+        private ucSessionInfo ucSessionData;
 
-        private ucSessionInfo SessionData;
-        private ucFuel FuelData;
-
-        private Joystick Joy;
-
-
-        private Simulators Sims;
-
+        /// <summary>
+        /// Gets or sets the current menu panel it's in (0-3). If set the interface will be updated.
+        /// Static property allows it to be changed from external sources as well.
+        /// </summary>
         public static int StatusMenu
         {
             get { return _StatusMenu; }
             set
             {
                 _StatusMenu = value;
-                myself.SetStatusControls(null, null);
+                _liveTelemetry.SetStatusControls(null, null);
 
             }
         }
-
         private static int _StatusMenu;
 
+        /// <summary>
+        /// Initializes for the window. This setups the data back-end framework, as well searches for joystick
+        /// configuration. Set-ups interface controls.
+        /// </summary>
+        public LiveTelemetry()
+        {
+            // Use EN-US for compatibility with functions as Convert.ToDouble etc.
+            // This is mainly used within track parsers.
+            Application.CurrentCulture = new CultureInfo("en-US");
+
+            // Boot up the telemetry service. Wait for it to start and register events that trigger interface changes.
+            Telemetry.m.Run();
+            while (Telemetry.m.Sims == null) System.Threading.Thread.Sleep(1);
+            Telemetry.m.Sim_Start += mUpdateUI;
+            Telemetry.m.Sim_Stop += mUpdateUI;
+            Telemetry.m.Session_Start += mUpdateUI;
+            Telemetry.m.Session_Stop += mUpdateUI;
+
+            // TODO: Detect hardware devices (COM-ports or USB devices)
+            // GameData is used for my own hardware extension projects.
+            // Race dashboard:
+            // https://dl.dropbox.com/u/207647/IMAG0924.jpg
+            // https://dl.dropbox.com/u/207647/IMAG1204.jpg
+            // Switchboard:
+            // https://dl.dropbox.com/u/207647/IMAG0928.jpg
+            // https://dl.dropbox.com/u/207647/IMAG0934.jpg
+            //GameData g = new GameData();
+
+            // Form of singleton for public StatusMenu access.
+            _liveTelemetry = this;
+
+            // Read joystick configuration.
+            // TODO: Needs fancy dialogs to first-time setup.
+            string[] lines = File.ReadAllLines("config.txt");
+            string controller = "";
+            bool controlleruseindex = false;
+            int controllerindex = 0;
+            foreach (string line in lines)
+            {
+                string[] p = line.Trim().Split("=".ToCharArray());
+                if (line.StartsWith("button"))Joystick_Button = Convert.ToInt32(p[1]);
+                if (line.StartsWith("index"))
+                {
+                    controlleruseindex = true;
+                    controllerindex = Convert.ToInt32(p[1]);
+                }
+                if (line.StartsWith("controller"))
+                    controller = p[1];
+
+                if (line.StartsWith("trackmap"))
+                {
+                    if (p[1] == "static")
+                        LiveTrackMap.StaticTrackMap = true;
+                    else
+                        LiveTrackMap.StaticTrackMap = false;
+                }
+
+            }
+            
+            // Search for the joystick.
+            List<JoystickDevice> devices = JoystickDevice.Search();
+            if (devices.Count == 0)
+            {
+                //MessageBox.Show("No (connected) joystick found for display panel control.\r\nTo utilize this please connect a joystick, configure and restart this program.");
+            }
+            else
+            {
+                if (controlleruseindex)
+                {
+                    Joystick_Instance = new Joystick(devices[controllerindex]);
+                    Joystick_Instance.Release += Joy_Release;
+                }
+                else
+                {
+                    int i = 0;
+                    foreach (JoystickDevice jd in devices)
+                    {
+                        if (jd.Name.Contains(controller.Trim()))
+                        {
+                            Joystick_Instance = new Joystick(jd);
+                            Joystick_Instance.Release += Joy_Release;
+                        }
+                        i++;
+                    }
+                }
+            }
+
+            // Set-up the main interface.
+            FormClosing += LiveTelemetry_FormClosing;
+            SizeChanged += Telemetry_ResizePanels;
+
+            InitializeComponent();
+
+            this.SuspendLayout();
+            BackColor = Color.Black;
+            ucLaps = new Gauge_Laps();
+            ucSplits = new Gauge_Splits();
+            ucA1GP = new Gauge_A1GP(Joystick_Instance);
+            ucTyres = new Gauge_Tyres();
+            ucSessionData = new ucSessionInfo();
+            ucTrackmap = new LiveTrackMap();
+            ucLapChart = new LapChart();
+
+            // Timers
+            Tmr_HiSpeed = new Timer{Interval=33}; // 30fps
+            Tmr_MdSpeed = new Timer{Interval = 450}; // ~2fps
+            Tmr_LwSpeed = new Timer{Interval=1000}; // 1fps
+
+            Tmr_HiSpeed.Tick += Tmr_HiSpeed_Tick;
+            Tmr_MdSpeed.Tick += Tmr_MdSpeed_Tick;
+            Tmr_LwSpeed.Tick += Tmr_LwSpeed_Tick;
+
+            Tmr_HiSpeed.Start();
+            Tmr_MdSpeed.Start();
+            Tmr_LwSpeed.Start();
+
+            System.Threading.Thread.Sleep(500);
+
+            SetupUI();
+            this.ResumeLayout(false);
+        }
+
+        /// <summary>
+        /// Reinitializes the panel changable with user defined button/joystick. The function invokes execution
+        /// to the main interface thread. 
+        /// 0: general data/wear A1GP Style (Default)
+        /// 1: Tyre temperature, wear and brakes.
+        /// 2: Lap times list
+        /// 3: Split times.
+        /// </summary>
+        /// <param name="sender">sender of event</param>
+        /// <param name="e">EventArgs of event</param>
         internal void SetStatusControls(object sender, EventArgs e)
         {
             if (this.InvokeRequired)
@@ -93,167 +221,51 @@ namespace LiveTelemetry
 
         }
 
-        public LiveTelemetry()
-        {
-
-
-            Application.CurrentCulture = new CultureInfo("en-US");
-            //SimTelemetry.TelemetryViewer fileman = new TelemetryViewer();
-            //fileman.ShowDialog();
-            //Application.Exit();
-           // return;
-            SimTelemetry.Data.Telemetry.m.Run();
-            while (SimTelemetry.Data.Telemetry.m.Sims == null) System.Threading.Thread.Sleep(1);
-            SimTelemetry.Data.Telemetry.m.Sim_Start += mUpdateUI;
-            SimTelemetry.Data.Telemetry.m.Sim_Stop += mUpdateUI;
-            SimTelemetry.Data.Telemetry.m.Session_Start += mUpdateUI;
-            SimTelemetry.Data.Telemetry.m.Session_Stop += mUpdateUI;
-
-            // TODO: Detect hardware devices (COM-ports or USB devices)
-            // This class is used for my own hardware extension projects.
-            // Race dashboard:
-            // https://dl.dropbox.com/u/207647/IMAG0924.jpg
-            // https://dl.dropbox.com/u/207647/IMAG1204.jpg
-            // Switchboard:
-            // https://dl.dropbox.com/u/207647/IMAG0928.jpg
-            // https://dl.dropbox.com/u/207647/IMAG0934.jpg
-            //GameData g = new GameData();
-
-            // Form of singleton.
-            myself = this;
-
-            this.FormClosing += LiveTelemetry_FormClosing;
-
-            // Read joystick configuration.
-            // Needs fancy dialogs to first-time setup.
-            string[] lines = File.ReadAllLines("config.txt");
-            string controller = "";
-            bool controlleruseindex = false;
-            int controllerindex = 0;
-            foreach (string line in lines)
-            {
-                string[] p = line.Trim().Split("=".ToCharArray());
-                if (line.StartsWith("button"))
-                {
-                    TheButton = Convert.ToInt32(p[1]);
-                }
-                if (line.StartsWith("index"))
-                {
-                    controlleruseindex = true;
-                    controllerindex = Convert.ToInt32(p[1]);
-                }
-                if (line.StartsWith("controller"))
-                {
-                    controller = p[1];
-                }
-                if (line.StartsWith("trackmap"))
-                {
-                    if (p[1] == "static")
-                        LiveTrackMap.StaticTrackMap = true;
-                    else
-                        LiveTrackMap.StaticTrackMap = false;
-                }
-
-            }
-            
-            // Search for the joystick.
-            List<JoystickDevice> devices = JoystickDevice.Search();
-            if (devices.Count == 0)
-            {
-                MessageBox.Show("No (connected) joystick found for display panel control.\r\nTo utilize this please connect a joystick, configure and restart this program.");
-            }
-            else
-            {
-                if (controlleruseindex)
-                {
-                    Joy = new Joystick(devices[controllerindex]);
-                    Joy.Release += Joy_Release;
-                }
-                else
-                {
-                    int i = 0;
-                    foreach (JoystickDevice jd in devices)
-                    {
-                        if (jd.Name.Contains(controller.Trim()))
-                        {
-                            Joy = new Joystick(jd);
-                            Joy.Release += Joy_Release;
-
-
-                        }
-                        i++;
-                    }
-                }
-            }
-
-            BackColor = Color.Black;
-            InitializeComponent();
-
-            this.SuspendLayout();
-            ucLaps = new Gauge_Laps();
-            ucSplits = new Gauge_Splits();
-            ucA1GP = new Gauge_A1GP(Joy);
-            ucTyres = new Gauge_Tyres();
-            SessionData = new ucSessionInfo();
-            //FuelData = new ucFuel();
-
-            ucTrackmap = new LiveTrackMap();
-            ucLapChart = new LapChart();
-
-            // Timers
-            Tmr_HiSpeed = new Timer();
-            Tmr_MdSpeed = new Timer();
-            Tmr_LwSpeed = new Timer();
-
-            Tmr_HiSpeed.Interval = 30;   // 10Hz
-            Tmr_MdSpeed.Interval = 600;  // 4 Hz
-            Tmr_LwSpeed.Interval = 1000;  // 1 Hz
-
-            Tmr_HiSpeed.Start();
-            Tmr_MdSpeed.Start();
-            Tmr_LwSpeed.Start();
-
-            Tmr_HiSpeed.Tick += Tmr_HiSpeed_Tick;
-            Tmr_MdSpeed.Tick += Tmr_MdSpeed_Tick;
-            Tmr_LwSpeed.Tick += Tmr_LwSpeed_Tick;
-            SizeChanged += LiveTelemetry_SizeChanged;
-
-            System.Threading.Thread.Sleep(500);
-
-            SetupUI(true);
-            this.ResumeLayout(false);
-        }
-
-        void mUpdateUI(object sender)
+        /// <summary>
+        /// Completely re updates user interfaces upon sim start/stop or session start/stop.
+        /// It will call SetupUI(true) in the windows UI context.
+        /// </summary>
+        /// <param name="sender">Parameter fed from anonymous signal. Unused</param>
+        private void mUpdateUI(object sender)
         {
             if (this.InvokeRequired)
             {
                 this.Invoke(new Signal(mUpdateUI), new object[1] { sender });
                 return;
             }
-            SetupUI(true);
+            SetupUI();
         }
 
-
-        void SetupUI(bool update)
+        /// <summary>
+        /// Completely redraws the user interface. It will bring this window into 3 modes:
+        /// A) Waiting for simulator.
+        /// B) Waiting for session.
+        /// C) Telemetry window.
+        /// 
+        /// The simulator panel displays all installed modules of simulators (if an image is found).
+        /// The session panel displays the full-size simulator image (if exists) with "waiting for session".
+        /// The telemetry window adds the controls track map, lap chart, session status. It initializes panel sizes
+        /// via Telemetry_ResizePanels and sets the user panel via SetStatusControls.
+        /// </summary>
+        private void SetupUI()
         {
             if (Telemetry.m.Active_Session)
             {
                 this.Controls.Clear();
-                this.Padding = new System.Windows.Forms.Padding(0);
+                this.Padding = new Padding(0);
 
                 Controls.Add(ucTrackmap);
                 Controls.Add(ucLapChart);
-                Controls.Add(SessionData);
+                Controls.Add(ucSessionData);
                 //Controls.Add(FuelData);
-                LiveTelemetry_SizeChanged(null, null);
+                Telemetry_ResizePanels(null, null);
                 SetStatusControls(null, null);
 
             }
             else if (Telemetry.m.Active_Sim)
             {
                 this.Controls.Clear();
-                this.Padding = new System.Windows.Forms.Padding(0);
+                this.Padding = new Padding(0);
                 // draw sim pic.
 
                 Label t = new Label { Text = "Waiting for session" };
@@ -267,15 +279,16 @@ namespace LiveTelemetry
                 if (File.Exists("Simulators/" + Telemetry.m.Sim.ProcessName + ".png") && this.Width > 80 && this.Height > 100)
                 {
                     ucResizableImage pb = new ucResizableImage("Simulators/" + Telemetry.m.Sim.ProcessName + ".png");
-                    pb.Crop(this.Size.Width - 80, this.Size.Height - 70);
+                    pb.Crop(Size.Width - 80, Size.Height - 70);
                     panel.Controls.Add(pb);
-                    panel.Location = new Point(40, (this.Height - pb.Size.Height - 60) / 2);
-                    panel.Size = new System.Drawing.Size(this.Width - 80, 60 + pb.Size.Height);
+                    panel.Location = new Point(40, (Height - pb.Size.Height - 60) / 2);
+                    panel.Size = new Size(Width - 80, 60 + pb.Size.Height);
 
                 }
                 else
                 {
-                    panel.Size = new System.Drawing.Size(this.Width, 50);
+                    panel.Size = new Size(Width, 60);
+                    panel.Location = new Point(40, (Height - 60) / 2);
                 }
                 panel.Controls.Add(t);
 
@@ -288,7 +301,7 @@ namespace LiveTelemetry
 
                 // draw sim gallery
                 FlowLayoutPanel panel = new FlowLayoutPanel();
-                this.Padding = new System.Windows.Forms.Padding(35);
+                this.Padding = new Padding(35);
 
                 int columns = (int)Math.Ceiling(Math.Sqrt(Telemetry.m.Sims.Sims.Count));
                 if (columns == 0) columns = 1;
@@ -309,7 +322,7 @@ namespace LiveTelemetry
                     if (File.Exists("Simulators/" + sim.ProcessName + ".png"))
                     {
                         ucResizableImage pb = new ucResizableImage("Simulators/" + sim.ProcessName + ".png");
-                        pb.Margin = new System.Windows.Forms.Padding(10);
+                        pb.Margin = new Padding(10);
                         pb.Crop(213, 120);
                         panel.Controls.Add(pb);
                     }
@@ -328,24 +341,40 @@ namespace LiveTelemetry
 
         }
 
-        private Label tmp;
-
-        void LiveTelemetry_FormClosing(object sender, FormClosingEventArgs e)
-        {
+        /// <summary>
+        /// Close the Triton framework properly. This stops all services and what not is running.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LiveTelemetry_FormClosing(object sender, FormClosingEventArgs e)
+        { 
             TritonBase.TriggerExit();
         }
 
-
-        void Joy_Release(Joystick joystick, int button)
+        /// <summary>
+        /// This method listens for joystick button releases and updates the StatusMenu property.
+        /// This will in turn update the user interface.
+        /// </summary>
+        /// <param name="joystick">Joystick class from which the event was wired.</param>
+        /// <param name="button">The button that was released.</param>
+        private void Joy_Release(Joystick joystick, int button)
         {
-            if (button == TheButton)
+            if (button == Joystick_Button)
             {
                 StatusMenu++;
 
             }
         }
 
-        void LiveTelemetry_SizeChanged(object sender, EventArgs e)
+        /// <summary>
+        /// This method resizes the interface to accommodate different window sizes possible on different systems and monitors.
+        /// This method is dependant on the different display modes as described at the method SetupUI().
+        /// 
+        /// The exact details still need further testing across various resolutions and aspect ratio's.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Telemetry_ResizePanels(object sender, EventArgs e)
         {
             try
             {
@@ -364,7 +393,7 @@ namespace LiveTelemetry
 
                     this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 20, this.Size.Height);
                     this.ucTrackmap.Location = new Point(10, 10);
-                    SessionData.Location = new Point(ucA1GP.Location.X, ucA1GP.Location.Y - SessionData.Size.Height - 10);
+                    ucSessionData.Location = new Point(ucA1GP.Location.X, ucA1GP.Location.Y - ucSessionData.Size.Height - 10);
 
                     this.ucTyres.Size = ucA1GP.Size;
                     this.ucTyres.Location = ucA1GP.Location;
@@ -380,7 +409,7 @@ namespace LiveTelemetry
                 }
                 else
                 {
-                    SetupUI(false);
+                    SetupUI();
                 }
             }
             catch (Exception ex)
@@ -389,31 +418,43 @@ namespace LiveTelemetry
             }
         }
 
-        private bool TrackResetDone = false;
-        private double ApexSpeed = 0;
-
-        void Tmr_HiSpeed_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// High-speed user interface updates. This runs gauges that need fluent updates like the A1GP(general data) and tyres.
+        /// The execution is invoked into the windows interface context.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Tmr_HiSpeed_Tick(object sender, EventArgs e)
         {
-            if (this.InvokeRequired)
+            if (InvokeRequired)
             {
-                this.Invoke(new EventHandler(Tmr_HiSpeed_Tick), new object[2] { sender, e });
+                Invoke(new EventHandler(Tmr_HiSpeed_Tick), new object[2] { sender, e });
                 return;
             }
 
             ucA1GP.Update();
             if (Controls.Contains(ucA1GP)) ucA1GP.Invalidate();
             if (Controls.Contains(ucTyres)) ucTyres.Invalidate();
-
-            //FuelData.Update();
         }
 
+        /// <summary>
+        /// Medium-speed interface updates. This is the time keeper (Session status) and track map. The track map
+        /// could also been placed into high-speed, but takes up too much CPU-time for little gain.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void Tmr_MdSpeed_Tick(object sender, EventArgs e)
         {
-            SessionData.Invalidate();
+            ucSessionData.Invalidate();
             ucTrackmap.Invalidate();
 
         }
 
+        /// <summary>
+        /// Low-speed interface updater. All things that keep track of lap times which don't have to be super fast.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void Tmr_LwSpeed_Tick(object sender, EventArgs e)
         {
             ucLapChart.Invalidate();

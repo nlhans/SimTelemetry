@@ -231,7 +231,7 @@ namespace SimTelemetry.Controls
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             this.SizeChanged += new EventHandler(TrackMap_SizeChanged);
-            Telemetry.m.Track_Load += new Triton.Signal(m_Track_Load);
+            Telemetry.m.Track_Loaded += new Triton.Signal(m_Track_Load);
 
             Timer t = new Timer();
             t.Interval = 250;
