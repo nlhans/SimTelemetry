@@ -16,7 +16,7 @@
         public bool Engine_PowerCurve;
         public bool Engine_Health;
 
-        public bool Aero_Drag_Cw;
+        public bool Aero_Drag;
         public bool Aero_Lift;
 
         public bool Track_MapFile;
