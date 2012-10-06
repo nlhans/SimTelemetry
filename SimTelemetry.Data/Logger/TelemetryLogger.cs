@@ -20,7 +20,7 @@ namespace SimTelemetry.Data.Logger
         {
             master = telemetry_master;
 
-            master.Track_Load += new Triton.Signal(AnnotateSession);
+            master.Track_Loaded += new Triton.Signal(AnnotateSession);
         }
 
         void master_Track_Load(object sender)
@@ -33,7 +33,7 @@ namespace SimTelemetry.Data.Logger
             if (master.Sim.Drivers.Player.Laps != LastLaps)
             {
                 LastLaps = master.Sim.Drivers.Player.Laps;
-                _logWriter.Annotate(AnnotationDirectory + "Lap " + LastLaps + ".dat");
+                _logWriter.Annotate(AnnotationDirectory + "Lap " + LastLaps + ".dat", LastLaps);
             }
         }
 
@@ -64,7 +64,7 @@ namespace SimTelemetry.Data.Logger
             while (Directory.Exists(AnnotationDirectory));
             Directory.CreateDirectory(AnnotationDirectory);
 
-            _logWriter.Start(AnnotationDirectory + "Lap 0.dat");
+            _logWriter.Start(AnnotationDirectory + "Lap 0.dat", 0);
             LastLaps = 0;
         }
 

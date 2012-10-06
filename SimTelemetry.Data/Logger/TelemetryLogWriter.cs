@@ -19,6 +19,7 @@ namespace SimTelemetry.Data.Logger
         private Dictionary<string, TelemetryLoggerSubscribedInstance> Instances = new Dictionary<string, TelemetryLoggerSubscribedInstance>();
         private ushort InstanceID = 1;
         private double AnnotationStartTime = 0;
+        private int AnnotationLapNumber = 0;
         private string AnnotationFile = ""; // File to dump in.
         private string AnnotationFileCompress = ""; // File to compress after annotation.
         private StreamWriter _mWrite;
@@ -66,7 +67,7 @@ namespace SimTelemetry.Data.Logger
                 // Get the PREVIOUS last lap:
                 // Insert via task; sleep 1.5second for timing to appear in game
 
-                ThreadPool.QueueUserWorkItem(new WaitCallback(InsertLapTime));
+                ThreadPool.QueueUserWorkItem(AnnotateDatabase);
 
             }
             catch (Exception ex)
@@ -75,13 +76,13 @@ namespace SimTelemetry.Data.Logger
             }
         }
 
-        private void InsertLapTime(object o)
+        private void AnnotateDatabase(object o)
         {
             System.Threading.Thread.Sleep(1500);
             List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
-            if (AllLaps.Count > 2)
+            if (AllLaps.Count != 0)
             {
-                ILap LastLap = AllLaps[AllLaps.Count - 2];
+                ILap LastLap = AllLaps[AnnotationLapNumber-1];
 
                 // Insert into log
                 OleDbConnection con =
@@ -89,16 +90,16 @@ namespace SimTelemetry.Data.Logger
                 using (
                     OleDbCommand newTime =
                         new OleDbCommand(
-                            "INSERT INTO laptimes (simulator,circuit,series,car,laptime,s1,s2,s3,driven,lapno,filepath) " +
+                            "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath,distance,enginerevs,fuelused,gearchanges,samplelength,localtime,simulatortime) " +
                             "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
                             Telemetry.m.Track.Name + "','" +
                             Telemetry.m.Sim.Drivers.Player.CarModel + "','" +
                             Telemetry.m.Sim.Drivers.Player.CarClass + "'," +
                             LastLap.LapTime + "," + LastLap.Sector1 + "," +
                             LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
-                            (Telemetry.m.Sim.Drivers.Player.Laps).ToString() +
+                            (AnnotationLapNumber).ToString() +
                             ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
-                            "')", con))
+                            "', "+Telemetry.m.Stats.Stats_AnnotationQuery+", NOW(), NOW())", con))
                 {
                     newTime.ExecuteNonQuery();
                 }
@@ -110,8 +111,10 @@ namespace SimTelemetry.Data.Logger
          * Start logging in a new file
          * If not yet started, start logging in this file.
          */
-        public void Annotate(string name)
+        public void Annotate(string name, int lapno)
         {
+
+            Telemetry.m.Stats.Reset();
             if (_mWrite != null)
             {
                 AnnotationFileCompress = AnnotationFile;
@@ -133,7 +136,7 @@ namespace SimTelemetry.Data.Logger
             AnnotationStart = DateTime.Now;
             AnnotationStartTime = Telemetry.m.Sim.Session.Time;
             AnnotationFile = name;
-            // Yay
+            AnnotationLapNumber = lapno;
 
 
         }
@@ -155,14 +158,14 @@ namespace SimTelemetry.Data.Logger
 
         }*/
 
-        public void Start(string file)
+        public void Start(string file, int lapno)
         {
             if (Active == false)
             {
                 Active = true;
 
                 BuildHeader();
-                Annotate(file);
+                Annotate(file, lapno);
 
                 _Worker = new Timer();
                 _Worker.Elapsed += new ElapsedEventHandler(_Worker_Elapsed);
@@ -239,6 +242,10 @@ namespace SimTelemetry.Data.Logger
 
         void _Worker_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (Telemetry.m.Active_Session == false)
+                this.Stop();
+
+
             if (_mWrite != null)
             {
                 lock (_mWrite)
@@ -261,7 +268,6 @@ namespace SimTelemetry.Data.Logger
                         }
                         if (dt_ms > 0)
                         {
-
                             byte[] data = new byte[8];
                             byte[] header = new byte[10];
                             header[0] = (byte)'$';
@@ -303,6 +309,7 @@ namespace SimTelemetry.Data.Logger
                                 // Reset the events fired.
                                 EventsFired = new List<string>();
                             }
+
                         }
                     }
                     catch (Exception ex)
