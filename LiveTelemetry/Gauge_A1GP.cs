@@ -451,7 +451,7 @@ namespace LiveTelemetry
                 g.DrawString(Math.Abs(Telemetry.m.Sim.Player.Speed*3.6).ToString("000") + "km/h", speed_f, Brushes.White,
                              border_bounds/2 + height/2 + 10, border_bounds/2 + height/2 + 80);
 
-                g.DrawString(Math.Round(Telemetry.m.Stats.GlobalOdometer, 1).ToString("00000.0km"), dist_f, Brushes.LightGray, border_bounds / 2 + height / 2 + 10, border_bounds / 2 + height / 2 + 110);
+                g.DrawString(Math.Round(Telemetry.m.Stats.GlobalOdometer, 2).ToString("00000.00km"), dist_f, Brushes.LightGray, border_bounds / 2 + height / 2 + 10, border_bounds / 2 + height / 2 + 110);
                 // ---------------------------------    Labels   ---------------------------------
 
                 // Throttle/brake

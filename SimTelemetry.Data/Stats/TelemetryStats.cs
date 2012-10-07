@@ -82,6 +82,7 @@ namespace SimTelemetry.Data.Stats
             get { return _Stats_AnnotationQuery; }
         }
 
+        public bool Stats_AnnotationReset { get; set; }
         private string _Stats_AnnotationQuery;
         private string Car;
         private string Series;
@@ -97,15 +98,21 @@ namespace SimTelemetry.Data.Stats
         {
             _mStatsCounter = new Timer { AutoReset = true, Enabled = true, Interval = 25 };
             _mStatsCounter.Elapsed += Count;
+
+            Stats_AnnotationReset = true;
+            _Stats_AnnotationQuery = "0,0,0,0,0";
         }
         public void Reset()
         {
             Car = Telemetry.m.Sim.Drivers.Player.CarModel;
             Series = Telemetry.m.Sim.Drivers.Player.CarClass;
 
-            _Stats_AnnotationQuery = Math.Round(Stats_Distance, 3) + "," + Math.Round(Stats_EngineRevs, 1) + "," +
-                       Math.Round(Stats_Fuel, 4) + "," + Stats_Gears + "," + Math.Round(Stats_Time, 3);
-
+            if (Stats_AnnotationReset)
+            {
+                _Stats_AnnotationQuery = Math.Round(Stats_Distance, 3) + "," + Math.Round(Stats_EngineRevs, 1) + "," +
+                                         Math.Round(Stats_Fuel, 4) + "," + Stats_Gears + "," + Math.Round(Stats_Time, 3);
+                Stats_AnnotationReset = false;
+            }
             _dStats_Engines = 0;
             _dStats_Time = 0;
             _dStats_Gears = 0;

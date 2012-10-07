@@ -19,9 +19,13 @@ namespace SimTelemetry.Data.Logger
         private Dictionary<string, TelemetryLoggerSubscribedInstance> Instances = new Dictionary<string, TelemetryLoggerSubscribedInstance>();
         private ushort InstanceID = 1;
         private double AnnotationStartTime = 0;
-        private int AnnotationLapNumber = 0;
+        
         private string AnnotationFile = ""; // File to dump in.
+        private int AnnotationLapNumber = 0;
+
         private string AnnotationFileCompress = ""; // File to compress after annotation.
+        private int AnnotationLapNumberCompress = 0;
+        
         private StreamWriter _mWrite;
         private byte[] Header = new byte[0]; // Header per annotation file.
         private DateTime AnnotationStart = DateTime.Now;
@@ -46,7 +50,7 @@ namespace SimTelemetry.Data.Logger
 
         }
 
-        private void Compress()
+        private void Compress(int lap)
         {
             try
             {
@@ -67,7 +71,7 @@ namespace SimTelemetry.Data.Logger
                 // Get the PREVIOUS last lap:
                 // Insert via task; sleep 1.5second for timing to appear in game
 
-                ThreadPool.QueueUserWorkItem(AnnotateDatabase);
+                ThreadPool.QueueUserWorkItem(AnnotateDatabase, lap);
 
             }
             catch (Exception ex)
@@ -78,11 +82,17 @@ namespace SimTelemetry.Data.Logger
 
         private void AnnotateDatabase(object o)
         {
-            System.Threading.Thread.Sleep(1500);
+            System.Threading.Thread.Sleep(100);
             List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
             if (AllLaps.Count != 0)
             {
-                ILap LastLap = AllLaps[AnnotationLapNumber-1];
+                int LapNo = (int) o;
+                ILap LastLap = AllLaps.Find(delegate(ILap l) { return l.LapNumber == LapNo; });
+                if(LastLap == null)
+                    if (AllLaps.Count > LapNo)
+                        LastLap = AllLaps[LapNo - 1];
+                    else
+                        LastLap = AllLaps[AllLaps.Count-1];
 
                 // Insert into log
                 OleDbConnection con =
@@ -101,9 +111,11 @@ namespace SimTelemetry.Data.Logger
                             ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
                             "', "+Telemetry.m.Stats.Stats_AnnotationQuery+", NOW(), NOW())", con))
                 {
+                    
                     newTime.ExecuteNonQuery();
                 }
                 DatabaseOleDbConnectionPool.Freeup();
+                Telemetry.m.Stats.Stats_AnnotationReset = true;
             }
         }
 
@@ -125,7 +137,8 @@ namespace SimTelemetry.Data.Logger
                 }
 
                 // Start compressing.
-                new Task(() => { Compress(); }).Start();
+                AnnotationLapNumberCompress = AnnotationLapNumber;
+                new Task(() => { Compress(AnnotationLapNumberCompress); }).Start();
             }
 
             _mWrite = new StreamWriter(name);
@@ -169,7 +182,7 @@ namespace SimTelemetry.Data.Logger
 
                 _Worker = new Timer();
                 _Worker.Elapsed += new ElapsedEventHandler(_Worker_Elapsed);
-                _Worker.Interval = 2; // 100Hz
+                _Worker.Interval = 2; // 50Hz
                 _Worker.AutoReset = true;
                 _Worker.Start();
             }
