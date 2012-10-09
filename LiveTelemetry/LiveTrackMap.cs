@@ -50,7 +50,9 @@ namespace LiveTelemetry
                                 g.FillEllipse(Brushes.Magenta, a1, a2, bubblesize, bubblesize);
                             else if (driver.Speed < 5) // speed < 
                                 g.FillEllipse(Brushes.Red, a1, a2, bubblesize, bubblesize);
-                            else if (driver.GetSplitTime(Telemetry.m.Sim.Drivers.Player) >= 10000) // lap>
+                            else if (driver.Flag_Yellow) // yellow flag 
+                                g.FillEllipse(Brushes.Yellow, a1, a2, bubblesize, bubblesize);
+                            else if (Telemetry.m.Sim.Session.Type.Type == SessionType.RACE && driver.GetSplitTime(Telemetry.m.Sim.Drivers.Player) >= 10000) // lap>
                                 g.FillEllipse(new SolidBrush(Color.FromArgb(80, 80, 80)), a1, a2, bubblesize, bubblesize);
                             else if (driver.Position > Telemetry.m.Sim.Drivers.Player.Position) // positie<
                                 g.FillEllipse(Brushes.YellowGreen, a1, a2, bubblesize, bubblesize);

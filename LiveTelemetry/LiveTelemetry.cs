@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using SimTelemetry;
 using SimTelemetry.Data;
 using Triton;
 using Triton.Joysticks;
@@ -60,6 +61,13 @@ namespace LiveTelemetry
             // Use EN-US for compatibility with functions as Convert.ToDouble etc.
             // This is mainly used within track parsers.
             Application.CurrentCulture = new CultureInfo("en-US");
+            
+            if(false)
+            {
+                TelemetryViewer t = new TelemetryViewer();
+                t.ShowDialog();
+                return;
+            }
 
             // Boot up the telemetry service. Wait for it to start and register events that trigger interface changes.
             Telemetry.m.Run();
@@ -380,32 +388,35 @@ namespace LiveTelemetry
             {
                 if (Telemetry.m.Active_Session)
                 {
-                    int tmp = StatusMenu;
-                    StatusMenu = 0;
+                    if (ucA1GP != null)
+                    {
+                        int tmp = StatusMenu;
+                        StatusMenu = 0;
 
-                    ucA1GP.Size = new Size(450, 325);
-                    this.ucA1GP.Location = new Point(this.Size.Width - ucA1GP.Size.Width - 20, this.Size.Height - ucA1GP.Height - 40);
+                        ucA1GP.Size = new Size(450, 325);
+                        ucA1GP.Location = new Point(this.Size.Width - ucA1GP.Size.Width - 20,
+                                                    this.Size.Height - ucA1GP.Height - 40);
 
 
-                    this.ucLapChart.Location = new Point(this.Size.Width - ucLapChart.Size.Width - 30, 10);
-                    if (this.ucLapChart.Height + this.ucA1GP.Height > this.Height - 40)
-                        this.ucLapChart.Size = new Size(this.ucLapChart.Width, this.Height - this.ucA1GP.Height - 40);
+                        this.ucLapChart.Location = new Point(this.Size.Width - ucLapChart.Size.Width - 30, 10);
+                        if (this.ucLapChart.Height + this.ucA1GP.Height > this.Height - 40)
+                            this.ucLapChart.Size = new Size(this.ucLapChart.Width, this.Height - this.ucA1GP.Height - 40);
 
-                    this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 20, this.Size.Height);
-                    this.ucTrackmap.Location = new Point(10, 10);
-                    ucSessionData.Location = new Point(ucA1GP.Location.X, ucA1GP.Location.Y - ucSessionData.Size.Height - 10);
+                        this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 20, this.Size.Height);
+                        this.ucTrackmap.Location = new Point(10, 10);
+                        ucSessionData.Location = new Point(ucA1GP.Location.X,
+                                                           ucA1GP.Location.Y - ucSessionData.Size.Height - 10);
 
-                    this.ucTyres.Size = ucA1GP.Size;
-                    this.ucTyres.Location = ucA1GP.Location;
+                        this.ucTyres.Size = ucA1GP.Size;
+                        this.ucTyres.Location = ucA1GP.Location;
 
-                    this.ucLaps.Size = ucA1GP.Size;
-                    this.ucLaps.Location = ucA1GP.Location;
+                        this.ucLaps.Size = ucA1GP.Size;
+                        this.ucLaps.Location = ucA1GP.Location;
 
-                    //this.FuelData.Location = new Point(110, 10);
-
-                    ucSplits.Size = ucA1GP.Size;
-                    ucSplits.Location = ucA1GP.Location;
-                    StatusMenu = tmp;
+                        ucSplits.Size = ucA1GP.Size;
+                        ucSplits.Location = ucA1GP.Location;
+                        StatusMenu = tmp;
+                    }
                 }
                 else
                 {

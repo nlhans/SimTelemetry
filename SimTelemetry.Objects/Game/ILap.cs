@@ -1,6 +1,5 @@
 ﻿namespace SimTelemetry.Objects
 {
-
     public interface ILap
     {
         int LapNumber { get; }

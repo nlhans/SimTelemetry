@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -18,8 +19,11 @@ namespace SimTelemetry.Data.Logger
     {
         private Dictionary<string, TelemetryLoggerSubscribedInstance> Instances = new Dictionary<string, TelemetryLoggerSubscribedInstance>();
         private ushort InstanceID = 1;
+
+        private DateTime AnnotationStart = DateTime.Now;
         private double AnnotationStartTime = 0;
-        
+        private double LastTime = 0;
+
         private string AnnotationFile = ""; // File to dump in.
         private int AnnotationLapNumber = 0;
 
@@ -28,7 +32,6 @@ namespace SimTelemetry.Data.Logger
         
         private StreamWriter _mWrite;
         private byte[] Header = new byte[0]; // Header per annotation file.
-        private DateTime AnnotationStart = DateTime.Now;
         private ManualResetEvent AnnotationWaiter = new ManualResetEvent(false);
 
         private Timer _Worker;
@@ -82,11 +85,12 @@ namespace SimTelemetry.Data.Logger
 
         private void AnnotateDatabase(object o)
         {
+            int LapNo = (int)o;
+            Debug.WriteLine("ANNOTATING LAP " + LapNo);
             System.Threading.Thread.Sleep(100);
             List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
             if (AllLaps.Count != 0)
             {
-                int LapNo = (int) o;
                 ILap LastLap = AllLaps.Find(delegate(ILap l) { return l.LapNumber == LapNo; });
                 if(LastLap == null)
                     if (AllLaps.Count > LapNo)
@@ -107,7 +111,7 @@ namespace SimTelemetry.Data.Logger
                             Telemetry.m.Sim.Drivers.Player.CarClass + "'," +
                             LastLap.LapTime + "," + LastLap.Sector1 + "," +
                             LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
-                            (AnnotationLapNumber).ToString() +
+                            (LapNo).ToString() +
                             ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
                             "', "+Telemetry.m.Stats.Stats_AnnotationQuery+", NOW(), NOW())", con))
                 {
@@ -269,6 +273,7 @@ namespace SimTelemetry.Data.Logger
                         /************** TIME SYNC *************/
 
                         double dt_ms = 0;
+                        double dt_dt_ms = 0;
                         if (Telemetry.m.Sim.Modules.Time_Available)
                         {
                             dt_ms = Telemetry.m.Sim.Session.Time - AnnotationStartTime;
@@ -279,7 +284,10 @@ namespace SimTelemetry.Data.Logger
                             TimeSpan dt = DateTime.Now.Subtract(AnnotationStart);
                             dt_ms = dt.TotalMilliseconds;
                         }
-                        if (dt_ms > 0 && Telemetry.m.Sim.Drivers.Player.Driving) // time is ticking AND player is driving
+
+                        dt_dt_ms = dt_ms - LastTime;
+                        LastTime = dt_ms;
+                        if (dt_dt_ms > 0)// && Telemetry.m.Sim.Drivers.Player.Driving) // time is ticking AND player is driving
                         {
                             byte[] data = new byte[8];
                             byte[] header = new byte[10];

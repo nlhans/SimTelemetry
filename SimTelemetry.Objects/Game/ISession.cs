@@ -5,6 +5,7 @@
         [LogOnChange]
         [LogProperty("Track Location", "Used for track loader. Location of track AIW.")]
         string GameData_TrackFile { get; set; }
+
         [LogOnChange]
         [LogProperty("Game Location", "Used for track loader. Location of game directory.")]
         string GameDirectory { get; set; }
@@ -54,7 +55,7 @@
         int Cars { get; set; }
 
         [Unloggable]
-        [LogProperty("??", "Active?")]
+        [LogProperty("Session Active", "Is the game currently running a session?")]
         bool Active { get; set; }
 
         [LogOnChange]

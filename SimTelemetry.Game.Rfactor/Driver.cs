@@ -23,7 +23,8 @@ namespace SimTelemetry.Game.Rfactor
         
         public bool Driving
         { // 0x1794 seems to be set to 1 at start of each session
-            get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x314)) == 1) ? true : false); }
+            // 0x314 seems to buggy with AI around.
+            get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x3CBF)) == 1) ? true : false); }
             set { }
         }
 
@@ -707,8 +708,10 @@ namespace SimTelemetry.Game.Rfactor
         
         public bool Flag_Yellow
         {
+            // 0x7155C4<<<, 0x7157D4
+            // ^ This goes high when car is <80km/h. 
             set { }
-            get { return ((rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0xCD8)) == 2) ? false : true); }
+            get { return (((rFactor.Game.ReadByte(new IntPtr(BaseAddress + 0x104)) == 1) ? false : true) && !Pits && this.Speed*3.6<40); }
         }
         
         public bool Flag_Blue
