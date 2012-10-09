@@ -6,8 +6,6 @@ namespace SimTelemetry.Game.GTR2
 {
     public class Session : ISession
     {
-
-        [Unloggable]
         public bool Active
         {
             get { return Cars > 0 && Time > 1; }
@@ -17,28 +15,27 @@ namespace SimTelemetry.Game.GTR2
         public bool Flag_YellowFull
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Flag_Red
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Flag_Green
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Flag_Finish
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
-        [Unloggable]
         public string GameData_TrackFile
         {
             get
@@ -47,7 +44,7 @@ namespace SimTelemetry.Game.GTR2
             }
             set { }
         }
-        [Unloggable]
+
         public string GameDirectory
         {
             get
@@ -62,31 +59,31 @@ namespace SimTelemetry.Game.GTR2
         public int RaceLaps
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool IsRace
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public string CircuitName
         {
-            get { return "";  }
-            set { throw new NotImplementedException(); }
+            get { return ""; }
+            set { }
         }
 
         public float TrackTemperature
         {
             get { return GTR2.Game.ReadFloat(new IntPtr(0x00FB1F38)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float AmbientTemperature
         {
             get { return GTR2.Game.ReadFloat(new IntPtr(0x00FB1F34)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public SessionInfo Type
@@ -100,37 +97,43 @@ namespace SimTelemetry.Game.GTR2
                 inf.Length = 3600;
                 return inf;
             }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float Time
         {
             get { return GTR2.Game.ReadFloat(new IntPtr(0x0082F4A8)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float TimeClock
         {
             get { return 0.0f; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int Cars_InPits
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int Cars_OnTrack
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int Cars
         {
             get { return GTR2.Game.ReadInt32(new IntPtr(0x00757C10)); }
-            set { throw new NotImplementedException(); }
+            set { }
+        }
+
+        public bool IsOffline
+        {
+            get { return true; }
+            set { }
         }
     }
 }

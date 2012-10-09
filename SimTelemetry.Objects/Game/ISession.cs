@@ -72,5 +72,9 @@
         [LogOnChange]
         [LogProperty("Flags: Chequered Flag", "Indicates a race finish situation.")]
         bool Flag_Finish { get; set; }
+
+        [LogOnChange]
+        [LogProperty("Offline session","Is this session offline or multiplayer?")]
+        bool IsOffline { get; set; }
     }
 }
