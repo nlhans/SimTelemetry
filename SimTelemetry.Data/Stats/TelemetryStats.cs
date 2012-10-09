@@ -158,11 +158,11 @@ namespace SimTelemetry.Data.Stats
                         _dStats_Gears++;
 
                     double dFuel = (Last_Fuel - Telemetry.m.Sim.Player.Fuel);
-                    if (Telemetry.m.Sim.Player.Fuel < Last_Fuel && dFuel < 0.5) // do not count refuelling
+                    if (Telemetry.m.Sim.Player.Fuel < Last_Fuel && dFuel < 0.5) // do not count refueling
                         _dStats_Fuel += (Last_Fuel - Telemetry.m.Sim.Player.Fuel);
 
                     _dStats_Engines += dt_ms * Telemetry.m.Sim.Player.Engine_RPM / 2.0 / Math.PI; // rad/s to rps
-                    _dStats_Distance += dt_ms * Math.Abs(Telemetry.m.Sim.Player.Speed) / 1000.0;//km's
+                    _dStats_Distance += dt_ms * Math.Abs(Telemetry.m.Sim.Player.Speed) / 1000.0;// km's
                     TodaysDistance += dt_ms * Math.Abs(Telemetry.m.Sim.Player.Speed) / 1000.0; // quick approximation of odometer
 
                     _dStats_Time += dt_ms;
