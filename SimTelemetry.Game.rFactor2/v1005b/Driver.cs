@@ -29,6 +29,13 @@ namespace SimTelemetry.Game.rFactor2.v1005b
         }
 
 
+        public bool Driving
+        {
+            get { return true; }
+            set { }
+        }
+
+
         public bool Ignition
         {
             get { return true; }
@@ -37,19 +44,19 @@ namespace SimTelemetry.Game.rFactor2.v1005b
         public int MemoryBlock
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int SectorsDriven
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Active
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool IsPlayer
@@ -59,331 +66,331 @@ namespace SimTelemetry.Game.rFactor2.v1005b
                 return Name == "Hans de Jong";
                 return ((rFactor2.Game.ReadInt32(new IntPtr(0x00D49F60)) == BaseAddress) ? true : false);
             }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public string Name
         {
             get { return rFactor2.Game.ReadString(new IntPtr(0x0077CC+BaseAddress),128 ); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int BaseAddress
         {
             get { return addr; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double CoordinateX
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x10+BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double CoordinateY
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x14 + BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double CoordinateZ
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x18 + BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double Throttle
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0xAC + BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double Brake
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x24C8 + BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double Fuel
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x3ED0+BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double Fuel_Max
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x3ED4 + BaseAddress)); } // TODO: Search memory address.
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public string CarModel
         {
             get { return rFactor2.Game.ReadString(new IntPtr(0x007946 + BaseAddress), 128); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public string CarClass
         {
             get { return ""; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Control_AI_Aid
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool PitLimiter
         {
             get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x1B79)) == 1?true:false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Pits
         {
             get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x3504)) == 1 ? true : false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool HeadLights
         {
             get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x1B75)) == 1 ? true : false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int Laps
         {
             get { return rFactor2.Game.ReadInt32(new IntPtr(BaseAddress + 0x59A4)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float LapTime_Best
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x5A44+BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float LapTime_Last
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(0x59BC + BaseAddress)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float LapTime_Best_Sector1
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float LapTime_Best_Sector2
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float LapTime_Best_Sector3
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float Sector_1_Best
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float Sector_2_Best
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float Sector_3_Best
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float Sector_1_Last
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float Sector_2_Last
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float Sector_3_Last
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double MetersDriven
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x59B8)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int PitStopRuns
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Retired
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public TrackPosition TrackPosition
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public LevelIndicator SteeringHelp
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int PitStop_FrontWingSetting
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int PitStop_RearWingSetting
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int PitStop_FuelSetting
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double FuelSetting_Offset
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double FuelSetting_Scale
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double MassEmpty
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double Mass
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x363C)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double RPM_Stationary
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double RPM_Max_Offset
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3EF4))-30; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double RPM_Max_Scale
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double Speed
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x7454)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public double RPM
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0xA8)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int Position
         {
             get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x59F8)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int Gear
         {
             get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x1B80)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public int Gears
         {
             get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x3FAC)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float GearRatio1
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4*0)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float GearRatio2
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 1)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float GearRatio3
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 2)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float GearRatio4
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 3)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float GearRatio5
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 4)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float GearRatio6
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 *5)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float GearRatio7
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 6)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         // TODO: Implement gears 8-10? (Not sure how many rFactor 2 supports)
@@ -403,49 +410,49 @@ namespace SimTelemetry.Game.rFactor2.v1005b
         public float GearRatioR
         {
             get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C - 0x4 * 1)); }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float TyreWear_LF
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float TyreWear_RF
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float TyreWear_LR
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public float TyreWear_RR
         {
             get { return 0; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Flag_Blue
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Flag_Yellow
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
 
         public bool Flag_Black
         {
             get { return false; }
-            set { throw new NotImplementedException(); }
+            set { }
         }
     }
 }

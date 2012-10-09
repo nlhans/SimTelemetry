@@ -15,7 +15,19 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                return Cars > 0 && Time > 0;
+                // In addition to checking obvious Active Session remarks, check some game data
+                // to verify a session is actual running.
+                // Problem: during loading rFactor may seem to run a Practice sesion for 1.5 seconds
+                // Addresses tried:
+                // 0x0070FE9C  0x0070FEA4 0x00AE396C - Int32 In game - still bugs during loading
+                // 0x0070F0FC - Int32 Bugs
+                // 0x0070D7D8, 0x0070FEE4 - Int8, AND combination seems to work?
+
+                int b = rFactor.Game.ReadByte(new IntPtr(0x0070D7D8));
+                int c = rFactor.Game.ReadByte(new IntPtr(0x0070FEE4));
+                bool a = (Cars > 0 && Time > 0 && b != 0 && c != 0);
+
+                return a;
             }
             set { }
         }

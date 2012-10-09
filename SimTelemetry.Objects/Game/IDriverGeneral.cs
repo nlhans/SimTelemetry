@@ -11,6 +11,13 @@ namespace SimTelemetry.Objects
         //[Loggable(1)]
         //bool Retired { get; set; }
 
+        /// <summary>
+        /// Denotes whether the driver is in garage or is 'on track' (at the controls).
+        /// </summary>
+        [LogOnChange]
+        [LogProperty("Driving", "Is the driver in garage(false) or on track(true) and at the controls?")]
+        bool Driving { get; set; }
+
         [LogOnChange]
         [LogProperty("Ignition", "Indicates whether the car ignition is turned ON.")]
         bool Ignition { get; set; }

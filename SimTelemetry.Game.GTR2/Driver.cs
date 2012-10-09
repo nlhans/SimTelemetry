@@ -48,13 +48,19 @@ namespace SimTelemetry.Game.GTR2
 
         public bool Active
         {
-            get { return false; throw new NotImplementedException(); }
+            get { return false; }
+            set { }
+        }
+
+        public bool Driving
+        {
+            get { return true; }
             set { }
         }
 
         public bool IsPlayer
         {
-            get { return false; throw new NotImplementedException(); }
+            get { return false; }
             set { }
         }
 
@@ -108,7 +114,7 @@ namespace SimTelemetry.Game.GTR2
 
         public double Fuel_Max
         {
-            get { return 100; throw new NotImplementedException(); } // TODO: Search memory address.
+            get { return 100; } // TODO: Search memory address.
             set { }
         }
 
@@ -235,13 +241,13 @@ namespace SimTelemetry.Game.GTR2
 
         public bool Retired
         {
-            get { return false; throw new NotImplementedException(); }
+            get { return false; }
             set { }
         }
 
         public TrackPosition TrackPosition
         {
-            get { return Objects.TrackPosition.SECTOR2; throw new NotImplementedException(); }
+            get { return Objects.TrackPosition.SECTOR2; }
             set { }
         }
 
@@ -319,7 +325,7 @@ namespace SimTelemetry.Game.GTR2
 
         public double RPM
         {
-            get { return GTR2.Game.ReadFloat(new IntPtr(BaseAddress + 0x4318)); throw new NotImplementedException(); }
+            get { return GTR2.Game.ReadFloat(new IntPtr(BaseAddress + 0x4318)); }
             set { }
         }
 

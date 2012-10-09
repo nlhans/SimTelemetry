@@ -279,16 +279,16 @@ namespace SimTelemetry.Data.Logger
                             TimeSpan dt = DateTime.Now.Subtract(AnnotationStart);
                             dt_ms = dt.TotalMilliseconds;
                         }
-                        if (dt_ms > 0)
+                        if (dt_ms > 0 && Telemetry.m.Sim.Drivers.Player.Driving) // time is ticking AND player is driving
                         {
                             byte[] data = new byte[8];
                             byte[] header = new byte[10];
-                            header[0] = (byte)'$';
+                            header[0] = (byte)'$'; // Sync
                             header[1] = (byte)'#'; // Sync
                             ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Time), 2, 4, 0);
                             // Packet ID
                             ByteMethods.memcpy(header, BitConverter.GetBytes(0), 2, 6, 0); // Instance ID
-                            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)8), 2, 8, 0); // Data length
+                            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)8), 2, 8, 0); // Data length of a double (8)
 
                             data = BitConverter.GetBytes(dt_ms);
                             _mWrite.BaseStream.Write(header, 0, header.Length);

@@ -145,7 +145,7 @@ namespace SimTelemetry.Data.Stats
                     dt_ms = dt.TotalMilliseconds / 1000.0;
                     Last_DT = DateTime.Now;
                 }
-                if (dt_ms > 0)
+                if (dt_ms > 0 && Telemetry.m.Sim.Drivers.Player.Driving) // time is ticking and player is driving
                 {
 
                     if (_dStats_Fuel < 0) _dStats_Fuel = 0;

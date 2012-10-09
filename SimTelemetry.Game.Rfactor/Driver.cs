@@ -20,6 +20,12 @@ namespace SimTelemetry.Game.Rfactor
             get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x27A8)) == 1) ? true : false); }
             set { }
         }*/
+        
+        public bool Driving
+        { // 0x1794 seems to be set to 1 at start of each session
+            get { return ((rFactor.Game.ReadByte(new IntPtr(Base + 0x314)) == 1) ? true : false); }
+            set { }
+        }
 
         
         public bool Ignition
