@@ -96,12 +96,6 @@
     <Compile Include="LiveTrackMap.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ucFuel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ucFuel.Designer.cs">
-      <DependentUpon>ucFuel.cs</DependentUpon>
-    </Compile>
     <Compile Include="ucResizableImage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -131,9 +125,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LiveTelemetry.resx">
       <DependentUpon>LiveTelemetry.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ucFuel.resx">
-      <DependentUpon>ucFuel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ucSessionInfo.resx">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>

@@ -87,7 +87,7 @@ namespace SimTelemetry.Data.Logger
         {
             int LapNo = (int)o;
             Debug.WriteLine("ANNOTATING LAP " + LapNo);
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(500);
             List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
             if (AllLaps.Count != 0)
             {
@@ -113,7 +113,7 @@ namespace SimTelemetry.Data.Logger
                             LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
                             (LapNo).ToString() +
                             ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
-                            "', "+Telemetry.m.Stats.Stats_AnnotationQuery+", NOW(), NOW())", con))
+                            "', "+Telemetry.m.Stats.Stats_AnnotationQuery+");", con))
                 {
                     
                     newTime.ExecuteNonQuery();

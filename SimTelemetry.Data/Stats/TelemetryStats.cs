@@ -100,7 +100,7 @@ namespace SimTelemetry.Data.Stats
             _mStatsCounter.Elapsed += Count;
 
             Stats_AnnotationReset = true;
-            _Stats_AnnotationQuery = "0,0,0,0,0";
+            _Stats_AnnotationQuery = "0,0,0,0,0,NOW(),-1";
         }
         public void Reset()
         {
@@ -110,7 +110,8 @@ namespace SimTelemetry.Data.Stats
             if (Stats_AnnotationReset)
             {
                 _Stats_AnnotationQuery = Math.Round(Stats_Distance, 3) + "," + Math.Round(Stats_EngineRevs, 1) + "," +
-                                         Math.Round(Stats_Fuel, 4) + "," + Stats_Gears + "," + Math.Round(Stats_Time, 3);
+                                         Math.Round(Stats_Fuel, 4) + "," + Stats_Gears + "," + Math.Round(Stats_Time, 3)+
+                                         ",NOW(),"+Math.Round(Telemetry.m.Sim.Session.TimeClock,3);
                 Stats_AnnotationReset = false;
             }
             _dStats_Engines = 0;

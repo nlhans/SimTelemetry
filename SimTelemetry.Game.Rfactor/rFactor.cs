@@ -28,25 +28,6 @@ namespace SimTelemetry.Game.Rfactor
             Player = new DriverPlayer();
         }
 
-
-        /*public static string rFactor_Directory
-        {
-            get
-            {
-                string meugen = rFactor.Game.ReadString(new IntPtr(0x00AEB320), 256);
-                string rfactor_map = meugen.Substring(0, meugen.Length-Path.GetFileName(meugen).Length);
-                return rfactor_map;
-            }
-        }
-
-        public static string GameData_TrackFile
-        {
-            get
-            {
-                return Game.ReadString(new IntPtr(0x00709D28), 256);
-            }
-        }*/
-
         public static void Kill()
         {
             Game.Active = false;
