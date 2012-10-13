@@ -77,6 +77,10 @@ namespace LiveTelemetry
             Telemetry.m.Session_Start += mUpdateUI;
             Telemetry.m.Session_Stop += mUpdateUI;
 
+            System.Threading.Thread.Sleep(500);
+            if (Telemetry.m.Sim != null)
+                Telemetry.m.Sim.Garage.Scan();
+
             // TODO: Detect hardware devices (COM-ports or USB devices)
             // GameData is used for my own hardware extension projects.
             // Race dashboard:

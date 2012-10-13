@@ -24,8 +24,8 @@
         int StartingGridSize { get; }
         int PitSpots { get; }
 
-        double PitSpeed_Practice { get; }
-        double PitSpeed_Race { get; }
+        int PitSpeed_Practice { get; }
+        int PitSpeed_Race { get; }
 
         double Laprecord_Race_Time { get; }
         string Laprecord_Race_Driver { get; }

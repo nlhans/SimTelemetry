@@ -67,6 +67,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 if(File.Exists(track.Replace(".gdb",".aiw")))
                 {
                     _tracks.Add(new rFactorTrack(track));
+                    _tracks[count].Scan();
                     count++;
                 }
             }

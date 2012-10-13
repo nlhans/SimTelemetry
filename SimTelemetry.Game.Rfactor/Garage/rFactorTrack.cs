@@ -40,9 +40,9 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private int _pitSpots;
 
-        private double _pitSpeedPractice;
+        private int _pitSpeedPractice;
 
-        private double _pitSpeedRace;
+        private int _pitSpeedRace;
 
         private double _laprecordRaceTime;
 
@@ -137,12 +137,12 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _pitSpots; }
         }
 
-        public double PitSpeed_Practice
+        public int PitSpeed_Practice
         {
             get { return _pitSpeedPractice; }
         }
 
-        public double PitSpeed_Race
+        public int PitSpeed_Race
         {
             get { return _pitSpeedRace; }
         }
@@ -179,6 +179,50 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
             _name = scanner.TryGetString("TrackName");
             _location = scanner.TryGetString("Location");
+            _type = scanner.TryGetString("TrackType");
+            _imageCache = System.IO.File.Exists("tracks/rfactor_" + File.Replace(".gdb", ".png")); // TODO: Fix a more unique ID globally!
+
+            _length = 0; // Read from AIW.
+
+            /******************* QUALIFY DAY *******************/
+            _qualifyDay = scanner.TryGetString("QualifyDay");
+            Int32.TryParse(scanner.TryGetString("QualifyLaps"), out _qualifyLaps);
+            Int32.TryParse(scanner.TryGetString("QualifyDuration"), out _qualifyMinutes);
+            int qualify_start_hr = 0, qualify_start_min = 0;
+            string qstart = scanner.TryGetString("QualifyStart").Trim();
+            if (qstart.Length == 5)
+            {
+                Int32.TryParse(qstart.Substring(0, 2), out qualify_start_hr);
+                Int32.TryParse(qstart.Substring(3, 2), out qualify_start_min);
+                _qualifyStart = qualify_start_min*60 + qualify_start_hr*3600;
+            }
+
+
+            /******************* RACE DAY *******************/
+            _fullRaceDay = scanner.TryGetString("RaceDay");
+            Int32.TryParse(scanner.TryGetString("RaceLaps"), out _fullRaceLaps);
+            Int32.TryParse(scanner.TryGetString("RaceDuration"), out _fullRaceMinutes);
+            int race_start_hr = 0, race_start_min = 0;
+            string rstart = scanner.TryGetString("RaceStart").Trim();
+            if (rstart.Length == 5)
+            {
+                Int32.TryParse(rstart.Substring(0, 2), out race_start_hr);
+                Int32.TryParse(rstart.Substring(3, 2), out race_start_min);
+                _fullRaceMinutes = race_start_min*60 + race_start_hr*3600;
+            }
+
+            _pitlane = true;
+            //Int32.TryParse(scanner.TryGetString("NormalPitKPH"), out _startingGridSize);
+            //Int32.TryParse(scanner.TryGetString("NormalPitKPH"), out _pitSpots);
+            // TODO: Headlights required.
+
+            Int32.TryParse(scanner.TryGetString("NormalPitKPH"), out _pitSpeedPractice);
+            Int32.TryParse(scanner.TryGetString("RacePitKPH"), out _pitSpeedRace);
+
+            Double.TryParse(scanner.TryGetString("Qualify Laptime").Trim(), out _laprecordQualifyTime);
+            Double.TryParse(scanner.TryGetString("Race Laptime").Trim(), out _laprecordRaceTime);
+            // Unfortunately, no driver strings in rFactor for lap records.
+
 
         }
     }
