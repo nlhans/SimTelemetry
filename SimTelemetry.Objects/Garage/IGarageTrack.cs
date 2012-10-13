@@ -31,5 +31,7 @@
         string Laprecord_Race_Driver { get; }
         double Laprecord_Qualify_Time { get; }
         string Laprecord_Qualify_Driver { get; }
+
+        void Scan();
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using SimTelemetry.Objects.Utilities;
-using Triton.Memory;
+﻿using SimTelemetry.Objects.Utilities;
 using SimTelemetry.Objects;
+using SimTelemetry.Game.Rfactor.Garage;
 
 namespace SimTelemetry.Game.Rfactor
 {
@@ -16,12 +13,14 @@ namespace SimTelemetry.Game.Rfactor
         public static Drivers Drivers;
         public static DriverPlayer Player;
         public static MemoryPolledReader Game;
+        public static rFactorGarage Garage;
         
         public rFactor(ISimulator sim)
         {
             Simulator = sim;
             Game = new MemoryPolledReader(sim);
 
+            Garage = new rFactorGarage();
             Session = new Session();
             Drivers = new Drivers();
 

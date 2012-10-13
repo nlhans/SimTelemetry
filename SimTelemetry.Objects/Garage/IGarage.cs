@@ -4,6 +4,9 @@ namespace SimTelemetry.Objects.Garage
 {
     public interface IGarage
     {
+        string InstallationDirectory { get; }
+        string GamedataDirectory { get; }
+
         string Simulator { get; }
         bool Available { get; }
 

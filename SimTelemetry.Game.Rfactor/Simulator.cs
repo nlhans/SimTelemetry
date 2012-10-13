@@ -69,7 +69,7 @@ namespace SimTelemetry.Game.Rfactor
 
         public IGarage Garage
         {
-            get { return null; }
+            get { return rFactor.Garage; }
         }
 
         public MemoryPolledReader Memory

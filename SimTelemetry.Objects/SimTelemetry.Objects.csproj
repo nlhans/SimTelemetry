@@ -55,6 +55,7 @@
     <Compile Include="Garage\IGarageMod.cs" />
     <Compile Include="Garage\IGarageCarWheels.cs" />
     <Compile Include="Garage\IGarageTrack.cs" />
+    <Compile Include="IniScanner.cs" />
     <Compile Include="ITrackParser.cs" />
     <Compile Include="Logger\TelemetryLogPacket.cs" />
     <Compile Include="Logger\TelemetryPacket.cs" />

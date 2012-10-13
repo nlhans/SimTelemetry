@@ -27,5 +27,7 @@ namespace SimTelemetry.Objects.Garage
         IGarageCarWheels Wheels { get;}
         IGarageCarBrakes Brakes { get; }
         IGarageCarGeneral General { get; }
+
+        void Scan();
     }
 }
