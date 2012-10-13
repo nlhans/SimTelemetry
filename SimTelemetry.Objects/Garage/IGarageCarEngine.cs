@@ -8,6 +8,7 @@ namespace SimTelemetry.Objects.Garage
         
         /// <summary>
         /// Maximum Engine speed (in RPM!)
+        /// Value at stock settings/mode.
         /// </summary>
         double Max { get; }
 
@@ -28,6 +29,11 @@ namespace SimTelemetry.Objects.Garage
         /// 0 must be STOCK engine mode
         /// </summary>
         Dictionary<int, string> EngineModes { get; }
+
+        /// <summary>
+        /// Maximum RPM dependant on engine mode.
+        /// </summary>
+        Dictionary<int, double> Max_Mode { get; }
 
         /// <summary>
         /// Torque curve on Engine RPM (key) vs Torque (Nm).

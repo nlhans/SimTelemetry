@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Game.rFactor2.v1005b
@@ -62,6 +63,11 @@ namespace SimTelemetry.Game.rFactor2.v1005b
         public ISession Session
         {
             get { return rFactor2.Session; }
+        }
+
+        public IGarage Garage
+        {
+            get { return null; }
         }
 
         public MemoryPolledReader Memory

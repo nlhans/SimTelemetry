@@ -1,4 +1,5 @@
-﻿using SimTelemetry.Objects.Utilities;
+﻿using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Objects
 {
@@ -17,6 +18,8 @@ namespace SimTelemetry.Objects
         IDriverCollection Drivers { get; }
         IDriverPlayer Player { get; }
         ISession Session { get; }
+
+        IGarage Garage { get; }
 
         MemoryPolledReader Memory { get; }
         //bool Attached { get; }

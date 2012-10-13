@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Utilities;
 using Triton.Memory;
 
@@ -90,6 +91,11 @@ namespace SimTelemetry.Game.GTR2
         public ISession Session
         {
             get { return GTR2.Session; }
+        }
+
+        public IGarage Garage
+        {
+            get { return null; }
         }
 
         public MemoryPolledReader Memory
