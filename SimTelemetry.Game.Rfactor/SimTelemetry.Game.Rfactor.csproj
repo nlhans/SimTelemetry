@@ -50,6 +50,7 @@
     <Compile Include="DriverPlayer.cs" />
     <Compile Include="Drivers.cs" />
     <Compile Include="Garage\rFactorGarage.cs" />
+    <Compile Include="Garage\rFactorMod.cs" />
     <Compile Include="Garage\rFactorTrack.cs" />
     <Compile Include="Lap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

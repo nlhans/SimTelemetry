@@ -15,12 +15,12 @@ namespace SimTelemetry.Objects.Garage
         /// <summary>
         /// Pitspeed in m/s
         /// </summary>
-        double PitSpeed_Practice_Default { get; }
+        int PitSpeed_Practice_Default { get; }
 
         /// <summary>
         /// Pitspeed in m/s
         /// </summary>
-        double PitSpeed_Race_Default { get; }
+        int PitSpeed_Race_Default { get; }
 
         /// <summary>
         /// Number of unique opponents in the mod.
@@ -30,8 +30,10 @@ namespace SimTelemetry.Objects.Garage
         /// <summary>
         /// Championship data for this mod, including no. of opponents, title and tracks.
         /// </summary>
-        IGarageChampionship Championships { get; }
+        List<IGarageChampionship> Championships { get; }
 
         List<IGarageCar> Models { get; }
+
+        void Scan();
     }
 }

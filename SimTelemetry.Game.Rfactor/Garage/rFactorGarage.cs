@@ -46,10 +46,10 @@ namespace SimTelemetry.Game.Rfactor.Garage
             ScanCars();
         }
 
-        private List<string> SearchFiles(string directory)
+        private List<string> SearchFiles(string directory, string pattern)
         {
             List<string> files = new List<string>();
-            foreach(string file in Directory.GetFiles(directory, "*.gdb", SearchOption.AllDirectories))
+            foreach(string file in Directory.GetFiles(directory, pattern, SearchOption.AllDirectories))
                 files.Add(file);
             return files;
         }
@@ -59,7 +59,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             _tracks = new List<IGarageTrack>();
             // rFactor stores data in GDB files.
             // All relevant path data is in stored in AIW files.
-            List<string> tracks = SearchFiles(GamedataDirectory);
+            List<string> tracks = SearchFiles(GamedataDirectory, "*.gdb");
             int count = 0;
             foreach(string track in tracks)
             {
@@ -67,12 +67,10 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 if(File.Exists(track.Replace(".gdb",".aiw")))
                 {
                     _tracks.Add(new rFactorTrack(track));
-                    _tracks[count].Scan();
                     count++;
                 }
             }
 
-            _tracks[0].Scan();
             Debug.WriteLine(count + " track(s) found");
         }
 
@@ -80,6 +78,21 @@ namespace SimTelemetry.Game.Rfactor.Garage
         {
             _mods = new List<IGarageMod>();
 
+            // rFactor stores data in GDB files.
+            // All relevant path data is in stored in AIW files.
+            List<string> vehicles = SearchFiles(InstallationDirectory + "rFM\\", "*.rfm");
+            int count = 0;
+            foreach (string mod in vehicles)
+            {
+                if (mod.Contains("F1_2010")==false) continue;
+                if (mod.Contains("ANY_DEV_ONLY")==false)
+                {
+                    _mods.Add(new rFactorMod(mod));
+                    count++;
+                }
+            }
+            _mods[0].Scan();
+            Debug.WriteLine(count + " mod(s) found");
         }
     }
 }

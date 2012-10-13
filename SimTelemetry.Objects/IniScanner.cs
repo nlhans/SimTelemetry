@@ -132,16 +132,16 @@ namespace SimTelemetry.Objects
                 {
                     Group = line.Substring(1, line.Length - 2);
                 }
-                else if(line == "{")
+                else if(line.Trim() == "{")
                 {
                     // Ignore
                 }
-                else if(i>lines.Length-1 && lines[i+1] == "{")
+                else if(i< lines.Length-1 && lines[i+1].Trim() == "{")
                 {
                     // This starts a new group at this line.
                     PushGroup(line);
                 }
-                else if(line == "}")
+                else if(line.Trim() == "}")
                 {
                     // This ends the group
                     PopGroup();
