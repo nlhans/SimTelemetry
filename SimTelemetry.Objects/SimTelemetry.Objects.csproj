@@ -44,6 +44,13 @@
   <ItemGroup>
     <Compile Include="ByteMethods.cs" />
     <Compile Include="Conversions.cs" />
+    <Compile Include="Garage\IGarageAerodynamics.cs" />
+    <Compile Include="Garage\IGarageBrakes.cs" />
+    <Compile Include="Garage\IGarageCar.cs" />
+    <Compile Include="Garage\IGarageEngine.cs" />
+    <Compile Include="Garage\IGarageGearbox.cs" />
+    <Compile Include="Garage\IGarageGeneral.cs" />
+    <Compile Include="Garage\IGarageWheels.cs" />
     <Compile Include="ITrackParser.cs" />
     <Compile Include="Logger\TelemetryLogPacket.cs" />
     <Compile Include="Logger\TelemetryPacket.cs" />

@@ -99,8 +99,16 @@ namespace SimTelemetry.Data.Stats
             _mStatsCounter = new Timer { AutoReset = true, Enabled = true, Interval = 25 };
             _mStatsCounter.Elapsed += Count;
 
+            Telemetry.m.Track_Loaded += new Triton.Signal(m_Track_Loaded);
+
             Stats_AnnotationReset = true;
             _Stats_AnnotationQuery = "0,0,0,0,0,NOW(),-1";
+            _GlobalDistance = -1;
+        }
+
+        void m_Track_Loaded(object sender)
+        {
+            _GlobalDistance = -1;
         }
         public void Reset()
         {
@@ -127,7 +135,6 @@ namespace SimTelemetry.Data.Stats
 
             _mStatsCounter.Start();
 
-            _GlobalDistance = -1;
         }
 
         private void Count(object sender, ElapsedEventArgs e)
