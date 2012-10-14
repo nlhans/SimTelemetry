@@ -2,7 +2,7 @@
 
 namespace SimTelemetry.Objects.Garage
 {
-    public interface IGarageChampionship
+    public interface IModChampionship
     {
         string File { get; }
         

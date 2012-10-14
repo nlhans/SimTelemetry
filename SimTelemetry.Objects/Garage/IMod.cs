@@ -2,7 +2,7 @@
 
 namespace SimTelemetry.Objects.Garage
 {
-    public interface IGarageMod
+    public interface IMod
     {
         string File { get; }
         
@@ -32,9 +32,9 @@ namespace SimTelemetry.Objects.Garage
         /// <summary>
         /// Championship data for this mod, including no. of opponents, title and tracks.
         /// </summary>
-        List<IGarageChampionship> Championships { get; }
+        List<IModChampionship> Championships { get; }
 
-        List<IGarageCar> Models { get; }
+        List<ICar> Models { get; }
 
         void Scan();
     }

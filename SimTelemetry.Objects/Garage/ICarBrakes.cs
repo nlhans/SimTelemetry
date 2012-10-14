@@ -1,6 +1,6 @@
 ﻿namespace SimTelemetry.Objects.Garage
 {
-    public interface IGarageCarAerodynamics
+    public interface ICarBrakes
     {
         string File { get; }
         

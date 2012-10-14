@@ -6,7 +6,7 @@ using Triton;
 
 namespace SimTelemetry.Game.Rfactor.Garage
 {
-    public class rFactorEngine : IGarageCarEngine
+    public class rFactorCarEngine : ICarEngine
     {
         private Dictionary<double, double> EngineTorque_Min;
         private Dictionary<double, double> EngineTorque_Max;
@@ -39,7 +39,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private Dictionary<int, double> _maxRpmMode;
 
-        public rFactorEngine(string file, IniScanner mHdv)
+        public rFactorCarEngine(string file, IniScanner mHdv)
         {
             EngineTorque_Min = new Dictionary<double, double>();
             EngineTorque_Max = new Dictionary<double, double>();
@@ -89,8 +89,6 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 _maxRpmMode.Add(i, mode_rpm * i + MaxRPM);
             }
 
-            Dictionary<double, double> t = GetTorqueCurve(100, 1, 1);
-            Dictionary<double, double> p = GetPowerCurve(100, 1, 6);
         }
 
         private void HandleEngineLine(object data)
@@ -172,7 +170,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
             for (int rpm = 0; rpm <= my_max_rpm; rpm += 100)
             {
-                double rpm_dutycycle = rpm/my_max_rpm;
+                double rpm_dutycycle = rpm / my_max_rpm;
                 double power_factor = 1 + rpm_dutycycle*(speed * ram_power + engine_mode * mode_power);
 
                 double t_max = GetTorqueFromCurve(EngineTorque_Max, rpm);
@@ -181,6 +179,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 torque *= torque_factor;
                 double power = rpm*torque*Math.PI*2/60000.0; // kW
                 power *= power_factor;
+                power /= 0.745699872;
                 // TODO: Mode and RAM effects
 
                 PowerCurve.Add(rpm, power);

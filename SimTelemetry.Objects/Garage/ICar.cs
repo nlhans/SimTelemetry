@@ -2,7 +2,7 @@
 
 namespace SimTelemetry.Objects.Garage
 {
-    public interface IGarageCar
+    public interface ICar
     {
         string File { get; }
         string Team { get; }
@@ -20,12 +20,12 @@ namespace SimTelemetry.Objects.Garage
         int Info_Wins { get; }
         int Info_Championships { get; }
 
-        IGarageCarEngine Engine { get; }
-        IGarageCarGearbox Gearbox { get; }
-        IGarageCarAerodynamics Aerodynamics { get; }
-        IGarageCarWheels Wheels { get;}
-        IGarageCarBrakes Brakes { get; }
-        IGarageCarGeneral General { get; }
+        ICarEngine Engine { get; }
+        ICarGearbox Gearbox { get; }
+        ICarAerodynamics Aerodynamics { get; }
+        ICarWheels Wheels { get;}
+        ICarBrakes Brakes { get; }
+        ICarGeneral General { get; }
 
         void Scan();
     }

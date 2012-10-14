@@ -6,7 +6,7 @@ using SimTelemetry.Objects.Garage;
 
 namespace SimTelemetry.Game.Rfactor.Garage
 {
-    public class rFactorCar : IGarageCar
+    public class rFactorCar : ICar
     {
         private string _file;
 
@@ -32,18 +32,18 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private int _infoChampionships;
 
-        private IGarageCarEngine _engine;
+        private ICarEngine _engine;
 
-        private IGarageCarGearbox _gearbox;
+        private ICarGearbox _gearbox;
 
-        private IGarageCarAerodynamics _aerodynamics;
+        private ICarAerodynamics _aerodynamics;
 
-        private IGarageCarWheels _wheels;
+        private ICarWheels _wheels;
 
-        private IGarageCarBrakes _brakes;
+        private ICarBrakes _brakes;
 
-        private IGarageCarGeneral _general;
-        private IGarageMod _mod;
+        private ICarGeneral _general;
+        private IMod _mod;
         private IniScanner _mScanner;
         private IniScanner _mHDV;
 
@@ -107,37 +107,37 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _infoChampionships; }
         }
 
-        public IGarageCarEngine Engine
+        public ICarEngine Engine
         {
             get { return _engine; }
         }
 
-        public IGarageCarGearbox Gearbox
+        public ICarGearbox Gearbox
         {
             get { return _gearbox; }
         }
 
-        public IGarageCarAerodynamics Aerodynamics
+        public ICarAerodynamics Aerodynamics
         {
             get { return _aerodynamics; }
         }
 
-        public IGarageCarWheels Wheels
+        public ICarWheels Wheels
         {
             get { return _wheels; }
         }
 
-        public IGarageCarBrakes Brakes
+        public ICarBrakes Brakes
         {
             get { return _brakes; }
         }
 
-        public IGarageCarGeneral General
+        public ICarGeneral General
         {
             get { return _general; }
         }
 
-        public rFactorCar(IGarageMod mod, string file)
+        public rFactorCar(IMod mod, string file)
         {
             _mod = mod;
             _file = file;
@@ -174,9 +174,9 @@ namespace SimTelemetry.Game.Rfactor.Garage
             _files.Add("Tyre", GarageTools.SearchFile(rFactor.Garage.GamedataDirectory, _mHDV.TryGetString("GENERAL", "TireBrand") + ".tbc"));
 
             // Now we have read the HDV file, we can just as well initialize all sub classes:
-            _engine = new rFactorEngine(_files["Engine"], _mHDV);
+            _engine = new rFactorCarEngine(_files["Engine"], _mHDV);
 
-
+            // TODO: Parse more data.
         }
     }
 

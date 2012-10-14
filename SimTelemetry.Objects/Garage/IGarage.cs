@@ -13,8 +13,8 @@ namespace SimTelemetry.Objects.Garage
         bool Available_Tracks { get; }
         bool Available_Mods { get; }
 
-        List<IGarageMod> Mods { get; }
-        List<IGarageTrack> Tracks { get; }
+        List<IMod> Mods { get; }
+        List<ITrack> Tracks { get; }
 
         /// <summary>
         /// Fill-up data for Mods and tracks. Do-not yet fill them out completely as this will take too much time.

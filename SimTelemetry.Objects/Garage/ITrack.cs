@@ -1,6 +1,6 @@
 ﻿namespace SimTelemetry.Objects.Garage
 {
-    public interface IGarageTrack
+    public interface ITrack
     {
         string File { get; }
         string Name { get; }

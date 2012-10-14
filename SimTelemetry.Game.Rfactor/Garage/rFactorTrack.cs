@@ -4,7 +4,7 @@ using SimTelemetry.Objects.Garage;
 
 namespace SimTelemetry.Game.Rfactor.Garage
 {
-    public class rFactorTrack : IGarageTrack
+    public class rFactorTrack : ITrack
     {
         private string _file;
 

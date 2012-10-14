@@ -6,7 +6,7 @@ using Triton;
 
 namespace SimTelemetry.Game.Rfactor.Garage
 {
-    public class rFactorMod : IGarageMod
+    public class rFactorMod : IMod
     {
         private string _file;
         private string _name;
@@ -19,8 +19,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
         private int _pitSpeedRaceDefault;
         private int _opponents;
 
-        private List<IGarageChampionship> _championships;
-        private List<IGarageCar> _models;
+        private List<IModChampionship> _championships;
+        private List<ICar> _models;
 
         public string File
         {
@@ -72,12 +72,12 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _opponents; }
         }
 
-        public List<IGarageChampionship> Championships
+        public List<IModChampionship> Championships
         {
             get { return _championships; }
         }
 
-        public List<IGarageCar> Models
+        public List<ICar> Models
         {
             get { return _models; }
         }
@@ -88,8 +88,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
         {
             _file = file;
 
-            _models = new List<IGarageCar>();
-            _championships = new List<IGarageChampionship>();
+            _models = new List<ICar>();
+            _championships = new List<IModChampionship>();
         }
 
         private void Handle_TrackLine(object data)

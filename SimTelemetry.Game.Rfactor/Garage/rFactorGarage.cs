@@ -8,8 +8,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
 {
     public class rFactorGarage : IGarage
     {
-        private List<IGarageMod> _mods;
-        private List<IGarageTrack> _tracks;
+        private List<IMod> _mods;
+        private List<ITrack> _tracks;
 
         public string GamedataDirectory
         {
@@ -37,8 +37,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
         public bool Available  { get { return true; } }
         public bool Available_Tracks { get { return true; } }
         public bool Available_Mods { get { return true; }  }
-        public List<IGarageMod> Mods { get { return _mods; } }
-        public List<IGarageTrack> Tracks {  get { return _tracks; } }
+        public List<IMod> Mods { get { return _mods; } }
+        public List<ITrack> Tracks {  get { return _tracks; } }
 
         public void Scan()
         {
@@ -48,7 +48,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private void ScanTracks()
         {
-            _tracks = new List<IGarageTrack>();
+            _tracks = new List<ITrack>();
             // rFactor stores data in GDB files.
             // All relevant path data is in stored in AIW files.
             List<string> tracks = GarageTools.SearchFiles(GamedataDirectory, "*.gdb");
@@ -68,7 +68,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private void ScanCars()
         {
-            _mods = new List<IGarageMod>();
+            _mods = new List<IMod>();
 
             // rFactor stores data in GDB files.
             // All relevant path data is in stored in AIW files.
