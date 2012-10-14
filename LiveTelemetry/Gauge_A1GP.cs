@@ -559,15 +559,15 @@ namespace LiveTelemetry
                 double power, power_max;
 
                 if (Telemetry.m.Sim.Modules.Engine_Power)
-                    power = Telemetry.m.Sim.Player.Engine_Torque * Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM )/ 5252;
+                    power = Telemetry.m.Sim.Player.Engine_Torque * Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM) * Math.PI * 2 / 60000.0;
                 else power = 0;
-
+                power /= 0.745699872; // TODO: Fix, this turns kW -> HP
                 PowerUsage.Add(power);
-                PowerUsage.MaxSize = 5;
-                power = PowerUsage.Average;
+                PowerUsage.MaxSize = 3;
+                //power = PowerUsage.Average;
 
                 if (Telemetry.m.Sim.Modules.Engine_PowerCurve)
-                    power_max = 700;
+                    power_max = 1000;
                 else
                     power_max = 1000;// TODO: Add minimum/maximum power plug-in support.
 

@@ -13,7 +13,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
         
         // RAM
         private double ram_torque;
-        private double ram_power; // Also affects RPM.
+        private double ram_power;
         private double ram_fuel;
         private double ram_wear;
 
@@ -90,7 +90,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
 
             Dictionary<double, double> t = GetTorqueCurve(100, 1, 1);
-            Dictionary<double, double> p = GetPowerCurve(100, 1, 1);
+            Dictionary<double, double> p = GetPowerCurve(100, 1, 6);
         }
 
         private void HandleEngineLine(object data)
@@ -139,16 +139,20 @@ namespace SimTelemetry.Game.Rfactor.Garage
             if(MaxRPM_Mode.ContainsKey(engine_mode))
                 my_max_rpm = MaxRPM_Mode[engine_mode];
 
-            my_max_rpm *= 1+ram_power*speed;
+            double torque_factor = 1+speed*ram_torque + engine_mode *mode_torque;
 
             Dictionary<double, double> TorqueCurve = new Dictionary<double, double>();
 
             for (int rpm = 0; rpm <= my_max_rpm; rpm+=100)
             {
+                double rpm_dutycycle = rpm / my_max_rpm;
+                double power_factor = 1 + rpm_dutycycle * (speed * ram_power + engine_mode * mode_power);
+
                 double t_max = GetTorqueFromCurve(EngineTorque_Max, rpm);
                 double t_min = GetTorqueFromCurve(EngineTorque_Min, rpm);
-                double torque = t_min + throttle*(t_max - t_min);
-
+                double torque = t_min + throttle * (t_max - t_min);
+                torque *= torque_factor;
+                torque *= power_factor;
                 // TODO: Mode and RAM effects
 
                 TorqueCurve.Add(rpm, torque);
@@ -162,16 +166,21 @@ namespace SimTelemetry.Game.Rfactor.Garage
             if (MaxRPM_Mode.ContainsKey(engine_mode))
                 my_max_rpm = MaxRPM_Mode[engine_mode];
 
-            my_max_rpm *= 1 + ram_power * speed;
+            double torque_factor = 1 + speed * ram_torque + engine_mode * mode_torque;
 
             Dictionary<double, double> PowerCurve = new Dictionary<double, double>();
 
             for (int rpm = 0; rpm <= my_max_rpm; rpm += 100)
             {
+                double rpm_dutycycle = rpm/my_max_rpm;
+                double power_factor = 1 + rpm_dutycycle*(speed * ram_power + engine_mode * mode_power);
+
                 double t_max = GetTorqueFromCurve(EngineTorque_Max, rpm);
                 double t_min = GetTorqueFromCurve(EngineTorque_Min, rpm);
                 double torque = t_min + throttle * (t_max - t_min);
+                torque *= torque_factor;
                 double power = rpm*torque*Math.PI*2/60000.0; // kW
+                power *= power_factor;
                 // TODO: Mode and RAM effects
 
                 PowerCurve.Add(rpm, power);
