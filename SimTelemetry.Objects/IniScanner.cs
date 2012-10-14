@@ -75,13 +75,13 @@ namespace SimTelemetry.Objects
         public string TryGetString(string key)
         {
             string[] d = TryGetData("Main", key);
-            return d[0];
+            return d[0].Trim();
         }
 
         public string TryGetString(string group, string key)
         {
             string[] d = TryGetData(group, key);
-            return d[0];
+            return d[0].Trim();
         }
 
         public string[] TryGetData(string group, string key)
@@ -93,6 +93,34 @@ namespace SimTelemetry.Objects
             }
 
             return new string[1]{""};
+        }
+
+        public int TryGetInt32(string key)
+        {
+            int value = 0;
+            Int32.TryParse(TryGetString(key), out value);
+            return value;
+        }
+
+        public int TryGetInt32(string group, string key)
+        {
+            int value = 0;
+            Int32.TryParse(TryGetString(group, key), out value);
+            return value;
+        }
+
+        public double TryGetDouble(string key)
+        {
+            double value = 0;
+            double.TryParse(TryGetString(key), out value);
+            return value;
+        }
+
+        public double TryGetDouble(string group, string key)
+        {
+            double value = 0;
+            Double.TryParse(TryGetString(group, key), out value);
+            return value;
         }
         
         public IniScanner()
@@ -112,6 +140,25 @@ namespace SimTelemetry.Objects
             {
                 Groups.RemoveAt(Groups.Count - 1);
             }
+        }
+
+        private static string[] ParseParameter(string d)
+        {
+            // Determine if the line contains a list of values.
+            if (d.Contains("(") && d.Trim().EndsWith(")"))
+            {
+                // Remove () from line, then split on comma.
+                d = d.Substring(d.IndexOf("(") + 1);
+                d = d.Substring(0, d.IndexOf(")"));
+
+                return d.Split(",".ToCharArray());
+
+            }
+            else
+            {
+                return new string[1] {d};
+            }
+
         }
 
         public void Read()
@@ -149,34 +196,16 @@ namespace SimTelemetry.Objects
                 else if (line.Contains("="))
                 {
                     string[] key_data = line.Split("=".ToCharArray(), 2);
-                        List<string> data = new List<string>();
+                    List<string> data = ParseParameter(key_data[1]).OfType<string>().ToList();
 
                     // Is this line in the cusotm keys list?
-                    if(FireEventsForKeys.Contains(Group+"."+key_data))
+                    if(FireEventsForKeys.Contains(Group+"."+key_data[0]))
                     {
                         if (HandleCustomKeys != null)
-                            HandleCustomKeys(key_data);
+                            HandleCustomKeys(new object[2] { key_data[0], data});
                     }
                     else
                     {
-                        // Determine if the line contains a list of values.
-                        if (line.Contains("(") && line.Trim().EndsWith(")"))
-                        {
-                            // Remove () from line, then split on comma.
-                            string d = key_data[1];
-                            d = d.Substring(d.IndexOf("(") + 1);
-                            d = d.Substring(0, d.IndexOf(")"));
-
-                            string[] data_parameters = d.Split(",".ToCharArray());
-
-                            data = data_parameters.OfType<string>().ToList();
-                        }
-                        else
-                        {
-                            //  Add single value.
-                            data.Add(key_data[1]);
-                        }
-
                         // If group doesn't exist; create it in the data dict.
                         if (Data.ContainsKey(Group) == false)
                             Data.Add(Group, new Dictionary<string, List<string>>());

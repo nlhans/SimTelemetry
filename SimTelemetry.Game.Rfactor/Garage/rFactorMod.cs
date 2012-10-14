@@ -9,25 +9,17 @@ namespace SimTelemetry.Game.Rfactor.Garage
     public class rFactorMod : IGarageMod
     {
         private string _file;
-
         private string _name;
-
         private string _author;
-
         private string _description;
-
         private string _website;
-
         private string _version;
-
+        private string _directoryVehicles;
         private int _pitSpeedPracticeDefault;
-
         private int _pitSpeedRaceDefault;
-
         private int _opponents;
 
         private List<IGarageChampionship> _championships;
-
         private List<IGarageCar> _models;
 
         public string File
@@ -58,6 +50,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
         public string Version
         {
             get { return _version; }
+        }
+
+        public string Directory_Vehicles
+        {
+            get { return _directoryVehicles; }
         }
 
         public int PitSpeed_Practice_Default
@@ -113,6 +110,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             _description = "";
             _website = "";
             _version = "";
+            _directoryVehicles = _mScanner.TryGetString("Main.ConfigOverrides", "VehiclesDir");
 
             // Pitspeeds
             Int32.TryParse(_mScanner.TryGetString("Main.DefaultScoring","RacePitKPH"), out _pitSpeedRaceDefault);
@@ -129,6 +127,19 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
 
             Int32.TryParse(_mScanner.TryGetString("Main", "Max Opponents"), out _opponents);
+
+            // Search for all cars in folder.
+            List<string> vehicles = GarageTools.SearchFiles(rFactor.Garage.InstallationDirectory + _directoryVehicles,
+                                                            "*.veh");
+            Console.WriteLine("Found " + vehicles.Count + " vehicles for MOD ["+_name+"]");
+
+            foreach(string veh in vehicles)
+            {
+                _models.Add(new rFactorCar(this, veh));
+            }
+
+            _models[0].Scan();
+
         }
     }
 }

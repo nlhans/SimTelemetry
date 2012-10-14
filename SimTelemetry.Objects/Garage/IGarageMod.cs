@@ -12,6 +12,8 @@ namespace SimTelemetry.Objects.Garage
         string Website { get; }
         string Version { get; }
 
+        string Directory_Vehicles { get; }
+
         /// <summary>
         /// Pitspeed in m/s
         /// </summary>

@@ -87,7 +87,7 @@ namespace SimTelemetry.Data.Logger
         {
             int LapNo = (int)o;
             Debug.WriteLine("ANNOTATING LAP " + LapNo);
-            System.Threading.Thread.Sleep(500);
+            Thread.Sleep(500);
             List<ILap> AllLaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
             if (AllLaps.Count != 0)
             {

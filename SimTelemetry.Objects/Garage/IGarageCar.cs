@@ -6,7 +6,6 @@ namespace SimTelemetry.Objects.Garage
     {
         string File { get; }
         string Team { get; }
-        string Name { get; }
         string Driver { get; }
         int Number { get; }
 

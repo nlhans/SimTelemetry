@@ -49,6 +49,8 @@
     <Compile Include="Driver.cs" />
     <Compile Include="DriverPlayer.cs" />
     <Compile Include="Drivers.cs" />
+    <Compile Include="Garage\rFactorCar.cs" />
+    <Compile Include="Garage\rFactorEngine.cs" />
     <Compile Include="Garage\rFactorGarage.cs" />
     <Compile Include="Garage\rFactorMod.cs" />
     <Compile Include="Garage\rFactorTrack.cs" />

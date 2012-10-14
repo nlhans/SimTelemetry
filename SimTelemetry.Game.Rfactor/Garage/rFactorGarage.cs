@@ -46,20 +46,12 @@ namespace SimTelemetry.Game.Rfactor.Garage
             ScanCars();
         }
 
-        private List<string> SearchFiles(string directory, string pattern)
-        {
-            List<string> files = new List<string>();
-            foreach(string file in Directory.GetFiles(directory, pattern, SearchOption.AllDirectories))
-                files.Add(file);
-            return files;
-        }
-
         private void ScanTracks()
         {
             _tracks = new List<IGarageTrack>();
             // rFactor stores data in GDB files.
             // All relevant path data is in stored in AIW files.
-            List<string> tracks = SearchFiles(GamedataDirectory, "*.gdb");
+            List<string> tracks = GarageTools.SearchFiles(GamedataDirectory, "*.gdb");
             int count = 0;
             foreach(string track in tracks)
             {
@@ -80,7 +72,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
             // rFactor stores data in GDB files.
             // All relevant path data is in stored in AIW files.
-            List<string> vehicles = SearchFiles(InstallationDirectory + "rFM\\", "*.rfm");
+            List<string> vehicles = GarageTools.SearchFiles(InstallationDirectory + "rFM\\", "*.rfm");
             int count = 0;
             foreach (string mod in vehicles)
             {
