@@ -75,7 +75,7 @@ namespace SimTelemetry.Game.GTR2
 
         public string Name
         {
-            get { return "GTR2 v1.1.0.0"; }
+            get { return "GTR2"; }
         }
 
         public IDriverCollection Drivers

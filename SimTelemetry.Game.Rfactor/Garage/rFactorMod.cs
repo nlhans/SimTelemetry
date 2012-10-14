@@ -82,6 +82,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _models; }
         }
 
+        public string Image
+        {
+            get { return _file.Replace(".rfm", ".tga"); }
+        }
+
         private IniScanner _mScanner;
 
         public rFactorMod(string file)
@@ -137,8 +142,6 @@ namespace SimTelemetry.Game.Rfactor.Garage
             {
                 _models.Add(new rFactorCar(this, veh));
             }
-
-            _models[0].Scan();
 
         }
     }

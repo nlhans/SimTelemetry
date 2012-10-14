@@ -35,6 +35,7 @@ namespace SimTelemetry.Objects.Garage
         List<IModChampionship> Championships { get; }
 
         List<ICar> Models { get; }
+        string Image { get; }
 
         void Scan();
     }

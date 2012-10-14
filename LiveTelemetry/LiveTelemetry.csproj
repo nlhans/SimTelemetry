@@ -44,6 +44,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="TargaImage">
+      <HintPath>..\Binaries\TargaImage.dll</HintPath>
+    </Reference>
     <Reference Include="Triton">
       <HintPath>..\Binaries\Triton.dll</HintPath>
     </Reference>
@@ -55,6 +58,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="fGarage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="fGarage.Designer.cs">
+      <DependentUpon>fGarage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IGarageUserControl.cs" />
+    <Compile Include="Garage\ucSelectGame.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Garage\ucSelectGame.Designer.cs">
+      <DependentUpon>ucSelectGame.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Garage\ucSelectTrackCars.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Garage\ucSelectTrackCars.Designer.cs">
+      <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gauge_A1GP.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -108,6 +130,15 @@
     <Compile Include="ucSessionInfo.Designer.cs">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="fGarage.resx">
+      <DependentUpon>fGarage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Garage\ucSelectGame.resx">
+      <DependentUpon>ucSelectGame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Garage\ucSelectTrackCars.resx">
+      <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Gauge_A1GP.resx">
       <DependentUpon>Gauge_A1GP.cs</DependentUpon>
     </EmbeddedResource>
@@ -163,6 +194,7 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

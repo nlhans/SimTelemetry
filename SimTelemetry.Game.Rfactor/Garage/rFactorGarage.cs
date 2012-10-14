@@ -76,14 +76,12 @@ namespace SimTelemetry.Game.Rfactor.Garage
             int count = 0;
             foreach (string mod in vehicles)
             {
-                if (mod.Contains("F1_2010")==false) continue;
                 if (mod.Contains("ANY_DEV_ONLY")==false)
                 {
                     _mods.Add(new rFactorMod(mod));
                     count++;
                 }
             }
-            _mods[0].Scan();
             Debug.WriteLine(count + " mod(s) found");
         }
     }

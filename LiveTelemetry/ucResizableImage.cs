@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace LiveTelemetry
 {
     public partial class ucResizableImage : UserControl
     {
+        public string Caption { get; set; }
         private string imagePath = "";
         private Bitmap imageBMP;
         private Size bmpSize;
+        public bool Disabled = false;
+
+        private ImageAttributes grayscaleAttributes;
 
         public Size PictureSize
         {
@@ -20,15 +25,37 @@ namespace LiveTelemetry
 
         public ucResizableImage(string image)
         {
+            Caption = "";
             InitializeComponent();
 
             imagePath = image;
-            imageBMP = (Bitmap)Bitmap.FromFile(image);
+            if (image.ToLower().EndsWith(".tga"))
+                imageBMP = Paloma.TargaImage.LoadTargaImage(image); // http://www.codeproject.com/Articles/31702/NET-Targa-Image-Reader
+            else
+                imageBMP = (Bitmap)Bitmap.FromFile(image);
 
             SetStyle(
               ControlStyles.AllPaintingInWmPaint |
               ControlStyles.UserPaint |
               ControlStyles.DoubleBuffer, true);
+
+
+            //create the grayscale ColorMatrix
+            ColorMatrix colorMatrix = new ColorMatrix(
+                new float[][]
+                    {
+                        new float[] {.3f, .3f, .3f, 0, 0},
+                        new float[] {.59f, .59f, .59f, 0, 0},
+                        new float[] {.11f, .11f, .11f, 0, 0},
+                        new float[] {0, 0, 0, 1, 0},
+                        new float[] {0, 0, 0, 0, 1}
+                    });
+
+            //create some image attributes
+            grayscaleAttributes = new ImageAttributes();
+
+            //set the color matrix attribute
+            grayscaleAttributes.SetColorMatrix(colorMatrix);
         }
 
         public void Crop(int w, int h)
@@ -78,11 +105,16 @@ namespace LiveTelemetry
             }
             Bitmap b = new Bitmap(this.Size.Width, this.Size.Height);
             Graphics g = Graphics.FromImage((Image)b);
+
+            Rectangle s = new Rectangle((this.Width - bmpSize.Width)/2, (this.Height - bmpSize.Height)/2,
+                                        this.bmpSize.Width, this.bmpSize.Height);
             g.DrawImage(imageBMP, (this.Width - bmpSize.Width) / 2, (this.Height - bmpSize.Height) / 2, this.bmpSize.Width, this.bmpSize.Height);
+            g.DrawString(Caption, new Font("Tahoma", 10.0f, FontStyle.Underline), Brushes.White, 5, this.Height-15);
             g.Dispose();
             this.BackgroundImage = (Image)b;
             if (e != null) base.OnResize(e);
         }
+
     }
 
 }

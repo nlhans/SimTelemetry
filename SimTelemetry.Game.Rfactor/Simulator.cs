@@ -49,7 +49,7 @@ namespace SimTelemetry.Game.Rfactor
 
         public string Name
         {
-            get { return "rFactor v1.255"; }
+            get { return "rFactor"; }
         }
 
         public IDriverCollection Drivers

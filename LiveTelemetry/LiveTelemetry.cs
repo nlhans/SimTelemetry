@@ -28,6 +28,8 @@ namespace LiveTelemetry
         private Timer Tmr_LwSpeed;
 
         // User interface controls.
+        private Button btGarage;
+
         private LapChart ucLapChart;
         private LiveTrackMap ucTrackmap;
         private Gauge_A1GP ucA1GP;
@@ -165,6 +167,14 @@ namespace LiveTelemetry
             ucSessionData = new ucSessionInfo();
             ucTrackmap = new LiveTrackMap();
             ucLapChart = new LapChart();
+            btGarage = new Button();
+
+            // Garage button
+            btGarage.Text = "Garage";
+            btGarage.Size = new Size(75, 25);
+            btGarage.BackColor = Color.White;
+            btGarage.Location = new Point(10, 10);
+            btGarage.Click += new EventHandler(btGarage_Click);
 
             // Timers
             Tmr_HiSpeed = new Timer{Interval=33}; // 30fps
@@ -183,6 +193,12 @@ namespace LiveTelemetry
 
             SetupUI();
             this.ResumeLayout(false);
+        }
+
+        void btGarage_Click(object sender, EventArgs e)
+        {
+            fGarage g = new fGarage();
+            g.Show();
         }
 
         /// <summary>
@@ -347,10 +363,13 @@ namespace LiveTelemetry
                 t.TextAlign = ContentAlignment.MiddleCenter;
                 panel.Controls.Add(t);
 
-
                 Controls.Add(panel);
             }
 
+            if (btGarage != null)
+            {
+                Controls.Add(btGarage);
+            }
         }
 
         /// <summary>
@@ -406,8 +425,8 @@ namespace LiveTelemetry
                         if (this.ucLapChart.Height + this.ucA1GP.Height > this.Height - 40)
                             this.ucLapChart.Size = new Size(this.ucLapChart.Width, this.Height - this.ucA1GP.Height - 40);
 
-                        this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 20, this.Size.Height);
-                        this.ucTrackmap.Location = new Point(10, 10);
+                        this.ucTrackmap.Size = new Size(ucLapChart.Location.X - 50, this.Size.Height);
+                        this.ucTrackmap.Location = new Point(10, 40);
                         ucSessionData.Location = new Point(ucA1GP.Location.X,
                                                            ucA1GP.Location.Y - ucSessionData.Size.Height - 10);
 

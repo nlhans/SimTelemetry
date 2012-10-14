@@ -67,19 +67,27 @@ namespace SimTelemetry.Game.Rfactor.Garage
             string[] mode_range = scanner.TryGetData("Main", "EngineBoostRange");
             string[] mode_effects = scanner.TryGetData("Main", "BoostEffects");
 
-            modes = Convert.ToInt32(mode_range[2]);
-            mode_rpm = Convert.ToDouble(mode_effects[0]);
-            mode_fuel = Convert.ToDouble(mode_effects[1]);
-            mode_wear = Convert.ToDouble(mode_effects[2]);
-            mode_torque = scanner.TryGetDouble("BoostTorque");
-            mode_power = scanner.TryGetDouble("BoostPower");
+            // Is there any EngineBoost defined?
+            if (mode_range.Length == 3)
+            {
+                modes = Convert.ToInt32(mode_range[2]);
+                mode_rpm = Convert.ToDouble(mode_effects[0]);
+                mode_fuel = Convert.ToDouble(mode_effects[1]);
+                mode_wear = Convert.ToDouble(mode_effects[2]);
+                mode_torque = scanner.TryGetDouble("BoostTorque");
+                mode_power = scanner.TryGetDouble("BoostPower");
+            }
+            else modes = 1;
 
             // RAM
             string[] ram_effects = scanner.TryGetData("Main", "RamEffects");
-            ram_torque = Convert.ToDouble(ram_effects[0]);
-            ram_power = Convert.ToDouble(ram_effects[1]);
-            ram_fuel = Convert.ToDouble(ram_effects[2]);
-            ram_wear = Convert.ToDouble(ram_effects[3]);
+            if (ram_effects.Length == 4)
+            {
+                ram_torque = Convert.ToDouble(ram_effects[0]);
+                ram_power = Convert.ToDouble(ram_effects[1]);
+                ram_fuel = Convert.ToDouble(ram_effects[2]);
+                ram_wear = Convert.ToDouble(ram_effects[3]);
+            }
 
             _maxRpmMode = new Dictionary<int, double>();
             _engineModes = new Dictionary<int, string>();

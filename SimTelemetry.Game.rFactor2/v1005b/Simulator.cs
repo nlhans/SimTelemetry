@@ -47,7 +47,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public string Name
         {
-            get { return "rFactor2 v1.005(beta)"; }
+            get { return "rFactor2"; }
         }
 
         public IDriverCollection Drivers
