@@ -4,21 +4,33 @@ using System.IO;
 
 namespace SimTelemetry.Objects.Garage
 {
-    public class GarageTools
+    public class FileList
     {
+        private List<string> Files;
+
+        public FileList(string root)
+        {
+            Files = new List<string>();
+            foreach (string f in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
+                Files.Add(f.ToLower());
+
+        }
+
         /// <summary>
         /// Searches for all vehicles with specific pattern in a directory.
         /// Returns all files (in relative path to directory) in list.
+        /// All files are locally cached.
         /// </summary>
         /// <param name="directory">Absolute path to directory to search.</param>
         /// <param name="pattern">File pattern. *.txt returns all txt-extension files.</param>
         /// <returns>List of found files (relative path)</returns>
-        public static List<string> SearchFiles(string directory, string pattern)
+        public List<string> SearchFiles(string directory, string pattern)
         {
-            List<string> files = new List<string>();
-            if (Directory.Exists(directory))
-            foreach (string file in Directory.GetFiles(directory, Path.GetFileName(pattern), SearchOption.AllDirectories))
-                files.Add(file);
+            if(pattern.StartsWith("*."))
+                pattern = pattern.Substring(1);
+            pattern = pattern.ToLower();
+            directory = directory.ToLower();
+            List<string> files = Files.FindAll(delegate(string f) { return f.StartsWith(directory) && f.EndsWith(pattern); });
             return files;
         }
         /// <summary>
@@ -27,7 +39,7 @@ namespace SimTelemetry.Objects.Garage
         /// <param name="directory"></param>
         /// <param name="pattern"></param>
         /// <returns></returns>
-        public static string SearchFile(string directory, string pattern)
+        public string SearchFile(string directory, string pattern)
         {
             List<string> files = SearchFiles(directory, pattern);
             if (files.Count == 1) return files[0];

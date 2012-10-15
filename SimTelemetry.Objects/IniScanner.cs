@@ -163,6 +163,7 @@ namespace SimTelemetry.Objects
 
         public void Read()
         {
+            if(IniFile == null) return;
             string[] lines = File.ReadAllLines(IniFile);
             
             // Set property to 'main'

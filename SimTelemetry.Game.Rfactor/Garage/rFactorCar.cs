@@ -143,40 +143,52 @@ namespace SimTelemetry.Game.Rfactor.Garage
             _file = file;
         }
 
+        private bool Scanned = false;
         public void Scan()
         {
-            _mScanner = new IniScanner { IniFile = _file };
+            if (!Scanned)
+            {
+                Scanned = true;
+                _mScanner = new IniScanner {IniFile = _file};
 
-            _mScanner.Read();
+                _mScanner.Read();
 
-            _team = _mScanner.TryGetString("Team");
-            _driver = _mScanner.TryGetString("Driver");
-            _number = _mScanner.TryGetInt32("Number");
+                _team = _mScanner.TryGetString("Team");
+                _driver = _mScanner.TryGetString("Driver");
+                _number = _mScanner.TryGetInt32("Number");
 
-            _files = new Dictionary<string, string>();
-            _files.Add("Vehicle", GarageTools.SearchFile(rFactor.Garage.GamedataDirectory, _mScanner.TryGetString("HDVehicle")));
+                _team = _team.Substring(1, _team.Length - 2);
+                _driver = _driver.Substring(1, _driver.Length - 2);
 
-            _infoEngineManufacturer = _mScanner.TryGetString("Engine");
+                _files = new Dictionary<string, string>();
+                _files.Add("Vehicle",
+                           rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory, _mScanner.TryGetString("HDVehicle")));
 
-            _infoYearFounded = _mScanner.TryGetInt32("TeamFounded");
-            _infoHq = _mScanner.TryGetString("TeamHeadquarters");
-            _infoStarts = _mScanner.TryGetInt32("TeamStarts");
-            _infoPoles = _mScanner.TryGetInt32("TeamPoles");
-            _infoWins = _mScanner.TryGetInt32("TeamWins");
-            _infoChampionships = _mScanner.TryGetInt32("TeamWorldChampionships");
+                _infoEngineManufacturer = _mScanner.TryGetString("Engine");
 
-            _mHDV = new IniScanner { IniFile = _files["Vehicle"] };
-            _mHDV.IgnoreGroups = false;
-            _mHDV.Read();
+                _infoYearFounded = _mScanner.TryGetInt32("TeamFounded");
+                _infoHq = _mScanner.TryGetString("TeamHeadquarters");
+                _infoStarts = _mScanner.TryGetInt32("TeamStarts");
+                _infoPoles = _mScanner.TryGetInt32("TeamPoles");
+                _infoWins = _mScanner.TryGetInt32("TeamWins");
+                _infoChampionships = _mScanner.TryGetInt32("TeamWorldChampionships");
 
-            // Add additional files.
-            _files.Add("Engine", GarageTools.SearchFile(rFactor.Garage.GamedataDirectory, _mHDV.TryGetString("ENGINE", "Normal") + ".ini"));
-            _files.Add("Tyre", GarageTools.SearchFile(rFactor.Garage.GamedataDirectory, _mHDV.TryGetString("GENERAL", "TireBrand") + ".tbc"));
+                _mHDV = new IniScanner {IniFile = _files["Vehicle"]};
+                _mHDV.IgnoreGroups = false;
+                _mHDV.Read();
 
+                // Add additional files.
+                //_files.Add("Tyre", rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory, _mHDV.TryGetString("GENERAL", "TireBrand") + ".tbc"));
+
+                // TODO: Parse more data.
+            }
+        }
+
+        public void EngineScan()
+        {
+            _files.Add("Engine", rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory, _mHDV.TryGetString("ENGINE", "Normal") + ".ini"));
             // Now we have read the HDV file, we can just as well initialize all sub classes:
             _engine = new rFactorCarEngine(_files["Engine"], _mHDV);
-
-            // TODO: Parse more data.
         }
     }
 

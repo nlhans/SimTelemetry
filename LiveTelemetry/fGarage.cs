@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using LiveTelemetry.Garage;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Garage;
 
 namespace LiveTelemetry
 {
@@ -31,9 +32,12 @@ namespace LiveTelemetry
 
         private ucSelectGame ucGame;
         private ucSelectTrackCars ucTrackCars;
+        private ucSelectModel ucMod;
+
         private Button btBack;
 
         public static ISimulator Sim { get; set; }
+        public static IMod Mod { get; set; }
 
         public fGarage()
         {
@@ -43,11 +47,12 @@ namespace LiveTelemetry
             this.Padding = new Padding(0, 50, 0, 0);
             // Window: Game
             ucGame = new ucSelectGame();
-            ucGame.Dock = DockStyle.Fill;
             ucGame.Chosen += new Triton.Signal(ucGame_Chosen);
 
             ucTrackCars = new ucSelectTrackCars();
-            ucTrackCars.Dock = DockStyle.Fill;
+            ucTrackCars.Chosen += new Triton.Signal(ucTrackCars_Chosen);
+
+            ucMod = new ucSelectModel();
 
             // Button Back
             btBack = new Button();
@@ -58,6 +63,22 @@ namespace LiveTelemetry
             btBack.Click += new EventHandler(btBack_Click);
 
             Resize += fGarage_Resize;
+            Redraw();
+        }
+
+        void ucTrackCars_Chosen(object sender)
+        {
+            // TODO: ADd track selection as well!
+            string smod = sender.ToString();
+            Mod = Sim.Garage.Mods.Find(delegate(IMod m) { if(m.Name == null) m.Scan();
+                return m.Name.Equals(smod); });
+            if (Mod == null)
+                Window = GarageWindow.TrackCars;
+            else
+            {
+                Window = GarageWindow.Mod;
+                Mod.Scan();
+            }
             Redraw();
         }
 
@@ -87,6 +108,10 @@ namespace LiveTelemetry
 
                 case GarageWindow.TrackCars:
                     Window = GarageWindow.GameSelect;
+                    break;
+
+                case GarageWindow.Mod:
+                    Window = GarageWindow.TrackCars;
                     break;
             }
             if (Window == GarageWindow.GameSelect)
@@ -119,9 +144,14 @@ namespace LiveTelemetry
                 case GarageWindow.TrackCars:
                     Controls.Add(ucTrackCars);
                     break;
+
+                case GarageWindow.Mod:
+                    Controls.Add(ucMod);
+                    break;
             }
 
             ((IGarageUserControl)Controls[0]).Close += new Triton.AnonymousSignal(ucGame_Close);
+            Controls[0].Dock = DockStyle.Fill;
             ((IGarageUserControl)Controls[0]).Draw();
 
             if(GarageWindow.GameSelect != Window)

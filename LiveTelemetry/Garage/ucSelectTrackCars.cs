@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using SimTelemetry.Data;
 using SimTelemetry.Objects.Garage;
 using Triton;
 
@@ -12,21 +11,19 @@ namespace LiveTelemetry.Garage
     {
         private bool ControlsAdded = false;
         private Label t;
-        private FlowLayoutPanel panel;
+        private BufferedFlowLayoutPanel panel;
         public ucSelectTrackCars()
         {
             InitializeComponent();
             this.Padding = new Padding(35, 85, 35, 35);
-            panel = new FlowLayoutPanel();
-            panel.HorizontalScroll.Enabled = false;
-            panel.VerticalScroll.Enabled = true;
-            panel.BorderStyle = BorderStyle.None;
-
+            panel = new BufferedFlowLayoutPanel();
 
             t = new Label { Text = "Select mod/track" };
             t.Font = new Font("Arial", 32.0f, FontStyle.Italic | FontStyle.Bold);
             t.ForeColor = Color.White;
             t.TextAlign = ContentAlignment.MiddleCenter;
+
+            SetStyle(ControlStyles.DoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
         }
 
         public event AnonymousSignal Close;
@@ -43,22 +40,23 @@ namespace LiveTelemetry.Garage
                     Close();
                 return;
             }
-
                 int columns = (int) Math.Ceiling(Math.Sqrt(fGarage.Sim.Garage.Mods.Count))+2;
-                if (columns == 0) columns = 1;
                 if (fGarage.Sim.Garage.Mods.Count % columns == 1)
                     columns++;
-                if (this.Width > 213)
+                if (this.Width+40 >= 233)
                 {
-                    while (233*columns > this.Width)
+                    while (233*columns > this.Width-40 && columns>0)
                         columns--;
                 }
+                if (columns <= 0) columns = 1;
                 int rows = (int)Math.Ceiling(fGarage.Sim.Garage.Mods.Count * 1.0 / columns) + 1;
 
-            panel.Size = new Size(233 * columns+40, rows * 140+20);
+            panel.Size = new Size(233 * columns+40, Math.Min(this.Height-50, rows * 140+20));
             panel.Location = new Point((this.Width - panel.Size.Width) / 2, (this.Height - panel.Size.Height) / 2);
 
-            t.Size = new Size(panel.Size.Width, 50);
+            t.Size = new Size(panel.Size.Width-40, 50);
+            panel.Rebuffer();
+
             if (ControlsAdded == false)
             {
                 Controls.Clear();
@@ -117,7 +115,10 @@ namespace LiveTelemetry.Garage
 
         void pb_Click(object sender, EventArgs e)
         {
+            Control c = (Control) sender;
 
+            if (Chosen != null)
+                Chosen(c.Name);
         }
     }
 }

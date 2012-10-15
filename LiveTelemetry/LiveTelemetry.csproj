@@ -50,6 +50,10 @@
     <Reference Include="Triton">
       <HintPath>..\Binaries\Triton.dll</HintPath>
     </Reference>
+    <Reference Include="Triton.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Binaries\Triton.Controls.dll</HintPath>
+    </Reference>
     <Reference Include="Triton.Database">
       <HintPath>..\Binaries\Triton.Database.dll</HintPath>
     </Reference>
@@ -63,6 +67,15 @@
     </Compile>
     <Compile Include="fGarage.Designer.cs">
       <DependentUpon>fGarage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BufferedFlowLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Garage\ucSelectModel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Garage\ucSelectModel.Designer.cs">
+      <DependentUpon>ucSelectModel.cs</DependentUpon>
     </Compile>
     <Compile Include="IGarageUserControl.cs" />
     <Compile Include="Garage\ucSelectGame.cs">
@@ -135,6 +148,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Garage\ucSelectGame.resx">
       <DependentUpon>ucSelectGame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Garage\ucSelectModel.resx">
+      <DependentUpon>ucSelectModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Garage\ucSelectTrackCars.resx">
       <DependentUpon>ucSelectTrackCars.cs</DependentUpon>

@@ -102,45 +102,52 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         }
 
+        private bool Scanned = false;
         public void Scan()
         {
-            _mScanner = new IniScanner { IniFile = _file };
-            _mScanner.HandleUnknownLine += new Signal(Handle_TrackLine);
-            _mScanner.IgnoreGroups = false;
-            _mScanner.Read();
-
-            // Only name available in rFactor. Or where else?
-            _name = _mScanner.TryGetString("Mod Name");
-            _author = "";
-            _description = "";
-            _website = "";
-            _version = "";
-            _directoryVehicles = _mScanner.TryGetString("Main.ConfigOverrides", "VehiclesDir");
-
-            // Pitspeeds
-            Int32.TryParse(_mScanner.TryGetString("Main.DefaultScoring","RacePitKPH"), out _pitSpeedRaceDefault);
-            Int32.TryParse(_mScanner.TryGetString("Main.DefaultScoring", "NormalPitKPH"), out _pitSpeedPracticeDefault);
-
-            // TODO: Add more properties like ParcFerme properties, flag settings, point scoring, etc.
-            foreach(KeyValuePair<string, Dictionary<string, List<string>>> GroupKey in _mScanner.Data)
+            if (!Scanned)
             {
-                if(GroupKey.Key.StartsWith("Season"))
+                Scanned = true;
+                _mScanner = new IniScanner {IniFile = _file};
+                _mScanner.HandleUnknownLine += new Signal(Handle_TrackLine);
+                _mScanner.IgnoreGroups = false;
+                _mScanner.Read();
+
+                // Only name available in rFactor. Or where else?
+                _name = _mScanner.TryGetString("Mod Name");
+                _author = "";
+                _description = "";
+                _website = "";
+                _version = "";
+                _directoryVehicles = _mScanner.TryGetString("Main.ConfigOverrides", "VehiclesDir");
+
+                // Pitspeeds
+                Int32.TryParse(_mScanner.TryGetString("Main.DefaultScoring", "RacePitKPH"), out _pitSpeedRaceDefault);
+                Int32.TryParse(_mScanner.TryGetString("Main.DefaultScoring", "NormalPitKPH"),
+                               out _pitSpeedPracticeDefault);
+
+                // TODO: Add more properties like ParcFerme properties, flag settings, point scoring, etc.
+                foreach (KeyValuePair<string, Dictionary<string, List<string>>> GroupKey in _mScanner.Data)
                 {
-                    // Championship!
-                    // TODO: parse track data.
+                    if (GroupKey.Key.StartsWith("Season"))
+                    {
+                        // Championship!
+                        // TODO: parse track data.
+                    }
                 }
-            }
 
-            Int32.TryParse(_mScanner.TryGetString("Main", "Max Opponents"), out _opponents);
+                Int32.TryParse(_mScanner.TryGetString("Main", "Max Opponents"), out _opponents);
 
-            // Search for all cars in folder.
-            List<string> vehicles = GarageTools.SearchFiles(rFactor.Garage.InstallationDirectory + _directoryVehicles,
-                                                            "*.veh");
-            Console.WriteLine("Found " + vehicles.Count + " vehicles for MOD ["+_name+"]");
+                // Search for all cars in folder.
+                List<string> vehicles =
+                    rFactor.Garage.Files.SearchFiles(rFactor.Garage.InstallationDirectory + _directoryVehicles,
+                                            "*.veh");
+                Console.WriteLine("Found " + vehicles.Count + " vehicles for MOD [" + _name + "]");
 
-            foreach(string veh in vehicles)
-            {
-                _models.Add(new rFactorCar(this, veh));
+                foreach (string veh in vehicles)
+                {
+                    _models.Add(new rFactorCar(this, veh));
+                }
             }
 
         }
