@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using LiveTelemetry.Garage;
+using SimTelemetry.Data;
+using SimTelemetry.Objects;
 
 namespace LiveTelemetry
 {
@@ -31,6 +33,8 @@ namespace LiveTelemetry
         private ucSelectTrackCars ucTrackCars;
         private Button btBack;
 
+        public static ISimulator Sim { get; set; }
+
         public fGarage()
         {
             Window = GarageWindow.GameSelect;
@@ -40,8 +44,7 @@ namespace LiveTelemetry
             // Window: Game
             ucGame = new ucSelectGame();
             ucGame.Dock = DockStyle.Fill;
-            ucGame.Close += new Triton.AnonymousSignal(ucGame_Close);
-            ucGame.Chosen += new Triton.AnonymousSignal(ucGame_Chosen);
+            ucGame.Chosen += new Triton.Signal(ucGame_Chosen);
 
             ucTrackCars = new ucSelectTrackCars();
             ucTrackCars.Dock = DockStyle.Fill;
@@ -58,9 +61,19 @@ namespace LiveTelemetry
             Redraw();
         }
 
-        void ucGame_Chosen()
+        void ucGame_Chosen(object sim)
         {
-            Window = GarageWindow.TrackCars;
+            Sim = Telemetry.m.Sims.Sims.Find(delegate(ISimulator s) { return s.Name.Equals(sim.ToString()); });
+            if (Sim.Garage == null)
+                // TODO: Display errors.
+                // TODO: Check if sim is installed.
+                Window = GarageWindow.GameSelect;
+            else
+            {
+                Window = GarageWindow.TrackCars;
+                Sim.Garage.Scan();
+            }
+
             Redraw();
         }
 
@@ -76,6 +89,8 @@ namespace LiveTelemetry
                     Window = GarageWindow.GameSelect;
                     break;
             }
+            if (Window == GarageWindow.GameSelect)
+                Sim = null;
             Redraw();
         }
 
@@ -91,6 +106,8 @@ namespace LiveTelemetry
 
         void Redraw()
         {
+            if (Controls.Count > 0)
+                ((IGarageUserControl) Controls[0]).Close -= new Triton.AnonymousSignal(ucGame_Close);
             Controls.Clear();
             BackColor = Color.Black;
             switch(Window)
@@ -103,8 +120,9 @@ namespace LiveTelemetry
                     Controls.Add(ucTrackCars);
                     break;
             }
-            IGarageUserControl uc = (IGarageUserControl)Controls[0];
-            uc.Draw();
+
+            ((IGarageUserControl)Controls[0]).Close += new Triton.AnonymousSignal(ucGame_Close);
+            ((IGarageUserControl)Controls[0]).Draw();
 
             if(GarageWindow.GameSelect != Window)
                 Controls.Add(btBack);

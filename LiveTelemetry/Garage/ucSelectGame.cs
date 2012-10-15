@@ -16,7 +16,7 @@ namespace LiveTelemetry.Garage
     public partial class ucSelectGame : UserControl, IGarageUserControl
     {
         public event AnonymousSignal Close;
-        public event AnonymousSignal Chosen;
+        public event Signal Chosen;
         public ucSelectGame()
         {
             InitializeComponent();
@@ -61,7 +61,7 @@ namespace LiveTelemetry.Garage
                 {
                     ucResizableImage pb = new ucResizableImage("Simulators/" + sim.ProcessName + ".png");
                     pb.Margin = new Padding(10);
-                    pb.Name = sim.ProcessName;
+                    pb.Name = sim.Name;
                     if (sim.Garage == null)
                     {
                         pb.Disabled = true;
@@ -80,7 +80,7 @@ namespace LiveTelemetry.Garage
                     l.Size = new Size(213, 120);
                     l.Font = new Font("Tahoma", 24.0f, FontStyle.Bold);
                     l.TextAlign = ContentAlignment.MiddleCenter;
-                    l.Name = sim.ProcessName;
+                    l.Name = sim.Name;
                     if (sim.Garage == null)
                     {
                         l.ForeColor = Color.Gray;
@@ -102,7 +102,7 @@ namespace LiveTelemetry.Garage
             Control pb = (Control)sender;
 
             if (Chosen != null)
-                Chosen();
+                Chosen(pb.Name);
         }
     }
 }

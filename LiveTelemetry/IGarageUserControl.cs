@@ -5,7 +5,7 @@ namespace LiveTelemetry
     public interface IGarageUserControl
     {
         event AnonymousSignal Close;
-        event AnonymousSignal Chosen;
+        event Signal Chosen;
 
         void Draw();
     }

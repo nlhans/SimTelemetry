@@ -30,22 +30,30 @@ namespace LiveTelemetry.Garage
         }
 
         public event AnonymousSignal Close;
-        public event AnonymousSignal Chosen;
+        public event Signal Chosen;
         public void Draw()
         {
             this.BackColor = Color.Black;
 
-            // TODO: Fix bug when simulator is not active!!
-                int columns = (int) Math.Ceiling(Math.Sqrt(Telemetry.m.Sim.Garage.Mods.Count))+2;
+            if (fGarage.Sim == null)
+            {
+                // TODO: Display errors.
+                // TODO: Check if sim is installed.
+                if (Close != null)
+                    Close();
+                return;
+            }
+
+                int columns = (int) Math.Ceiling(Math.Sqrt(fGarage.Sim.Garage.Mods.Count))+2;
                 if (columns == 0) columns = 1;
-                if (Telemetry.m.Sim.Garage.Mods.Count%columns == 1)
+                if (fGarage.Sim.Garage.Mods.Count % columns == 1)
                     columns++;
                 if (this.Width > 213)
                 {
-                    while (213*columns > this.Width)
+                    while (233*columns > this.Width)
                         columns--;
                 }
-                int rows = (int) Math.Ceiling(Telemetry.m.Sim.Garage.Mods.Count*1.0/columns) + 1;
+                int rows = (int)Math.Ceiling(fGarage.Sim.Garage.Mods.Count * 1.0 / columns) + 1;
 
             panel.Size = new Size(233 * columns+40, rows * 140+20);
             panel.Location = new Point((this.Width - panel.Size.Width) / 2, (this.Height - panel.Size.Height) / 2);
@@ -57,7 +65,7 @@ namespace LiveTelemetry.Garage
 
                 panel.Controls.Add(t);
 
-                foreach (IMod mod in Telemetry.m.Sim.Garage.Mods)
+                foreach (IMod mod in fGarage.Sim.Garage.Mods)
                 {
                     // If required, scan:
                     mod.Scan();
