@@ -161,10 +161,9 @@ namespace SimTelemetry.Game.Rfactor
             // TODO: Rolling resistance / speed effects
 
             max_hp = Power.HP_KW(max_hp);
-            max_hp = 810;
             max_hp = Power.HP_KW(max_hp);
 
-            double TopSpeed = 3.6 * Math.Pow(max_hp / aero * 1000, 1 / 3.0);
+            double TopSpeed = 3+3.6 * Math.Pow(max_hp / aero * 1000, 1 / 3.0);
             return TopSpeed;
         }
         public static double GetPracticalTopSpeed()
