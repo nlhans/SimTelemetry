@@ -17,6 +17,9 @@ namespace LiveTelemetry.Garage
     {
         public event AnonymousSignal Close;
         public event Signal Chosen;
+
+        private BufferedFlowLayoutPanel panel;
+        private Label lbl_selectsim;
         public ucSelectGame()
         {
             InitializeComponent();
@@ -30,30 +33,15 @@ namespace LiveTelemetry.Garage
             Controls.Clear();
 
             // draw sim gallery
-            FlowLayoutPanel panel = new FlowLayoutPanel();
-            this.Padding = new Padding(35);
+            panel = new BufferedFlowLayoutPanel();
+            panel.AutoScroll = false;
+            Padding = new Padding(35);
 
-            int columns = (int)Math.Ceiling(Math.Sqrt(Telemetry.m.Sims.Sims.Count));
-            if (columns == 0) columns = 1;
-            if (Telemetry.m.Sims.Sims.Count % columns == 1)
-                columns++;
-            if (this.Width > 233)
-            {
-                while (233 * columns > this.Width)
-                    columns--;
-            }
-            int rows = (int)Math.Ceiling(Telemetry.m.Sims.Sims.Count * 1.0 / columns) + 1;
-
-
-            panel.Size = new Size(233 * columns, rows * 140);
-            panel.Location = new Point((this.Width - panel.Size.Width) / 2, (this.Height - panel.Size.Height) / 2);
-
-            Label t = new Label { Text = "Select simulator" };
-            t.Font = new Font("Arial", 32.0f, FontStyle.Italic | FontStyle.Bold);
-            t.ForeColor = Color.White;
-            t.Size = new Size(panel.Size.Width, 50);
-            t.TextAlign = ContentAlignment.MiddleCenter;
-            panel.Controls.Add(t);
+            lbl_selectsim = new Label { Text = "Select simulator" };
+            lbl_selectsim.Font = new Font("Arial", 32.0f, FontStyle.Italic | FontStyle.Bold);
+            lbl_selectsim.ForeColor = Color.White;
+            lbl_selectsim.TextAlign = ContentAlignment.MiddleCenter;
+            panel.Controls.Add(lbl_selectsim);
 
             foreach (ISimulator sim in Telemetry.m.Sims.Sims)
             {
@@ -95,6 +83,28 @@ namespace LiveTelemetry.Garage
                 }
             }
             Controls.Add(panel);
+        }
+
+        public void Resize()
+        {
+
+            int columns = (int)Math.Ceiling(Math.Sqrt(Telemetry.m.Sims.Sims.Count));
+            if (columns == 0) columns = 1;
+            if (Telemetry.m.Sims.Sims.Count % columns == 1)
+                columns++;
+            if (this.Width > 233)
+            {
+                while (233 * columns > this.Width)
+                    columns--;
+            }
+            int rows = (int)Math.Ceiling(Telemetry.m.Sims.Sims.Count * 1.0 / columns) + 1;
+
+
+            panel.Size = new Size(233 * columns+20, rows * 140);
+            panel.Location = new Point((this.Width - panel.Size.Width) / 2, (this.Height - panel.Size.Height) / 2);
+
+            lbl_selectsim.Size = new Size(panel.Size.Width, 50);
+
         }
 
         void pb_Click(object sender, EventArgs e)

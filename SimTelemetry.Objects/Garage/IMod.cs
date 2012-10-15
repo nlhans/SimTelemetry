@@ -11,6 +11,7 @@ namespace SimTelemetry.Objects.Garage
         string Description { get; }
         string Website { get; }
         string Version { get; }
+        List<string> Classes { get; }
 
         string Directory_Vehicles { get; }
 

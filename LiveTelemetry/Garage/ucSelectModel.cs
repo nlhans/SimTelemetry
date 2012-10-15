@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using SimTelemetry.Objects.Garage;
 using Triton;
@@ -14,41 +15,54 @@ namespace LiveTelemetry.Garage
 {
     public partial class ucSelectModel : UserControl, IGarageUserControl
     {
+
         private VisualListDetails _models;
+
+        public event AnonymousSignal Close;
+        public event Signal Chosen;
+        private List<ListViewItem> models = new List<ListViewItem>();
+
         public ucSelectModel()
         {
             InitializeComponent();
             _models = new VisualListDetails(true);
 
-            _models.Columns.Add("id", "Driver",150);
-            _models.Columns.Add("team","Team",140);
+            _models.Columns.Add("id", "Description", 130);
+            _models.Columns.Add("team", "Team", 160);
 
             splitContainer1.Panel1.Controls.Add(_models);
 
-
         }
 
-        public event AnonymousSignal Close;
-        public event Signal Chosen;
         public void Draw()
         {
             _models.Items.Clear();
 
-            List<ListViewItem> i = new List<ListViewItem>();
-            foreach(ICar car in fGarage.Mod.Models)
+            foreach (ICar car in fGarage.Mod.Models)
             {
                 car.Scan();
-                i.Add(
+                string driver = car.Description;
+
+                if (car.Number > 0 && driver.StartsWith("#") == false)
+                    driver = "#" + car.Number.ToString("000") + " " + driver;
+                models.Add(
                     new ListViewItem(new string[2]
                                          {
-                                             car.Number.ToString("#000 ") + car.Driver, car.Team
+                                             driver, car.Team
                                          }));
             }
 
-            i.Sort(
+            models.Sort(
                 delegate(ListViewItem lvi1, ListViewItem lvi2)
-                    { return lvi1.SubItems[0].Text.CompareTo(lvi2.SubItems[0].Text); });
-            _models.Items.AddRange(i.ToArray());
+                { return lvi1.SubItems[0].Text.CompareTo(lvi2.SubItems[0].Text); });
+
+            _models.Items.AddRange(models.ToArray());
+
+        }
+
+        public void Resize()
+        {
+            
 
         }
     }

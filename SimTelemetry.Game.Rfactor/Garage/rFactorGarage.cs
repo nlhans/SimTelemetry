@@ -42,6 +42,9 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         public FileList Files { get; internal set; }
 
+        // Cache with all data files
+        private Dictionary<string, ICar> Cars = new Dictionary<string, ICar>();
+
         private bool Scanned = false;
         public void Scan()
         {
@@ -95,6 +98,16 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
 
             Debug.WriteLine(count + " mod(s) found");
+        }
+
+        public ICar CarFactory(IMod mod, string veh)
+        {
+            if (!Cars.ContainsKey(veh))
+            {
+                Cars.Add(veh,  new rFactorCar(veh));
+                Cars[veh].Scan();
+            }
+            return Cars[veh];
         }
     }
 }

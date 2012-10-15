@@ -15,6 +15,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
         private string _website;
         private string _version;
         private string _directoryVehicles;
+        private List<string> _classes;
         private int _pitSpeedPracticeDefault;
         private int _pitSpeedRaceDefault;
         private int _opponents;
@@ -50,6 +51,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
         public string Version
         {
             get { return _version; }
+        }
+
+        public List<string> Classes
+        {
+            get { return _classes; }
         }
 
         public string Directory_Vehicles
@@ -120,6 +126,17 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 _website = "";
                 _version = "";
                 _directoryVehicles = _mScanner.TryGetString("Main.ConfigOverrides", "VehiclesDir");
+                string c = _mScanner.TryGetString("Main", "Vehicle Filter");
+                if (c.StartsWith("\""))
+                    c = c.Substring(1, c.Length - 2);
+                if(c.Contains(" "))
+                {
+                    _classes = new List<string>( c.Split(" ".ToCharArray()));
+                }
+                else
+                {
+                    _classes = new List<string>(c.Split(",".ToCharArray()));
+                }
 
                 // Pitspeeds
                 Int32.TryParse(_mScanner.TryGetString("Main.DefaultScoring", "RacePitKPH"), out _pitSpeedRaceDefault);
@@ -142,12 +159,16 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 List<string> vehicles =
                     rFactor.Garage.Files.SearchFiles(rFactor.Garage.InstallationDirectory + _directoryVehicles,
                                             "*.veh");
-                Console.WriteLine("Found " + vehicles.Count + " vehicles for MOD [" + _name + "]");
 
                 foreach (string veh in vehicles)
                 {
-                    _models.Add(new rFactorCar(this, veh));
+                    ICar car = rFactor.Garage.CarFactory(this, veh);
+                    if (car.InClass(Classes))
+                    {
+                        _models.Add(car);
+                    }
                 }
+                Console.WriteLine("Found " + _models.Count + " vehicles for MOD [" + _name + "]");
             }
 
         }

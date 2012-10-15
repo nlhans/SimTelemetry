@@ -92,7 +92,6 @@ namespace LiveTelemetry
             else
             {
                 Window = GarageWindow.TrackCars;
-                Sim.Garage.Scan();
             }
 
             Redraw();
@@ -153,6 +152,7 @@ namespace LiveTelemetry
             ((IGarageUserControl)Controls[0]).Close += new Triton.AnonymousSignal(ucGame_Close);
             Controls[0].Dock = DockStyle.Fill;
             ((IGarageUserControl)Controls[0]).Draw();
+            ((IGarageUserControl)Controls[0]).Resize();
 
             if(GarageWindow.GameSelect != Window)
                 Controls.Add(btBack);
@@ -161,7 +161,7 @@ namespace LiveTelemetry
         void fGarage_Resize(object sender, EventArgs e)
         {
             IGarageUserControl uc = (IGarageUserControl) Controls[0];
-            uc.Draw();
+            uc.Resize();
         }
 
     }

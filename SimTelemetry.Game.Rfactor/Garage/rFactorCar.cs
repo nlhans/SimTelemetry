@@ -16,6 +16,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private int _number;
 
+        private string _description;
+
         private Dictionary<string, string> _files;
 
         private string _infoEngineManufacturer;
@@ -43,9 +45,10 @@ namespace SimTelemetry.Game.Rfactor.Garage
         private ICarBrakes _brakes;
 
         private ICarGeneral _general;
-        private IMod _mod;
         private IniScanner _mScanner;
         private IniScanner _mHDV;
+
+        private List<string> _classes;
 
         public string File
         {
@@ -62,9 +65,19 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _driver; }
         }
 
+        public string Description
+        {
+            get { return _description; }
+        }
+
         public int Number
         {
             get { return _number; }
+        }
+
+        public List<string> Classes
+        {
+            get { return _classes; }
         }
 
         public Dictionary<string, string> Files
@@ -137,9 +150,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _general; }
         }
 
-        public rFactorCar(IMod mod, string file)
+        public rFactorCar(string file)
         {
-            _mod = mod;
             _file = file;
         }
 
@@ -155,10 +167,27 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
                 _team = _mScanner.TryGetString("Team");
                 _driver = _mScanner.TryGetString("Driver");
+                _description = _mScanner.TryGetString("Description");
                 _number = _mScanner.TryGetInt32("Number");
 
                 _team = _team.Substring(1, _team.Length - 2);
                 _driver = _driver.Substring(1, _driver.Length - 2);
+                _description = _description.Substring(1, _description.Length - 2);
+
+                string c = _mScanner.TryGetString("Classes");
+                if (c.StartsWith("\""))
+                    c = c.Substring(1, c.Length - 2);
+
+                if (c.StartsWith("\""))
+                    c = c.Substring(1, c.Length - 2);
+                if (c.Contains(" "))
+                {
+                    _classes = new List<string>(c.Split(" ".ToCharArray()));
+                }
+                else
+                {
+                    _classes = new List<string>(c.Split(",".ToCharArray()));
+                }
 
                 _files = new Dictionary<string, string>();
                 _files.Add("Vehicle",
@@ -182,6 +211,14 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
                 // TODO: Parse more data.
             }
+        } 
+        public bool InClass(List<string> classes)
+        {
+            bool match = false;
+            foreach (string f in classes)
+                if (Classes.Contains(f)) match = true;
+
+            return match;
         }
 
         public void EngineScan()

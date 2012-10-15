@@ -8,5 +8,6 @@ namespace LiveTelemetry
         event Signal Chosen;
 
         void Draw();
+        void Resize();
     }
 }

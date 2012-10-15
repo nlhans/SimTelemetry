@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.lbl_Team = new System.Windows.Forms.Label();
-            this.lbl_info1 = new System.Windows.Forms.Label();
             this.lbl_info2 = new System.Windows.Forms.Label();
+            this.lbl_info1 = new System.Windows.Forms.Label();
+            this.lbl_Team = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -51,19 +51,18 @@
             this.splitContainer1.Panel2.Controls.Add(this.lbl_info1);
             this.splitContainer1.Panel2.Controls.Add(this.lbl_Team);
             this.splitContainer1.Size = new System.Drawing.Size(581, 424);
-            this.splitContainer1.SplitterDistance = 300;
+            this.splitContainer1.SplitterDistance = 340;
             this.splitContainer1.TabIndex = 0;
             // 
-            // lbl_Team
+            // lbl_info2
             // 
-            this.lbl_Team.AutoSize = true;
-            this.lbl_Team.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbl_Team.ForeColor = System.Drawing.Color.White;
-            this.lbl_Team.Location = new System.Drawing.Point(12, 15);
-            this.lbl_Team.Name = "lbl_Team";
-            this.lbl_Team.Size = new System.Drawing.Size(70, 25);
-            this.lbl_Team.TabIndex = 0;
-            this.lbl_Team.Text = "Team";
+            this.lbl_info2.AutoSize = true;
+            this.lbl_info2.ForeColor = System.Drawing.Color.White;
+            this.lbl_info2.Location = new System.Drawing.Point(211, 48);
+            this.lbl_info2.Name = "lbl_info2";
+            this.lbl_info2.Size = new System.Drawing.Size(34, 13);
+            this.lbl_info2.TabIndex = 2;
+            this.lbl_info2.Text = "Info 2";
             // 
             // lbl_info1
             // 
@@ -75,15 +74,16 @@
             this.lbl_info1.TabIndex = 1;
             this.lbl_info1.Text = "Info 1";
             // 
-            // lbl_info2
+            // lbl_Team
             // 
-            this.lbl_info2.AutoSize = true;
-            this.lbl_info2.ForeColor = System.Drawing.Color.White;
-            this.lbl_info2.Location = new System.Drawing.Point(211, 48);
-            this.lbl_info2.Name = "lbl_info2";
-            this.lbl_info2.Size = new System.Drawing.Size(34, 13);
-            this.lbl_info2.TabIndex = 2;
-            this.lbl_info2.Text = "Info 2";
+            this.lbl_Team.AutoSize = true;
+            this.lbl_Team.Font = new System.Drawing.Font("Tahoma", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_Team.ForeColor = System.Drawing.Color.White;
+            this.lbl_Team.Location = new System.Drawing.Point(12, 15);
+            this.lbl_Team.Name = "lbl_Team";
+            this.lbl_Team.Size = new System.Drawing.Size(70, 25);
+            this.lbl_Team.TabIndex = 0;
+            this.lbl_Team.Text = "Team";
             // 
             // ucSelectModel
             // 

@@ -7,7 +7,9 @@ namespace SimTelemetry.Objects.Garage
         string File { get; }
         string Team { get; }
         string Driver { get; }
+        string Description { get; }
         int Number { get; }
+        List<string> Classes { get; }
 
         Dictionary<string, string> Files { get; }
 
@@ -28,5 +30,6 @@ namespace SimTelemetry.Objects.Garage
         ICarGeneral General { get; }
 
         void Scan();
+        bool InClass(List<string> classes);
     }
 }
