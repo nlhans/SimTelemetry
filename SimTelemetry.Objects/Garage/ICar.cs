@@ -31,5 +31,8 @@ namespace SimTelemetry.Objects.Garage
 
         void Scan();
         bool InClass(List<string> classes);
+        void ScanEngine();
+        void ScanGeneral();
+        void ScanAerodynamics();
     }
 }

@@ -22,6 +22,8 @@ namespace LiveTelemetry.Garage
         public event Signal Chosen;
         private List<ListViewItem> models = new List<ListViewItem>();
 
+        private ucSelectModel_EngineCurve ucEngine;
+
         public ucSelectModel()
         {
             InitializeComponent();
@@ -29,13 +31,67 @@ namespace LiveTelemetry.Garage
 
             _models.Columns.Add("id", "Description", 130);
             _models.Columns.Add("team", "Team", 160);
+            _models.Columns.Add("file", "File", 1);
+            _models.MultiSelect = false;
+            _models.ItemSelectionChanged += _models_ItemSelectionChanged;
 
             splitContainer1.Panel1.Controls.Add(_models);
 
+            ucEngine = new ucSelectModel_EngineCurve();
+            ucEngine.Size = new Size(600, 400);
+            ucEngine.Location = new Point(10, 400);
+            splitContainer1.Panel2.Controls.Add(ucEngine);
+
+        }
+
+        void _models_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if(_models.SelectedItems.Count > 0)
+            {
+                string file = _models.SelectedItems[0].SubItems[2].Text;
+
+                ICar car = fGarage.Sim.Garage.CarFactory(fGarage.Mod, file);
+                
+                CarEngineTools engineinfo = new CarEngineTools(car);
+                engineinfo.Scan();
+
+                lbl_Team.Text = car.Driver + " [" + car.Team + "]";
+
+                lbl_info1.Text = "[Team]\n";
+                lbl_info1.Text += "Start number: " + car.Number.ToString() + "\n";
+                lbl_info1.Text += "Engine: " + car.Info_Engine_Manufacturer.ToString() + "\n";
+                lbl_info1.Text += "\n";
+                lbl_info1.Text += "Team Founded: " + car.Info_YearFounded.ToString() + "\n";
+                lbl_info1.Text += "Team Headquarters: " + car.Info_HQ + "\n";
+                if (car.Info_Starts > 0)
+                {
+                    lbl_info1.Text += "Team Starts: " + car.Info_Starts.ToString() + "\n";
+                    lbl_info1.Text += "Team Pole positions: " + car.Info_Poles.ToString() + " (" +
+                                      (100.0*car.Info_Poles/car.Info_Starts).ToString("000.0") + "%)\n";
+                    lbl_info1.Text += "Team Race Wins: " + car.Info_Wins.ToString() + " (" +
+                                      (100.0 * car.Info_Wins / car.Info_Starts).ToString("000.0") + "%)\n";
+                    lbl_info1.Text += "Team Championship Wins: " + car.Info_Championships.ToString() + "\n";
+                }
+
+                lbl_info1.Text += "\n";
+                lbl_info1.Text += "[Car]\n";
+
+                lbl_info2.Text = "[Engine]\n";
+                lbl_info2.Text += "Maximum RPM: " + car.Engine.MaxRPM.ToString("00000") + "rpm\n";
+                lbl_info2.Text += "Idle RPM: " + car.Engine.IdleRPM.ToString("00000") + "rpm\n";
+
+                lbl_info2.Text += "Maximum torque: " + engineinfo.MaxTorque_NM.ToString("0000.0") + "nm  at " + engineinfo.MaxTorque_RPM.ToString("00000") + " rpm\n";
+                lbl_info2.Text += "Maximum power: " + engineinfo.MaxPower_HP.ToString("0000.0") + "hp at " + engineinfo.MaxPower_RPM.ToString("00000") + " rpm\n";
+
+                lbl_info2.Text += "Boost steps: " + car.Engine.EngineModes.Count.ToString() + "\n";
+
+                ucEngine.Load(car, engineinfo);
+            }
         }
 
         public void Draw()
         {
+            models = new List<ListViewItem>();
             _models.Items.Clear();
 
             foreach (ICar car in fGarage.Mod.Models)
@@ -46,9 +102,9 @@ namespace LiveTelemetry.Garage
                 if (car.Number > 0 && driver.StartsWith("#") == false)
                     driver = "#" + car.Number.ToString("000") + " " + driver;
                 models.Add(
-                    new ListViewItem(new string[2]
+                    new ListViewItem(new string[3]
                                          {
-                                             driver, car.Team
+                                             driver, car.Team, car.File
                                          }));
             }
 

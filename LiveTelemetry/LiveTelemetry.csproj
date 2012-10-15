@@ -77,6 +77,12 @@
     <Compile Include="Garage\ucSelectModel.Designer.cs">
       <DependentUpon>ucSelectModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Garage\ucSelectModel_EngineCurve.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Garage\ucSelectModel_EngineCurve.Designer.cs">
+      <DependentUpon>ucSelectModel_EngineCurve.cs</DependentUpon>
+    </Compile>
     <Compile Include="IGarageUserControl.cs" />
     <Compile Include="Garage\ucSelectGame.cs">
       <SubType>UserControl</SubType>
@@ -151,6 +157,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Garage\ucSelectModel.resx">
       <DependentUpon>ucSelectModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Garage\ucSelectModel_EngineCurve.resx">
+      <DependentUpon>ucSelectModel_EngineCurve.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Garage\ucSelectTrackCars.resx">
       <DependentUpon>ucSelectTrackCars.cs</DependentUpon>

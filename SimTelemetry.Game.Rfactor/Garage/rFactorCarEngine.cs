@@ -39,6 +39,16 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private Dictionary<int, double> _maxRpmMode;
 
+        private double _lifetimeAverage;
+
+        private double _lifetimeStdDeviation;
+
+        private double _lifetimeRpm;
+
+        private double _lifetimeTemperatureOil;
+
+        private double _lifetimeTemperatureWater;
+
         public rFactorCarEngine(string file, IniScanner mHdv)
         {
             EngineTorque_Min = new Dictionary<double, double>();
@@ -54,7 +64,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             _file = file;
             string[] rpm_idle = scanner.TryGetData("Main", "IdleRPMLogic");
             string[] rpm_max = scanner.TryGetData("Main", "RevLimitRange");
-            _maxRpm = Convert.ToDouble(rpm_max[0]) + Convert.ToInt32(rpm_max[2])*Convert.ToDouble(rpm_max[1]); // With maximum limits.
+            _maxRpm = Convert.ToDouble(rpm_max[0]) + Convert.ToDouble(rpm_max[2]) *Convert.ToDouble(rpm_max[1]); // With maximum limits.
             _idleRpm = Convert.ToDouble(rpm_idle[0]) + Convert.ToDouble(rpm_idle[1]);
             _idleRpm /= 2.0;
 
@@ -70,7 +80,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             // Is there any EngineBoost defined?
             if (mode_range.Length == 3)
             {
-                modes = Convert.ToInt32(mode_range[2]);
+                modes = (int)Convert.ToDouble(mode_range[2]);
                 mode_rpm = Convert.ToDouble(mode_effects[0]);
                 mode_fuel = Convert.ToDouble(mode_effects[1]);
                 mode_wear = Convert.ToDouble(mode_effects[2]);
@@ -128,8 +138,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 if (last_rpm != kvp.Key && last_rpm <= rpm && kvp.Key >= rpm)
                 {
                     // Closest spot!
+                    double last_curve = 0;
+                    if (curve.ContainsKey(last_rpm))
+                        last_curve = curve[last_rpm];
                     double duty_cycle = (rpm - last_rpm)/(kvp.Key - last_rpm);
-                    double d = curve[last_rpm] - kvp.Value; // TODO: Is this the right way around?
+                    double d = last_curve - kvp.Value; // TODO: Is this the right way around?
 
                     return kvp.Value + d*(1-duty_cycle);
                 }
@@ -137,6 +150,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 last_rpm = kvp.Key;
             }
             return 0;
+        }
+
+        public double Lifetime_Temperature_Water
+        {
+            get { return _lifetimeTemperatureWater; }
         }
 
         public Dictionary<double, double> GetTorqueCurve(double speed, double throttle, int engine_mode)
@@ -224,6 +242,26 @@ namespace SimTelemetry.Game.Rfactor.Garage
         public Dictionary<int, double> MaxRPM_Mode
         {
             get { return _maxRpmMode; }
+        }
+
+        public double Lifetime_Average
+        {
+            get { return _lifetimeAverage; }
+        }
+
+        public double Lifetime_StdDeviation
+        {
+            get { return _lifetimeStdDeviation; }
+        }
+
+        public double Lifetime_RPM
+        {
+            get { return _lifetimeRpm; }
+        }
+
+        public double Lifetime_Temperature_Oil
+        {
+            get { return _lifetimeTemperatureOil; }
         }
     }
 }

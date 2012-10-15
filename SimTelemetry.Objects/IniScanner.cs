@@ -151,8 +151,15 @@ namespace SimTelemetry.Objects
                 d = d.Substring(d.IndexOf("(") + 1);
                 d = d.Substring(0, d.IndexOf(")"));
 
-                return d.Split(",".ToCharArray());
+                string[] d_a= d.Split(",".ToCharArray());
 
+                for (int i = 0; i < d_a.Length; i++)
+                {
+                    d_a[i] = d_a[i].Trim();
+                    if (d_a[i].StartsWith("\""))
+                        d_a[i] = d_a[i].Substring(1, d_a.Length - 2);
+                }
+                return d_a;
             }
             else
             {

@@ -22,5 +22,13 @@ namespace SimTelemetry.Objects.Garage
         /// </summary>
         void Scan();
 
+        /// <summary>
+        /// Factory method to cache/create Car objects.
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="veh"></param>
+        /// <returns></returns>
+        ICar CarFactory(IMod mod, string veh);
+
     }
 }

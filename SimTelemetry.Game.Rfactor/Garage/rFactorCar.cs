@@ -221,11 +221,29 @@ namespace SimTelemetry.Game.Rfactor.Garage
             return match;
         }
 
-        public void EngineScan()
+        public void ScanGeneral()
         {
-            _files.Add("Engine", rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory, _mHDV.TryGetString("ENGINE", "Normal") + ".ini"));
-            // Now we have read the HDV file, we can just as well initialize all sub classes:
-            _engine = new rFactorCarEngine(_files["Engine"], _mHDV);
+            
+        }
+
+        public void ScanAerodynamics()
+        {
+            
+        }
+
+        public void ScanEngine()
+        {
+            if (_files.ContainsKey("Engine") == false)
+            {
+                string eng = _mHDV.TryGetString("ENGINE", "Normal");
+                if (!eng.EndsWith(".ini"))
+                    eng += ".ini";
+
+                _files.Add("Engine",
+                           rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory, eng));
+                // Now we have read the HDV file, we can just as well initialize all sub classes:
+                _engine = new rFactorCarEngine(_files["Engine"], _mHDV);
+            }
         }
     }
 

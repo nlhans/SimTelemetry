@@ -35,6 +35,12 @@ namespace SimTelemetry.Objects.Garage
         /// </summary>
         Dictionary<int, double> MaxRPM_Mode { get; }
 
+        double Lifetime_Average { get; }
+        double Lifetime_StdDeviation { get; }
+        double Lifetime_RPM { get; }
+        double Lifetime_Temperature_Oil { get; }
+        double Lifetime_Temperature_Water { get; }
+
         /// <summary>
         /// Torque curve on Engine RPM (key) vs Torque (Nm).
         /// Optional variables of influence can be speed (in some sims), engine mode and throttle (ofcourse).
@@ -44,7 +50,17 @@ namespace SimTelemetry.Objects.Garage
         /// <param name="throttle">Throttle 0.000-1.000 (0-100%)</param>
         /// <param name="engine_mode">Engine mode.</param>
         /// <returns>RPM vs torque map</returns>
-        Dictionary<double, double> GetTorqueCurve(double speed, double throttle, int engine_mode); 
+        Dictionary<double, double> GetTorqueCurve(double speed, double throttle, int engine_mode);
 
+        /// <summary>
+        /// Torque curve on Engine RPM (key) vs Power (hp).
+        /// Optional variables of influence can be speed (in some sims), engine mode and throttle (ofcourse).
+        /// The curve should be accurate to steps of 100 rpm from 0 to Maximum RPM. 
+        /// </summary>
+        /// <param name="speed">Speed in m/s</param>
+        /// <param name="throttle">Throttle 0.000-1.000 (0-100%)</param>
+        /// <param name="engine_mode">Engine mode.</param>
+        /// <returns>RPM vs power map</returns>
+        Dictionary<double, double> GetPowerCurve(double speed, double throttle, int engine_mode);
     }
 }
