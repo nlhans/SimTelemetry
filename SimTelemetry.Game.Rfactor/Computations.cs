@@ -156,31 +156,15 @@ namespace SimTelemetry.Game.Rfactor
 
         public static double GetTheoraticalTopSpeed()
         {
-            // Get areo drag
-            double aero = GetAeroDrag(); // 2.07m^2 surface area? Dunno
-            // Get engine power
-            double max_hp = Get_Engine_MaxHP();
+            double aero = GetAeroDrag(); 
+            double max_hp = Get_Engine_MaxHP();//TODO: Fix real hp figures (from Garage plug-ins!)
             // TODO: Rolling resistance / speed effects
 
-            // calculate power
-            // double pd = 0.5 * p * v^3 * Cd * A
-            // Cd * a = aero
-            // p = air density (1.204kg/m^3 at 20C)
-            // v = velocity
-            //max_hp = 1100;
+            max_hp = Power.HP_KW(max_hp);
+            max_hp = 810;
             max_hp = Power.HP_KW(max_hp);
 
-            double spd = 300/3.6;
-            double F = max_hp*1000/spd;
-            double Fd = (F - 300)/spd/spd;
-
-            double AeroFactor = 0.5 * GetAirDensity() * rFactor.Game.ReadFloat(new IntPtr(0xAE89A4));//2.26 m^2, F1 2010 CM
-            //double diff = Fd/AeroFactor;
-            //AeroFactor = 0.5*rFactor.Game.ReadFloat(new IntPtr(rFactor.Drivers.Player.BaseAddress + 0x37F8)); // Aero Cw
-            //AeroFactor *= GetAirDensity();
-            //AeroFactor = rFactor.Game.ReadFloat(new IntPtr(0xAE755C));
-            //AeroFactor *= rFactor.Game.ReadFloat(new IntPtr(rFactor.Drivers.Player.BaseAddress + 0x3800));
-            double TopSpeed = 3.6*Math.Pow(max_hp/AeroFactor*1000, 1/3.0);
+            double TopSpeed = 3.6 * Math.Pow(max_hp / aero * 1000, 1 / 3.0);
             return TopSpeed;
         }
         public static double GetPracticalTopSpeed()

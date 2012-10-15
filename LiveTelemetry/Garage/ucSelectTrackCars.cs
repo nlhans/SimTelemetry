@@ -35,7 +35,7 @@ namespace LiveTelemetry.Garage
         {
             this.BackColor = Color.Black;
 
-
+            // TODO: Fix bug when simulator is not active!!
                 int columns = (int) Math.Ceiling(Math.Sqrt(Telemetry.m.Sim.Garage.Mods.Count))+2;
                 if (columns == 0) columns = 1;
                 if (Telemetry.m.Sim.Garage.Mods.Count%columns == 1)

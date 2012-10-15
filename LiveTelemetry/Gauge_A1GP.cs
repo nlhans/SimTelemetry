@@ -123,7 +123,7 @@ namespace LiveTelemetry
                 if (Telemetry.m.Sim.Modules.Aero_Drag == false || Telemetry.m.Sim.Modules.Engine_Power == false)
                     SpeedTop = 400; // Considered as a typical topspeed for most driving simulators..
                 else
-                    SpeedTop = 360;// SimTelemetry.Game.Rfactor.Computations.GetTheoraticalTopSpeed();// TODO: Add interface to simulators to calculate this.
+                    SpeedTop = SimTelemetry.Game.Rfactor.Computations.GetTheoraticalTopSpeed();// TODO: Add interface to simulators to calculate this.
                 
                 if (double.IsNaN(SpeedTop) || double.IsInfinity(SpeedTop))
                     SpeedTop = 400;
