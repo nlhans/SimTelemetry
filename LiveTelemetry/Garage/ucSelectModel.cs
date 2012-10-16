@@ -38,8 +38,6 @@ namespace LiveTelemetry.Garage
             splitContainer1.Panel1.Controls.Add(_models);
 
             ucEngine = new ucSelectModel_EngineCurve();
-            ucEngine.Size = new Size(600, 400);
-            ucEngine.Location = new Point(10, 400);
             splitContainer1.Panel2.Controls.Add(ucEngine);
 
         }
@@ -86,6 +84,7 @@ namespace LiveTelemetry.Garage
                 lbl_info2.Text += "Boost steps: " + car.Engine.EngineModes.Count.ToString() + "\n";
 
                 ucEngine.Load(car, engineinfo);
+                Resize();
             }
         }
 
@@ -118,8 +117,10 @@ namespace LiveTelemetry.Garage
 
         public void Resize()
         {
-            
 
+            ucEngine.Size = new Size(splitContainer1.Panel2.Width, splitContainer1.Panel2.Height - Math.Max(lbl_info2.Height, lbl_info1.Height) - lbl_info2.Location.Y);
+            ucEngine.Location = new Point(0, splitContainer1.Panel2.Height - ucEngine.Size.Height);
+            ucEngine.Invalidate();
         }
     }
 }

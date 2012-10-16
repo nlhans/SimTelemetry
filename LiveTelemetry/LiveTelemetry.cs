@@ -177,7 +177,7 @@ namespace LiveTelemetry
             btGarage.Click += new EventHandler(btGarage_Click);
 
             // Timers
-            Tmr_HiSpeed = new Timer{Interval=10}; // 30fps
+            Tmr_HiSpeed = new Timer{Interval=20}; // 30fps
             Tmr_MdSpeed = new Timer{Interval = 450}; // ~2fps
             Tmr_LwSpeed = new Timer{Interval=1000}; // 1fps
 

@@ -92,6 +92,7 @@ namespace LiveTelemetry
             else
             {
                 Window = GarageWindow.TrackCars;
+                Sim.Garage.Scan();
             }
 
             Redraw();
