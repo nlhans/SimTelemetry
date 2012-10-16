@@ -120,6 +120,7 @@ namespace LiveTelemetry.Garage
 
             ucEngine.Size = new Size(splitContainer1.Panel2.Width, splitContainer1.Panel2.Height - Math.Max(lbl_info2.Height, lbl_info1.Height) - lbl_info2.Location.Y);
             ucEngine.Location = new Point(0, splitContainer1.Panel2.Height - ucEngine.Size.Height);
+            ucEngine.Resize();
             ucEngine.Invalidate();
         }
     }

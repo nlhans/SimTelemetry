@@ -90,6 +90,9 @@ namespace SimTelemetry.Game.Rfactor.Garage
             int count = 0;
             foreach (string mod in vehicles)
             {
+#if DEBUG
+            if(mod.Contains("05"))
+#endif
                 if (mod.Contains("ANY_DEV_ONLY")==false)
                 {
                     _mods.Add(new rFactorMod(mod));

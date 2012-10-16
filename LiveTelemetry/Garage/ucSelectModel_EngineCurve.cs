@@ -11,15 +11,37 @@ using SimTelemetry.Objects.Garage;
 
 namespace LiveTelemetry.Garage
 {
+    internal class ucSelectModel_EngineCurve_Mode
+    {
+        public int index { get; set; }
+        public string mode { get; set; }
+
+        public ucSelectModel_EngineCurve_Mode(int i, string m)
+        {
+            index = i;
+            mode = m;
+        }
+    }
     public partial class ucSelectModel_EngineCurve : UserControl
     {
         private ICarEngine eng;
         private CarEngineTools tools;
+
+        private int _Settings_mode = 0;
+        private double _Settings_speed = 0;
+        private double _Settings_throttle = 1.0;
+
         public ucSelectModel_EngineCurve()
         {
             InitializeComponent();
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer, true);
+
+            cb_mode.Items.Add(new ucSelectModel_EngineCurve_Mode(0, "Mode 0"));
+            cb_mode.SelectedIndex = 0;
+            tb_throttle.Value = 100;
+            tb_speed.Text = "0";
+
         }
 
         public void Load(ICar car)
@@ -34,7 +56,27 @@ namespace LiveTelemetry.Garage
 
             eng = car.Engine;
             tools = t;
+
+            _Settings_mode = 0;
+            _Settings_speed = 0;
+            _Settings_throttle = 1;
+
             this.Invalidate();
+            cb_mode.Items.Clear();
+            cb_mode.DisplayMember = "mode";
+            cb_mode.ValueMember = "index";
+            foreach(KeyValuePair<int, string> mode in car.Engine.EngineModes)
+            {
+                cb_mode.Items.Add(new ucSelectModel_EngineCurve_Mode (mode.Key, mode.Value));
+            }
+
+            if(cb_mode.Items.Count >= _Settings_mode)
+                cb_mode.SelectedIndex = _Settings_mode;
+        }
+        public void Resize()
+        {
+            this.panel1.Size = new Size(this.Width, 40);
+            this.panel1.Location = new Point(0, this.Height - 40);
         }
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -50,16 +92,29 @@ namespace LiveTelemetry.Garage
                 double max_y = Math.Max(tools.MaxPower_HP, tools.MaxTorque_NM);
                 double max_x = eng.MaxRPM;
 
-                max_y = Math.Ceiling(max_y / 15) * 15; // 6 ticks
-                max_x = Math.Ceiling(max_x / 500.0) * 500.0; // to 500rpm
+                Dictionary<double, double> curve_power = eng.GetPowerCurve(_Settings_speed, _Settings_throttle,
+                                                                           _Settings_mode);
+                Dictionary<double, double> curve_torque = eng.GetTorqueCurve(_Settings_speed, _Settings_throttle, _Settings_mode);
 
-                double step_y = max_y/15;
+                if (_Settings_mode != 0)
+                {
+                    foreach (KeyValuePair<double, double> kvp in curve_power)
+                        max_y = Math.Max(kvp.Value, max_y);
+                    foreach (KeyValuePair<double, double> kvp in curve_torque)
+                        max_y = Math.Max(kvp.Value, max_y);
+                    max_x = eng.MaxRPM_Mode[_Settings_mode];
+                }
+
+                max_y = Math.Ceiling(max_y / 50) * 50; // steps of 50
+                max_x = Math.Ceiling(max_x / 500.0) * 500.0; // steps of 500rpm
+
+                double step_y = ((max_y>800)?100:50);
                 double step_x = 500;
                 if (max_x > 10000)
                     step_x = 1000;
 
                 int labelsLeft = 50;
-                int labelsBot = 50;
+                int labelsBot = 30;
 
                 double graph_x = e.ClipRectangle.Width - 10 - labelsLeft;
                 double graph_y = e.ClipRectangle.Height - 10 - labelsBot;
@@ -76,7 +131,7 @@ namespace LiveTelemetry.Garage
                         r_str = (rpm / 1000.0).ToString("0.0");
                     
                     g.DrawString(r_str, label_font, Brushes.LightGray, x-10,
-                                 e.ClipRectangle.Height - 40);
+                                 e.ClipRectangle.Height - labelsBot + 10);
                 }
                 for (double v = 0; v <= max_y; v += step_y)
                 {
@@ -88,14 +143,11 @@ namespace LiveTelemetry.Garage
                                  y-7);
                 }
 
-                Dictionary<double, double> curve_power = eng.GetPowerCurve(0,1,0);
-                Dictionary<double, double> curve_torque = eng.GetTorqueCurve(0, 1, 0);
-
                 List<PointF> graph1 = new List<PointF>();
                 List<PointF> graph2 = new List<PointF>();
 
                 int index = -1;
-                for (int rpm = 0; rpm <= eng.MaxRPM; rpm += 100)
+                for (int rpm = 0; rpm <= max_x; rpm += 100)
                 {
                     double x = labelsLeft + rpm / max_x * graph_x;
                     if (x < labelsLeft) x = labelsLeft;
@@ -124,6 +176,37 @@ namespace LiveTelemetry.Garage
                 g.DrawString("[Green] Torque", label_font, Brushes.Green,55, 14);
                 g.DrawString("[Red] Power", label_font, Brushes.Red, 55, 36);
 
+            }
+        }
+
+        private void tb_throttle_ValueChanged(object sender, EventArgs e)
+        {
+            _Settings_throttle = tb_throttle.Value/100.0;
+            lbl_throttle.Text = "Throttle " + tb_throttle.Value.ToString() + "%";
+            this.Invalidate();
+        }
+
+        private void tb_speed_TextChanged(object sender, EventArgs e)
+        {
+            if (Double.TryParse(tb_speed.Text, out _Settings_speed))
+            {
+                if (_Settings_speed > 1000)
+                    tb_speed.Text = "1000";
+                else
+                {
+                    _Settings_speed /= 3.6;
+                    this.Invalidate();
+                }
+            }
+
+        }
+
+        private void cb_mode_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (((ucSelectModel_EngineCurve_Mode)cb_mode.SelectedItem) != null)
+            {
+                _Settings_mode = ((ucSelectModel_EngineCurve_Mode) cb_mode.SelectedItem).index;
+                this.Invalidate();
             }
         }
     }

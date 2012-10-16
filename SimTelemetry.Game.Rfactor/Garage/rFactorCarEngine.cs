@@ -30,6 +30,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
         private string _file;
 
         private double _maxRpm;
+        private int _maxModeIndex;
+        private double _maxModeRpm;
 
         private double _idleRpm;
 
