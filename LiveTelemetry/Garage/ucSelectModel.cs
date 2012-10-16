@@ -22,6 +22,9 @@ namespace LiveTelemetry.Garage
         public event Signal Chosen;
         private List<ListViewItem> models = new List<ListViewItem>();
 
+        private ICar car;
+        private CarEngineTools engineinfo;
+
         private ucSelectModel_EngineCurve ucEngine;
 
         public ucSelectModel()
@@ -38,54 +41,69 @@ namespace LiveTelemetry.Garage
             splitContainer1.Panel1.Controls.Add(_models);
 
             ucEngine = new ucSelectModel_EngineCurve();
+            ucEngine.CurveUpdated += new AnonymousSignal(ucEngine_CurveUpdated);
             splitContainer1.Panel2.Controls.Add(ucEngine);
 
         }
 
+        void ucEngine_CurveUpdated()
+        {
+            engineinfo.Scan(ucEngine.Settings_Speed, ucEngine.Settings_Throttle,
+                            ucEngine.Settings_Mode);
+            UpdateLabels();
+        }
+
         void _models_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            if(_models.SelectedItems.Count > 0)
+            if (_models.SelectedItems.Count > 0)
             {
                 string file = _models.SelectedItems[0].SubItems[2].Text;
 
-                ICar car = fGarage.Sim.Garage.CarFactory(fGarage.Mod, file);
-                
-                CarEngineTools engineinfo = new CarEngineTools(car);
+                car = fGarage.Sim.Garage.CarFactory(fGarage.Mod, file);
+
+                engineinfo = new CarEngineTools(car);
                 engineinfo.Scan();
 
-                lbl_Team.Text = car.Driver + " [" + car.Team + "]";
-
-                lbl_info1.Text = "[Team]\n";
-                lbl_info1.Text += "Start number: " + car.Number.ToString() + "\n";
-                lbl_info1.Text += "Engine: " + car.Info_Engine_Manufacturer.ToString() + "\n";
-                lbl_info1.Text += "\n";
-                lbl_info1.Text += "Team Founded: " + car.Info_YearFounded.ToString() + "\n";
-                lbl_info1.Text += "Team Headquarters: " + car.Info_HQ + "\n";
-                if (car.Info_Starts > 0)
-                {
-                    lbl_info1.Text += "Team Starts: " + car.Info_Starts.ToString() + "\n";
-                    lbl_info1.Text += "Team Pole positions: " + car.Info_Poles.ToString() + " (" +
-                                      (100.0*car.Info_Poles/car.Info_Starts).ToString("000.0") + "%)\n";
-                    lbl_info1.Text += "Team Race Wins: " + car.Info_Wins.ToString() + " (" +
-                                      (100.0 * car.Info_Wins / car.Info_Starts).ToString("000.0") + "%)\n";
-                    lbl_info1.Text += "Team Championship Wins: " + car.Info_Championships.ToString() + "\n";
-                }
-
-                lbl_info1.Text += "\n";
-                lbl_info1.Text += "[Car]\n";
-
-                lbl_info2.Text = "[Engine]\n";
-                lbl_info2.Text += "Maximum RPM: " + car.Engine.MaxRPM.ToString("00000") + "rpm\n";
-                lbl_info2.Text += "Idle RPM: " + car.Engine.IdleRPM.ToString("00000") + "rpm\n";
-
-                lbl_info2.Text += "Maximum torque: " + engineinfo.MaxTorque_NM.ToString("0000.0") + "nm  at " + engineinfo.MaxTorque_RPM.ToString("00000") + " rpm\n";
-                lbl_info2.Text += "Maximum power: " + engineinfo.MaxPower_HP.ToString("0000.0") + "hp at " + engineinfo.MaxPower_RPM.ToString("00000") + " rpm\n";
-
-                lbl_info2.Text += "Boost steps: " + car.Engine.EngineModes.Count.ToString() + "\n";
+                UpdateLabels();
 
                 ucEngine.Load(car, engineinfo);
                 Resize();
             }
+        }
+
+        private void UpdateLabels()
+        {
+
+
+            lbl_Team.Text = car.Driver + " [" + car.Team + "]";
+
+            lbl_info1.Text = "[Team]\n";
+            lbl_info1.Text += "Start number: " + car.Number.ToString() + "\n";
+            lbl_info1.Text += "Engine: " + car.Info_Engine_Manufacturer.ToString() + "\n";
+            lbl_info1.Text += "\n";
+            lbl_info1.Text += "Team Founded: " + car.Info_YearFounded.ToString() + "\n";
+            lbl_info1.Text += "Team Headquarters: " + car.Info_HQ + "\n";
+            if (car.Info_Starts > 0)
+            {
+                lbl_info1.Text += "Team Starts: " + car.Info_Starts.ToString() + "\n";
+                lbl_info1.Text += "Team Pole positions: " + car.Info_Poles.ToString() + " (" +
+                                  (100.0 * car.Info_Poles / car.Info_Starts).ToString("000.0") + "%)\n";
+                lbl_info1.Text += "Team Race Wins: " + car.Info_Wins.ToString() + " (" +
+                                  (100.0 * car.Info_Wins / car.Info_Starts).ToString("000.0") + "%)\n";
+                lbl_info1.Text += "Team Championship Wins: " + car.Info_Championships.ToString() + "\n";
+            }
+
+            lbl_info1.Text += "\n";
+            lbl_info1.Text += "[Car]\n";
+
+            lbl_info2.Text = "[Engine]\n";
+            lbl_info2.Text += "Maximum RPM: " + car.Engine.MaxRPM.ToString("00000") + "rpm\n";
+            lbl_info2.Text += "Idle RPM: " + car.Engine.IdleRPM.ToString("00000") + "rpm\n";
+
+            lbl_info2.Text += "Maximum torque: " + engineinfo.MaxTorque_NM.ToString("0000.0") + "nm  at " + engineinfo.MaxTorque_RPM.ToString("00000") + " rpm\n";
+            lbl_info2.Text += "Maximum power: " + engineinfo.MaxPower_HP.ToString("0000.0") + "hp at " + engineinfo.MaxPower_RPM.ToString("00000") + " rpm\n";
+
+            lbl_info2.Text += "Boost steps: " + car.Engine.EngineModes.Count.ToString() + "\n";
         }
 
         public void Draw()

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SimTelemetry.Objects.Garage;
+using Triton;
 
 namespace LiveTelemetry.Garage
 {
@@ -30,6 +31,12 @@ namespace LiveTelemetry.Garage
         private int _Settings_mode = 0;
         private double _Settings_speed = 0;
         private double _Settings_throttle = 1.0;
+
+        public int Settings_Mode { get { return _Settings_mode; } }
+        public double Settings_Speed { get { return _Settings_speed; } }
+        public double Settings_Throttle { get { return _Settings_throttle; } }
+
+        public event AnonymousSignal CurveUpdated;
 
         public ucSelectModel_EngineCurve()
         {
@@ -90,7 +97,7 @@ namespace LiveTelemetry.Garage
             {
                 // Draw grid
                 double max_y = Math.Max(tools.MaxPower_HP, tools.MaxTorque_NM);
-                double max_x = eng.MaxRPM;
+                double max_rpm = eng.MaxRPM;
 
                 Dictionary<double, double> curve_power = eng.GetPowerCurve(_Settings_speed, _Settings_throttle,
                                                                            _Settings_mode);
@@ -102,11 +109,11 @@ namespace LiveTelemetry.Garage
                         max_y = Math.Max(kvp.Value, max_y);
                     foreach (KeyValuePair<double, double> kvp in curve_torque)
                         max_y = Math.Max(kvp.Value, max_y);
-                    max_x = eng.MaxRPM_Mode[_Settings_mode];
+                    max_rpm = eng.MaxRPM_Mode[_Settings_mode];
                 }
 
                 max_y = Math.Ceiling(max_y / 50) * 50; // steps of 50
-                max_x = Math.Ceiling(max_x / 500.0) * 500.0; // steps of 500rpm
+                double max_x = Math.Ceiling(max_rpm / 500.0) * 500.0; // steps of 500rpm
 
                 double step_y = ((max_y>800)?100:50);
                 double step_x = 500;
@@ -136,6 +143,8 @@ namespace LiveTelemetry.Garage
                 for (double v = 0; v <= max_y; v += step_y)
                 {
                     float y = Convert.ToSingle(10 + v/max_y* graph_y);
+                    if (y < 10 || float.IsNaN(y) || float.IsInfinity(y))
+                        y = 10;
                     g.DrawLine(gridPen, labelsLeft, y, e.ClipRectangle.Width - 10, y);
                     string a_str = (max_y-v).ToString();
 
@@ -147,12 +156,14 @@ namespace LiveTelemetry.Garage
                 List<PointF> graph2 = new List<PointF>();
 
                 int index = -1;
-                for (int rpm = 0; rpm <= max_x; rpm += 100)
+                for (int rpm = 0; rpm <= max_rpm; rpm += 100)
                 {
                     double x = labelsLeft + rpm / max_x * graph_x;
                     if (x < labelsLeft) x = labelsLeft;
                     double y1 = 10+(1 - Math.Max(0,curve_power[rpm]) / max_y) * graph_y;
                     double y2 = 10 + (1 - Math.Max(0, curve_torque[rpm]) / max_y) * graph_y;
+                    if (y1 < 10 || double.IsNaN(y1) || double.IsInfinity(y1)) y1 = 10 + graph_y;
+                    if (y2 < 10 || double.IsNaN(y2) || double.IsInfinity(y2)) y2 = 10 + graph_y;
 
                     graph1.Add(new PointF(Convert.ToSingle(x), Convert.ToSingle(y1)));
                     graph2.Add(new PointF(Convert.ToSingle(x), Convert.ToSingle(y2)));
@@ -176,6 +187,8 @@ namespace LiveTelemetry.Garage
                 g.DrawString("[Green] Torque", label_font, Brushes.Green,55, 14);
                 g.DrawString("[Red] Power", label_font, Brushes.Red, 55, 36);
 
+                if (CurveUpdated != null)
+                    CurveUpdated();
             }
         }
 

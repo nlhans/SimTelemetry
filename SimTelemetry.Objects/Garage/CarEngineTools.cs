@@ -23,9 +23,14 @@ namespace SimTelemetry.Objects.Garage
 
         public void Scan()
         {
+            Scan(0, 1, 0);
+        }
+
+        public void Scan(double speed, double throttle, int engine_mode)
+        {
             // Maximum power/torque figures
-            Dictionary<double, double> torque = Car.Engine.GetTorqueCurve(0, 1, 0);
-            Dictionary<double, double> power = Car.Engine.GetPowerCurve(0, 1, 0);
+            Dictionary<double, double> torque = Car.Engine.GetTorqueCurve(speed, throttle, engine_mode);
+            Dictionary<double, double> power = Car.Engine.GetPowerCurve(speed, throttle, engine_mode);
 
             MaxPower_HP = 0;
             MaxTorque_NM = 0;
