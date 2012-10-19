@@ -13,6 +13,11 @@ namespace SimTelemetry.Objects.Garage
         double MaxRPM { get; }
 
         /// <summary>
+        /// Maximum engine speed from the engine curve.
+        /// </summary>
+        double MaxRPMCurve { get; }
+
+        /// <summary>
         /// Idle Engine speed (RPM)
         /// </summary> 
         double IdleRPM { get; }

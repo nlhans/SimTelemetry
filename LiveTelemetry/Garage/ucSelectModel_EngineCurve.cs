@@ -97,7 +97,7 @@ namespace LiveTelemetry.Garage
             {
                 // Draw grid
                 double max_y = Math.Max(tools.MaxPower_HP, tools.MaxTorque_NM);
-                double max_rpm = eng.MaxRPM;
+                double max_rpm = Math.Max(eng.MaxRPM, eng.MaxRPMCurve);
 
                 Dictionary<double, double> curve_power = eng.GetPowerCurve(_Settings_speed, _Settings_throttle,
                                                                            _Settings_mode);
@@ -109,7 +109,7 @@ namespace LiveTelemetry.Garage
                         max_y = Math.Max(kvp.Value, max_y);
                     foreach (KeyValuePair<double, double> kvp in curve_torque)
                         max_y = Math.Max(kvp.Value, max_y);
-                    max_rpm = eng.MaxRPM_Mode[_Settings_mode];
+                    max_rpm = Math.Max( eng.MaxRPM_Mode[_Settings_mode], eng.MaxRPMCurve);
                 }
 
                 max_y = Math.Ceiling(max_y / 50) * 50; // steps of 50

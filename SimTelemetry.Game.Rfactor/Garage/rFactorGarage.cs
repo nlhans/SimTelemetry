@@ -91,7 +91,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             foreach (string mod in vehicles)
             {
 #if DEBUG
-            if(mod.Contains("05"))
+            if(true||mod.Contains("05"))
 #endif
                 if (mod.Contains("ANY_DEV_ONLY")==false)
                 {

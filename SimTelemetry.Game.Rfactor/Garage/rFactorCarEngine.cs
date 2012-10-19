@@ -30,6 +30,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
         private string _file;
 
         private double _maxRpm;
+        private double _MaxRpmCurve;
         private int _maxModeIndex;
         private double _maxModeRpm;
 
@@ -127,6 +128,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 EngineTorque_Min.Add(rpm, torq_min);
                 EngineTorque_Max.Add(rpm, torq_max);
 
+                if (_MaxRpmCurve < rpm)
+                    _MaxRpmCurve = rpm;
 
             }
         }
@@ -164,6 +167,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             double my_max_rpm = MaxRPM;
             if(MaxRPM_Mode.ContainsKey(engine_mode))
                 my_max_rpm = MaxRPM_Mode[engine_mode];
+            my_max_rpm = Math.Max(my_max_rpm, MaxRPMCurve);
 
             double torque_factor = 1+speed*ram_torque + engine_mode *mode_torque;
 
@@ -191,6 +195,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             double my_max_rpm = MaxRPM;
             if (MaxRPM_Mode.ContainsKey(engine_mode))
                 my_max_rpm = MaxRPM_Mode[engine_mode];
+            my_max_rpm = Math.Max(my_max_rpm, MaxRPMCurve);
 
             double torque_factor = 1 + speed * ram_torque + engine_mode * mode_torque;
 
@@ -224,6 +229,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
         public double MaxRPM
         {
             get { return _maxRpm; }
+        }
+
+        public double MaxRPMCurve
+        {
+            get { return _MaxRpmCurve; }
         }
 
         public double IdleRPM
