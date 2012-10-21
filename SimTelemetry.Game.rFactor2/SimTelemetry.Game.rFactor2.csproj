@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zlib">
+      <HintPath>..\Binaries\Ionic.Zlib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -45,6 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MAS2Reader.cs" />
     <Compile Include="v1005b\Driver.cs" />
     <Compile Include="v1005b\DriverPlayer.cs" />
     <Compile Include="v1005b\Drivers.cs" />

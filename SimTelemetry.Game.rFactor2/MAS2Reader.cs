@@ -147,7 +147,7 @@ namespace SimTelemetry.Game.rFactor2
         {
             this.mas2_file = file;
             Files = new List<MAS2File>();
-            reader = new BinaryReader(File.OpenRead(file));
+            reader = new BinaryReader(System.IO.File.OpenRead(file));
             ReadHeader();
 
             int files = file_header.Length / 256;
@@ -194,7 +194,7 @@ namespace SimTelemetry.Game.rFactor2
         #region Extract files in MAS2File
         public void ExtractFile(MAS2File f, string target)
         {
-            BinaryReader reader = new BinaryReader(File.OpenRead(this.mas2_file));
+            BinaryReader reader = new BinaryReader(System.IO.File.OpenRead(this.mas2_file));
             reader.BaseStream.Seek(f.FileOffset, SeekOrigin.Begin);
             byte[] RawData = reader.ReadBytes((int)f.CompressedSize);
 
@@ -216,17 +216,17 @@ namespace SimTelemetry.Game.rFactor2
                 codec.Inflate(FlushType.None);
                 codec.EndInflate();
 
-                File.WriteAllBytes(target, OutputData);
+                System.IO.File.WriteAllBytes(target, OutputData);
             }
             else
             {
-                File.WriteAllBytes(target, RawData);
+                System.IO.File.WriteAllBytes(target, RawData);
             }
 
         }
         public byte[] ExtractBytes(MAS2File f)
         {
-            BinaryReader reader = new BinaryReader(File.OpenRead(this.mas2_file));
+            BinaryReader reader = new BinaryReader(System.IO.File.OpenRead(this.mas2_file));
             reader.BaseStream.Seek(f.FileOffset, SeekOrigin.Begin);
             byte[] RawData = reader.ReadBytes((int)f.CompressedSize);
             reader.Close();
