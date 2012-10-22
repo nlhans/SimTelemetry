@@ -54,13 +54,14 @@ namespace LiveTelemetry.Garage
                     Close();
                 return;
             }
-
+            ControlsAdded = false;
             if (ControlsAdded == false)
             {
-                Controls.Clear();
+                Controls.Clear();;
                 Controls.Add(txt_loading);
                 ControlsAdded = true;
                 mods_list = new List<Control>();
+                panel.Controls.Clear();
                 panel.Controls.Add(t);
 
                 this.BackColor = Color.Black;
@@ -77,7 +78,7 @@ namespace LiveTelemetry.Garage
                                                  if (mod.Image != "" &&
                                                      File.Exists(mod.Image))
                                                  {
-
+                                                     
                                                      ucResizableImage pb =
                                                          new ucResizableImage(mod.Image);
                                                      pb.Caption = mod.Name;
