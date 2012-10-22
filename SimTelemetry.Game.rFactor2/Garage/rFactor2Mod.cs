@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using SimTelemetry.Objects;
@@ -147,8 +148,34 @@ namespace SimTelemetry.Game.rFactor2.Garage
 
             _description = "";
             _directoryVehicles = ""; // Irrelevant?!
-            _image = ""; // Search&extract DDS from RFM file
+            
+            _image = "Mods/rfactor2_ " + _name+".png"; // Search&extract DDS from RFM file
 
+            if(System.IO.File.Exists(_image)==false)
+            {
+                // Search in the MAS archive for SMICON.DDS
+                foreach(MAS2File masf in MASFile.Master.Files)
+                {
+                    if(masf.Filename.Contains("SMICON"))
+                    {
+                        try
+                        {
+                            MASFile.Master.ExtractFile(masf, "tmp.dds");
+                            Bitmap dds_bitmap = DevIL.DevIL.LoadBitmap("tmp.dds");
+                            System.IO.File.Delete("tmp.dds");
+                            DevIL.DevIL.SaveBitmap(_image, dds_bitmap);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Failed
+
+                            _image = "";
+                        }
+                        break;
+                    }
+                }
+
+            }
             // Search for vehicles in mod directory
             // rFactor2 works with 'teams' instead of car class filters
             List<MAS2File> vehicles = rFactor2.Garage.Files.SearchFiles("*.veh");
