@@ -81,7 +81,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
             string[] mode_effects = scanner.TryGetData("Main", "BoostEffects");
 
             // Is there any EngineBoost defined?
-            if (mode_range.Length == 3)
+            if (mode_effects.Length == 3)
             {
                 modes = (int)Convert.ToDouble(mode_range[2]);
                 mode_rpm = Convert.ToDouble(mode_effects[0]);
