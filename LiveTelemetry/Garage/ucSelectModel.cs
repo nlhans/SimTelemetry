@@ -55,20 +55,25 @@ namespace LiveTelemetry.Garage
 
         void _models_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
+            string file = "";
             if (_models.SelectedItems.Count > 0)
-            {
-                string file = _models.SelectedItems[0].SubItems[2].Text;
+                file = _models.SelectedItems[0].SubItems[2].Text;
+            else if (_models.Items.Count == 0)
+                return;
+            else
+                file = _models.Items[0].SubItems[2].Text;
 
-                car = fGarage.Sim.Garage.CarFactory(fGarage.Mod, file);
 
-                engineinfo = new CarEngineTools(car);
-                engineinfo.Scan();
+            car = fGarage.Sim.Garage.CarFactory(fGarage.Mod, file);
 
-                UpdateLabels();
+            engineinfo = new CarEngineTools(car);
+            engineinfo.Scan();
 
-                ucEngine.Load(car, engineinfo);
-                Resize();
-            }
+            UpdateLabels();
+
+            ucEngine.Load(car, engineinfo);
+            Resize();
+
         }
 
         private void UpdateLabels()
@@ -135,7 +140,7 @@ namespace LiveTelemetry.Garage
                 { return lvi1.SubItems[0].Text.CompareTo(lvi2.SubItems[0].Text); });
 
             _models.Items.AddRange(models.ToArray());
-
+            _models_ItemSelectionChanged(null, null);
         }
 
         public void Resize()
