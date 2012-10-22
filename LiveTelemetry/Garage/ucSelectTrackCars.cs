@@ -100,6 +100,7 @@ namespace LiveTelemetry.Garage
                                                  {
                                                      Label l = new Label();
                                                      l.Text = mod.Name;
+                                                     l.Name = mod.Name;
                                                      l.Font = new Font("Tahoma", 24.0f,
                                                                        FontStyle.Bold);
                                                      l.Size = new Size(213, 120);

@@ -1,4 +1,5 @@
-﻿using SimTelemetry.Game.rFactor2.v1005b;
+﻿using SimTelemetry.Game.rFactor2.Garage;
+using SimTelemetry.Game.rFactor2.v1005b;
 using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Game.rFactor2
@@ -11,6 +12,7 @@ namespace SimTelemetry.Game.rFactor2
         public static DriverPlayer Player;
         public static MemoryPolledReader Game;
         private static Simulator Sim;
+        public static rFactor2Garage Garage;
 
 
         // TODO: This class should do version detect first before initializing session, drivers and driverplayer classes.
@@ -24,6 +26,7 @@ namespace SimTelemetry.Game.rFactor2
             Drivers = new Drivers();
 
             Player = new DriverPlayer();
+            Garage = new rFactor2Garage();
         }
 
         public static void Kill()

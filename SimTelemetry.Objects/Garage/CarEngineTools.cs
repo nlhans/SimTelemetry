@@ -17,8 +17,11 @@ namespace SimTelemetry.Objects.Garage
 
         public CarEngineTools(ICar c)
         {
-            Car = c;
-            Car.ScanEngine();
+            if (c != null)
+            {
+                Car = c;
+                Car.ScanEngine();
+            }
         }
 
         public void Scan()
@@ -28,28 +31,31 @@ namespace SimTelemetry.Objects.Garage
 
         public void Scan(double speed, double throttle, int engine_mode)
         {
-            // Maximum power/torque figures
-            Dictionary<double, double> torque = Car.Engine.GetTorqueCurve(speed, throttle, engine_mode);
-            Dictionary<double, double> power = Car.Engine.GetPowerCurve(speed, throttle, engine_mode);
-
-            MaxPower_HP = 0;
-            MaxTorque_NM = 0;
-
-            foreach (KeyValuePair<double, double> torque_kvp in torque)
+            if (Car != null && Car.Engine != null)
             {
-                if (torque_kvp.Value > MaxTorque_NM)
+                // Maximum power/torque figures
+                Dictionary<double, double> torque = Car.Engine.GetTorqueCurve(speed, throttle, engine_mode);
+                Dictionary<double, double> power = Car.Engine.GetPowerCurve(speed, throttle, engine_mode);
+
+                MaxPower_HP = 0;
+                MaxTorque_NM = 0;
+
+                foreach (KeyValuePair<double, double> torque_kvp in torque)
                 {
-                    MaxTorque_NM = torque_kvp.Value;
-                    MaxTorque_RPM = torque_kvp.Key;
+                    if (torque_kvp.Value > MaxTorque_NM)
+                    {
+                        MaxTorque_NM = torque_kvp.Value;
+                        MaxTorque_RPM = torque_kvp.Key;
+                    }
                 }
-            }
 
-            foreach (KeyValuePair<double, double> power_kvp in power)
-            {
-                if (power_kvp.Value > MaxPower_HP)
+                foreach (KeyValuePair<double, double> power_kvp in power)
                 {
-                    MaxPower_HP = power_kvp.Value;
-                    MaxPower_RPM = power_kvp.Key;
+                    if (power_kvp.Value > MaxPower_HP)
+                    {
+                        MaxPower_HP = power_kvp.Value;
+                        MaxPower_RPM = power_kvp.Key;
+                    }
                 }
             }
         }

@@ -48,6 +48,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Garage\rFactor2Car.cs" />
+    <Compile Include="Garage\rFactor2FileList.cs" />
+    <Compile Include="Garage\rFactor2Garage.cs" />
+    <Compile Include="Garage\rFactor2Mod.cs" />
+    <Compile Include="Garage\rFactor2CarEngine.cs" />
     <Compile Include="MAS2Reader.cs" />
     <Compile Include="v1005b\Driver.cs" />
     <Compile Include="v1005b\DriverPlayer.cs" />
@@ -56,7 +61,7 @@
     <Compile Include="rFactor2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="v1005b\Session.cs" />
-    <Compile Include="v1005b\Simulator.cs" />
+    <Compile Include="Simulator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">

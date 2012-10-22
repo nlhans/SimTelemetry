@@ -73,37 +73,42 @@ namespace LiveTelemetry.Garage
 
         private void UpdateLabels()
         {
-
-
-            lbl_Team.Text = car.Driver + " [" + car.Team + "]";
-
-            lbl_info1.Text = "[Team]\n";
-            lbl_info1.Text += "Start number: " + car.Number.ToString() + "\n";
-            lbl_info1.Text += "Engine: " + car.Info_Engine_Manufacturer.ToString() + "\n";
-            lbl_info1.Text += "\n";
-            lbl_info1.Text += "Team Founded: " + car.Info_YearFounded.ToString() + "\n";
-            lbl_info1.Text += "Team Headquarters: " + car.Info_HQ + "\n";
-            if (car.Info_Starts > 0)
+            if (car != null)
             {
-                lbl_info1.Text += "Team Starts: " + car.Info_Starts.ToString() + "\n";
-                lbl_info1.Text += "Team Pole positions: " + car.Info_Poles.ToString() + " (" +
-                                  (100.0 * car.Info_Poles / car.Info_Starts).ToString("000.0") + "%)\n";
-                lbl_info1.Text += "Team Race Wins: " + car.Info_Wins.ToString() + " (" +
-                                  (100.0 * car.Info_Wins / car.Info_Starts).ToString("000.0") + "%)\n";
-                lbl_info1.Text += "Team Championship Wins: " + car.Info_Championships.ToString() + "\n";
+
+                lbl_Team.Text = car.Driver + " [" + car.Team + "]";
+
+                lbl_info1.Text = "[Team]\n";
+                lbl_info1.Text += "Start number: " + car.Number.ToString() + "\n";
+                lbl_info1.Text += "Engine: " + car.Info_Engine_Manufacturer.ToString() + "\n";
+                lbl_info1.Text += "\n";
+                lbl_info1.Text += "Team Founded: " + car.Info_YearFounded.ToString() + "\n";
+                lbl_info1.Text += "Team Headquarters: " + car.Info_HQ + "\n";
+                if (car.Info_Starts > 0)
+                {
+                    lbl_info1.Text += "Team Starts: " + car.Info_Starts.ToString() + "\n";
+                    lbl_info1.Text += "Team Pole positions: " + car.Info_Poles.ToString() + " (" +
+                                      (100.0 * car.Info_Poles / car.Info_Starts).ToString("000.0") + "%)\n";
+                    lbl_info1.Text += "Team Race Wins: " + car.Info_Wins.ToString() + " (" +
+                                      (100.0 * car.Info_Wins / car.Info_Starts).ToString("000.0") + "%)\n";
+                    lbl_info1.Text += "Team Championship Wins: " + car.Info_Championships.ToString() + "\n";
+                }
+
+                lbl_info1.Text += "\n";
+                lbl_info1.Text += "[Car]\n";
+
+                if (car.Engine != null)
+                {
+                    lbl_info2.Text = "[Engine]\n";
+                    lbl_info2.Text += "Maximum RPM: " + car.Engine.MaxRPM.ToString("00000") + "rpm\n";
+                    lbl_info2.Text += "Idle RPM: " + car.Engine.IdleRPM.ToString("00000") + "rpm\n";
+
+                    lbl_info2.Text += "Maximum torque: " + engineinfo.MaxTorque_NM.ToString("0000.0") + "nm  at " + engineinfo.MaxTorque_RPM.ToString("00000") + " rpm\n";
+                    lbl_info2.Text += "Maximum power: " + engineinfo.MaxPower_HP.ToString("0000.0") + "hp at " + engineinfo.MaxPower_RPM.ToString("00000") + " rpm\n";
+
+                    lbl_info2.Text += "Boost steps: " + car.Engine.EngineModes.Count.ToString() + "\n";
+                }
             }
-
-            lbl_info1.Text += "\n";
-            lbl_info1.Text += "[Car]\n";
-
-            lbl_info2.Text = "[Engine]\n";
-            lbl_info2.Text += "Maximum RPM: " + car.Engine.MaxRPM.ToString("00000") + "rpm\n";
-            lbl_info2.Text += "Idle RPM: " + car.Engine.IdleRPM.ToString("00000") + "rpm\n";
-
-            lbl_info2.Text += "Maximum torque: " + engineinfo.MaxTorque_NM.ToString("0000.0") + "nm  at " + engineinfo.MaxTorque_RPM.ToString("00000") + " rpm\n";
-            lbl_info2.Text += "Maximum power: " + engineinfo.MaxPower_HP.ToString("0000.0") + "hp at " + engineinfo.MaxPower_RPM.ToString("00000") + " rpm\n";
-
-            lbl_info2.Text += "Boost steps: " + car.Engine.EngineModes.Count.ToString() + "\n";
         }
 
         public void Draw()

@@ -10,10 +10,12 @@ namespace SimTelemetry.Objects.Garage
 
         public FileList(string root)
         {
-            Files = new List<string>();
-            foreach (string f in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
-                Files.Add(f.ToLower());
-
+            if (root != null)
+            {
+                Files = new List<string>();
+                foreach (string f in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
+                    Files.Add(f.ToLower());
+            }
         }
 
         /// <summary>

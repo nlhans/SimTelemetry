@@ -59,26 +59,29 @@ namespace LiveTelemetry.Garage
         }
         public void Load(ICar car, CarEngineTools t)
         {
-            this.BackColor = Color.Black;
-
-            eng = car.Engine;
-            tools = t;
-
-            _Settings_mode = 0;
-            _Settings_speed = 0;
-            _Settings_throttle = 1;
-
-            this.Invalidate();
-            cb_mode.Items.Clear();
-            cb_mode.DisplayMember = "mode";
-            cb_mode.ValueMember = "index";
-            foreach(KeyValuePair<int, string> mode in car.Engine.EngineModes)
+            if (car != null && car.Engine != null)
             {
-                cb_mode.Items.Add(new ucSelectModel_EngineCurve_Mode (mode.Key, mode.Value));
-            }
+                this.BackColor = Color.Black;
 
-            if(cb_mode.Items.Count >= _Settings_mode)
-                cb_mode.SelectedIndex = _Settings_mode;
+                eng = car.Engine;
+                tools = t;
+
+                _Settings_mode = 0;
+                _Settings_speed = 0;
+                _Settings_throttle = 1;
+
+                this.Invalidate();
+                cb_mode.Items.Clear();
+                cb_mode.DisplayMember = "mode";
+                cb_mode.ValueMember = "index";
+                foreach (KeyValuePair<int, string> mode in car.Engine.EngineModes)
+                {
+                    cb_mode.Items.Add(new ucSelectModel_EngineCurve_Mode(mode.Key, mode.Value));
+                }
+
+                if (cb_mode.Items.Count >= _Settings_mode)
+                    cb_mode.SelectedIndex = _Settings_mode;
+            }
         }
         public void Resize()
         {

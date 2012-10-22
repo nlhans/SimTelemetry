@@ -37,9 +37,15 @@ namespace SimTelemetry.Objects
         public List<string> FireEventsForKeys { get; set; }
 
         /// <summary>
-        ///  The INI file that must be read.
+        /// The INI file that must be read.
+        /// When streams in memory must be parsed; pass data via IniData.
         /// </summary>
         public string IniFile { get; set; }
+
+        /// <summary>
+        /// Alternatively to IniFile property; raw string data that must be parsed.
+        /// </summary>
+        public string IniData { get; set; }
 
         /// <summary>
         /// This setting places all keys in one group.
@@ -156,7 +162,7 @@ namespace SimTelemetry.Objects
                 for (int i = 0; i < d_a.Length; i++)
                 {
                     d_a[i] = d_a[i].Trim();
-                    if (d_a[i].StartsWith("\""))
+                    if (d_a[i].StartsWith("\"") && d_a[i].EndsWith("\"") && d_a[i].Length>2)
                         d_a[i] = d_a[i].Substring(1, d_a.Length - 2);
                 }
                 return d_a;
@@ -170,8 +176,18 @@ namespace SimTelemetry.Objects
 
         public void Read()
         {
-            if(IniFile == null) return;
-            string[] lines = File.ReadAllLines(IniFile);
+            if (IniData == null && IniFile == null) return;
+
+            string[] lines = new string[0];
+            if(IniFile == null)
+            {
+                lines = IniData.Split("\n".ToCharArray());
+            }
+            else
+            {
+             lines =File.ReadAllLines(IniFile);
+                
+            }
             
             // Set property to 'main'
             Group = "Main";
@@ -207,10 +223,10 @@ namespace SimTelemetry.Objects
                     List<string> data = ParseParameter(key_data[1]).OfType<string>().ToList();
 
                     // Is this line in the cusotm keys list?
-                    if(FireEventsForKeys.Contains(Group+"."+key_data[0]))
+                    if(FireEventsForKeys.Contains(Group+"."+key_data[0].Trim()))
                     {
                         if (HandleCustomKeys != null)
-                            HandleCustomKeys(new object[2] { key_data[0], data});
+                            HandleCustomKeys(new object[2] { Group + "." + key_data[0].Trim(), data });
                     }
                     else
                     {
@@ -235,5 +251,6 @@ namespace SimTelemetry.Objects
             }
 
         }
+
     }
 }

@@ -11,6 +11,8 @@ namespace SimTelemetry.Game.rFactor2
         public string Filename;
         public string Filename_Path;
 
+        public MAS2Reader Master;
+
         public bool IsCompressed { get { return (CompressedSize != UncompressedSize); } }
 
         public uint Index;
@@ -162,12 +164,11 @@ namespace SimTelemetry.Game.rFactor2
                 filename_path = filename_path.Substring(0, filename_path.IndexOf('\0'));
 
                 uint file_index = BitConverter.ToUInt32(file_header, f * 256);
-                uint size_compressed2 = BitConverter.ToUInt32(file_header, 4 + f * 256);
-
+                uint size_compressed = BitConverter.ToUInt32(file_header, 65*4 + f * 256);
                 uint size_uncompressed = BitConverter.ToUInt32(file_header, 63 * 4 + f * 256);
-                uint size_compressed = BitConverter.ToUInt32(file_header, 65 * 4 + f * 256);
 
-                MAS2File masfile = new MAS2File();
+                MAS2File masfile = new MAS2File{Master=this};
+
                 masfile.CompressedSize = size_compressed;
                 masfile.UncompressedSize = size_uncompressed;
                 masfile.Index = file_index;

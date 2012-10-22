@@ -7,7 +7,7 @@ using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Utilities;
 
-namespace SimTelemetry.Game.rFactor2.v1005b
+namespace SimTelemetry.Game.rFactor2
 {
     [Export(typeof(ISimulator))]
     public class Simulator : ISimulator
@@ -67,7 +67,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public IGarage Garage
         {
-            get { return null; }
+            get { return rFactor2.Garage; }
         }
 
         public MemoryPolledReader Memory
