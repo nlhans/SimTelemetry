@@ -49,7 +49,8 @@ namespace SimTelemetry.Game.rFactor2.Garage
                 Scanned = true;
 
                 // Index ALL files in GameDataDirectory:
-                Files = new rFactor2FileList(GamedataDirectory);
+                Files = new rFactor2FileList(GamedataDirectory,
+                    new string[6] { ".aiw", ".gdb", ".veh", ".rfm", ".ini", ".hdv" });
 
                 ScanTracks();
                 ScanCars();
@@ -65,7 +66,10 @@ namespace SimTelemetry.Game.rFactor2.Garage
             int count = 0;
             foreach (MAS2File track in tracks)
             {
-
+                if (track.Master.ContainsFile(track.Filename.ToLower().Replace("gdb", "aiw")))
+                {
+                    TrackFactory(track.Filename);
+                }
             }
 
             Debug.WriteLine(count + " track(s) found");
@@ -102,6 +106,18 @@ namespace SimTelemetry.Game.rFactor2.Garage
                 Cars[veh].Scan();
             }
             return Cars[veh];
+        }
+
+        public ITrack TrackFactory(string track)
+        {
+            ITrack t = Tracks.Find(delegate(ITrack tr) { return track.Equals(tr.Name); });
+            if (t == null)
+            {
+                t = new rFactor2Track(track);
+                t.Scan();
+                Tracks.Add(t);
+            }
+            return t;
         }
     }
 }

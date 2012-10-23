@@ -10,12 +10,12 @@ namespace SimTelemetry.Game.rFactor2.Garage
         private List<MAS2Reader> MAS = new List<MAS2Reader>();
         private List<MAS2File> MASFiles = new List<MAS2File>();
 
-        public rFactor2FileList(string dir)
+        public rFactor2FileList(string dir, string[] extensions)
         {
             List<string> mas_Files = GarageTools.SearchFiles(dir, "*.mas");
             foreach(string mas_file in mas_Files)
             {
-                MAS2Reader mas2r = new MAS2Reader(mas_file);
+                MAS2Reader mas2r = new MAS2Reader(mas_file, extensions);
                 MASFiles.AddRange(mas2r.Files);
                 MAS.Add(mas2r);
             }
@@ -35,7 +35,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
                 pattern = pattern.Substring(1);
             pattern = pattern.ToLower();
             directory = directory.ToLower();
-            List<MAS2File> files = MASFiles.FindAll(delegate(MAS2File f) { return f.Master.File.ToLower().Contains(directory) && f.Filename.ToLower().EndsWith(pattern); });
+            List<MAS2File> files = MASFiles.FindAll(delegate(MAS2File f) { return f.Master.File.Contains(directory) && f.Filename.EndsWith(pattern); });
             return files;
         }
 
@@ -51,7 +51,19 @@ namespace SimTelemetry.Game.rFactor2.Garage
             if (pattern.StartsWith("*."))
                 pattern = pattern.Substring(1);
             pattern = pattern.ToLower();
-            List<MAS2File> files = MASFiles.FindAll(delegate(MAS2File f) { return f.Filename.ToLower().EndsWith(pattern); });
+            int k = pattern.Length;
+            List<MAS2File> files = MASFiles.FindAll(delegate(MAS2File f)
+                                                        {
+                                                            int l = f.Filename.Length;
+                                                            if (l == k)
+                                                                return f.Filename.Equals(pattern);
+                                                            else if (l >= k)
+                                                            {
+                                                                string end = f.Filename.Substring(l - k, k);
+                                                                return pattern.Equals(end);
+                                                            }
+                                                            return false;
+                                                        });
             return files;
         }
         /// <summary>

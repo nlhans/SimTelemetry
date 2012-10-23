@@ -8,13 +8,19 @@ namespace SimTelemetry.Objects.Garage
     {
         private List<string> Files;
 
-        public FileList(string root)
+        public FileList(string root, string[] extensions_array)
         {
             if (root != null)
             {
                 Files = new List<string>();
+                // All files of interest are:
+                List<string> extensions = new List<string>(extensions_array);
                 foreach (string f in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
-                    Files.Add(f.ToLower());
+                {
+                    string ext = Path.GetExtension(f).ToLower();
+                    if (extensions.Contains(ext))
+                        Files.Add(f.ToLower());
+                }
             }
         }
 
@@ -32,7 +38,18 @@ namespace SimTelemetry.Objects.Garage
                 pattern = pattern.Substring(1);
             pattern = pattern.ToLower();
             directory = directory.ToLower();
-            List<string> files = Files.FindAll(delegate(string f) { return f.StartsWith(directory) && f.EndsWith(pattern); });
+            int dl = directory.Length;
+            int pl = pattern.Length;
+            int tl = dl + pl;
+            List<string> files = Files.FindAll(delegate(string f)
+                                                   {
+                                                       int l = f.Length;
+                                                       if (l < tl)
+                                                           return false;
+                                                       string start = f.Substring(0,dl);
+                                                       string end = f.Substring(l - pl, pl);
+                                                       return (pattern.Equals(end) && start.Equals(directory));
+                                                   });
             return files;
         }
         /// <summary>

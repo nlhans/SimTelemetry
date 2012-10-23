@@ -60,7 +60,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             // Read the engine files.
             scanner = new IniScanner{IniFile = file};
             scanner.FireEventsForKeys = new List<string>();
-            scanner.FireEventsForKeys.Add("Main.RPMTorque");
+            scanner.FireEventsForKeys.Add("Main.rpmtorque");
             scanner.HandleCustomKeys += new Signal(HandleEngineLine);
             scanner.Read();
 
@@ -116,9 +116,9 @@ namespace SimTelemetry.Game.Rfactor.Garage
         {
             object[] d = (object[]) data;
             string key = (string) d[0];
-            List<string> elements = (List<string>) d[1];
+            string[] elements = (string[]) d[1];
 
-            if (elements.Count == 3)
+            if (elements.Length == 3)
             {
                 double rpm = Convert.ToDouble(elements[0]);
 

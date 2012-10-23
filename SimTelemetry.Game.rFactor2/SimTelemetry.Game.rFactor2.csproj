@@ -57,6 +57,7 @@
     <Compile Include="Garage\rFactor2Garage.cs" />
     <Compile Include="Garage\rFactor2Mod.cs" />
     <Compile Include="Garage\rFactor2CarEngine.cs" />
+    <Compile Include="Garage\rFactor2Track.cs" />
     <Compile Include="MAS2Reader.cs" />
     <Compile Include="v1005b\Driver.cs" />
     <Compile Include="v1005b\DriverPlayer.cs" />

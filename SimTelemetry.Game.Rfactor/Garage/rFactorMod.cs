@@ -144,7 +144,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
                                out _pitSpeedPracticeDefault);
 
                 // TODO: Add more properties like ParcFerme properties, flag settings, point scoring, etc.
-                foreach (KeyValuePair<string, Dictionary<string, List<string>>> GroupKey in _mScanner.Data)
+                foreach (KeyValuePair<string, Dictionary<string, string[]>> GroupKey in _mScanner.Data)
                 {
                     if (GroupKey.Key.StartsWith("Season"))
                     {

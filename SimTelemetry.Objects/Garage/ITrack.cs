@@ -32,6 +32,8 @@
         double Laprecord_Qualify_Time { get; }
         string Laprecord_Qualify_Driver { get; }
 
+        RouteCollection Route { get; }
+
         void Scan();
     }
 }

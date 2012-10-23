@@ -13,8 +13,8 @@ namespace SimTelemetry.Objects
         /// <summary>
         /// The data dictionary with groups, keys and then data (arrays).
         /// </summary>
-        public Dictionary<string, Dictionary<string, List<string>>> Data =
-            new Dictionary<string, Dictionary<string, List<string>>>();
+        public Dictionary<string, Dictionary<string, string[]>> Data =
+            new Dictionary<string, Dictionary<string, string[]>>();
 
         /// <summary>
         /// This event is fired whenever the INI parser comes across a line that isn't a key or group indicator.
@@ -92,13 +92,13 @@ namespace SimTelemetry.Objects
 
         public string[] TryGetData(string group, string key)
         {
+            key = key.ToLower();
             if(Data.ContainsKey(group) && Data[group].ContainsKey(key))
             {
-                if(Data[group][key].Count >= 1)
+                if(Data[group][key].Length >= 1)
                     return Data[group][key].ToArray();
             }
-
-            return new string[1]{""};
+            return new string[1] { "" };
         }
 
         public int TryGetInt32(string key)
@@ -150,19 +150,20 @@ namespace SimTelemetry.Objects
 
         private static string[] ParseParameter(string d)
         {
-            // Determine if the line contains a list of values.
-            if (d.Contains("(") && d.Trim().EndsWith(")"))
+            d = d.Trim();
+            // Determine if the line contains a list of values.)
+            if (d.Length > 2 && d.Substring(0,1) == "(" && d.Substring(d.Length-1,1) == ")")
             {
                 // Remove () from line, then split on comma.
-                d = d.Substring(d.IndexOf("(") + 1);
-                d = d.Substring(0, d.IndexOf(")"));
+                d = d.Substring(1, d.Length-2);
 
                 string[] d_a= d.Split(",".ToCharArray());
 
                 for (int i = 0; i < d_a.Length; i++)
                 {
                     d_a[i] = d_a[i].Trim();
-                    if (d_a[i].StartsWith("\"") && d_a[i].EndsWith("\"") && d_a[i].Length>2)
+                    int l = d_a[i].Length;
+                    if (l>2 && d_a[i].Substring(0,1) == "\"" && d_a[i].Substring(l-1,1) == "\"")
                         d_a[i] = d_a[i].Substring(1, d_a.Length - 2);
                 }
                 return d_a;
@@ -220,23 +221,24 @@ namespace SimTelemetry.Objects
                 else if (line.Contains("="))
                 {
                     string[] key_data = line.Split("=".ToCharArray(), 2);
-                    List<string> data = ParseParameter(key_data[1]).OfType<string>().ToList();
+                    key_data[0] = key_data[0].ToLower().Trim();
+                    string[] data = ParseParameter(key_data[1]);
 
                     // Is this line in the cusotm keys list?
-                    if(FireEventsForKeys.Contains(Group+"."+key_data[0].Trim()))
+                    if(FireEventsForKeys.Contains(Group+"."+key_data[0]))
                     {
                         if (HandleCustomKeys != null)
-                            HandleCustomKeys(new object[2] { Group + "." + key_data[0].Trim(), data });
+                            HandleCustomKeys(new object[2] { Group + "." + key_data[0], data });
                     }
                     else
                     {
                         // If group doesn't exist; create it in the data dict.
                         if (Data.ContainsKey(Group) == false)
-                            Data.Add(Group, new Dictionary<string, List<string>>());
+                            Data.Add(Group, new Dictionary<string, string[]>());
                         
                         // Check if data exists. Otherwise throw event DuplicateKey
-                        if (Data[Group].ContainsKey(key_data[0].Trim()) == false)
-                            Data[Group].Add(key_data[0].Trim(), data);
+                        if (Data[Group].ContainsKey(key_data[0]) == false)
+                            Data[Group].Add(key_data[0], data);
                         else if (HandleDuplicateKey != null)
                             HandleDuplicateKey(key_data);
                     }

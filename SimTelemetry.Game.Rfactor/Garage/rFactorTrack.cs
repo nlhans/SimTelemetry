@@ -52,6 +52,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private string _laprecordQualifyDriver;
 
+        private RouteCollection _Route;
+
         public string File
         {
             get { return _file; }
@@ -165,6 +167,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
         public string Laprecord_Qualify_Driver
         {
             get { return _laprecordQualifyDriver; }
+        }
+
+        public RouteCollection Route
+        {
+            get { return _Route; }
         }
 
         public rFactorTrack(string file)

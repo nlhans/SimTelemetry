@@ -133,8 +133,8 @@ namespace SimTelemetry.Game.rFactor2.Garage
             IniScanner scan = new IniScanner { IniData = rfmData };
             scan.HandleCustomKeys += new Signal(Scan_AddTeamAndLayout);
             scan.FireEventsForKeys = new List<string>();
-            scan.FireEventsForKeys.Add("Main.Layout");
-            scan.FireEventsForKeys.Add("Main.Team");
+            scan.FireEventsForKeys.Add("Main.layout");
+            scan.FireEventsForKeys.Add("Main.team");
             scan.Read();
 
             _name = scan.TryGetString("Mod Name");
@@ -149,7 +149,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
             _description = "";
             _directoryVehicles = ""; // Irrelevant?!
             
-            _image = "Mods/rfactor2_ " + _name+".png"; // Search&extract DDS from RFM file
+            _image = "Cache/Mods/rfactor2_ " + _name+".png"; // Search&extract DDS from RFM file
 
             if(System.IO.File.Exists(_image)==false)
             {
@@ -195,13 +195,13 @@ namespace SimTelemetry.Game.rFactor2.Garage
         private void Scan_AddTeamAndLayout(object sender)
         {
             object[] d = (object[])sender;
-            if(d[0].ToString() == "Main.Layout")
+            if(d[0].ToString() == "Main.layout")
             {
                 // Add to tracklist.
             }
-            if (d[0].ToString() == "Main.Team")
+            if (d[0].ToString() == "Main.team")
             {
-                List<string> k = (List<string>) d[1];
+                string[] k = (string[])d[1];
                 _teams.Add(k[0].Trim().ToLower());
             }
         }

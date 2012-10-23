@@ -113,7 +113,7 @@ namespace SimTelemetry.Game.rFactor2
             if (bf.Length > 0)
             {
                 uint gigabyte_index = 0;
-                for (int byte_index = 0; byte_index < bf.Length; byte_index++)
+                for (ulong byte_index = 0; byte_index < (ulong)bf.Length; byte_index++)
                 {
                     byte ind = (byte)((byte_index + byte_index / 256) % 256);
                     byte c = (byte)(byte_index & 0x3F);
@@ -128,8 +128,9 @@ namespace SimTelemetry.Game.rFactor2
 
                     value = value_l | value_h << 32;
 
-                    output[byte_index] = (byte)(bf[byte_index] ^ DecodeFileHeader_ShiftBytesRight(value, c));
+                    output[byte_index] = (byte) (bf[byte_index] ^ (value >> c));
 
+                    if (byte_index > 2147483648)
                     gigabyte_index = (uint)DecodeFileHeader_ShiftBytesRight((ulong)byte_index, 32);
                 }
             }
@@ -145,7 +146,7 @@ namespace SimTelemetry.Game.rFactor2
             return d >> s;
         }
 
-        public MAS2Reader(string file)
+        public MAS2Reader(string file, string[] exts)
         {
             this.mas2_file = file;
             Files = new List<MAS2File>();
@@ -156,27 +157,38 @@ namespace SimTelemetry.Game.rFactor2
             uint FilePosition = (uint)reader.BaseStream.Position;
             reader.Close();
 
+            List<string> extensions = new List<string>(exts);
+            bool parse_extensions = (extensions.Count > 0);
             for (int f = 0; f < files; f++)
             {
+                MAS2File masfile = new MAS2File { Master = this };
+                uint size_compressed = BitConverter.ToUInt32(file_header, 65 * 4 + f * 256);
+                masfile.FileOffset = FilePosition;
+                FilePosition += size_compressed;
+
                 string filename = ASCIIEncoding.ASCII.GetString(file_header, f * 256 + 16, 128);
-                filename = filename.Substring(0, filename.IndexOf('\0'));
-                string filename_path = ASCIIEncoding.ASCII.GetString(file_header, f * 256 + 16 + filename.Length + 1, 128);
-                filename_path = filename_path.Substring(0, filename_path.IndexOf('\0'));
+                filename = filename.Substring(0, filename.IndexOf('\0')).ToLower();
+
+                if(parse_extensions)
+                {
+                    string ext = System.IO.Path.GetExtension(filename);
+                    if (extensions.Contains(ext) == false)
+                        continue;
+                }
 
                 uint file_index = BitConverter.ToUInt32(file_header, f * 256);
-                uint size_compressed = BitConverter.ToUInt32(file_header, 65*4 + f * 256);
                 uint size_uncompressed = BitConverter.ToUInt32(file_header, 63 * 4 + f * 256);
 
-                MAS2File masfile = new MAS2File{Master=this};
+                string filename_path = ASCIIEncoding.ASCII.GetString(file_header, f * 256 + 16 + filename.Length + 1, 128);
+                filename_path = filename_path.Substring(0, filename_path.IndexOf('\0')).ToLower();
+
 
                 masfile.CompressedSize = size_compressed;
                 masfile.UncompressedSize = size_uncompressed;
                 masfile.Index = file_index;
-                masfile.FileOffset = FilePosition;
                 masfile.Filename = filename;
                 masfile.Filename_Path = filename_path;
 
-                FilePosition += masfile.CompressedSize;
                 this.Files.Add(masfile);
             }
         }
@@ -184,11 +196,13 @@ namespace SimTelemetry.Game.rFactor2
         #region Simple search methods.
         public bool ContainsFile(string file)
         {
+            file = file.ToLower();
             return (Files.FindAll(delegate(MAS2File f) { return f.Filename.Contains(file); }).Count >= 1);
         }
 
         public List<MAS2File> GetFile(string file)
         {
+            file = file.ToLower();
             return Files.FindAll(delegate(MAS2File f) { return f.Filename.Contains(file); });
         }
         #endregion
