@@ -195,16 +195,20 @@ namespace SimTelemetry.Objects
 
             for (int i = 0; i < lines.Length;i ++)
             {
-                string line = lines[i].TrimEnd();
+                string line = lines[i];
                 // Is there a comment at the end of this line? Remove.
                 if (line.Contains("//"))
                     line = line.Substring(0, line.LastIndexOf("//"));
+                line = line.TrimEnd();
 
-                if (line.StartsWith("[") && line.EndsWith("]"))
+                if (line.Length == 0) continue;
+
+                string first_char = line.Substring(0, 1);
+                if (first_char == "[" && line.EndsWith("]"))
                 {
                     Group = line.Substring(1, line.Length - 2);
                 }
-                else if(line.Trim() == "{")
+                else if(first_char == "{")
                 {
                     // Ignore
                 }
@@ -213,7 +217,7 @@ namespace SimTelemetry.Objects
                     // This starts a new group at this line.
                     PushGroup(line);
                 }
-                else if(line.Trim() == "}")
+                else if (first_char == "}")
                 {
                     // This ends the group
                     PopGroup();
@@ -243,7 +247,7 @@ namespace SimTelemetry.Objects
                             HandleDuplicateKey(key_data);
                     }
                 }
-                else if (line.Trim() != "" && line.StartsWith("#") == false)
+                else if (line.Trim() != "" && first_char != "#") 
                 {
                     // No comment, not empty.. Dunno what to do with this!
                     if (HandleUnknownLine != null)

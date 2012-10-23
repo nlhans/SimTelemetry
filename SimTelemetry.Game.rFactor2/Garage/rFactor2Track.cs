@@ -209,17 +209,35 @@ namespace SimTelemetry.Game.rFactor2.Garage
 
         }
 
+        private bool ScannedGDB=false;
+        private bool ScannedAIW = false;
         public void Scan()
         {
             if (FoundFiles)
             {
+                if (!ScannedGDB)
+                {
+                    ScannedGDB = true;
+                    track_gdb = new IniScanner { IniData = masfile_gdb.Master.ExtractString(masfile_gdb) };
+                    track_gdb.Read();
+                }
+            }
+        }
+
+        public void ScanRoute()
+        {
+            if (!ScannedAIW)
+            {
                 _Route = new RouteCollection();
-                track_gdb = new IniScanner {IniData = masfile_gdb.Master.ExtractString(masfile_gdb)};
+
                 track_aiw = new IniScanner {IniData = masfile_aiw.Master.ExtractString(masfile_aiw)};
                 track_aiw.HandleCustomKeys += new Signal(Scan_AIWKey);
                 track_aiw.FireEventsForKeys = new List<string>();
-                track_aiw.FireEventsForKeys.AddRange(new string[6] { "Main.wp_pos", "Main.wp_score", "Main.wp_branchid", "Main.wp_perp", "Main.wp_width", "Main.wp_ptrs" });
-                track_gdb.Read();
+                track_aiw.FireEventsForKeys.AddRange(new string[6]
+                                                         {
+                                                             "Main.wp_pos", "Main.wp_score", "Main.wp_branchid",
+                                                             "Main.wp_perp", "Main.wp_width", "Main.wp_ptrs"
+                                                         });
                 track_aiw.Read();
             }
         }

@@ -138,21 +138,22 @@ namespace SimTelemetry.Game.rFactor2.Garage
         {
             double last_rpm = 0;
 
-            foreach(KeyValuePair<double, double>kvp in curve)
+            foreach(double r in curve.Keys)
             {
-                if (last_rpm != kvp.Key && last_rpm <= rpm && kvp.Key >= rpm)
+                if (last_rpm != r && last_rpm <= rpm && r >= rpm)
                 {
+                    double v = curve[r];
                     // Closest spot!
                     double last_curve = 0;
                     if (curve.ContainsKey(last_rpm))
                         last_curve = curve[last_rpm];
-                    double duty_cycle = (rpm - last_rpm)/(kvp.Key - last_rpm);
-                    double d = last_curve - kvp.Value; // TODO: Is this the right way around?
+                    double duty_cycle = (rpm - last_rpm) / (r - last_rpm);
+                    double d = last_curve - v; // TODO: Is this the right way around?
 
-                    return kvp.Value + d*(1-duty_cycle);
+                    return v + d * (1 - duty_cycle);
                 }
 
-                last_rpm = kvp.Key;
+                last_rpm = r;
             }
             return 0;
         }
