@@ -67,6 +67,7 @@
       <DependentUpon>TrackMap.cs</DependentUpon>
     </Compile>
     <Compile Include="Track\TrackParser.cs" />
+    <Compile Include="Track\TrackThumbnail.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">

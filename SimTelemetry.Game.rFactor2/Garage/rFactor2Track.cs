@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
 using Triton;
@@ -182,6 +183,13 @@ namespace SimTelemetry.Game.rFactor2.Garage
         {
             get { return _Route; }
         }
+
+        public string Thumbnail
+        {
+            get { return "Cache/Tracks/rfactor2_" + Path.GetFileNameWithoutExtension(File) +".png"; }
+        }
+
+
         #endregion
 
         public rFactor2Track(string trackfile)
@@ -220,6 +228,8 @@ namespace SimTelemetry.Game.rFactor2.Garage
                     ScannedGDB = true;
                     track_gdb = new IniScanner { IniData = masfile_gdb.Master.ExtractString(masfile_gdb) };
                     track_gdb.Read();
+
+                    _name = track_gdb.TryGetString("eventname");
                 }
             }
         }
@@ -239,6 +249,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
                                                              "Main.wp_perp", "Main.wp_width", "Main.wp_ptrs"
                                                          });
                 track_aiw.Read();
+                ScannedAIW = true;
             }
         }
 
@@ -248,7 +259,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
         {
             object[] a = (object[]) d;
             string key = (string)a[0];
-            List<string> values = (List<string>)a[1];
+            string[] values = (string[])a[1];
 
             switch(key)
             {
@@ -271,7 +282,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
 
                     // branchID = path ID, 0=main, 1=pitlane
                 case "Main.wp_branchid":
-                    if (values.Count == 1)
+                    if (values.Length == 1)
                     {
                         switch (values[0])
                         {

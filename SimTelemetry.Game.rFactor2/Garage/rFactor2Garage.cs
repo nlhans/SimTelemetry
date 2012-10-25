@@ -62,7 +62,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
             _tracks = new List<ITrack>();
             // rFactor stores data in GDB files.
             // All relevant path data is in stored in AIW files.
-            List<MAS2File> tracks = rFactor2.Garage.Files.SearchFiles(GamedataDirectory, "*.gdb");
+            List<MAS2File> tracks = rFactor2.Garage.Files.SearchFiles("*.gdb");
             int count = 0;
             foreach (MAS2File track in tracks)
             {

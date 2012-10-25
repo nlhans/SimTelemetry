@@ -33,7 +33,9 @@
         string Laprecord_Qualify_Driver { get; }
 
         RouteCollection Route { get; }
+        string Thumbnail { get; }
 
         void Scan();
+        void ScanRoute();
     }
 }
