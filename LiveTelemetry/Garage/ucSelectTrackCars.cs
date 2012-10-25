@@ -135,7 +135,6 @@ namespace LiveTelemetry.Garage
                                                    fGarage.Sim.Garage.Scan();
                                                    foreach(ITrack track in fGarage.Sim.Garage.Tracks)
                                                    {
-                                                       break;
                                                        track.Scan();
                                                        if(File.Exists(track.Thumbnail) == false)
                                                        {

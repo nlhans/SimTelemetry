@@ -192,9 +192,13 @@ namespace LiveTelemetry.Garage
                 float x_max = Convert.ToSingle(labelsLeft + eng.MaxRPM / max_x * graph_x);
                 g.DrawLine(new Pen(Color.DarkBlue, 2.0f), x_max, 10, x_max, e.ClipRectangle.Height - labelsBot);
 
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+
                 // Power/torque curves
-                g.DrawPolygon(new Pen(Color.Red, 1.0f), graph1.ToArray());
-                g.DrawPolygon(new Pen(Color.Green, 1.0f), graph2.ToArray());
+                g.DrawPolygon(new Pen(Color.Red, 2.0f), graph1.ToArray());
+                g.DrawPolygon(new Pen(Color.Green, 2.0f), graph2.ToArray());
+
+                g.SmoothingMode = SmoothingMode.HighSpeed;
 
                 // Draw axis
                 g.DrawLine(axisPen, labelsLeft, 10, labelsLeft, e.ClipRectangle.Height - labelsBot);
