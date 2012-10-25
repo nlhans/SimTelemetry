@@ -70,58 +70,59 @@ namespace LiveTelemetry.Garage
 
                 Task load = new Task(() =>
                                          {
-
-                                             foreach (IMod mod in fGarage.Sim.Garage.Mods)
+                                             if (fGarage.Sim != null && fGarage.Sim.Garage != null && fGarage.Sim.Garage.Mods != null)
                                              {
-                                                 // If required, scan:
-                                                 mod.Scan();
-
-                                                 if (mod.Image != "" &&
-                                                     File.Exists(mod.Image))
+                                                 foreach (IMod mod in fGarage.Sim.Garage.Mods)
                                                  {
-                                                     
-                                                     ucResizableImage pb =
-                                                         new ucResizableImage(mod.Image);
-                                                     pb.Caption = mod.Name;
-                                                     pb.Margin = new Padding(10);
-                                                     pb.Name = mod.Name;
-                                                     if (mod.Models.Count == 0)
+                                                     // If required, scan:
+                                                     mod.Scan();
+
+                                                     if (mod.Image != "" &&
+                                                         File.Exists(mod.Image))
                                                      {
-                                                         pb.Disabled = true;
+
+                                                         ucResizableImage pb =
+                                                             new ucResizableImage(mod.Image);
+                                                         pb.Caption = mod.Name;
+                                                         pb.Margin = new Padding(10);
+                                                         pb.Name = mod.Name;
+                                                         if (mod.Models.Count == 0)
+                                                         {
+                                                             pb.Disabled = true;
+                                                         }
+                                                         else
+                                                         {
+                                                             pb.Cursor = Cursors.Hand;
+                                                             pb.Click +=
+                                                                 new EventHandler(pb_Click);
+                                                         }
+                                                         pb.Crop(220, 220);
+                                                         mods_list.Add(pb);
                                                      }
                                                      else
                                                      {
-                                                         pb.Cursor = Cursors.Hand;
-                                                         pb.Click +=
-                                                             new EventHandler(pb_Click);
-                                                     }
-                                                     pb.Crop(213, 120);
-                                                     mods_list.Add(pb);
-                                                 }
-                                                 else
-                                                 {
-                                                     Label l = new Label();
-                                                     l.Text = mod.Name;
-                                                     l.Name = mod.Name;
-                                                     l.Font = new Font("Tahoma", 24.0f,
-                                                                       FontStyle.Bold);
-                                                     l.Size = new Size(213, 120);
-                                                     if (mod.Models.Count == 0)
-                                                     {
-                                                         l.ForeColor = Color.Gray;
-                                                     }
-                                                     else
-                                                     {
-                                                         l.ForeColor = Color.White;
-                                                         l.Cursor = Cursors.Hand;
-                                                         l.Click +=
-                                                             new EventHandler(pb_Click);
-                                                     }
-                                                     mods_list.Add(l);
+                                                         Label l = new Label();
+                                                         l.Text = mod.Name;
+                                                         l.Name = mod.Name;
+                                                         l.Font = new Font("Tahoma", 24.0f,
+                                                                           FontStyle.Bold);
+                                                         l.Size = new Size(213, 120);
+                                                         if (mod.Models.Count == 0)
+                                                         {
+                                                             l.ForeColor = Color.Gray;
+                                                         }
+                                                         else
+                                                         {
+                                                             l.ForeColor = Color.White;
+                                                             l.Cursor = Cursors.Hand;
+                                                             l.Click +=
+                                                                 new EventHandler(pb_Click);
+                                                         }
+                                                         mods_list.Add(l);
 
+                                                     }
                                                  }
                                              }
-
                                          });
                 load.ContinueWith((result) =>
                                       {
@@ -134,12 +135,13 @@ namespace LiveTelemetry.Garage
                                                    fGarage.Sim.Garage.Scan();
                                                    foreach(ITrack track in fGarage.Sim.Garage.Tracks)
                                                    {
+                                                       break;
                                                        track.Scan();
                                                        if(File.Exists(track.Thumbnail) == false)
                                                        {
                                                            track.ScanRoute();
-                                                           thumbnail_generator.Create(track.Thumbnail, track.Name, track.Version,  track.Route, 250,
-                                                                                      250);
+                                                           thumbnail_generator.Create(track.Thumbnail, track.Name, track.Version,  track.Route, 220,
+                                                                                      220);
                                                        }
                                                        
                                                        ucResizableImage pb =
@@ -149,7 +151,7 @@ namespace LiveTelemetry.Garage
                                                        pb.Name = track.Name;
                                                        pb.Cursor = Cursors.Hand;
                                                        //pb.Click +=pb_Click;
-                                                       pb.Crop(213, 120);
+                                                       pb.Crop(220, 220);
                                                        mods_list.Add(pb);
 
                                                    }
@@ -182,16 +184,16 @@ namespace LiveTelemetry.Garage
             int columns = (int)Math.Ceiling(Math.Sqrt(grid_content_size)) + 2;
             if (grid_content_size % columns == 1)
                 columns++;
-            if (this.Width + 40 >= 233)
+            if (this.Width + 40 >= 240)
             {
-                while (233 * columns > this.Width - 40 && columns > 0)
+                while (240 * columns > this.Width - 40 && columns > 0)
                     columns--;
             }
             if (columns <= 0) columns = 1;
             int rows = (int)Math.Ceiling(grid_content_size * 1.0 / columns) + 1;
 
-            panel.Size = new Size(233 * columns + 40,
-                                  Math.Min(this.Height - 50, rows * 140 + 20));
+            panel.Size = new Size(240 * columns + 40,
+                                  Math.Min(this.Height - 50, rows * 240 + 20));
             panel.Location = new Point((this.Width - panel.Size.Width) / 2,
                                        (this.Height - panel.Size.Height) / 2);
 

@@ -106,16 +106,15 @@ namespace SimTelemetry.Data.Logger
                         new OleDbCommand(
                             "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath,distance,enginerevs,fuelused,gearchanges,samplelength,localtime,simulatortime) " +
                             "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
-                            Telemetry.m.Track.Name + "','" +
-                            Telemetry.m.Sim.Drivers.Player.CarModel + "','" +
-                            Telemetry.m.Sim.Drivers.Player.CarClass + "'," +
+                            Telemetry.m.Track.Name.Replace("'","\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
                             LastLap.LapTime + "," + LastLap.Sector1 + "," +
                             LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
                             (LapNo).ToString() +
                             ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
                             "', "+Telemetry.m.Stats.Stats_AnnotationQuery+");", con))
                 {
-                    
                     newTime.ExecuteNonQuery();
                 }
                 DatabaseOleDbConnectionPool.Freeup();

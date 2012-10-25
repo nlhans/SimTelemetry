@@ -140,12 +140,12 @@ namespace SimTelemetry.Data.Logger
                         }
                         else
                         {
-                            return new object();
+                            return 0.0;
                         }
                     }
                     else
                     {
-                        return new object();
+                        return 0.0;
                     }
                 }
             }
@@ -386,12 +386,12 @@ namespace SimTelemetry.Data.Logger
             }
         }
 
-        private string GetString(TelemetrySample frame, string key)
+        public string GetString(TelemetrySample frame, string key)
         {
             return Get(frame.Time, key).ToString();
         }
 
-        private string GetString(double frame, string key)
+        public string GetString(double frame, string key)
         {
             return Get(frame, key).ToString();
         }

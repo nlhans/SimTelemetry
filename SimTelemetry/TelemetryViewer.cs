@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SimTelemetry.Data;
 using SimTelemetry.Data.Logger;
+using SimTelemetry.Data.Track;
 using SimTelemetry.Objects;
 using SimTelemetry.Properties;
 using Triton;
@@ -145,8 +147,14 @@ namespace SimTelemetry
                         TelemetrySample sample = sp.Value;
 
                         // TODO: Make this work from the configuration data (or files)
-                        cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time/1000.0, _logReader.GetDouble(sample, "Driver.RPM"));
-                        //cPlotter.Graphs[1].Curves[1].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Driver.Speed") * 3.6);
+                        cPlotter.Graphs[0].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Driver.RPM"));
+                        cPlotter.Graphs[1].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Driver.Speed") * 3.6);
+                        cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Pedals_Throttle")*100);
+                        cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Pedals_Brake") * 100);
+                        cPlotter.Graphs[3].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_LF"));
+                        cPlotter.Graphs[3].Curves[1].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_LR"));
+                        cPlotter.Graphs[3].Curves[2].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_RF"));
+                        cPlotter.Graphs[3].Curves[3].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_RR"));
 
                         /*double x = (double)sample.Data[3][7];
                         double y = (double)sample.Data[3][8];
@@ -325,6 +333,9 @@ namespace SimTelemetry
                                           while (_logReader.Progress == 0) ;
                                           while (_logReader.Progress != 1000) ;
                                           TelemetryFile = datafile;
+                                          Telemetry.m.Track_Load(
+                                              _logReader.GetString(0.0, "Session.GameDirectory"),
+                                              _logReader.GetString(0.0, "Session.GameData_TrackFile"));
                                           GraphFill();
                                           DrawPlotbounds();
                                           _logReader.Start();
