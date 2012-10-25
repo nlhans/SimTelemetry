@@ -23,6 +23,8 @@ namespace SimTelemetry.Game.rFactor2.Garage
         #region ITrack Properties
         private string _name;
 
+        private string _version;
+
         private string _location;
 
         private string _type;
@@ -67,6 +69,11 @@ namespace SimTelemetry.Game.rFactor2.Garage
         public string File
         {
             get { return masfile_gdb.Filename; }
+        }
+
+        public string Version
+        {
+            get { return _version; }
         }
 
         public string Name
@@ -186,13 +193,13 @@ namespace SimTelemetry.Game.rFactor2.Garage
 
         public string Thumbnail
         {
-            get { return "Cache/Tracks/rfactor2_" + Path.GetFileNameWithoutExtension(File) +".png"; }
+            get { return "Cache/Tracks/rfactor2_" + Path.GetFileNameWithoutExtension(File) +"_"+Version+".png"; }
         }
 
 
         #endregion
 
-        public rFactor2Track(string trackfile)
+        public rFactor2Track(string trackfile, string root)
         {
             FoundFiles = false;
             try
@@ -200,15 +207,16 @@ namespace SimTelemetry.Game.rFactor2.Garage
                 trackfile = trackfile.ToLower();
                 if (trackfile.EndsWith("gdb"))
                 {
-                    masfile_gdb = rFactor2.Garage.Files.SearchFile(trackfile);
-                    masfile_aiw = rFactor2.Garage.Files.SearchFile(trackfile.Replace("gdb", "aiw"));
+                    masfile_gdb = rFactor2.Garage.Files.SearchFile(root, trackfile);
+                    masfile_aiw = rFactor2.Garage.Files.SearchFile(root, trackfile.Replace("gdb", "aiw"));
                 }
                 else
                 {
-                    masfile_aiw = rFactor2.Garage.Files.SearchFile(trackfile);
-                    masfile_gdb = rFactor2.Garage.Files.SearchFile(trackfile.Replace("aiw", "gdb"));
+                    masfile_aiw = rFactor2.Garage.Files.SearchFile(root, trackfile);
+                    masfile_gdb = rFactor2.Garage.Files.SearchFile(root, trackfile.Replace("aiw", "gdb"));
                 }
                 FoundFiles = true;
+
             }
             catch (Exception ex)
             {
@@ -230,6 +238,9 @@ namespace SimTelemetry.Game.rFactor2.Garage
                     track_gdb.Read();
 
                     _name = track_gdb.TryGetString("eventname");
+                    // Extract version number
+                    string MASFileDirectory = Path.GetDirectoryName(masfile_gdb.Master.File);
+                    _version = ParseVersion(MASFileDirectory);
                 }
             }
         }
@@ -337,6 +348,16 @@ namespace SimTelemetry.Game.rFactor2.Garage
                     break;
 
             }
+        }
+
+        public static string ParseVersion(string directory)
+        {
+            if (directory.Length > 5)
+            {
+                return
+                    directory.Substring(directory.IndexOf("\\", directory.Length - 5) + 1);
+            }
+            else return "";
         }
     }
 }

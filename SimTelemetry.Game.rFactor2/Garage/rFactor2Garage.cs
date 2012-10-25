@@ -68,9 +68,16 @@ namespace SimTelemetry.Game.rFactor2.Garage
             {
                 if (track.Master.ContainsFile(track.Filename.ToLower().Replace("gdb", "aiw")))
                 {
-                    TrackFactory(track.Filename);
+                    TrackFactory(track.Filename, Path.GetDirectoryName(track.Master.File));
                 }
             }
+
+            Tracks.Sort(delegate(ITrack t1, ITrack t2)
+                            {
+                                int c1 = t1.Name.CompareTo(t2.Name);
+                                if (c1 == 0) return t1.Version.CompareTo(t2.Version);
+                                else return c1;
+                            });
 
             Debug.WriteLine(count + " track(s) found");
         }
@@ -108,12 +115,13 @@ namespace SimTelemetry.Game.rFactor2.Garage
             return Cars[veh];
         }
 
-        public ITrack TrackFactory(string track)
+        public ITrack TrackFactory(string track, string directory)
         {
-            ITrack t = Tracks.Find(delegate(ITrack tr) { return track.Equals(tr.Name); });
+            string myversion = rFactor2Track.ParseVersion(directory);
+            ITrack t = Tracks.Find(delegate(ITrack tr) { return myversion == tr.Version && track.Equals(tr.Name); });
             if (t == null)
             {
-                t = new rFactor2Track(track);
+                t = new rFactor2Track(track, directory);
                 t.Scan();
                 Tracks.Add(t);
             }

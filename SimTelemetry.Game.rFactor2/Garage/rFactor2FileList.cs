@@ -35,7 +35,7 @@ namespace SimTelemetry.Game.rFactor2.Garage
                 pattern = pattern.Substring(1);
             pattern = pattern.ToLower();
             directory = directory.ToLower();
-            List<MAS2File> files = MASFiles.FindAll(delegate(MAS2File f) { return f.Master.File.Contains(directory) && f.Filename.EndsWith(pattern); });
+            List<MAS2File> files = MASFiles.FindAll(delegate(MAS2File f) { return f.Master.File.ToLower().Contains(directory) && f.Filename.EndsWith(pattern); });
             return files;
         }
 

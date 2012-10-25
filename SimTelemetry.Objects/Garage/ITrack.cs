@@ -5,11 +5,11 @@
         string File { get; }
         string Name { get; }
         string Location { get; }
+        string Version { get; }
         string Type { get; }
         bool ImageCache { get; }
 
         double Length { get; }
-
         string Qualify_Day { get; }
         double Qualify_Start { get; }
         int Qualify_Laps { get; }

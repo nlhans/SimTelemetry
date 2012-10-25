@@ -40,9 +40,10 @@ namespace SimTelemetry.Data.Track
         Font tf12 = new Font("calibri", 12f);
         Font tf10 = new Font("calibri", 10f);
         Font tf18 = new Font("calibri", 18f);
+        Font font_version = new Font("calibri", 24f, FontStyle.Bold | FontStyle.Italic);
         #endregion
 
-        public void Create(string file, string name, RouteCollection route, int width, int height)
+        public void Create(string file, string name, string version, RouteCollection route, int width, int height)
         {
             Pen pen_track = new Pen(brush_sector1, track_width);
             try
@@ -107,6 +108,7 @@ namespace SimTelemetry.Data.Track
                 // Draw polygons!
                 if (track.Count > 0) g.DrawPolygon(pen_track, track.ToArray());
 
+                g.DrawString(version, font_version, Brushes.DarkRed, 5.0f, 5.0f);
                 //g.DrawString(name, tf18, Brushes.White, 3.0f, Convert.ToSingle(map_height - 19.0f));
 
                 track_img.Save(file);

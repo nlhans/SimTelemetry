@@ -68,6 +68,10 @@ namespace SimTelemetry.Game.Rfactor.Garage
         {
             get { return _file; }
         }
+        public string Version
+        {
+            get { return ""; }
+        }
 
         public string Name
         {

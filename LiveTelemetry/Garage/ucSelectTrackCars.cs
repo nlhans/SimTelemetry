@@ -138,7 +138,7 @@ namespace LiveTelemetry.Garage
                                                        if(File.Exists(track.Thumbnail) == false)
                                                        {
                                                            track.ScanRoute();
-                                                           thumbnail_generator.Create(track.Thumbnail, track.Name, track.Route, 250,
+                                                           thumbnail_generator.Create(track.Thumbnail, track.Name, track.Version,  track.Route, 250,
                                                                                       250);
                                                        }
                                                        
