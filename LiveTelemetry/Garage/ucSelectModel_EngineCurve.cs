@@ -115,10 +115,18 @@ namespace LiveTelemetry.Garage
                     max_rpm = Math.Max( eng.MaxRPM_Mode[_Settings_mode], eng.MaxRPMCurve);
                 }
 
-                max_y = Math.Ceiling(max_y / 50) * 50; // steps of 50
                 double max_x = Math.Ceiling(max_rpm / 500.0) * 500.0; // steps of 500rpm
 
-                double step_y = ((max_y>800)?100:50);
+                double step_y = 100;
+                if (max_y < 100)
+                    step_y = 10;
+                if (max_y < 200 && max_y >= 100)
+                    step_y = 20;
+                if (max_y < 400 && max_y >= 200)
+                    step_y = 25;
+                if (max_y < 700 && max_y >= 400)
+                    step_y = 50;
+                max_y = Math.Ceiling(max_y / step_y) * step_y; // steps of 50
                 double step_x = 500;
                 if (max_x > 10000)
                     step_x = 1000;
