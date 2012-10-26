@@ -58,6 +58,9 @@
     <Compile Include="Garage\IMod.cs" />
     <Compile Include="Garage\ICarWheels.cs" />
     <Compile Include="Garage\ITrack.cs" />
+    <Compile Include="HyperType\ChainingPropertyDescriptor.cs" />
+    <Compile Include="HyperType\HyperTypeDescriptionProvider.cs" />
+    <Compile Include="HyperType\HyperTypeDescriptor.cs" />
     <Compile Include="IniScanner.cs" />
     <Compile Include="ITrackParser.cs" />
     <Compile Include="Logger\TelemetryLogPacket.cs" />

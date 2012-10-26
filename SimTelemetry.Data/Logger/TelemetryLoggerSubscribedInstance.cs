@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.HyperType;
 
 namespace SimTelemetry.Data.Logger
 {
@@ -40,6 +41,8 @@ namespace SimTelemetry.Data.Logger
         {
             this.type = type;
             this.instance = instance;
+
+           // HyperTypeDescriptionProvider.Add(type);
 
             Events = new Dictionary<string, List<List<string>>>();
             LogOnChange = new Dictionary<string, bool>();
