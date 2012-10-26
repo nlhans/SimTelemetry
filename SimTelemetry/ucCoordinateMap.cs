@@ -99,7 +99,7 @@ namespace SimTelemetry
                 }
 
                 //g.FillRectangle(new SolidBrush(new PlotterPalette().Background), bounds);
-                g.DrawImage(BackgroundImage, 0, 0);
+                g.DrawImage(_EmptyTrackMap, 0, 0);
 
                 double px = 0;
                 double py = 0;

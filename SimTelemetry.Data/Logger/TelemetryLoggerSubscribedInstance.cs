@@ -42,7 +42,7 @@ namespace SimTelemetry.Data.Logger
             this.type = type;
             this.instance = instance;
 
-           // HyperTypeDescriptionProvider.Add(type);
+            HyperTypeDescriptionProvider.Add(type);
 
             Events = new Dictionary<string, List<List<string>>>();
             LogOnChange = new Dictionary<string, bool>();

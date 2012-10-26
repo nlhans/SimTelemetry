@@ -3,14 +3,9 @@
     using System.Collections.Generic;
     using System.Drawing;
     using System.Drawing.Drawing2D;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Threading;
-using System.Windows.Forms;
+    using System.Windows.Forms;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
-    using SimTelemetry.Data.Track;
     using Triton;
     using Timer = System.Windows.Forms.Timer;
 
@@ -38,18 +33,17 @@ namespace SimTelemetry.Controls
 
             Graphics g = e.Graphics;
 
-            if (BackgroundImage == null)
+            if (_EmptyTrackMap == null)
             {
                 g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
             }
             else
             {
-                g.DrawImage(BackgroundImage, 0, 0);
+                g.DrawImage(_EmptyTrackMap, 0, 0);
             }
-            base.OnPaint(e);
         }
 
-        protected Bitmap BackgroundImage;
+        protected Bitmap _EmptyTrackMap;
 
 
         #region Settings
@@ -70,8 +64,8 @@ namespace SimTelemetry.Controls
 
         public void UpdateTrackmap()
         {
-            BackgroundImage = new Bitmap(10 + this.Size.Width, 10 + this.Size.Height);
-            Graphics g = Graphics.FromImage(BackgroundImage);
+            _EmptyTrackMap = new Bitmap(10 + this.Size.Width, 10 + this.Size.Height);
+            Graphics g = Graphics.FromImage(_EmptyTrackMap);
             g.FillRectangle(Brushes.Black, 0, 0, this.Size.Width, this.Size.Height);
 
             if (Telemetry.m.Track == null || Telemetry.m.Track.Route == null || Telemetry.m.Track.Route.Racetrack == null)
@@ -143,10 +137,8 @@ namespace SimTelemetry.Controls
                     x2 = Limits.Clamp(x2, -100000, 100000);
                     y2 = Limits.Clamp(y2, -100000, 100000);
 
-                    g.FillEllipse(brush_pitlane, x1, y1, 6.0f, 6.0f);
+                    //g.FillEllipse(brush_pitlane, x1, y1, 6.0f, 6.0f);
 
-                    //pitlane_a.Add(new PointF(x1, y1));
-                    //pitlane_b.Add(new PointF(x2, y2));
 
                 }
             }
@@ -219,7 +211,7 @@ namespace SimTelemetry.Controls
 
 
             }
-
+            
             this.Invalidate();
 
         }
@@ -231,18 +223,8 @@ namespace SimTelemetry.Controls
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             this.SizeChanged += new EventHandler(TrackMap_SizeChanged);
+
             Telemetry.m.Track_Loaded += new Triton.Signal(m_Track_Load);
-
-            Timer t = new Timer();
-            t.Interval = 250;
-            t.Tick += new EventHandler(t_Tick);
-            t.Start();
-        }
-
-        void t_Tick(object sender, EventArgs e)
-        {
-            UpdateTrackmap();
-            this.Invalidate();
         }
 
         void TrackMap_SizeChanged(object sender, EventArgs e)

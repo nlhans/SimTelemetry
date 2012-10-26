@@ -337,7 +337,7 @@ namespace SimTelemetry.Game.Rfactor
         
         public double Engine_RPM { set { } get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADBE80)); } }
 
-        
+
         public double Engine_RPM_Max_Live { set { } get { return rFactor.Game.ReadDouble(new IntPtr(0x00ADBF08)); } }
         
         public double Engine_RPM_Max_Scale { set { } get { return rFactor.Game.ReadDouble(new IntPtr(0x00AE1B60)); } }

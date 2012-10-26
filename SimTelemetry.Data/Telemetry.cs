@@ -120,6 +120,16 @@ namespace SimTelemetry.Data
         /// Event fired after Session_Start and the SimTelemetry framework has loaded the track data.
         /// </summary>
         public event Signal Track_Loaded;
+
+        /// <summary>
+        /// Event fired whenever a driver enters the cockpit view. Some simulators may not support this.
+        /// </summary>
+        public event Signal Driving_Start;
+
+        /// <summary>
+        /// Event fired whenever a driver leaves the cockpit view. Some simulators may not support this.
+        /// </summary>
+        public event Signal Driving_Stop;
         #endregion
 
         /// <summary>
@@ -226,6 +236,18 @@ namespace SimTelemetry.Data
                             Report_SessionStop(sim);
                         }
                     }
+                    if(state.Active && sim.Drivers.Player.Driving != state.Driving)
+                    {
+                        state.Driving = sim.Drivers.Player.Driving;
+                        if (state.Driving)
+                        {
+                            Report_DrivingStart(sim);
+                        }
+                        else
+                        {
+                            Report_DrivingStop(sim);
+                        }
+                    }
 
                     // Restore state.
                     Simulator_StateCollection[sim.ProcessName] = state;
@@ -234,6 +256,28 @@ namespace SimTelemetry.Data
                 // 50Hz
                 Thread.Sleep(20);
             }
+        }
+
+        /// <summary>
+        /// Fire Driving Start event.
+        /// </summary>
+        /// <param name="sim">Simulator with drive session started</param>
+        private void Report_DrivingStart(ISimulator sim)
+        {
+            Debug.WriteLine("DrivingStart fired");
+            if (Driving_Start != null)
+                Driving_Start(sim);
+        }
+
+        /// <summary>
+        /// Fire Driving Stop event.
+        /// </summary>
+        /// <param name="sim">Simulator with drive session stopped</param>
+        private void Report_DrivingStop(ISimulator sim)
+        {
+            Debug.WriteLine("DrivingStop fired");
+            if (Driving_Stop != null)
+                Driving_Stop(sim);
         }
 
         /// <summary>

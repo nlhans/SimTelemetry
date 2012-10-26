@@ -53,10 +53,6 @@ namespace SimTelemetry.Game.Rfactor
         public static double GetAirDensity()
         {
             return 1.22;
-            double Ambient = 20;
-            double Density = Math.Pow(10, -5)*2*Ambient*Ambient - 0.0048*Ambient + 1.2926;
-            return Density;
-
         }
 
 
@@ -83,12 +79,11 @@ namespace SimTelemetry.Game.Rfactor
             double rpm = 0;
             double rpm_max = Rotations.Rads_RPM(rFactor.Player.Engine_RPM_Max_Live);
             double power = 0;
-            for (rpm = 0; rpm < rpm_max; rpm+= 1000)
+            for (rpm = 0; rpm < rpm_max; rpm+= 50)
             {
                 double tmp = Get_Engine_Hp(rpm);
                 if(double.IsNaN(tmp) == false && double.IsInfinity(tmp) == false)
                 power = Math.Max(power, tmp);
-
             }
             return power;
 
@@ -148,6 +143,7 @@ namespace SimTelemetry.Game.Rfactor
 
             // calculate duty cycle and determine torque.
             double RPM_Part = (Rads - R_L) / (R_H - R_L); // factor in rpm curve.
+            if (double.IsNaN(RPM_Part)) RPM_Part = 0;
             double TorqueH = Th_L + RPM_Part * (Th_H - Th_L);
             double TorqueL = Tl_L + RPM_Part * (Tl_H - Tl_L);
             //return TorqueH * throttle * boost + TorqueL * boost;
@@ -159,6 +155,11 @@ namespace SimTelemetry.Game.Rfactor
             double aero = GetAeroDrag(); 
             double max_hp = Get_Engine_MaxHP();//TODO: Fix real hp figures (from Garage plug-ins!)
             // TODO: Rolling resistance / speed effects
+            while(max_hp == 0)
+            {
+                System.Threading.Thread.Sleep(1); // TODO: Messy fix about weird bug returning all 0's on Driving_Start event.
+                max_hp = Get_Engine_MaxHP();
+            }
 
             max_hp = Power.HP_KW(max_hp);
             max_hp = Power.HP_KW(max_hp);

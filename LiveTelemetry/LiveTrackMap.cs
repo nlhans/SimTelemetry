@@ -10,6 +10,11 @@ namespace LiveTelemetry
 {
     public class LiveTrackMap : TrackMap
     {
+        public LiveTrackMap()
+        {
+            this.BackgroundImage = this._EmptyTrackMap;
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             try
@@ -17,13 +22,17 @@ namespace LiveTelemetry
 
                 Graphics g = e.Graphics;
                 if (!Telemetry.m.Active_Session) return;
-                if (BackgroundImage == null)
+                if (_EmptyTrackMap == null)
                 {
                     g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
                 }
                 else
                 {
-                    g.DrawImage(BackgroundImage, 0, 0);
+                    CompositingMode compMode = g.CompositingMode;
+                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.CompositingMode = CompositingMode.SourceCopy;
+                    g.DrawImage(_EmptyTrackMap, 0, 0);
+                    g.CompositingMode = compMode;
                 }
                 g.SmoothingMode = SmoothingMode.AntiAlias;
 

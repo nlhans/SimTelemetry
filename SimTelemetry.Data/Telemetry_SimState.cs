@@ -7,9 +7,11 @@
     {
         public bool Active;
         public bool Session;
+        public bool Driving;
 
         public Telemetry_SimState()
         {
+            Driving = false;
             Active = false;
             Session = false;
         }
