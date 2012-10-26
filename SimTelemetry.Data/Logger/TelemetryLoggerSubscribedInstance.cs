@@ -53,7 +53,7 @@ namespace SimTelemetry.Data.Logger
 
             // Fill things.
             int indexer = 0;
-            double Frequency; 
+            double Frequency;
 
             PropertyDescriptors = TypeDescriptor.GetProperties(type);
             PropertyInfo[] pic = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -83,13 +83,13 @@ namespace SimTelemetry.Data.Logger
                 attrs = pi.GetCustomAttributes(typeof(LogOnChange), false);
                 LogOnChange.Add(fi.Name, ((attrs.Length == 1) ? true : false));
                 LogOnChangePreviousValue.Add(fi.Name, null);
-                
+
                 // ---------- Events ----------
                 attrs = pi.GetCustomAttributes(typeof(LogOnEvent), false);
                 Events.Add(fi.Name, new List<List<string>>());
                 if (attrs.Length > 0)
                 {
-                    foreach(LogOnEvent logEvent in attrs)
+                    foreach (LogOnEvent logEvent in attrs)
                         Events[fi.Name].Add(logEvent.Events);
                 }
 
@@ -109,37 +109,41 @@ namespace SimTelemetry.Data.Logger
 
             object data = -10293812;
             bool data_read = false;
-            foreach (PropertyDescriptor fi in PropertyDescriptors)
+
+            // TODO: Put PropertyDescriptor, OnChange, Data, FrequencyCounter etc.. in a struct/class.
+            for (int i = 0; i < PropertyDescriptors.Count; i++)
             {
+                PropertyDescriptor fi = PropertyDescriptors[i];
+                string name = fi.Name;
                 data_read = false;
 
                 // ---------- ID ----------
-                if (Mapping.ContainsKey(fi.Name) == false) continue;
-                int id = Mapping[fi.Name];
+                if (Mapping.ContainsKey(name) == false) continue;
+                int id = Mapping[name];
 
                 bool dump = false;
                 // ---------- Frequency ----------
-                double Frequency = Frequencies[fi.Name]; // 1Hz normal
+                double Frequency = Frequencies[name]; // 1Hz normal
 
                 // 10ms ticks.
-                FrequencyCounter[fi.Name]++;
-                double val = FrequencyCounter[fi.Name]/100.0;
-                if (val >=1.0/Frequency)
+                FrequencyCounter[name]++;
+                double val = FrequencyCounter[name] / 100.0;
+                if (val >= 1.0 / Frequency)
                 {
-                    FrequencyCounter[fi.Name] = 0;
+                    FrequencyCounter[name] = 0;
                     dump = true;
                 }
 
                 // ---------- Log on change ----------
-                if (LogOnChange[fi.Name])
+                if (LogOnChange[name])
                 {
                     data = fi.GetValue(instance);
                     data_read = true;
 
                     // The on-change event overrules frequency events.
-                    dump = !data.Equals(LogOnChangePreviousValue[fi.Name]);
+                    dump = !data.Equals(LogOnChangePreviousValue[name]);
 
-                    LogOnChangePreviousValue[fi.Name] = data;
+                    LogOnChangePreviousValue[name] = data;
                 }
 
 
@@ -148,9 +152,9 @@ namespace SimTelemetry.Data.Logger
                 // It is possible to enter multiple LogOnEvents lists.
                 // The multiple lists are OR'ed.
                 // All elements in 1 list are AND'ed.
-                if (Events.ContainsKey(fi.Name))
+                if (Events.ContainsKey(name))
                 {
-                    foreach (List<string> evts in Events[fi.Name])
+                    foreach (List<string> evts in Events[name])
                     {
                         bool log = true;
 
@@ -175,9 +179,9 @@ namespace SimTelemetry.Data.Logger
 
                 // ---------- Dumping ----------
                 if (dump)
-                 {
+                {
                     byte[] b = new byte[0];
-                    if(!data_read)
+                    if (!data_read)
                         data = fi.GetValue(instance);
 
                     Type t = fi.PropertyType;

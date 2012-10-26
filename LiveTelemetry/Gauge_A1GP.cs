@@ -277,6 +277,8 @@ namespace LiveTelemetry
                                    Convert.ToSingle(x2_b), Convert.ToSingle(y2_b));
 
                 }
+                this.BackgroundImage = null;
+                this.BackgroundImage = _EmptyGauges;
             }
 
             for (double angle = 90; angle <= 90 + 225.1; angle += 225.0 / ((Speed_Max - Speed_Min) / SpeedStep))
@@ -337,10 +339,9 @@ namespace LiveTelemetry
                 int clip_height = this.Height;
                 int clip_width = this.Width;
 
-                base.OnPaint(e);
                 Graphics g = e.Graphics;
 
-                g.DrawImage(_EmptyGauges,0,0);
+                //g.DrawImage(_EmptyGauges,0,0);
                 if (!Telemetry.m.Active_Session) return;
 
 

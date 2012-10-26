@@ -152,7 +152,6 @@ namespace SimTelemetry.Game.Rfactor
 
         public static double GetTheoraticalTopSpeed()
         {
-            double aero = GetAeroDrag(); 
             double max_hp = Get_Engine_MaxHP();//TODO: Fix real hp figures (from Garage plug-ins!)
             // TODO: Rolling resistance / speed effects
             while(max_hp == 0)
@@ -160,6 +159,7 @@ namespace SimTelemetry.Game.Rfactor
                 System.Threading.Thread.Sleep(1); // TODO: Messy fix about weird bug returning all 0's on Driving_Start event.
                 max_hp = Get_Engine_MaxHP();
             }
+            double aero = GetAeroDrag(); 
 
             max_hp = Power.HP_KW(max_hp);
             max_hp = Power.HP_KW(max_hp);
