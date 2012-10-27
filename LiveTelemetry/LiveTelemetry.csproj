@@ -195,6 +195,10 @@
       <Project>{705CD38F-897F-4AE3-8461-739A84657D23}</Project>
       <Name>SimTelemetry.Game.GTR2</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Game.LFS\SimTelemetry.Game.LFS.csproj">
+      <Project>{EC67EF8B-5685-4F06-BAE9-22921F4A4AB4}</Project>
+      <Name>SimTelemetry.Game.LFS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Game.rFactor2\SimTelemetry.Game.rFactor2.csproj">
       <Project>{BE808CB9-AF50-43A3-83D0-D719E52957B8}</Project>
       <Name>SimTelemetry.Game.rFactor2</Name>

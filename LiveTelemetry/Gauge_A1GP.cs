@@ -135,196 +135,199 @@ namespace LiveTelemetry
 
             _EmptyGauges = new Bitmap(this.Size.Width, this.Size.Height);
             Graphics g = Graphics.FromImage(_EmptyGauges);
-
-            g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
-            if (!Telemetry.m.Active_Session) return;
-
-            // ---------------------------------       Speed      ---------------------------------
-            if (Telemetry.m.Sim.Modules.Aero_Drag == false || Telemetry.m.Sim.Modules.Engine_Power == false)
-                Speed_Max = 400; // Considered as a typical topspeed for most driving simulators..
-            else
-                Speed_Max = SimTelemetry.Game.Rfactor.Computations.GetTheoraticalTopSpeed();// TODO: Add interface to simulators to calculate this. Performance fix here.
-
-            if (double.IsNaN(Speed_Max) || double.IsInfinity(Speed_Max))
-                Speed_Max = 400;
-
-            Speed_Min = 0;
-            double SpeedStep = 30;
-
-            if (Speed_Max < 300) SpeedStep = 25;
-            if (Speed_Max < 200) SpeedStep = 20;
-            if (Speed_Max < 120)
+            lock (g)
             {
-                
-            }
+                g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
+                if (!Telemetry.m.Active_Session) return;
 
-            if (Speed_Max % SpeedStep > 0)
-                Speed_Max += SpeedStep - (Speed_Max % SpeedStep);
+                // ---------------------------------       Speed      ---------------------------------
+                if (Telemetry.m.Sim.Modules.Aero_Drag == false || Telemetry.m.Sim.Modules.Engine_Power == false)
+                    Speed_Max = 300; // Considered as a typical topspeed for most driving simulators..
+                else
+                    Speed_Max = SimTelemetry.Game.Rfactor.Computations.GetTheoraticalTopSpeed();
+                        // TODO: Add interface to simulators to calculate this. Performance fix here.
 
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.DrawArc(new Pen(Color.White, 2f), border_bounds / 2, border_bounds / 2, height, height, 90, 225);
-            g.DrawArc(new Pen(Color.White, 2f), border_bounds / 2 + 8, border_bounds / 2 + 8, height - 16, height - 16,
-                      90, 225);
-            g.DrawArc(new Pen(Color.White, 2f), border_bounds / 2 + 25, border_bounds / 2 + 25, height - 50, height - 50,
-                      90, 225);
+                if (double.IsNaN(Speed_Max) || double.IsInfinity(Speed_Max))
+                    Speed_Max = 300;
 
-            // ---------------------------------        RPM       ---------------------------------
-            RPM_Max = 1000 * Math.Ceiling(Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live) / 1000);
-            RPM_Min = 0;
+                Speed_Min = 0;
+                double SpeedStep = 30;
 
-            double RPM_Step = 2000;
-            // Ranges.
-            if (RPM_Max <= 8000) RPM_Step = 1000;
-            else if (RPM_Max <= 12000) RPM_Step = 2000;
-            else if (RPM_Max <= 20000)
-            {
-                RPM_Step = 2000;
-                RPM_Min = RPM_Max - 6 * 2000;
-
-            }
-            else if (RPM_Max <= 30000)
-            {
-                RPM_Step = 2000;
-                RPM_Min = RPM_Max - 7 * 2000;
-
-            }
-            double rpm_idle = Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Idle_Max);
-            if (RPM_Min > rpm_idle)
-            {
-                RPM_Min = rpm_idle;
-
-                if (RPM_Min % RPM_Step != 0)
-                    RPM_Min -= (RPM_Min % RPM_Step);
-
-            }
-
-            if (RPM_Max > 14000)
-                RPM_Min = 6000;
-            if (RPM_Max > 20000)
-                RPM_Min = 8000;
-
-
-            if (RPM_Min % RPM_Step != 0)
-                RPM_Min += RPM_Step - (RPM_Min % RPM_Step);
-
-            if (RPM_Max % RPM_Step != 0)
-                RPM_Max += RPM_Step - (RPM_Max % RPM_Step);
-
-            // ---------------------------------     RPM Gauge    ---------------------------------
-            double fAngle_RPM_RedLine = (Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live) - RPM_Step / 2 - RPM_Min) /
-                                        (RPM_Max - RPM_Min) * 225;
-            if (double.IsInfinity(fAngle_RPM_RedLine) || double.IsNaN(fAngle_RPM_RedLine)) fAngle_RPM_RedLine = 200;
-            int Angle_RPM_RedLine = Convert.ToInt32(Math.Round(fAngle_RPM_RedLine));
-
-
-            double fAngle_RPM_WarningLine = (Rads_RPM(Telemetry.m.Sim.Player.Engine_Lifetime_RPM_Base) - RPM_Step / 2 -
-                                             RPM_Min) / (RPM_Max - RPM_Min) * 225;
-            if (double.IsInfinity(fAngle_RPM_WarningLine) || double.IsNaN(fAngle_RPM_WarningLine)) fAngle_RPM_WarningLine = 180;
-            int Angle_RPM_WarningLine = Convert.ToInt32(Math.Round(fAngle_RPM_WarningLine));
-            if (Angle_RPM_WarningLine > Angle_RPM_RedLine)
-            {
-                g.DrawArc(new Pen(Color.DarkRed, 10f), border_bounds / 2 + 58, border_bounds / 2 + 57, height - 116,
-                          height - 116,
-                          90 + Angle_RPM_RedLine, 225 - Angle_RPM_RedLine);
-                g.DrawArc(new Pen(Color.Red, 10f), border_bounds / 2 + 58, border_bounds / 2 + 57, height - 116,
-                          height - 116, 90 + Angle_RPM_WarningLine, 225 - Angle_RPM_WarningLine);
-            }
-            else
-            {
-
-                g.DrawArc(new Pen(Color.DarkRed, 10f), border_bounds / 2 + 58, border_bounds / 2 + 57, height - 116,
-                          height - 115, 90 + Angle_RPM_WarningLine, 225 - Angle_RPM_WarningLine);
-                g.DrawArc(new Pen(Color.Red, 10f), border_bounds / 2 + 58, border_bounds / 2 + 57, height - 116,
-                          height - 116,
-                          90 + Angle_RPM_RedLine, 225 - Angle_RPM_RedLine);
-            }
-            for (double angle = 90; angle <= 90 + 225; angle += 225.0 / ((RPM_Max - RPM_Min) / RPM_Step))
-            {
-                double sin_a = Math.Sin(angle / 180.0 * Math.PI);
-                double cos_a = Math.Cos(angle / 180.0 * Math.PI);
-
-                double y_a = clip_height / 2 + sin_a * 70;
-                double x_a = clip_height / 2 + cos_a * 70;
-                double y_b = clip_height / 2 + sin_a * 80;
-                double x_b = clip_height / 2 + cos_a * 80;
-
-                double y_c = clip_height / 2 + sin_a * 95 - 8;
-                double x_c = clip_height / 2 + cos_a * 95 - 8;
-
-                g.DrawLine(new Pen(Color.White, 2f), Convert.ToSingle(x_a), Convert.ToSingle(y_a),
-                           Convert.ToSingle(x_b), Convert.ToSingle(y_b));
-                double RPM = RPM_Min + (RPM_Max - RPM_Min) * (angle - 90) / 225;
-                g.DrawString((RPM / 1000.0).ToString("0"), font_arial_10, Brushes.White, Convert.ToSingle(x_c),
-                             Convert.ToSingle(y_c));
-
-                for (int i = 1; i < 5; i++)
+                if (Speed_Max < 300) SpeedStep = 25;
+                if (Speed_Max < 200) SpeedStep = 20;
+                if (Speed_Max < 120)
                 {
-                    double angle2 = angle + 225.0 / ((RPM_Max - RPM_Min) / RPM_Step) * i / 5;
-                    if (angle2 > 90 + 225) break;
-                    double sin2_a = Math.Sin(angle2 / 180.0 * Math.PI);
-                    double cos2_a = Math.Cos(angle2 / 180.0 * Math.PI);
-
-                    double y2_a = clip_height / 2 + sin2_a * 72;
-                    double x2_a = clip_height / 2 + cos2_a * 72;
-                    double y2_b = clip_height / 2 + sin2_a * 78;
-                    double x2_b = clip_height / 2 + cos2_a * 78;
-
-                    if (angle2 > 90 + fAngle_RPM_RedLine)
-                        g.DrawLine(new Pen(Color.Red, 1f), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
-                                   Convert.ToSingle(x2_b), Convert.ToSingle(y2_b));
-                    else
-                        g.DrawLine(new Pen(Color.White, 1f), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
-                                   Convert.ToSingle(x2_b), Convert.ToSingle(y2_b));
 
                 }
-                this.BackgroundImage = null;
-                this.BackgroundImage = _EmptyGauges;
+
+                if (Speed_Max%SpeedStep > 0)
+                    Speed_Max += SpeedStep - (Speed_Max%SpeedStep);
+
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.DrawArc(new Pen(Color.White, 2f), border_bounds/2, border_bounds/2, height, height, 90, 225);
+                g.DrawArc(new Pen(Color.White, 2f), border_bounds/2 + 8, border_bounds/2 + 8, height - 16, height - 16,
+                          90, 225);
+                g.DrawArc(new Pen(Color.White, 2f), border_bounds/2 + 25, border_bounds/2 + 25, height - 50, height - 50,
+                          90, 225);
+
+                // ---------------------------------        RPM       ---------------------------------
+                RPM_Max = 1000*Math.Ceiling(Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live)/1000);
+                RPM_Min = 0;
+
+                double RPM_Step = 2000;
+                // Ranges.
+                if (RPM_Max <= 8000) RPM_Step = 1000;
+                else if (RPM_Max <= 12000) RPM_Step = 2000;
+                else if (RPM_Max <= 20000)
+                {
+                    RPM_Step = 2000;
+                    RPM_Min = RPM_Max - 6*2000;
+
+                }
+                else if (RPM_Max <= 30000)
+                {
+                    RPM_Step = 2000;
+                    RPM_Min = RPM_Max - 7*2000;
+
+                }
+                double rpm_idle = Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Idle_Max);
+                if (RPM_Min > rpm_idle)
+                {
+                    RPM_Min = rpm_idle;
+
+                    if (RPM_Min%RPM_Step != 0)
+                        RPM_Min -= (RPM_Min%RPM_Step);
+
+                }
+
+                if (RPM_Max > 14000)
+                    RPM_Min = 6000;
+                if (RPM_Max > 20000)
+                    RPM_Min = 8000;
+
+
+                if (RPM_Min%RPM_Step != 0)
+                    RPM_Min += RPM_Step - (RPM_Min%RPM_Step);
+
+                if (RPM_Max%RPM_Step != 0)
+                    RPM_Max += RPM_Step - (RPM_Max%RPM_Step);
+
+                // ---------------------------------     RPM Gauge    ---------------------------------
+                double fAngle_RPM_RedLine = (Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live) - RPM_Step/2 - RPM_Min)/
+                                            (RPM_Max - RPM_Min)*225;
+                if (double.IsInfinity(fAngle_RPM_RedLine) || double.IsNaN(fAngle_RPM_RedLine)) fAngle_RPM_RedLine = 200;
+                int Angle_RPM_RedLine = Convert.ToInt32(Math.Round(fAngle_RPM_RedLine));
+
+
+                double fAngle_RPM_WarningLine = (Rads_RPM(Telemetry.m.Sim.Player.Engine_Lifetime_RPM_Base) - RPM_Step/2 -
+                                                 RPM_Min)/(RPM_Max - RPM_Min)*225;
+                if (double.IsInfinity(fAngle_RPM_WarningLine) || double.IsNaN(fAngle_RPM_WarningLine))
+                    fAngle_RPM_WarningLine = 180;
+                int Angle_RPM_WarningLine = Convert.ToInt32(Math.Round(fAngle_RPM_WarningLine));
+                if (Angle_RPM_WarningLine > Angle_RPM_RedLine)
+                {
+                    g.DrawArc(new Pen(Color.DarkRed, 10f), border_bounds/2 + 58, border_bounds/2 + 57, height - 116,
+                              height - 116,
+                              90 + Angle_RPM_RedLine, 225 - Angle_RPM_RedLine);
+                    g.DrawArc(new Pen(Color.Red, 10f), border_bounds/2 + 58, border_bounds/2 + 57, height - 116,
+                              height - 116, 90 + Angle_RPM_WarningLine, 225 - Angle_RPM_WarningLine);
+                }
+                else
+                {
+
+                    g.DrawArc(new Pen(Color.DarkRed, 10f), border_bounds/2 + 58, border_bounds/2 + 57, height - 116,
+                              height - 115, 90 + Angle_RPM_WarningLine, 225 - Angle_RPM_WarningLine);
+                    g.DrawArc(new Pen(Color.Red, 10f), border_bounds/2 + 58, border_bounds/2 + 57, height - 116,
+                              height - 116,
+                              90 + Angle_RPM_RedLine, 225 - Angle_RPM_RedLine);
+                }
+                for (double angle = 90; angle <= 90 + 225; angle += 225.0/((RPM_Max - RPM_Min)/RPM_Step))
+                {
+                    double sin_a = Math.Sin(angle/180.0*Math.PI);
+                    double cos_a = Math.Cos(angle/180.0*Math.PI);
+
+                    double y_a = clip_height/2 + sin_a*70;
+                    double x_a = clip_height/2 + cos_a*70;
+                    double y_b = clip_height/2 + sin_a*80;
+                    double x_b = clip_height/2 + cos_a*80;
+
+                    double y_c = clip_height/2 + sin_a*95 - 8;
+                    double x_c = clip_height/2 + cos_a*95 - 8;
+
+                    g.DrawLine(new Pen(Color.White, 2f), Convert.ToSingle(x_a), Convert.ToSingle(y_a),
+                               Convert.ToSingle(x_b), Convert.ToSingle(y_b));
+                    double RPM = RPM_Min + (RPM_Max - RPM_Min)*(angle - 90)/225;
+                    g.DrawString((RPM/1000.0).ToString("0"), font_arial_10, Brushes.White, Convert.ToSingle(x_c),
+                                 Convert.ToSingle(y_c));
+
+                    for (int i = 1; i < 5; i++)
+                    {
+                        double angle2 = angle + 225.0/((RPM_Max - RPM_Min)/RPM_Step)*i/5;
+                        if (angle2 > 90 + 225) break;
+                        double sin2_a = Math.Sin(angle2/180.0*Math.PI);
+                        double cos2_a = Math.Cos(angle2/180.0*Math.PI);
+
+                        double y2_a = clip_height/2 + sin2_a*72;
+                        double x2_a = clip_height/2 + cos2_a*72;
+                        double y2_b = clip_height/2 + sin2_a*78;
+                        double x2_b = clip_height/2 + cos2_a*78;
+
+                        if (angle2 > 90 + fAngle_RPM_RedLine)
+                            g.DrawLine(new Pen(Color.Red, 1f), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
+                                       Convert.ToSingle(x2_b), Convert.ToSingle(y2_b));
+                        else
+                            g.DrawLine(new Pen(Color.White, 1f), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
+                                       Convert.ToSingle(x2_b), Convert.ToSingle(y2_b));
+
+                    }
+                    this.BackgroundImage = null;
+                    this.BackgroundImage = _EmptyGauges;
+                }
+
+                for (double angle = 90; angle <= 90 + 225.1; angle += 225.0/((Speed_Max - Speed_Min)/SpeedStep))
+                {
+
+                    double sin_a = Math.Sin(angle/180.0*Math.PI);
+                    double cos_a = Math.Cos(angle/180.0*Math.PI);
+
+                    double y_a = clip_height/2 + sin_a*133 - 3;
+                    double x_a = clip_height/2 + cos_a*133 - 3;
+
+                    double y_c = clip_height/2 + sin_a*147 - 10;
+                    double x_c = clip_height/2 + cos_a*147 - 15;
+
+                    g.FillEllipse(Brushes.DarkRed, Convert.ToSingle(x_a), Convert.ToSingle(y_a), 6, 6);
+                    g.DrawEllipse(new Pen(Color.White, 1f), Convert.ToSingle(x_a), Convert.ToSingle(y_a), 6, 6);
+
+                    double Spd = Speed_Min + (Speed_Max - Speed_Min)*(angle - 90)/225;
+                    g.DrawString(Spd.ToString("000"), font_arial_10, Brushes.White, Convert.ToSingle(x_c),
+                                 Convert.ToSingle(y_c));
+
+                }
+
+                // ---------------------------------    Labels   ---------------------------------
+
+                // Throttle/brake
+                g.DrawString("PEDALS", font_arial_10, DimBrush, height - 50, 119);
+                g.FillRectangle(DimBrush, height + 10, 120, 120, 13);
+
+                // Fuel remaining / estimated laps.
+                g.DrawString("FUEL", font_arial_10, DimBrush, height - 50, 139);
+                g.FillRectangle(DimBrush, height + 10, 140, 120, 13);
+
+                // Engine wear / laps estimation
+                g.DrawString("ENGINE", font_arial_10, DimBrush, height - 50, 179);
+                g.FillRectangle(DimBrush, height + 10, 180, 120, 13);
+
+                // Power bar.
+                g.DrawString("POWER", font_arial_10, DimBrush, height - 50, 219);
+
+                // ---------------------------------   Menu Labels   ---------------------------------
+                g.DrawString("Engine", small_font, Brushes.White, this.Width - 42, this.Height - 60);
+                g.DrawString("Tyres", small_font, DimBrush, this.Width - 35, this.Height - 45);
+                g.DrawString("Laptimes", small_font, DimBrush, this.Width - 51, this.Height - 30);
+                g.DrawString("Split", small_font, DimBrush, this.Width - 30, this.Height - 15);
             }
-
-            for (double angle = 90; angle <= 90 + 225.1; angle += 225.0 / ((Speed_Max - Speed_Min) / SpeedStep))
-            {
-
-                double sin_a = Math.Sin(angle / 180.0 * Math.PI);
-                double cos_a = Math.Cos(angle / 180.0 * Math.PI);
-
-                double y_a = clip_height / 2 + sin_a * 133 - 3;
-                double x_a = clip_height / 2 + cos_a * 133 - 3;
-
-                double y_c = clip_height / 2 + sin_a * 147 - 10;
-                double x_c = clip_height / 2 + cos_a * 147 - 15;
-
-                g.FillEllipse(Brushes.DarkRed, Convert.ToSingle(x_a), Convert.ToSingle(y_a), 6, 6);
-                g.DrawEllipse(new Pen(Color.White, 1f), Convert.ToSingle(x_a), Convert.ToSingle(y_a), 6, 6);
-
-                double Spd = Speed_Min + (Speed_Max - Speed_Min) * (angle - 90) / 225;
-                g.DrawString(Spd.ToString("000"), font_arial_10, Brushes.White, Convert.ToSingle(x_c),
-                             Convert.ToSingle(y_c));
-
-            }
-
-            // ---------------------------------    Labels   ---------------------------------
-
-            // Throttle/brake
-            g.DrawString("PEDALS", font_arial_10, DimBrush, height - 50, 119);
-            g.FillRectangle(DimBrush, height + 10, 120, 120, 13);
-
-            // Fuel remaining / estimated laps.
-            g.DrawString("FUEL", font_arial_10, DimBrush, height - 50, 139);
-            g.FillRectangle(DimBrush, height + 10, 140, 120, 13);
-
-            // Engine wear / laps estimation
-            g.DrawString("ENGINE", font_arial_10, DimBrush, height - 50, 179);
-            g.FillRectangle(DimBrush, height + 10, 180, 120, 13);
-
-            // Power bar.
-            g.DrawString("POWER", font_arial_10, DimBrush, height - 50, 219);
-
-            // ---------------------------------   Menu Labels   ---------------------------------
-            g.DrawString("Engine", small_font, Brushes.White, this.Width - 42, this.Height - 60);
-            g.DrawString("Tyres", small_font, DimBrush, this.Width - 35, this.Height - 45);
-            g.DrawString("Laptimes", small_font, DimBrush, this.Width - 51, this.Height - 30);
-            g.DrawString("Split", small_font, DimBrush, this.Width - 30, this.Height - 15);
-
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -341,209 +344,231 @@ namespace LiveTelemetry
 
                 Graphics g = e.Graphics;
 
+                
                 //g.DrawImage(_EmptyGauges,0,0);
                 if (!Telemetry.m.Active_Session) return;
-
-
-                // ---------------------------------      RPM Needle    ---------------------------------
-                double RPMLive = Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM);
-                double fAngle_RPM = 90 + (RPMLive - RPM_Min) / (RPM_Max - RPM_Min) * 225;
-                if (fAngle_RPM < 90) fAngle_RPM = 90;
-                if (fAngle_RPM > 90 + 225) fAngle_RPM = 90 + 225;
-                double rpm_gauge_sin = Math.Sin(fAngle_RPM / 180.0 * Math.PI);
-                double rpm_gauge_cos = Math.Cos(fAngle_RPM / 180.0 * Math.PI);
-
-                double rpm_gauge_ya = clip_height / 2 + rpm_gauge_sin * -15;
-                double rpm_gauge_xa = clip_height / 2 + rpm_gauge_cos * -15;
-                double rpm_gauge_yb = clip_height / 2 + rpm_gauge_sin * 80;
-                double rpm_gauge_xb = clip_height / 2 + rpm_gauge_cos * 80;
-
-                g.DrawLine(new Pen(Color.DarkRed, 4f), Convert.ToSingle(rpm_gauge_xa), Convert.ToSingle(rpm_gauge_ya),
-                           Convert.ToSingle(rpm_gauge_xb), Convert.ToSingle(rpm_gauge_yb));
-
-                // ---------------------------------     Speed Needle    ---------------------------------
-                double SpeedLive = Telemetry.m.Sim.Player.Speed * 3.6;
-
-                double fAngle_Speed = 90 + (SpeedLive - Speed_Min) / (Speed_Max - Speed_Min) * 225;
-                if (fAngle_Speed < 90) fAngle_Speed = 90;
-                if (fAngle_Speed > 90 + 225) fAngle_Speed = 90 + 225;
-
-                double Speed_gauge_sin = Math.Sin(fAngle_Speed / 180.0 * Math.PI);
-                double Speed_gauge_cos = Math.Cos(fAngle_Speed / 180.0 * Math.PI);
-
-                double Speed_gauge_ya = clip_height / 2 + Speed_gauge_sin * -20;
-                double Speed_gauge_xa = clip_height / 2 + Speed_gauge_cos * -20;
-                double Speed_gauge_yb = clip_height / 2 + Speed_gauge_sin * 133;
-                double Speed_gauge_xb = clip_height / 2 + Speed_gauge_cos * 133;
-
-                g.DrawLine(new Pen(Color.DarkGreen, 6f), Convert.ToSingle(Speed_gauge_xa),
-                           Convert.ToSingle(Speed_gauge_ya), Convert.ToSingle(Speed_gauge_xb),
-                           Convert.ToSingle(Speed_gauge_yb));
-                g.FillEllipse(Brushes.DarkGreen, clip_height / 2 - 10, clip_height / 2 - 10, 20, 20);
-
-                /* Bars filling up the speed bar proved  CPU intensive
-                for (double angle = 90; angle <= fAngle_Speed; angle += 3.5)
+                lock (g)
                 {
-                    double Spd = SpeedMin+(SpeedMax-SpeedMin)*(angle - 90)/225;
-                    if (Spd > SpeedLive || Math.Abs(Spd - SpeedLive) < 0.5) break;
-                    double le = 3;
-                    if (angle + 3 > fAngle_Speed) le = fAngle_Speed - angle;
-                    Color clr = Color.FromArgb(Convert.ToInt32(100 + Spd*155/SpeedMax),
-                                               Convert.ToInt32(255 - Spd*255/SpeedMax), 0);
-                    /g.DrawArc(new Pen(clr, 4f), Convert.ToSingle(border_bounds/2 + 4),
-                              Convert.ToSingle(border_bounds/2 + 4), Convert.ToSingle(height - 8),
-                              Convert.ToSingle(height - 8), Convert.ToSingle(angle), Convert.ToSingle(le));
-                }*/
 
+                    // ---------------------------------      RPM Needle    ---------------------------------
+                    double RPMLive = Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM);
+                    double fAngle_RPM = 90 + (RPMLive - RPM_Min)/(RPM_Max - RPM_Min)*225;
+                    if (fAngle_RPM < 90) fAngle_RPM = 90;
+                    if (fAngle_RPM > 90 + 225) fAngle_RPM = 90 + 225;
+                    double rpm_gauge_sin = Math.Sin(fAngle_RPM/180.0*Math.PI);
+                    double rpm_gauge_cos = Math.Cos(fAngle_RPM/180.0*Math.PI);
 
-                // ---------------------------------    Gear/Speed    ---------------------------------
+                    double rpm_gauge_ya = clip_height/2 + rpm_gauge_sin*-15;
+                    double rpm_gauge_xa = clip_height/2 + rpm_gauge_cos*-15;
+                    double rpm_gauge_yb = clip_height/2 + rpm_gauge_sin*80;
+                    double rpm_gauge_xb = clip_height/2 + rpm_gauge_cos*80;
 
-                if (Telemetry.m.Sim.Player.Gear == -1 || Telemetry.m.Sim.Player.Gear == 0xFF)
-                    g.DrawString("R", gear_f, Brushes.White, border_bounds / 2 + height / 2 + 5,
-                                 border_bounds / 2 + height / 2 + 40);
-                else if (Telemetry.m.Sim.Player.Gear > 0)
-                    g.DrawString(Telemetry.m.Sim.Player.Gear.ToString(), gear_f, Brushes.White, border_bounds / 2 + height / 2 + 5,
-                                 border_bounds / 2 + height / 2 + 40);
-                else if (Telemetry.m.Sim.Player.Gear == 0)
-                    g.DrawString("N", gear_f, Brushes.White, border_bounds / 2 + height / 2 + 5,
-                                 border_bounds / 2 + height / 2 + 40);
+                    g.DrawLine(new Pen(Color.DarkRed, 4f), Convert.ToSingle(rpm_gauge_xa),
+                               Convert.ToSingle(rpm_gauge_ya),
+                               Convert.ToSingle(rpm_gauge_xb), Convert.ToSingle(rpm_gauge_yb));
 
-                if (Telemetry.m.Sim.Drivers.Player.PitLimiter)
-                    g.DrawString(Math.Abs(Telemetry.m.Sim.Player.Speed * 3.6).ToString("000") + "km/h", speed_f, Brushes.DarkOrange,
-                                 border_bounds / 2 + height / 2 + 10, border_bounds / 2 + height / 2 + 80);
-                else
-                    g.DrawString(Math.Abs(Telemetry.m.Sim.Player.Speed * 3.6).ToString("000") + "km/h", speed_f, Brushes.White,
-                                 border_bounds / 2 + height / 2 + 10, border_bounds / 2 + height / 2 + 80);
+                    // ---------------------------------     Speed Needle    ---------------------------------
+                    double SpeedLive = Telemetry.m.Sim.Player.Speed*3.6;
 
-                g.DrawString(Math.Round(Telemetry.m.Stats.GlobalOdometer, 2).ToString("00000.00km"), dist_f, Brushes.LightGray, border_bounds / 2 + height / 2 + 10, border_bounds / 2 + height / 2 + 110);
+                    double fAngle_Speed = 90 + (SpeedLive - Speed_Min)/(Speed_Max - Speed_Min)*225;
+                    if (fAngle_Speed < 90) fAngle_Speed = 90;
+                    if (fAngle_Speed > 90 + 225) fAngle_Speed = 90 + 225;
 
-                // ---------------------------------    Labels   ---------------------------------
+                    double Speed_gauge_sin = Math.Sin(fAngle_Speed/180.0*Math.PI);
+                    double Speed_gauge_cos = Math.Cos(fAngle_Speed/180.0*Math.PI);
 
-                // Throttle
-                g.FillRectangle(Brushes.DarkRed, height + 10, 120, Convert.ToSingle(Telemetry.m.Sim.Drivers.Player.Brake * 120), 13);
-                g.FillRectangle(Brushes.DarkGreen, height + 10, 120, Convert.ToSingle(Telemetry.m.Sim.Drivers.Player.Throttle * 120), 13);
-                if (Telemetry.m.Sim.Drivers.Player.Brake > Telemetry.m.Sim.Drivers.Player.Throttle)
-                {
-                    g.DrawString(Telemetry.m.Sim.Drivers.Player.Brake.ToString("000%"), font_arial_10, Brushes.DarkRed,
-                                 width + border_bounds - 45, 119);
-                }
-                else
-                {
-                    g.DrawString(Telemetry.m.Sim.Drivers.Player.Throttle.ToString("000%"), font_arial_10, Brushes.DarkGreen,
-                                 width + border_bounds - 45, 119);
-                }
+                    double Speed_gauge_ya = clip_height/2 + Speed_gauge_sin*-20;
+                    double Speed_gauge_xa = clip_height/2 + Speed_gauge_cos*-20;
+                    double Speed_gauge_yb = clip_height/2 + Speed_gauge_sin*133;
+                    double Speed_gauge_xb = clip_height/2 + Speed_gauge_cos*133;
 
-                // Fuel
-                // TODO: Fix bug where red bar doesn't decrease.
-                double fuel_state = Telemetry.m.Sim.Drivers.Player.Fuel / Telemetry.m.Sim.Drivers.Player.Fuel_Max;
+                    g.DrawLine(new Pen(Color.DarkGreen, 6f), Convert.ToSingle(Speed_gauge_xa),
+                               Convert.ToSingle(Speed_gauge_ya), Convert.ToSingle(Speed_gauge_xb),
+                               Convert.ToSingle(Speed_gauge_yb));
+                    g.FillEllipse(Brushes.DarkGreen, clip_height/2 - 10, clip_height/2 - 10, 20, 20);
 
-                if (fuel_state > 0.1)
-                {
-                    g.FillRectangle(Brushes.Red, height + 10, 140, 12, 13);
-                    g.FillRectangle(Brushes.DarkOrange, height + 22, 140, Convert.ToSingle(120 * (fuel_state - 0.1)), 13);
-                }
-                else
-                {
-                    g.FillRectangle(Brushes.Red, height + 10, 180, Convert.ToSingle(fuel_state * 120), 13);
-                }
-                if (fuel_state < 0.1)
-                    g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("00.0").Replace(".", "L"), font_arial_10, Brushes.Red,
-                                 width + border_bounds - 45, 139);
-                else
-                    g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("000.0").Replace(".", "L"), font_arial_10, Brushes.DarkOrange,
-                                 width + border_bounds - 45, 139);
-
-                // Laps estimation.
-                if (FuelUsage.Count > 5)
-                {
-                    double avg = 0;
-                    for (int i = FuelUsage.Count - 5; i < FuelUsage.Count; i++) avg += FuelUsage[i];
-                    avg /= FuelUsage.Count - (FuelUsage.Count - 5);
-                    if (avg > 0)
+                    /* Bars filling up the speed bar proved  CPU intensive
+                    for (double angle = 90; angle <= fAngle_Speed; angle += 3.5)
                     {
-                        double laps = Telemetry.m.Sim.Player.Fuel / avg;
-                        g.DrawString(laps.ToString("(000)"), font_arial_10, Brushes.DarkOrange, width + border_bounds - 45, 159);
-                        g.DrawString(avg.ToString("0.00L") + " per lap", font_arial_10, Brushes.DarkOrange, height + 10, 159);
+                        double Spd = SpeedMin+(SpeedMax-SpeedMin)*(angle - 90)/225;
+                        if (Spd > SpeedLive || Math.Abs(Spd - SpeedLive) < 0.5) break;
+                        double le = 3;
+                        if (angle + 3 > fAngle_Speed) le = fAngle_Speed - angle;
+                        Color clr = Color.FromArgb(Convert.ToInt32(100 + Spd*155/SpeedMax),
+                                                   Convert.ToInt32(255 - Spd*255/SpeedMax), 0);
+                        /g.DrawArc(new Pen(clr, 4f), Convert.ToSingle(border_bounds/2 + 4),
+                                  Convert.ToSingle(border_bounds/2 + 4), Convert.ToSingle(height - 8),
+                                  Convert.ToSingle(height - 8), Convert.ToSingle(angle), Convert.ToSingle(le));
+                    }*/
+
+
+                    // ---------------------------------    Gear/Speed    ---------------------------------
+
+                    if (Telemetry.m.Sim.Player.Gear == -1 || Telemetry.m.Sim.Player.Gear == 0xFF)
+                        g.DrawString("R", gear_f, Brushes.White, border_bounds/2 + height/2 + 5,
+                                     border_bounds/2 + height/2 + 40);
+                    else if (Telemetry.m.Sim.Player.Gear > 0)
+                        g.DrawString(Telemetry.m.Sim.Player.Gear.ToString(), gear_f, Brushes.White,
+                                     border_bounds/2 + height/2 + 5,
+                                     border_bounds/2 + height/2 + 40);
+                    else if (Telemetry.m.Sim.Player.Gear == 0)
+                        g.DrawString("N", gear_f, Brushes.White, border_bounds/2 + height/2 + 5,
+                                     border_bounds/2 + height/2 + 40);
+
+                    if (Telemetry.m.Sim.Drivers.Player.PitLimiter)
+                        g.DrawString(Math.Abs(Telemetry.m.Sim.Player.Speed*3.6).ToString("000") + "km/h", speed_f,
+                                     Brushes.DarkOrange,
+                                     border_bounds/2 + height/2 + 10, border_bounds/2 + height/2 + 80);
+                    else
+                        g.DrawString(Math.Abs(Telemetry.m.Sim.Player.Speed*3.6).ToString("000") + "km/h", speed_f,
+                                     Brushes.White,
+                                     border_bounds/2 + height/2 + 10, border_bounds/2 + height/2 + 80);
+
+                    g.DrawString(Math.Round(Telemetry.m.Stats.GlobalOdometer, 2).ToString("00000.00km"), dist_f,
+                                 Brushes.LightGray, border_bounds/2 + height/2 + 10, border_bounds/2 + height/2 + 110);
+
+                    // ---------------------------------    Labels   ---------------------------------
+
+                    // Throttle
+                    g.FillRectangle(Brushes.DarkRed, height + 10, 120,
+                                    Convert.ToSingle(Telemetry.m.Sim.Drivers.Player.Brake*120), 13);
+                    g.FillRectangle(Brushes.DarkGreen, height + 10, 120,
+                                    Convert.ToSingle(Telemetry.m.Sim.Drivers.Player.Throttle*120), 13);
+                    if (Telemetry.m.Sim.Drivers.Player.Brake > Telemetry.m.Sim.Drivers.Player.Throttle)
+                    {
+                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Brake.ToString("000%"), font_arial_10,
+                                     Brushes.DarkRed,
+                                     width + border_bounds - 45, 119);
                     }
-                }
-                else
-                    g.DrawString("(???)", font_arial_10, DimBrush, width + border_bounds - 45, 159);
+                    else
+                    {
+                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Throttle.ToString("000%"), font_arial_10,
+                                     Brushes.DarkGreen,
+                                     width + border_bounds - 45, 119);
+                    }
 
-                // Engine
-                double engine_live = Telemetry.m.Sim.Player.Engine_Lifetime_Live;
-                double engine_perc = engine_live / Engine_Max;
-                if (double.IsInfinity(engine_perc) || double.IsNaN(engine_perc)) engine_perc = 1;
+                    // Fuel
+                    // TODO: Fix bug where red bar doesn't decrease.
+                    double fuel_state = Telemetry.m.Sim.Drivers.Player.Fuel/Telemetry.m.Sim.Drivers.Player.Fuel_Max;
 
-                if (engine_perc > 0.1)
-                {
-                    g.FillRectangle(Brushes.Red, height + 10, 180, 12, 13);
-                    g.FillRectangle(Brushes.DarkOrange, height + 22, 180, Convert.ToSingle(120 * (engine_perc - 0.1)), 13);
-                }
-                else
-                {
-                    g.FillRectangle(Brushes.Red, height + 10, 180, Convert.ToSingle(engine_perc * 120), 13);
-                }
-                if (engine_perc < 0.4)
-                    g.DrawString((100 * engine_perc).ToString("00.0").Replace(".", "%"), font_arial_10, Brushes.Red, width + border_bounds - 45, 179);
-                else
-                    g.DrawString((100 * engine_perc).ToString("000.0").Replace(".", "%"), font_arial_10, Brushes.DarkOrange, width + border_bounds - 45, 179);
+                    if (fuel_state > 0.1)
+                    {
+                        g.FillRectangle(Brushes.Red, height + 10, 140, 12, 13);
+                        g.FillRectangle(Brushes.DarkOrange, height + 22, 140, Convert.ToSingle(120*(fuel_state - 0.1)),
+                                        13);
+                    }
+                    else
+                    {
+                        g.FillRectangle(Brushes.Red, height + 10, 180, Convert.ToSingle(fuel_state*120), 13);
+                    }
+                    if (fuel_state < 0.1)
+                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("00.0").Replace(".", "L"),
+                                     font_arial_10, Brushes.Red,
+                                     width + border_bounds - 45, 139);
+                    else
+                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("000.0").Replace(".", "L"),
+                                     font_arial_10, Brushes.DarkOrange,
+                                     width + border_bounds - 45, 139);
 
-
-                // Laps estimation.
-                if (Counter == 10)
-                    g.DrawString("Refreshed!", font_arial_10, Brushes.Yellow, width + border_bounds - 75, 199);
-                else
-                {
-                    if (EngineUsage.Count > 5)
+                    // Laps estimation.
+                    if (FuelUsage.Count > 5)
                     {
                         double avg = 0;
-                        for (int i = EngineUsage.Count - 5; i < EngineUsage.Count; i++) avg += EngineUsage[i];
-                        avg /= EngineUsage.Count - (EngineUsage.Count - 5);
+                        for (int i = FuelUsage.Count - 5; i < FuelUsage.Count; i++) avg += FuelUsage[i];
+                        avg /= FuelUsage.Count - (FuelUsage.Count - 5);
                         if (avg > 0)
                         {
-                            double engine_laps = Engine_LastLap / avg;
-                            g.DrawString(engine_laps.ToString("(000)"), font_arial_10, Brushes.DarkOrange,
-                                         width + border_bounds - 45, 199);
-                            g.DrawString(avg.ToString("0.00%") + " per lap", font_arial_10, Brushes.DarkOrange,
-                                          height + 10, 199);
+                            double laps = Telemetry.m.Sim.Player.Fuel/avg;
+                            g.DrawString(laps.ToString("(000)"), font_arial_10, Brushes.DarkOrange,
+                                         width + border_bounds - 45, 159);
+                            g.DrawString(avg.ToString("0.00L") + " per lap", font_arial_10, Brushes.DarkOrange,
+                                         height + 10, 159);
                         }
                     }
                     else
+                        g.DrawString("(???)", font_arial_10, DimBrush, width + border_bounds - 45, 159);
 
-                        g.DrawString("(???)", font_arial_10, DimBrush,
-                                     width + border_bounds - 45, 199);
+                    // Engine
+                    double engine_live = Telemetry.m.Sim.Player.Engine_Lifetime_Live;
+                    double engine_perc = engine_live/Engine_Max;
+                    if (double.IsInfinity(engine_perc) || double.IsNaN(engine_perc)) engine_perc = 1;
+
+                    if (engine_perc > 0.1)
+                    {
+                        g.FillRectangle(Brushes.Red, height + 10, 180, 12, 13);
+                        g.FillRectangle(Brushes.DarkOrange, height + 22, 180, Convert.ToSingle(120*(engine_perc - 0.1)),
+                                        13);
+                    }
+                    else
+                    {
+                        g.FillRectangle(Brushes.Red, height + 10, 180, Convert.ToSingle(engine_perc*120), 13);
+                    }
+                    if (engine_perc < 0.4)
+                        g.DrawString((100*engine_perc).ToString("00.0").Replace(".", "%"), font_arial_10, Brushes.Red,
+                                     width + border_bounds - 45, 179);
+                    else
+                        g.DrawString((100*engine_perc).ToString("000.0").Replace(".", "%"), font_arial_10,
+                                     Brushes.DarkOrange, width + border_bounds - 45, 179);
+
+
+                    // Laps estimation.
+                    if (Counter == 10)
+                        g.DrawString("Refreshed!", font_arial_10, Brushes.Yellow, width + border_bounds - 75, 199);
+                    else
+                    {
+                        if (EngineUsage.Count > 5)
+                        {
+                            double avg = 0;
+                            for (int i = EngineUsage.Count - 5; i < EngineUsage.Count; i++) avg += EngineUsage[i];
+                            avg /= EngineUsage.Count - (EngineUsage.Count - 5);
+                            if (avg > 0)
+                            {
+                                double engine_laps = Engine_LastLap/avg;
+                                g.DrawString(engine_laps.ToString("(000)"), font_arial_10, Brushes.DarkOrange,
+                                             width + border_bounds - 45, 199);
+                                g.DrawString(avg.ToString("0.00%") + " per lap", font_arial_10, Brushes.DarkOrange,
+                                             height + 10, 199);
+                            }
+                        }
+                        else
+
+                            g.DrawString("(???)", font_arial_10, DimBrush,
+                                         width + border_bounds - 45, 199);
+                    }
+
+                    // Power
+                    double power, power_max;
+
+                    if (Telemetry.m.Sim.Modules.Engine_Power)
+                        power = Telemetry.m.Sim.Player.Engine_Torque*
+                                Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM)*Math.PI*2/60000.0;
+                    else power = 0;
+                    power /= 0.745699872; // TODO: Fix, this turns kW -> HP
+                    PowerUsage.Add(power);
+                    PowerUsage.MaxSize = 3;
+                    //power = PowerUsage.Average;
+
+                    if (Telemetry.m.Sim.Modules.Engine_PowerCurve)
+                        power_max = 1000;
+                    else
+                        power_max = 1000; // TODO: Add minimum/maximum power plug-in support.
+
+                    float power_factor = Convert.ToSingle(power/power_max);
+                    if (power_factor > 1f) power_factor = 1f;
+
+                    g.FillRectangle(Brushes.Yellow, height + 10, 220, power_factor*120f, 13);
+                    g.DrawString((power).ToString("0000"), font_arial_10, Brushes.Yellow, width + border_bounds - 45,
+                                 220);
+
+                    // ---------------------------------      FPS     ---------------------------------
+                    /*
+                    TimeSpan dt = DateTime.Now.Subtract(lastrender);
+                    fps = fps*0.7 + 0.3*(1000/dt.TotalMilliseconds);
+                    if (double.IsInfinity(fps) || double.IsNaN(fps))
+                        fps = 0;
+                    g.DrawString(fps.ToString("00fps"), small_font, Brushes.White, 0, 0);
+                    lastrender = DateTime.Now;*/
                 }
-
-                // Power
-                double power, power_max;
-
-                if (Telemetry.m.Sim.Modules.Engine_Power)
-                    power = Telemetry.m.Sim.Player.Engine_Torque * Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM) * Math.PI * 2 / 60000.0;
-                else power = 0;
-                power /= 0.745699872; // TODO: Fix, this turns kW -> HP
-                PowerUsage.Add(power);
-                PowerUsage.MaxSize = 3;
-                //power = PowerUsage.Average;
-
-                if (Telemetry.m.Sim.Modules.Engine_PowerCurve)
-                    power_max = 1000;
-                else
-                    power_max = 1000;// TODO: Add minimum/maximum power plug-in support.
-
-                float power_factor = Convert.ToSingle(power / power_max);
-                if (power_factor > 1f) power_factor = 1f;
-
-                g.FillRectangle(Brushes.Yellow, height + 10, 220, power_factor * 120f, 13);
-                g.DrawString((power).ToString("0000"), font_arial_10, Brushes.Yellow, width + border_bounds - 45, 220);
-
-                // ---------------------------------      FPS     ---------------------------------
-                /*
-                TimeSpan dt = DateTime.Now.Subtract(lastrender);
-                fps = fps*0.7 + 0.3*(1000/dt.TotalMilliseconds);
-                if (double.IsInfinity(fps) || double.IsNaN(fps))
-                    fps = 0;
-                g.DrawString(fps.ToString("00fps"), small_font, Brushes.White, 0, 0);
-                lastrender = DateTime.Now;*/
             }
             catch (Exception ex)
             {

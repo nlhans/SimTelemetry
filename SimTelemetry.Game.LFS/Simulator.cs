@@ -1,38 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel.Composition;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Utilities;
-using Triton.Memory;
 
-namespace SimTelemetry.Game.GTR2
+namespace SimTelemetry.Game.LFS
 {
-    public class GTR2
-    {
-        public static MemoryPolledReader Game
-        {
-            get
-            {
-                return Simulator.Game;
-            }
-        }
-
-        public static Session Session;
-        public static Drivers Drivers;
-        public static DriverPlayer Player;
-
-        public GTR2()
-        {
-            Session = new Session();
-            Drivers = new Drivers();
-
-            Player = new DriverPlayer();
-        }
-    }
-
     [Export(typeof(ISimulator))]
     public class Simulator : ISimulator
     {
@@ -46,7 +18,7 @@ namespace SimTelemetry.Game.GTR2
         public void Initialize()
         {
             _Memory = new MemoryPolledReader(this);
-            new GTR2();
+            new LFS();
 
             _Modules = new SimulatorModules();
             _Modules.Track_Coordinates = true;
@@ -66,7 +38,7 @@ namespace SimTelemetry.Game.GTR2
 
         public string ProcessName
         {
-            get { return "GTR2"; }
+            get { return "LFS"; }
         }
 
         public SimulatorModules Modules
@@ -76,22 +48,22 @@ namespace SimTelemetry.Game.GTR2
 
         public string Name
         {
-            get { return "GTR2"; }
+            get { return "LFS"; }
         }
 
         public IDriverCollection Drivers
         {
-            get { return GTR2.Drivers; }
+            get { return LFS.Drivers; }
         }
 
         public IDriverPlayer Player
         {
-            get { return GTR2.Player; }
+            get { return LFS.Player; }
         }
 
         public ISession Session
         {
-            get { return GTR2.Session; }
+            get { return LFS.Session; }
         }
 
         public IGarage Garage
