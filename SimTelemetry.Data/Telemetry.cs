@@ -130,6 +130,11 @@ namespace SimTelemetry.Data
         /// Event fired whenever a driver leaves the cockpit view. Some simulators may not support this.
         /// </summary>
         public event Signal Driving_Stop;
+
+        /// <summary>
+        /// Event fired whenever the player starts a new lap.
+        /// </summary>
+        public event Signal Lap;
         #endregion
 
         /// <summary>
@@ -236,16 +241,24 @@ namespace SimTelemetry.Data
                             Report_SessionStop(sim);
                         }
                     }
-                    if(state.Active && sim.Drivers.Player.Driving != state.Driving)
+                    if (sim.Drivers.Player != null)
                     {
-                        state.Driving = sim.Drivers.Player.Driving;
-                        if (state.Driving)
+                        if (state.Active && sim.Drivers.Player.Driving != state.Driving)
                         {
-                            Report_DrivingStart(sim);
+                            state.Driving = sim.Drivers.Player.Driving;
+                            if (state.Driving)
+                            {
+                                Report_DrivingStart(sim);
+                            }
+                            else
+                            {
+                                Report_DrivingStop(sim);
+                            }
                         }
-                        else
+                        if(sim.Drivers.Player.Laps != state.Laps)
                         {
-                            Report_DrivingStop(sim);
+                            state.Laps = sim.Drivers.Player.Laps;
+                            Report_Laps(sim);
                         }
                     }
 
@@ -322,6 +335,17 @@ namespace SimTelemetry.Data
             Debug.WriteLine("SessionStop fired");
             if (Session_Stop != null)
                 Session_Stop(me);
+        }
+
+        /// <summary>
+        /// Fire Lap event.
+        /// </summary>
+        /// <param name="me">Simulator of which session stopped</param>
+        internal void Report_Laps(ISimulator me)
+        {
+            Debug.WriteLine("Laps fired");
+            if (Lap != null)
+                Lap(me);
         }
 
         /// <summary>
