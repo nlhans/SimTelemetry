@@ -170,6 +170,7 @@ namespace SimTelemetry.Data
             Sims = new Simulators();
             Logger = new TelemetryLogger(this);
             Stats = new TelemetryStats();
+            new Splits();
 
             Simulator_StatePollerThread = new Thread(Simulator_StatePoller);
             Simulator_StatePollerThread.Start();

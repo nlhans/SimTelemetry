@@ -560,6 +560,9 @@ namespace LiveTelemetry
                     g.DrawString((power).ToString("0000"), font_arial_10, Brushes.Yellow, width + border_bounds - 45,
                                  220);
 
+                    // TMP:
+                    g.DrawString(Splits.Split.ToString("0.000"), font_arial_10, Brushes.Red, 0, 10);
+
                     // ---------------------------------      FPS     ---------------------------------
                     /*
                     TimeSpan dt = DateTime.Now.Subtract(lastrender);

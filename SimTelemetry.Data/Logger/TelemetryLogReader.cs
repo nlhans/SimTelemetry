@@ -193,6 +193,11 @@ namespace SimTelemetry.Data.Logger
             }
         }
 
+        public void ReadPolling()
+        {
+            ReadWorker(null);
+        }
+
         private void ReadWorker(object n)
         {
             lock (this.Data)
