@@ -1,21 +1,136 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
+using SimTelemetry.Data;
 
 namespace LiveTelemetry
 {
     static class Program
     {
+        private static bool ReportingError = false;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            AppDomain.CurrentDomain.FirstChanceException += new EventHandler<System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs>(CurrentDomain_FirstChanceException);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new LiveTelemetry());
+        }
+
+        static void CurrentDomain_FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
+        {
+            LogError(e.Exception);
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            LogError((Exception) e.ExceptionObject);
+        }
+
+        static void LogError(Exception ex)
+        {
+            if (ReportingError)
+            {
+                // Then this is an error during error reporting. Cancel this..
+                // However it still sucks.
+                return;
+            }
+            ReportingError = true;
+
+            FileStream fs;
+            if (File.Exists("debug.txt") == false)
+                fs = File.Create("debug.txt");
+            else
+            {
+                fs = File.Open("debug.txt", FileMode.Append);
+            }
+            StringBuilder error = new StringBuilder();
+            error.AppendLine(
+                "*******************************************************************************************");
+            error.AppendLine("-----------------------------------------------------------------");
+            error.AppendLine(DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortDateString());
+            if (Telemetry.m == null) error.AppendLine("No Telemetry object");
+            else
+            {
+                error.AppendLine("-----------------------------------------------------------------");
+                error.Append("Simulator: ");
+                if (Telemetry.m.Active_Sim == false) error.AppendLine("No simulator running");
+                else error.AppendLine(Telemetry.m.Sim.ProcessName.ToLower());
+
+                error.AppendLine("-----------------------------------------------------------------");
+                error.Append("Session: ");
+                if (Telemetry.m.Active_Session == false) error.AppendLine("No session running");
+                else error.AppendLine(Telemetry.m.Sim.Session.Type.Type.ToString());
+
+                if (Telemetry.m.Active_Session && Telemetry.m.Sim != null)
+                {
+                    error.AppendLine("-----------------------------------------------------------------");
+                    error.Append("Driver: ");
+                    if (Telemetry.m.Sim != null && Telemetry.m.Sim.Drivers != null &&
+                        Telemetry.m.Sim.Drivers.Player != null)
+                    {
+                        error.AppendLine(Telemetry.m.Sim.Drivers.Player.Name + " / " +
+                                         Telemetry.m.Sim.Drivers.Player.CarClass + " / " +
+                                         Telemetry.m.Sim.Drivers.Player.CarModel);
+                        error.AppendLine("Laps: " + Telemetry.m.Sim.Drivers.Player.Laps);
+                    }
+                    else if (Telemetry.m.Sim == null)
+                        error.AppendLine("Error in Sim object");
+                    else if (Telemetry.m.Sim.Drivers == null)
+                        error.AppendLine("Error in Drivers object");
+                    else if (Telemetry.m.Sim.Drivers.Player == null)
+                        error.AppendLine("No player found");
+
+                    error.AppendLine("Cars: " + Telemetry.m.Sim.Session.Cars);
+                    error.AppendLine("-----------------------------------------------------------------");
+                    error.AppendLine("Track loaded: " + ((Telemetry.m.Track == null) ? "No" : "Yes"));
+                    error.AppendLine("Track: " + Telemetry.m.Sim.Session.GameData_TrackFile);
+                    if (Telemetry.m.Track != null)
+                    {
+                        error.AppendLine("Track: " + Telemetry.m.Track.Name);
+                        error.AppendLine("Route points: " + Telemetry.m.Track.Route.Racetrack.Count.ToString());
+                    }
+
+                }
+            }
+
+            error.AppendLine("-----------------------------------------------------------------");
+            error.AppendLine("Simulator Event log:");
+            error.AppendLine("TODO");
+
+            error.AppendLine("-----------------------------------------------------------------");
+            error.AppendLine("Exception info:");
+            error.AppendLine(ex.Message);
+
+            error.AppendLine("-----------------------------------------------------------------");
+            error.AppendLine(ex.StackTrace);
+
+            if (ex.InnerException != null)
+            {
+                error.AppendLine("-----------------------------------------------------------------");
+                error.AppendLine("INNER Exception info:");
+                error.AppendLine(ex.InnerException.Message);
+
+                error.AppendLine("-----------------------------------------------------------------");
+                error.AppendLine(ex.InnerException.StackTrace);
+            }
+            error.AppendLine("-----------------------------------------------------------------");
+
+            byte[] sb = ASCIIEncoding.ASCII.GetBytes(error.ToString());
+            fs.Write(sb, 0, sb.Length);
+            fs.Close();
+
+            Error err = new Error();
+            err.ShowDialog();
+
+            ReportingError = false;
         }
     }
 }
