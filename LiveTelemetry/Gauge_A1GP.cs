@@ -114,16 +114,16 @@ namespace LiveTelemetry
         private double Speed_Min;
         private double Speed_Max;
 
-        // Fonts
-        Font font_arial_10 = new Font("Arial", 10f, FontStyle.Bold);
-
-        Font gear_f = new Font("Arial", 30f);
-        Font speed_f = new Font("Arial", 18f);
-        Font dist_f = new Font("Arial", 12f);
-        Font small_font = new Font("Arial", 8f);
-
         private void PaintBackground(object sender)
         {
+
+            // Fonts
+            Font font_arial_10 = new Font("Arial", 10f, FontStyle.Bold);
+
+            Font gear_f = new Font("Arial", 30f);
+            Font speed_f = new Font("Arial", 18f);
+            Font dist_f = new Font("Arial", 12f);
+            Font small_font = new Font("Arial", 8f);
 
             int border_bounds = 60;
             int width = this.Width;
@@ -157,7 +157,13 @@ namespace LiveTelemetry
                 if (Speed_Max < 200) SpeedStep = 20;
                 if (Speed_Max < 120)
                 {
+                    Speed_Max = 120;
+                }
 
+                if (Telemetry.m.Sim.Name=="FalconBMS")
+                {
+                    Speed_Max = 2000;
+                    SpeedStep = 100;
                 }
 
                 if (Speed_Max%SpeedStep > 0)
@@ -332,6 +338,14 @@ namespace LiveTelemetry
 
         protected override void OnPaint(PaintEventArgs e)
         {
+
+            // Fonts
+            Font font_arial_10 = new Font("Arial", 10f, FontStyle.Bold);
+
+            Font gear_f = new Font("Arial", 30f);
+            Font speed_f = new Font("Arial", 18f);
+            Font dist_f = new Font("Arial", 12f);
+            Font small_font = new Font("Arial", 8f);
             try
             {
                 int border_bounds = 60;
