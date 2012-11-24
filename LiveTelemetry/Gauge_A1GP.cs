@@ -144,7 +144,11 @@ namespace LiveTelemetry
                 if (Telemetry.m.Sim.Modules.Aero_Drag == false || Telemetry.m.Sim.Modules.Engine_Power == false)
                     Speed_Max = 300; // Considered as a typical topspeed for most driving simulators..
                 else
+#if DEBUG
                     Speed_Max = SimTelemetry.Game.Rfactor.Computations.GetTheoraticalTopSpeed();
+#else
+                    Speed_Max = 400;
+#endif
                         // TODO: Add interface to simulators to calculate this. Performance fix here.
 
                 if (double.IsNaN(Speed_Max) || double.IsInfinity(Speed_Max))

@@ -17,24 +17,31 @@ namespace LiveTelemetry
         [STAThread]
         static void Main()
         {
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            AppDomain.CurrentDomain.FirstChanceException += new EventHandler<System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs>(CurrentDomain_FirstChanceException);
+            AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new LiveTelemetry());
         }
 
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            LogError(e.Exception, false);
+        }
+
         static void CurrentDomain_FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
         {
-            LogError(e.Exception);
+            LogError(e.Exception,true);
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            LogError((Exception) e.ExceptionObject);
+            LogError((Exception) e.ExceptionObject,false);
         }
 
-        static void LogError(Exception ex)
+        static void LogError(Exception ex, bool firstchance)
         {
             if (ReportingError)
             {
@@ -54,8 +61,18 @@ namespace LiveTelemetry
             StringBuilder error = new StringBuilder();
             error.AppendLine(
                 "*******************************************************************************************");
-            error.AppendLine("-----------------------------------------------------------------");
-            error.AppendLine(DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortDateString());
+            error.Append("                           ");
+            if(firstchance)
+            {
+                error.AppendLine("Silent Exception");
+            }else
+            {
+                error.AppendLine("Fatal Exception");
+            }
+            error.AppendLine(
+                "*******************************************************************************************");
+
+            error.AppendLine(DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString()+"."+DateTime.Now.Millisecond );
             if (Telemetry.m == null) error.AppendLine("No Telemetry object");
             else
             {
@@ -126,9 +143,11 @@ namespace LiveTelemetry
             byte[] sb = ASCIIEncoding.ASCII.GetBytes(error.ToString());
             fs.Write(sb, 0, sb.Length);
             fs.Close();
-
-            Error err = new Error();
-            err.ShowDialog();
+            if (!firstchance)
+            {
+                Error err = new Error();
+                err.ShowDialog();
+            }
 
             ReportingError = false;
         }
