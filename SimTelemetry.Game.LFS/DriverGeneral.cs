@@ -21,6 +21,10 @@ namespace SimTelemetry.Game.LFS
         {
             return null;
         }
+        public ILap GetLapTime(int lap)
+        {
+            throw new NotImplementedException();
+        }
 
         public bool Driving
         {

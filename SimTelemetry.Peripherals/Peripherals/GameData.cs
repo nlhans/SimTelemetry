@@ -313,6 +313,7 @@ namespace SimTelemetry.Peripherals.Dashboard
             cardata.RPM_Shift5 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(5)));
             cardata.RPM_Shift6 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(6)));*/
             ShiftRpm r = new ShiftRpm();
+            cardata.RPM_Shift0 = cardata.RPM_Max;
             cardata.RPM_Shift1 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
             cardata.RPM_Shift2 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
             cardata.RPM_Shift3 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
@@ -457,7 +458,9 @@ namespace SimTelemetry.Peripherals.Dashboard
 
                 /** LIVE DRIVING TIMES **/
                 package.Laptime_Current = 0; // TODO
-                package.Gap_Front = 0; // TODO
+                package.Gap_Front = (float)Splits.Split;
+                if (float.IsNaN(package.Gap_Front) || float.IsInfinity(package.Gap_Front))
+                    package.Gap_Front = 0;
                 package.Gap_Back = 0; // TODO
 
                 package.Wipers = 0;

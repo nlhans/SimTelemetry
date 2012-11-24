@@ -7,6 +7,7 @@ namespace SimTelemetry.Objects
         double GetSplitTime(IDriverGeneral player);
         List<ILap> GetLapTimes();
         ILap GetBestLap();
+        ILap GetLapTime(int lap);
 
         //[Loggable(1)]
         //bool Retired { get; set; }
@@ -288,6 +289,5 @@ namespace SimTelemetry.Objects
         bool Flag_Yellow { get; set; }
         [LogOnChange]
         bool Flag_Black { get; set; }
-
     }
 }

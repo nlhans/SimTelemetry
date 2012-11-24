@@ -2,17 +2,10 @@
 using System.Collections.Generic;
 using SimTelemetry.Objects;
 
-namespace SimTelemetry.Game.rFactor2.v1005b
+namespace SimTelemetry.Game.FalconBMS
 {
-    public class Driver : IDriverGeneral
+    public class DriverGeneral : IDriverGeneral
     {
-        private int addr = 0;
-        public Driver(int baseaddr)
-        {
-            this.addr = baseaddr;
-
-        }
-
         public double GetSplitTime(IDriverGeneral player)
         {
             return 0;
@@ -21,30 +14,34 @@ namespace SimTelemetry.Game.rFactor2.v1005b
         public List<ILap> GetLapTimes()
         {
             return new List<ILap>();
+            throw new NotImplementedException();
+        }
+
+        public ILap GetBestLap()
+        {
+            return null;
         }
 
         public ILap GetLapTime(int lap)
         {
-            return new rf2Lap();
+            return null;
         }
-        public ILap GetBestLap()
-        {
-            return new rf2Lap();
-        }
-
 
         public bool Driving
         {
-            get { return true; }
+            get
+            {
+                    return true;
+            }
             set { }
         }
-
 
         public bool Ignition
         {
-            get { return true; }
+            get { return false; }
             set { }
         }
+
         public int MemoryBlock
         {
             get { return 0; }
@@ -65,77 +62,69 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public bool IsPlayer
         {
-            get
-            {
-                return Name == "Hans de Jong";
-                return ((rFactor2.Game.ReadInt32(new IntPtr(0x00D49F60)) == BaseAddress) ? true : false);
-            }
+            get { return true; }
+
             set { }
         }
 
         public string Name
         {
-            get { return rFactor2.Game.ReadString(new IntPtr(0x0077CC+BaseAddress),128 ); }
+            get { return "Hans"; }
             set { }
         }
 
-        public int BaseAddress
-        {
-            get { return addr; }
-            set { }
-        }
-
+        public int BaseAddress { get; set; }
         public double CoordinateX
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x10+BaseAddress)); }
+            get { return 0; }
             set { }
         }
 
         public double CoordinateY
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x14 + BaseAddress)); }
+            get { return 0; }
             set { }
         }
 
         public double CoordinateZ
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x18 + BaseAddress)); }
+            get { return 0; }
             set { }
         }
 
         public double Throttle
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0xAC + BaseAddress)); }
+            get { return 0; }
             set { }
         }
 
         public double Brake
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x24C8 + BaseAddress)); }
+            get { return 0; }
             set { }
         }
 
         public double Fuel
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x3ED0+BaseAddress)); }
+            get { return FalconBms.Game.ReadFloat(new IntPtr(0x4d0c210)); }
             set { }
         }
 
         public double Fuel_Max
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x3ED4 + BaseAddress)); } // TODO: Search memory address.
+            get { return 12500; }
             set { }
         }
 
         public string CarModel
         {
-            get { return rFactor2.Game.ReadString(new IntPtr(0x007946 + BaseAddress), 128); }
+            get { return "F16"; }
             set { }
         }
 
         public string CarClass
         {
-            get { return ""; }
+            get { return "F16"; }
             set { }
         }
 
@@ -147,37 +136,41 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public bool PitLimiter
         {
-            get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x1B79)) == 1?true:false; }
+            get { return false; }
             set { }
         }
 
         public bool Pits
         {
-            get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x3504)) == 1 ? true : false; }
+            get { return false; }
             set { }
         }
 
         public bool HeadLights
         {
-            get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x1B75)) == 1 ? true : false; }
+            get { return false; }
             set { }
         }
 
         public int Laps
         {
-            get { return rFactor2.Game.ReadInt32(new IntPtr(BaseAddress + 0x59A4)); }
+            get { return 0; }
             set { }
         }
 
         public float LapTime_Best
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x5A44+BaseAddress)); }
+            get { return 0; }
             set { }
         }
 
         public float LapTime_Last
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(0x59BC + BaseAddress)); }
+            get
+            {
+                return 0;
+                    // This is last split/lap: return LFS.Game.ReadInt32(new IntPtr(BaseAddress + 0x284)) / 100.0f; }
+            }
             set { }
         }
 
@@ -237,7 +230,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public double MetersDriven
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x59B8)); }
+            get { return 0; }
             set { }
         }
 
@@ -303,7 +296,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public double Mass
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x363C)); }
+            get { return 0; }
             set { }
         }
 
@@ -315,7 +308,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public double RPM_Max_Offset
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3EF4))-30; }
+            get { return 0; }
             set { }
         }
 
@@ -327,93 +320,153 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public double Speed
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x7454)); }
+            get { return FalconBms.Game.ReadFloat(new IntPtr(0x04D0C1FC))/3.6*1.8421; }
             set { }
         }
 
         public double RPM
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0xA8)); }
+            get
+            {
+                if (FalconBms.Game.ReadFloat(new IntPtr(0x04D0C21C)) > 90)
+                return 1000*
+                       ((FalconBms.Game.ReadFloat(new IntPtr(0x04D0C21C)) - 70)/30 +
+                        FalconBms.Game.ReadFloat(new IntPtr(0x04D0BDAC)));
+                else
+                    return 1000*(FalconBms.Game.ReadFloat(new IntPtr(0x04D0C21C)) - 70)/30;
+            }
             set { }
         }
 
         public int Position
         {
-            get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x59F8)); }
+            get { return 0; }
             set { }
         }
 
         public int Gear
         {
-            get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x1B80)); }
+            get { return 1; }
             set { }
         }
 
         public int Gears
         {
-            get { return rFactor2.Game.ReadByte(new IntPtr(BaseAddress + 0x3FAC)); }
+            get { return 2; }
             set { }
         }
 
         public float GearRatio1
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4*0)); }
+            get { return 2; }
             set { }
         }
 
         public float GearRatio2
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 1)); }
+            get { return 1; }
             set { }
         }
 
         public float GearRatio3
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 2)); }
+            get { return 0; }
             set { }
         }
 
         public float GearRatio4
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 3)); }
+            get { return 0; }
             set { }
         }
 
         public float GearRatio5
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 4)); }
+            get { return 0; }
             set { }
         }
 
         public float GearRatio6
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 *5)); }
+            get { return 0; }
             set { }
         }
 
         public float GearRatio7
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C + 0x4 * 6)); }
+            get { return 0; }
             set { }
         }
 
-        // TODO: Implement gears 8-10? (Not sure how many rFactor 2 supports)
-        public float GearRatio8 { get; set; }
-        public float GearRatio9 { get; set; }
+        public float GearRatio8
+        {
+            get { return 0; }
+            set { }
+        }
 
-        public float GearRatio10 { get { return 0; } set { } }
-        public float GearRatio11 { get { return 0; } set { } }
-        public float GearRatio12 { get { return 0; } set { } }
-        public float GearRatio13 { get { return 0; } set { } }
-        public float GearRatio14 { get { return 0; } set { } }
-        public float GearRatio15 { get { return 0; } set { } }
-        public float GearRatio16 { get { return 0; } set { } }
-        public float GearRatio17 { get { return 0; } set { } }
-        public float GearRatio18 { get { return 0; } set { } }
+        public float GearRatio9
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio10
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio11
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio12
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio13
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio14
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio15
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio16
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio17
+        {
+            get { return 0; }
+            set { }
+        }
+
+        public float GearRatio18
+        {
+            get { return 0; }
+            set { }
+        }
 
         public float GearRatioR
         {
-            get { return rFactor2.Game.ReadFloat(new IntPtr(BaseAddress + 0x3F7C - 0x4 * 1)); }
+            get { return 0; }
             set { }
         }
 

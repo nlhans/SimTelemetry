@@ -37,17 +37,16 @@ namespace SimTelemetry.Peripherals
         public UInt16 MetersDriven;
 
 
-        /* MORE SHIT */
-        public byte Ignition;
-        public byte Lights;
-        public byte Pause;
-        public byte Wipers;
-
         /** LIVE DRIVING TIMES **/
         public float Laptime_Current;
         public float Gap_Front;
         public float Gap_Back;
         public byte FlagIntensity;
 
+        /* MORE SHIT */
+        public byte Ignition;
+        public byte Lights;
+        public byte Pause;
+        public byte Wipers;
     }
 }

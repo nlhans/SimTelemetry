@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 using SimTelemetry;
 using SimTelemetry.Data;
+using SimTelemetry.Peripherals.Dashboard;
 using Triton;
 using Triton.Joysticks;
 using SimTelemetry.Objects;
@@ -191,6 +192,7 @@ namespace LiveTelemetry
 
             System.Threading.Thread.Sleep(500);
 
+            new GameData();
             SetupUI();
             this.ResumeLayout(false);
         }
@@ -469,6 +471,7 @@ namespace LiveTelemetry
             ucA1GP.Update();
             if (Controls.Contains(ucA1GP)) ucA1GP.Invalidate();
             if (Controls.Contains(ucTyres)) ucTyres.Invalidate();
+            ucTrackmap.Invalidate();
         }
 
         /// <summary>
@@ -480,7 +483,6 @@ namespace LiveTelemetry
         void Tmr_MdSpeed_Tick(object sender, EventArgs e)
         {
             ucSessionData.Invalidate();
-            ucTrackmap.Invalidate();
 
         }
 

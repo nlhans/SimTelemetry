@@ -46,62 +46,85 @@ namespace SimTelemetry.Data
                                            };
 
             // Trigger-once timer
-            _mUpdateBestLap = new Timer{Interval=100};
+            _mUpdateBestLap = new Timer {Interval = 100};
             _mUpdateBestLap.AutoReset = false;
-            _mUpdateBestLap.Elapsed += (s,e) =>
-                                              {
-                                                  if (Telemetry.m.Sim == null) return;
-                                                  if (Telemetry.m.Track == null) return;
-                                                  OleDbConnection con =
-                                                      DatabaseOleDbConnectionPool.GetOleDbConnection();
-                                                  using (
-                                                      OleDbCommand times =
-                                                          new OleDbCommand("SELECT Filepath FROM Laptimes WHERE " +
-                                                                           "Car = '" +
-                                                                           Telemetry.m.Sim.Drivers.Player.CarModel.
-                                                                               Replace("'", "\\'") + "' AND " +
-                                                                           "Series = '" +
-                                                                           Telemetry.m.Sim.Drivers.Player.CarClass.
-                                                                               Replace("'", "\\'") + "' AND " +
-                                                                           "Circuit = '" +
-                                                                           Telemetry.m.Track.Name.Replace("'", "\\'") +
-                                                                           "' AND " +
-                                                                           "Simulator = '" + Telemetry.m.Sim.Name + "'" +
-                                                                           "AND Laptime > 1 " +
-                                                                           "ORDER BY Laptime ASC",
-                                                                           con))
-                                                  using (OleDbDataReader times_Reader = times.ExecuteReader())
-                                                  {
-                                                      if (times_Reader.HasRows)
-                                                      {
-                                                          while (PreviousRecords == false && times_Reader.Read())
-                                                          {
-                                                              try
-                                                              {
-                                                                  _mReferenceLapReader =
-                                                                      new TelemetryLogReader(times_Reader.GetString(0));
-                                                                  _mReferenceLapReader.ReadPolling();
-                                                                  PreviousRecords = true;
-                                                              }
-                                                              catch (Exception ex)
-                                                              {
-                                                                  _mReferenceLapReader = null;
-                                                              }
+            _mUpdateBestLap.Elapsed += (s, e) =>
+                                           {
+                                               bool RemoveLapTelemetryPath = false;
+                                               List<int> LapsToInvalidate = new List<int>();
+                                               if (Telemetry.m.Sim == null) return;
+                                               if (Telemetry.m.Track == null) return;
+                                               if (Telemetry.m.Track.Name == null) return;
+                                               OleDbConnection con =
+                                                   DatabaseOleDbConnectionPool.GetOleDbConnection();
+                                               using (
+                                                   OleDbCommand times =
+                                                       new OleDbCommand("SELECT Filepath, `ID` FROM Laptimes WHERE " +
+                                                                        "Car = '" +
+                                                                        Telemetry.m.Sim.Drivers.Player.CarModel.
+                                                                            Replace("'", "\\'") + "' AND " +
+                                                                        "Series = '" +
+                                                                        Telemetry.m.Sim.Drivers.Player.CarClass.
+                                                                            Replace("'", "\\'") + "' AND " +
+                                                                        "Circuit = '" +
+                                                                        Telemetry.m.Track.Name.Replace("'", "\\'") +
+                                                                        "' AND " +
+                                                                        "Simulator = '" + Telemetry.m.Sim.Name + "'" +
+                                                                        "AND Laptime > 1 " +
+                                                                        "AND `InvalidLapData` = 0 " +
+                                                                        "ORDER BY Laptime ASC",
+                                                                        con))
+                                               using (OleDbDataReader times_Reader = times.ExecuteReader())
+                                               {
+                                                   if (times_Reader.HasRows)
+                                                   {
+                                                       while (PreviousRecords == false && times_Reader.Read())
+                                                       {
+                                                           int lapID = 0;
+                                                           try
+                                                           {
+                                                               lapID = times_Reader.GetInt32(1);
+                                                               _mReferenceLapReader =
+                                                                   new TelemetryLogReader(times_Reader.GetString(0));
+                                                               _mReferenceLapReader.ReadPolling();
+                                                               PreviousRecords = true;
+                                                           }
+                                                           catch (Exception ex)
+                                                           {
+                                                               LapsToInvalidate.Add(lapID);
+                                                               RemoveLapTelemetryPath = true;
+                                                               _mReferenceLapReader = null;
+                                                           }
 
-                                                          }
-                                                      }
-                                                  }
-                                                  DatabaseOleDbConnectionPool.Freeup();
-                                                  Load_ExtractMetersTable();
-                                              };
+                                                       }
+                                                   }
+                                               }
+                                               if (RemoveLapTelemetryPath)
+                                               {
+                                                   while (LapsToInvalidate.Count > 0)
+                                                   {
+                                                       int lapID = LapsToInvalidate[0];
+                                                       OleDbCommand upd =
+                                                           new OleDbCommand(
+                                                               "UPDATE Laptimes SET InvalidLapData = 1 WHERE `ID` = " + lapID, con);
+                                                       upd.ExecuteNonQuery();
+                                                       LapsToInvalidate.RemoveAt(0);
+                                                   }
+                                               }
+                                               DatabaseOleDbConnectionPool.Freeup();
+                                               Load_ExtractMetersTable();
+                                           };
         }
 
-        private void m_Lap(object sender)
+        private void m_Lap(ISimulator sim, ILap lap)
         {
-            Time_Start = Telemetry.m.Sim.Session.Time; // TODO: add local timing if not supported.
-            // Get the last lap from the game.
-            PreviousRecords = false;
-            _mUpdateBestLap.Start();
+            if (Telemetry.m.Sim != null)
+            {
+                Time_Start = Telemetry.m.Sim.Session.Time; // TODO: add local timing if not supported.
+                // Get the last lap from the game.
+                PreviousRecords = false;
+                _mUpdateBestLap.Start();
+            }
         }
 
         private double GetTimeFromTable(double meters)

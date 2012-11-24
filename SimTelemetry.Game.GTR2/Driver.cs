@@ -23,6 +23,10 @@ namespace SimTelemetry.Game.GTR2
         {
             return 10;
         }
+        public ILap GetLapTime(int lap)
+        {
+            return new GTR2_Lap();
+        }
 
         public List<ILap> GetLapTimes()
         {

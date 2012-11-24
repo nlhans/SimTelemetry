@@ -474,8 +474,6 @@ namespace SimTelemetry.Game.Rfactor
             
             List<ILap> laps = new List<ILap>();
 
-            if (DateTime.Now.Subtract(LastLapTimeRetrival).TotalMilliseconds < 2000)
-                return LastLapTimes;
             int lapsbase = __LapsData.ToInt32();
 
             for (int l = 0; l < this.Laps + 1; l++)
@@ -489,11 +487,24 @@ namespace SimTelemetry.Game.Rfactor
                 Lap lap = new Lap(l, s1, s2, s3);
                 laps.Add(lap);
             }
-            LastLapTimes = laps;
-            LastLapTimeRetrival = DateTime.Now;
+
             return laps;
         }
 
+        public ILap GetLapTime(int l)
+        {
+            int lapsbase = __LapsData.ToInt32();
+
+            float start = rFactor.Game.ReadFloat(new IntPtr(lapsbase + l*0x04*0x06));
+            float s1 = rFactor.Game.ReadFloat(new IntPtr(lapsbase + 0x04 + l*0x04*0x06));
+            float s2 = rFactor.Game.ReadFloat(new IntPtr(lapsbase + 0x08 + l*0x04*0x06));
+            float s3 = rFactor.Game.ReadFloat(new IntPtr(lapsbase + 0x0C + l*0x04*0x06));
+            s3 -= s2;
+            s2 -= s1;
+            Lap lap = new Lap(l, s1, s2, s3);
+
+            return lap;
+        }
 
         public LevelIndicator SteeringHelp
         {

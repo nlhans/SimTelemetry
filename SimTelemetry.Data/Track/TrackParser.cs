@@ -70,80 +70,86 @@ namespace SimTelemetry.Data.Track
                     {
                         foreach (IDriverGeneral driver in Telemetry.m.Sim.Drivers.AllDrivers)
                         {
-                            // Look up the lap.
-                            int lap = driver.Laps;
-                            int drv = driver.MemoryBlock;
-                            Lap l = GetLap(driver, 0);
-
-                            l.Distance += driver.Speed * dt;
-                            // Create lap if it doesnt exist
-                            if (l.LapNo == -1)
+                            if (driver != null)
                             {
-                                l = new Lap
-                                        {
-                                            ApexSpeeds = new List<double>(),
-                                            Checkpoints = new List<double>(),
-                                            DriverNo = drv,
-                                            LapNo = lap,
-                                            Distance=0,
-                                            MinTime = Telemetry.m.Sim.Session.Time
-                                        };
-                                int k = 0;
-                                for (k = 0; k < Sections.Lines.Count; k++)
-                                    l.Checkpoints.Add(-1);
-                                for (k = 0; k < Apexes.Positions.Count; k++)
-                                    l.ApexSpeeds.Add(-1);
+                                // Look up the lap.
+                                int lap = driver.Laps;
+                                int drv = driver.MemoryBlock;
+                                Lap l = GetLap(driver, 0);
 
-                                //TrackLogger.Add(l);
-
-                                if (drv == Telemetry.m.Sim.Drivers.Player.MemoryBlock && PlayerLap != null)
-                                    PlayerLap();
-                                else if (DriverLap != null)
-                                    DriverLap();
-
-                                Lap lastLap = GetLap(driver, 1);
-                                if (lastLap.LapNo != -1)
+                                l.Distance += driver.Speed*dt;
+                                // Create lap if it doesnt exist
+                                if (l.LapNo == -1)
                                 {
-                                    l.Sector1 = driver.Sector_1_Last;
-                                    l.Sector2 = driver.Sector_2_Last;
-                                    l.Sector3 = driver.Sector_3_Last;
-                                    l.MaxTime = Telemetry.m.Sim.Session.Time;
-                                    l.Total = l.Sector3 + l.Sector2 + l.Sector1;
+                                    l = new Lap
+                                            {
+                                                ApexSpeeds = new List<double>(),
+                                                Checkpoints = new List<double>(),
+                                                DriverNo = drv,
+                                                LapNo = lap,
+                                                Distance = 0,
+                                                MinTime = Telemetry.m.Sim.Session.Time
+                                            };
+                                    int k = 0;
+                                    for (k = 0; k < Sections.Lines.Count; k++)
+                                        l.Checkpoints.Add(-1);
+                                    for (k = 0; k < Apexes.Positions.Count; k++)
+                                        l.ApexSpeeds.Add(-1);
+
+                                    //TrackLogger.Add(l);
+
+                                    if (drv == Telemetry.m.Sim.Drivers.Player.MemoryBlock && PlayerLap != null)
+                                        PlayerLap();
+                                    else if (DriverLap != null)
+                                        DriverLap();
+
+                                    Lap lastLap = GetLap(driver, 1);
+                                    if (lastLap.LapNo != -1)
+                                    {
+                                        l.Sector1 = driver.Sector_1_Last;
+                                        l.Sector2 = driver.Sector_2_Last;
+                                        l.Sector3 = driver.Sector_3_Last;
+                                        l.MaxTime = Telemetry.m.Sim.Session.Time;
+                                        l.Total = l.Sector3 + l.Sector2 + l.Sector1;
+                                    }
+                                    SetLap(driver, l);
+                                    continue;
                                 }
+
+                                // Apex speeds
+                                int i = 0;
+                                foreach (KeyValuePair<double, string> apex in Apexes.Positions)
+                                {
+                                    if (l.ApexSpeeds[i] == -1 && l.PrevMeters < apex.Key &&
+                                        driver.MetersDriven >= apex.Key && apex.Key > (driver.MetersDriven - 100))
+                                    {
+                                        l.ApexSpeeds[i] = driver.Speed;
+                                        break;
+                                    }
+
+                                    i++;
+                                }
+
+                                // Sections
+                                i = 0;
+                                foreach (KeyValuePair<double, string> checkpoint in Sections.Lines)
+                                {
+                                    if (l.Checkpoints[i] == -1 && l.PrevMeters <= checkpoint.Key &&
+                                        driver.MetersDriven >= checkpoint.Key &&
+                                        checkpoint.Key > (driver.MetersDriven - 100))
+                                    {
+                                        l.Checkpoints[i] = Telemetry.m.Sim.Session.Time;
+                                        break;
+                                    }
+
+                                    i++;
+                                }
+                                l.PrevMeters = driver.MetersDriven;
+                                l.MaxTime = Telemetry.m.Sim.Session.Time;
+                                /*int ind = TrackLogger.FindIndex(delegate(Lap lm) { return lm.LapNo == lap && lm.DriverNo == drv; });
+                                TrackLogger[ind] = l;*/
                                 SetLap(driver, l);
-                                continue;
                             }
-
-                            // Apex speeds
-                            int i = 0;
-                            foreach (KeyValuePair<double, string> apex in Apexes.Positions)
-                            {
-                                if (l.ApexSpeeds[i] == -1 && l.PrevMeters < apex.Key && driver.MetersDriven >= apex.Key && apex.Key > (driver.MetersDriven - 100))
-                                {
-                                    l.ApexSpeeds[i] = driver.Speed;
-                                    break;
-                                }
-
-                                i++;
-                            }
-
-                            // Sections
-                            i = 0;
-                            foreach (KeyValuePair<double, string> checkpoint in Sections.Lines)
-                            {
-                                if (l.Checkpoints[i] == -1 && l.PrevMeters <= checkpoint.Key && driver.MetersDriven >= checkpoint.Key && checkpoint.Key > (driver.MetersDriven - 100))
-                                {
-                                    l.Checkpoints[i] = Telemetry.m.Sim.Session.Time;
-                                    break;
-                                }
-
-                                i++;
-                            }
-                            l.PrevMeters = driver.MetersDriven;
-                            l.MaxTime = Telemetry.m.Sim.Session.Time;
-                            /*int ind = TrackLogger.FindIndex(delegate(Lap lm) { return lm.LapNo == lap && lm.DriverNo == drv; });
-                            TrackLogger[ind] = l;*/
-                            SetLap(driver, l);
                         }
                     }
                 }

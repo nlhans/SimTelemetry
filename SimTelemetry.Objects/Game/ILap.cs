@@ -1,5 +1,6 @@
 ﻿namespace SimTelemetry.Objects
 {
+    public delegate void LapEvent(ISimulator sim, ILap lap);
     public interface ILap
     {
         int LapNumber { get; }

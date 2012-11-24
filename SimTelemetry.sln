@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.SFX", "SimTele
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Game.LFS", "SimTelemetry.Game.LFS\SimTelemetry.Game.LFS.csproj", "{EC67EF8B-5685-4F06-BAE9-22921F4A4AB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Game.FalconBMS", "SimTelemetry.Game.FalconBMS\SimTelemetry.Game.FalconBMS.csproj", "{A7EF9582-B057-417B-B063-74469E02B406}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,16 @@ Global
 		{EC67EF8B-5685-4F06-BAE9-22921F4A4AB4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EC67EF8B-5685-4F06-BAE9-22921F4A4AB4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EC67EF8B-5685-4F06-BAE9-22921F4A4AB4}.Release|x86.ActiveCfg = Release|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A7EF9582-B057-417B-B063-74469E02B406}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

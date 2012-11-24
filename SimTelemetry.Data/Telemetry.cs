@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Diagnostics;
@@ -134,7 +133,7 @@ namespace SimTelemetry.Data
         /// <summary>
         /// Event fired whenever the player starts a new lap.
         /// </summary>
-        public event Signal Lap;
+        public event LapEvent Lap;
         #endregion
 
         /// <summary>
@@ -242,7 +241,7 @@ namespace SimTelemetry.Data
                             Report_SessionStop(sim);
                         }
                     }
-                    if (sim.Drivers.Player != null)
+                    if (sim.Session.Active && sim.Drivers.Player != null)
                     {
                         if (state.Active && sim.Drivers.Player.Driving != state.Driving)
                         {
@@ -259,7 +258,7 @@ namespace SimTelemetry.Data
                         if(sim.Drivers.Player.Laps != state.Laps)
                         {
                             state.Laps = sim.Drivers.Player.Laps;
-                            Report_Laps(sim);
+                            Report_Laps(sim, sim.Drivers.Player.GetLapTime(sim.Drivers.Player.Laps));
                         }
                     }
 
@@ -342,11 +341,11 @@ namespace SimTelemetry.Data
         /// Fire Lap event.
         /// </summary>
         /// <param name="me">Simulator of which session stopped</param>
-        internal void Report_Laps(ISimulator me)
+        internal void Report_Laps(ISimulator me, ILap lap)
         {
             Debug.WriteLine("Laps fired");
             if (Lap != null)
-                Lap(me);
+                Lap(me , lap);
         }
 
         /// <summary>
@@ -372,7 +371,7 @@ namespace SimTelemetry.Data
         /// </summary>
         public void Run()
         {
-            //Peripherals = new Devices();
+            Peripherals = new Devices();
             ThreadPool.QueueUserWorkItem(new WaitCallback(Bootup));
         }
     }
