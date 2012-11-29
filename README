@@ -9,3 +9,5 @@ SimTelemetry.Game are plug-ins for various simulators. rFactor1 support is good,
 SimTelemetry.Peripherals contains communication code for some personal peripherals I made to enhance my own racing experience. It's not of much use, unless you implement the same client code on your own hardware dashboards!
 
 Please feel free to contribute, fork, give feedback, etc. (hans1990@gmail.com). Thanks :)
+
+This software is distributed under the GPL v3 license. Please see gpl.txt or <http://www.gnu.org/licenses/> for more information.
