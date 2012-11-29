@@ -139,7 +139,7 @@ namespace SimTelemetry.Data.Stats
 
         private void Count(object sender, ElapsedEventArgs e)
         {
-            if (Telemetry.m.Active_Session)
+            if (Telemetry.m.Active_Session && !Telemetry.m.Net.IsClient)
             {
                 double dt_ms = 0;
                 if (Telemetry.m.Sim.Modules.Time_Available)

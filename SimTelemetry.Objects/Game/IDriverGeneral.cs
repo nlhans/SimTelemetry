@@ -48,26 +48,32 @@ namespace SimTelemetry.Objects
         int BaseAddress { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         [LogProperty("Coordinate X", "Coordinate X of the car.")]
         double CoordinateX { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         [LogProperty("Coordinate Y", "Coordinate Y of the car.")]
         double CoordinateY { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         [LogProperty("Coordinate Z", "Coordinate Z of the car.")]
         double CoordinateZ { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         [LogProperty("Pedal Throttle", "Status of throttle pedal.")]
         double Throttle { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         [LogProperty("Pedal Brake", "Status of brake pedal.")]
         double Brake { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         [LogProperty("Fuel", "Litres of fuel currently in the car's fuel tank.")]
         double Fuel { set; get; }
 
@@ -148,6 +154,7 @@ namespace SimTelemetry.Objects
         float Sector_3_Last { get; set; }
 
         [Loggable(25)]
+        [LogOnChange]
         [LogProperty("Meters Driven", "Number of meters driven from start/finish line (per lap).")]
         double MetersDriven { get; set; }
 
@@ -198,10 +205,12 @@ namespace SimTelemetry.Objects
         double RPM_Max_Scale { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         [DisplayConversion( DataConversions.SPEED_MS_TO_KMH)]
         double Speed { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         [DisplayConversion(DataConversions.ROTATION_RADS_TO_RPM)]
         double RPM { set; get; }
 
@@ -272,15 +281,19 @@ namespace SimTelemetry.Objects
         float GearRatioR { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         float TyreWear_LF { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         float TyreWear_RF { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         float TyreWear_LR { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         float TyreWear_RR { set; get; }
 
         [LogOnChange]

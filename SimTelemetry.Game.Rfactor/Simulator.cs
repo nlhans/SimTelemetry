@@ -72,9 +72,11 @@ namespace SimTelemetry.Game.Rfactor
             get { return rFactor.Garage; }
         }
 
-        public MemoryPolledReader Memory
+        private MemoryPolledReader Memory
         {
             get { return rFactor.Game; }
         }
+        public bool Attached { get { return Memory.Attached; } }
+        public bool UseMemoryReader { get { return true; } }
     }
 }

@@ -167,23 +167,6 @@ namespace SimTelemetry.Data.Logger
 
         }
 
-        /* DEPRECATED
-        public void Start()
-        {
-            if (Active == false)
-            {
-                Active = true;
-
-
-                _Worker = new Timer();
-                _Worker.Elapsed += new ElapsedEventHandler(_Worker_Elapsed);
-                _Worker.Interval = 2; // 100Hz
-                _Worker.AutoReset = true;
-                _Worker.Start();
-            }
-
-        }*/
-
         public void Start(string file, int lapno)
         {
             if (Active == false)
@@ -195,7 +178,7 @@ namespace SimTelemetry.Data.Logger
 
                 _Worker = new Timer();
                 _Worker.Elapsed += new ElapsedEventHandler(_Worker_Elapsed);
-                _Worker.Interval = 2; // 50Hz
+                _Worker.Interval = 2; // 500Hz
                 _Worker.AutoReset = true;
                 _Worker.Start();
             }
@@ -206,6 +189,7 @@ namespace SimTelemetry.Data.Logger
         {
             List<byte> tmpheader = new List<byte>();
 
+            // TODO: Move to TelemetryLoggerSubcribedInstance
             foreach (KeyValuePair<string, TelemetryLoggerSubscribedInstance> tel_instance in Instances)
             {
                 byte[] data = new byte[64];
@@ -228,6 +212,9 @@ namespace SimTelemetry.Data.Logger
                     data = new byte[68];
                     short type = 0xFF;
                     Type t = tel_instance.Value.PropertyDescriptors.Find(properyMap.Key, true).PropertyType;
+
+                    // TODO: Put in enumerator
+                    // Or find something nicer for this.
                     if (t == typeof(double)) type = 0;
                     if (t == typeof(float)) type = 1;
                     if (t == typeof(Int32)) type = 2;
@@ -268,8 +255,10 @@ namespace SimTelemetry.Data.Logger
 
         void _Worker_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if(Telemetry.m.Net.IsClient)
+                Stop();
             if (Telemetry.m.Active_Session == false)
-                this.Stop();
+                Stop();
 
 
             if (_mWrite != null)
@@ -311,7 +300,6 @@ namespace SimTelemetry.Data.Logger
                             _mWrite.BaseStream.Write(header, 0, header.Length);
                             _mWrite.BaseStream.Write(data, 0, data.Length);
 
-
                             /************** DATA *************/
                             lock (EventsFired)
                             {
@@ -322,12 +310,13 @@ namespace SimTelemetry.Data.Logger
                                     {
 
                                         // Write a packet to the stream.
-                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Data), 2, 4,
+                                        ByteMethods.memcpy(header,
+                                                           BitConverter.GetBytes((ushort) TelemetryLogPacket.Data), 2, 4,
                                                            0);
                                         // Packet ID
                                         ByteMethods.memcpy(header, BitConverter.GetBytes(tel_instance.Value.ID), 2, 6, 0);
                                         // Instance ID
-                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)data.Length), 2, 8, 0);
+                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort) data.Length), 2, 8, 0);
                                         // Data length
 
 

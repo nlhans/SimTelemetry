@@ -33,13 +33,13 @@ namespace SimTelemetry.Peripherals.Dashboard
                 for (offset = 0; offset < 500; offset++)
                 {
 
-                    double curve_rpm, Tl_Now, Th_Now;
+                    double curve_rpm = 0, Tl_Now = 0, Th_Now = 0;
                     // read rpm
                     // TOOD: RFACTOR ONLY
                     // TODO: these operations need to be moved to game DLL's!!!
-                    curve_rpm = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 3 * offset));
+                    /*curve_rpm = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 3 * offset));
                     Tl_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 1 + 0x8 * 3 * offset));
-                    Th_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 2 + 0x8 * 3 * offset));
+                    Th_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 2 + 0x8 * 3 * offset));*/
 
                     DoubleList.Add(curve_rpm);
                     DoubleList.Add(Tl_Now);

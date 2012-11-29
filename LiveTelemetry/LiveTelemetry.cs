@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using LiveTelemetry.UI;
 using SimTelemetry;
 using SimTelemetry.Data;
 using SimTelemetry.Peripherals.Dashboard;
@@ -30,6 +31,8 @@ namespace LiveTelemetry
 
         // User interface controls.
         private Button btGarage;
+        private Button btSettings;
+        private Button btNetwork;
 
         private LapChart ucLapChart;
         private LiveTrackMap ucTrackmap;
@@ -98,57 +101,65 @@ namespace LiveTelemetry
             _liveTelemetry = this;
 
             // Read joystick configuration.
-            // TODO: Needs fancy dialogs to first-time setup.
-            string[] lines = File.ReadAllLines("config.txt");
-            string controller = "";
-            bool controlleruseindex = false;
-            int controllerindex = 0;
-            foreach (string line in lines)
+            if(File.Exists("config.txt") == false)
             {
-                string[] p = line.Trim().Split("=".ToCharArray());
-                if (line.StartsWith("button"))Joystick_Button = Convert.ToInt32(p[1]);
-                if (line.StartsWith("index"))
+                // TODO: Needs fancy dialogs to first-time setup.
+                File.Create("config.txt");
+                MessageBox.Show(
+                    "Please edit config.txt:\r\ncontroller=[your controller you want to use for cyclign through panels]\r\nbutton=[the button on the controller you want to use]\r\n\r\nJust type the name of your controller (G25 alone is enough usually) and look up the button in Devices -> Game Controllers.");
+            }else
+            {
+                string[] lines = File.ReadAllLines("config.txt");
+                string controller = "";
+                bool controlleruseindex = false;
+                int controllerindex = 0;
+                foreach (string line in lines)
                 {
-                    controlleruseindex = true;
-                    controllerindex = Convert.ToInt32(p[1]);
-                }
-                if (line.StartsWith("controller"))
-                    controller = p[1];
+                    string[] p = line.Trim().Split("=".ToCharArray());
+                    if (line.StartsWith("button")) Joystick_Button = Convert.ToInt32(p[1]);
+                    if (line.StartsWith("index"))
+                    {
+                        controlleruseindex = true;
+                        controllerindex = Convert.ToInt32(p[1]);
+                    }
+                    if (line.StartsWith("controller"))
+                        controller = p[1];
 
-                if (line.StartsWith("trackmap"))
-                {
-                    if (p[1] == "static")
-                        LiveTrackMap.StaticTrackMap = true;
-                    else
-                        LiveTrackMap.StaticTrackMap = false;
+                    if (line.StartsWith("trackmap"))
+                    {
+                        if (p[1] == "static")
+                            LiveTrackMap.StaticTrackMap = true;
+                        else
+                            LiveTrackMap.StaticTrackMap = false;
+                    }
+
                 }
 
-            }
-            
-            // Search for the joystick.
-            List<JoystickDevice> devices = JoystickDevice.Search();
-            if (devices.Count == 0)
-            {
-                //MessageBox.Show("No (connected) joystick found for display panel control.\r\nTo utilize this please connect a joystick, configure and restart this program.");
-            }
-            else
-            {
-                if (controlleruseindex)
+                // Search for the joystick.
+                List<JoystickDevice> devices = JoystickDevice.Search();
+                if (devices.Count == 0)
                 {
-                    Joystick_Instance = new Joystick(devices[controllerindex]);
-                    Joystick_Instance.Release += Joy_Release;
+                    //MessageBox.Show("No (connected) joystick found for display panel control.\r\nTo utilize this please connect a joystick, configure and restart this program.");
                 }
                 else
                 {
-                    int i = 0;
-                    foreach (JoystickDevice jd in devices)
+                    if (controlleruseindex)
                     {
-                        if (jd.Name.Contains(controller.Trim()))
+                        Joystick_Instance = new Joystick(devices[controllerindex]);
+                        Joystick_Instance.Release += Joy_Release;
+                    }
+                    else
+                    {
+                        int i = 0;
+                        foreach (JoystickDevice jd in devices)
                         {
-                            Joystick_Instance = new Joystick(jd);
-                            Joystick_Instance.Release += Joy_Release;
+                            if (jd.Name.Contains(controller.Trim()))
+                            {
+                                Joystick_Instance = new Joystick(jd);
+                                Joystick_Instance.Release += Joy_Release;
+                            }
+                            i++;
                         }
-                        i++;
                     }
                 }
             }
@@ -169,6 +180,8 @@ namespace LiveTelemetry
             ucTrackmap = new LiveTrackMap();
             ucLapChart = new LapChart();
             btGarage = new Button();
+            btNetwork = new Button();
+            btSettings = new Button();
 
             // Garage button
             btGarage.Text = "Garage";
@@ -176,6 +189,20 @@ namespace LiveTelemetry
             btGarage.BackColor = Color.White;
             btGarage.Location = new Point(10, 10);
             btGarage.Click += new EventHandler(btGarage_Click);
+
+            // Settings button
+            btSettings.Text = "Settings";
+            btSettings.Size = new Size(75, 25);
+            btSettings.BackColor = Color.White;
+            btSettings.Location = new Point(95, 10);
+            btSettings.Click += new EventHandler(btSettings_Click);
+
+            // Network
+            btNetwork.Text = "Network";
+            btNetwork.Size = new Size(75, 25);
+            btNetwork.BackColor = Color.White;
+            btNetwork.Location = new Point(180, 10);
+            btNetwork.Click += new EventHandler(btNetwork_Click);
 
             // Timers
             Tmr_HiSpeed = new Timer{Interval=20}; // 30fps
@@ -191,10 +218,23 @@ namespace LiveTelemetry
             Tmr_LwSpeed.Start();
 
             System.Threading.Thread.Sleep(500);
-
+#if DEBUG
+            // This is for hardware peripheral support
             new GameData();
+#endif
             SetupUI();
             this.ResumeLayout(false);
+        }
+
+        void btNetwork_Click(object sender, EventArgs e)
+        {
+            fNetwork ntwk = new fNetwork();
+            ntwk.ShowDialog();
+        }
+
+        void btSettings_Click(object sender, EventArgs e)
+        {
+
         }
 
         void btGarage_Click(object sender, EventArgs e)
@@ -371,6 +411,8 @@ namespace LiveTelemetry
             if (btGarage != null)
             {
                 Controls.Add(btGarage);
+                Controls.Add(btSettings);
+                Controls.Add(btNetwork);
             }
         }
 

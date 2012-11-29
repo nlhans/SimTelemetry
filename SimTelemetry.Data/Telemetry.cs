@@ -4,8 +4,10 @@ using System.Data.OleDb;
 using System.Diagnostics;
 using System.Threading;
 using SimTelemetry.Data.Logger;
+using SimTelemetry.Data.Net;
 using SimTelemetry.Data.Stats;
 using SimTelemetry.Data.Track;
+using SimTelemetry.Game.Network;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Peripherals;
 using Triton;
@@ -93,6 +95,8 @@ namespace SimTelemetry.Data
         /// </summary>
         public TelemetryStats Stats { get; set; }
 
+        public TelemetryNetwork Net { get; set; }
+
         #region Events
         /// <summary>
         /// Event fired whenever a simulator process starts. An object is passed containing the simulator instance.
@@ -166,10 +170,12 @@ namespace SimTelemetry.Data
         public void Bootup(object no)
         {
             // Initialize simulator collection, data logger and stats collector.
+            Net = new TelemetryNetwork();
             Sims = new Simulators();
             Logger = new TelemetryLogger(this);
             Stats = new TelemetryStats();
             new Splits();
+
 
             Simulator_StatePollerThread = new Thread(Simulator_StatePoller);
             Simulator_StatePollerThread.Start();
@@ -189,8 +195,11 @@ namespace SimTelemetry.Data
         {
             // Start trackparser.
             //Wait 500ms because the track-parser may need some time to complete parsing the track.
-            Track = new TrackParser(Sim.Session.GameDirectory, Sim.Session.GameData_TrackFile);
-            Thread.Sleep(500);
+            if (!Net.IsClient)
+            {
+                Track = new TrackParser(Sim.Session.GameDirectory, Sim.Session.GameData_TrackFile);
+                Thread.Sleep(500);
+            }
 
             if (Track_Loaded != null)
                 Track_Loaded(null);
@@ -203,20 +212,24 @@ namespace SimTelemetry.Data
         /// <remarks>For proper shutdown of this thread, call TritonBase.TriggerExit();</remarks>
         private void Simulator_StatePoller()
         {
-            // Run whenver the TritonBase (Framework) is active.
+            // Run whenever the TritonBase (Framework) is active.
             while (TritonBase.Active)
             {
                 foreach (ISimulator sim in this.Sims.Sims)
                 {
+                    if (Telemetry.m.Net.IsClient
+                        && sim != Telemetry.m.Sims.Network)
+                        continue;
+
                     if (Simulator_StateCollection.ContainsKey(sim.ProcessName) == false)
                         Simulator_StateCollection.Add(sim.ProcessName, new Telemetry_SimState());
 
                     Telemetry_SimState state = Simulator_StateCollection[sim.ProcessName];
 
-                    if (sim.Memory.Attached != state.Active) // Simulator events.
+                    if (sim.Attached != state.Active) // Simulator events.
                     {
-                        state.Active = sim.Memory.Attached;
-                        if (sim.Memory.Attached)
+                        state.Active = sim.Attached;
+                        if (sim.Attached)
                         {
                             Report_SimStart(sim);
                         }
@@ -241,7 +254,7 @@ namespace SimTelemetry.Data
                             Report_SessionStop(sim);
                         }
                     }
-                    if (sim.Session.Active && sim.Drivers.Player != null)
+                    if (sim.Session != null && sim.Drivers != null && sim.Session.Active && sim.Drivers.Player != null)
                     {
                         if (state.Active && sim.Drivers.Player.Driving != state.Driving)
                         {
@@ -355,7 +368,10 @@ namespace SimTelemetry.Data
         /// <param name="track">Relative path from gamedirectory to track file.</param>
         public void Track_Load(string gamedir, string track)
         {
-            Track = new TrackParser(gamedir, track);
+            if (!Net.IsClient)
+            {
+                Track = new TrackParser(gamedir, track);
+            }
         }
 
         /// <summary>

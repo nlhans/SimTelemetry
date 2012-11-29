@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Windows.Forms;
 
 namespace LiveTelemetry
@@ -25,6 +26,7 @@ namespace LiveTelemetry
 
         public ucResizableImage(string image)
         {
+            if (File.Exists(image) == false) return;
             Caption = "";
             InitializeComponent();
 
@@ -65,6 +67,9 @@ namespace LiveTelemetry
 
         public void Crop(int w, int h, bool resize)
         {
+            if (imageBMP == null)
+                return;
+
             if (h > imageBMP.Size.Height)
                 h = imageBMP.Size.Height;
 

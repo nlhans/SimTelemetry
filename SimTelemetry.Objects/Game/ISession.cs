@@ -50,11 +50,12 @@
         [LogProperty("No. of cars on track", "The amount of cars on track.")]
         int Cars_OnTrack { get; set; }
 
-        [Loggable(true)]
+        [LogOnChange]
         [LogProperty("No. of cars", "Total amount of cars in session")]
         int Cars { get; set; }
 
-        [Unloggable]
+        //[Unloggable]
+        [Loggable(1)]
         [LogProperty("Session Active", "Is the game currently running a session?")]
         bool Active { get; set; }
 

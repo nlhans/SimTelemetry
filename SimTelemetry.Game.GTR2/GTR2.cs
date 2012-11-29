@@ -99,9 +99,11 @@ namespace SimTelemetry.Game.GTR2
             get { return null; }
         }
 
-        public MemoryPolledReader Memory
+        private MemoryPolledReader Memory
         {
             get { return _Memory; }
         }
+        public bool Attached { get { return Memory.Attached; } }
+        public bool UseMemoryReader { get { return true; } }
     }
 }

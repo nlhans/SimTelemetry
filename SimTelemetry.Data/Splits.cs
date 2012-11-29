@@ -34,6 +34,9 @@ namespace SimTelemetry.Data
             UpdateSplitTime = new Timer {Interval = 50};
             UpdateSplitTime.Elapsed += (s, e) =>
                                            {
+                                               if (Telemetry.m.Sim == null || Telemetry.m.Sim.Drivers == null || Telemetry.m.Sim.Drivers.Player == null)
+                                                   return;
+
                                                double MyMeters = Telemetry.m.Sim.Drivers.Player.MetersDriven;
                                                double MyDt = Telemetry.m.Sim.Session.Time - Time_Start;
                                                double OldTime = GetTimeFromTable(MyMeters);
@@ -55,6 +58,8 @@ namespace SimTelemetry.Data
                                                if (Telemetry.m.Sim == null) return;
                                                if (Telemetry.m.Track == null) return;
                                                if (Telemetry.m.Track.Name == null) return;
+                                               if (Telemetry.m.Net.IsClient) return;
+
                                                OleDbConnection con =
                                                    DatabaseOleDbConnectionPool.GetOleDbConnection();
                                                using (

@@ -21,7 +21,9 @@ namespace SimTelemetry.Objects
 
         IGarage Garage { get; }
 
-        MemoryPolledReader Memory { get; }
-        //bool Attached { get; }
+
+        //MemoryPolledReader Memory { get; }
+        bool Attached { get; }
+        bool UseMemoryReader { get; }
     }
 }

@@ -39,6 +39,7 @@ namespace SimTelemetry.Data.Track
 
         public TrackParser(string path, string name)
         {
+            if (name == null) return;
             Route = new RouteCollection();
             Apexes = new ApexCollection();
             Sections = new SectionsCollection();
@@ -60,7 +61,7 @@ namespace SimTelemetry.Data.Track
         private double PreviousTime;
         public void LapLogger_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (Telemetry.m.Active_Session)
+            if (Telemetry.m.Active_Session && Telemetry.m.Sim.Modules.Time_Available)
             {
                 try
                 {

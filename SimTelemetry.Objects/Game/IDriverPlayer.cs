@@ -72,15 +72,19 @@
         double Suspension_RideHeight_RR_G { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_LF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_LR { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_RF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_RR { set; get; }
 
         [LogOnChange]
@@ -111,15 +115,19 @@
         double Tyre_Pressure_Optimal_RR { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_LF { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_LR { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_RF { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_RR { set; get; }
 
         [LogOnChange]
@@ -147,51 +155,67 @@
         double Tyre_Grip_Sidewards_RR { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_LF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_LR { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_RF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_RR { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LF_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LR_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RF_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RR_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LF_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LR_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RF_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RR_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LF_Outside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LR_Outside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RF_Outside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RR_Outside { set; get; }
 
         [LogOnChange]
@@ -282,6 +306,7 @@
         int Aerodynamics_BrakeDuct_Setting { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Engine_RPM { set; get; }
 
         [LogOnChange]
@@ -309,9 +334,11 @@
         double Engine_Idle_ThrottleGain { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Engine_Torque_Negative { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Engine_Torque { set; get; }
 
         [LogOnChange]
@@ -333,15 +360,19 @@
         double Brake_TypicalFailure_RR { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_LF { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_LR { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_RF { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_RR { set; get; }
 
         [LogOnChange]
@@ -399,15 +430,19 @@
         double Clutch_Friction { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Pedals_Clutch { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Pedals_Throttle { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Pedals_Brake { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double SteeringAngle { set; get; }
 
         [LogOnChange]
@@ -432,6 +467,7 @@
         bool DrivingHelp_AutoClutch { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Speed { set; get; }
 
         [LogOnChange]
@@ -447,6 +483,7 @@
         double Brake_InitialThickness_RR { get; set; }
 
         [Loggable(25)]
+        [LogOnChange]
         double SpeedSlipping { get; set; }
     }
 

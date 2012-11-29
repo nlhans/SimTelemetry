@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Timers;
+using SimTelemetry.Game.Network;
 using SimTelemetry.Objects;
 using Triton;
 
@@ -31,7 +32,23 @@ namespace SimTelemetry.Data
         /// List of simulator objects available in catalog. Searches for objects implementing ISimulator.
         /// </summary>
         [ImportMany(typeof(ISimulator))]
-        public List<ISimulator> Sims { get; set; }
+        public List<ISimulator> _Sims { get; set; }
+        public List<ISimulator> Sims{get
+        {
+            if (Telemetry.m.Net.IsClient)
+            {
+                List<ISimulator> simList= new List<ISimulator>();
+                simList.Add(Network);
+                return simList;
+            }
+            else
+            {
+                return _Sims;
+            }
+        }
+        set { _Sims = value; }}
+
+        public ISimulator Network { get; set; }
 
         /// <summary>
         /// Upon initializing try loading all simulators from the catalog.
@@ -59,6 +76,16 @@ namespace SimTelemetry.Data
                     sim.Host = Telemetry.m;
                     sim.Initialize();
                 }
+
+                if (Network != null)
+                {
+                    throw new Exception("Network already added");
+                }
+                Network = new NetworkGame {Host = Telemetry.m};
+                Network.Initialize();
+
+                Sims.Add(Network);
+                
             }
             catch (Exception ex)
             {
@@ -87,7 +114,7 @@ namespace SimTelemetry.Data
         {
             return Sims.FindAll(delegate(ISimulator sim)
                                     {
-                                        return sim.Memory.Attached; // TODO: Use localized detection; not all may use memory.
+                                        return sim.Attached; // TODO: Use localized detection; not all may use memory.
                                     });
         }
 
@@ -97,6 +124,9 @@ namespace SimTelemetry.Data
         /// <returns></returns>
         public ISimulator GetRunning()
         {
+            
+            if (Network != null && Network.Attached)
+                return Network;
             List<ISimulator> sms = GetAllRunning();
             if (sms.Count > 0) 
                 return sms[0];

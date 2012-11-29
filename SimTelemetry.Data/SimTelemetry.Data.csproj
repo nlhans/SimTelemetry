@@ -55,6 +55,19 @@
     <Compile Include="Logger\TelemetryLogReplay.cs" />
     <Compile Include="Logger\TelemetryLogWriter.cs" />
     <Compile Include="Logger\TelemetryLoggerSubscribedInstance.cs" />
+    <Compile Include="Net\NetworkAppState.cs" />
+    <Compile Include="Net\NetworkPacket.cs" />
+    <Compile Include="Net\NetworkTypes.cs" />
+    <Compile Include="Net\Objects\NetworkDriverGeneral.cs" />
+    <Compile Include="Net\Objects\NetworkDriverPlayer.cs" />
+    <Compile Include="Net\Objects\NetworkDrivers.cs" />
+    <Compile Include="Net\Objects\NetworkGame.cs" />
+    <Compile Include="Net\Objects\NetworkGarage.cs" />
+    <Compile Include="Net\Objects\NetworkSession.cs" />
+    <Compile Include="Net\TelemetryClient.cs" />
+    <Compile Include="Net\TelemetryNetwork.cs" />
+    <Compile Include="Net\TelemetryServer.cs" />
+    <Compile Include="Net\TelemetryServerClient.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

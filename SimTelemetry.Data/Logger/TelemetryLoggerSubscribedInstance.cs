@@ -12,6 +12,10 @@ namespace SimTelemetry.Data.Logger
     {
         public Type type { get; protected set; }
         public object instance { get; protected set; }
+        protected string Name { get; set; }
+
+        // Frequency of telemetrylogger
+        public double RunFrequency { get; set; }
 
         // Analysis of class
         public PropertyDescriptorCollection PropertyDescriptors { get; set; }
@@ -37,10 +41,20 @@ namespace SimTelemetry.Data.Logger
         // Unique ID for dump file
         public ushort ID { get; set; }
 
+        public bool ResetOnchange { get; set; }
+
+        public TelemetryLoggerSubscribedInstance(string name, Type type, object instance) : this(type, instance)
+        {
+            this.Name = name;
+        }
+
         public TelemetryLoggerSubscribedInstance(Type type, object instance)
         {
             this.type = type;
             this.instance = instance;
+
+
+            RunFrequency = 100.0;
 
             HyperTypeDescriptionProvider.Add(type);
 
@@ -127,7 +141,7 @@ namespace SimTelemetry.Data.Logger
 
                 // 10ms ticks.
                 FrequencyCounter[name]++;
-                double val = FrequencyCounter[name] / 100.0;
+                double val = FrequencyCounter[name] / RunFrequency;
                 if (val >= 1.0 / Frequency)
                 {
                     FrequencyCounter[name] = 0;
@@ -144,6 +158,9 @@ namespace SimTelemetry.Data.Logger
                     dump = !data.Equals(LogOnChangePreviousValue[name]);
 
                     LogOnChangePreviousValue[name] = data;
+
+                    if (this.ResetOnchange)
+                        dump = true;
                 }
 
 
@@ -214,6 +231,60 @@ namespace SimTelemetry.Data.Logger
             }
             return output.ToArray();
 
+        }
+
+        public byte[] ExportHeader()
+        {
+
+            List<byte> tmpheader = new List<byte>();
+
+
+            byte[] data = new byte[64];
+            ByteMethods.memcpy(data, ASCIIEncoding.ASCII.GetBytes(this.Name), 64, 0, 0);
+
+            byte[] header = new byte[10];
+            header[0] = (byte)'$';
+            header[1] = (byte)'#';                                                                      // Sync
+            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.InstanceName), 2, 4, 0); // Packet ID
+            ByteMethods.memcpy(header, BitConverter.GetBytes(this.ID), 2, 6, 0);          // Instance ID
+            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)data.Length), 2, 8, 0);            // Data length
+
+            tmpheader.AddRange(header);
+            tmpheader.AddRange(data);
+
+            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.InstanceMember), 2, 4, 0); // Packet ID
+            ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)68), 2, 8, 0);            // Data length
+            foreach (KeyValuePair<string, int> properyMap in this.Mapping)
+            {
+                data = new byte[68];
+                short type = 0xFF;
+                Type t = this.PropertyDescriptors.Find(properyMap.Key, true).PropertyType;
+
+                // TODO: Put in enumerator
+                // Or find something nicer for this.
+                if (t == typeof(double)) type = 0;
+                if (t == typeof(float)) type = 1;
+                if (t == typeof(Int32)) type = 2;
+                if (t == typeof(Int16)) type = 3;
+                if (t == typeof(byte)) type = 4;
+                if (t == typeof(UInt32)) type = 5;
+                if (t == typeof(UInt16)) type = 6;
+                if (t == typeof(char)) type = 7;
+                if (t == typeof(string)) type = 8;
+                if (t == typeof(bool)) type = 9;
+                if (type < 0xFF)
+                {
+                    ByteMethods.memcpy(data, BitConverter.GetBytes(type), 2, 0, 0);
+                    ByteMethods.memcpy(data, BitConverter.GetBytes(properyMap.Value), 2, 2, 0);
+                    ByteMethods.memcpy(data, ASCIIEncoding.ASCII.GetBytes(properyMap.Key), 64, 4, 0);
+
+                    tmpheader.AddRange(header);
+                    tmpheader.AddRange(data);
+                }
+            }
+
+
+            return tmpheader.ToArray();
         }
 
     }

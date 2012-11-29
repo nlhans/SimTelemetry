@@ -45,12 +45,14 @@ namespace LiveTelemetry.Garage
 
             foreach (ISimulator sim in Telemetry.m.Sims.Sims)
             {
+                bool validSim = (sim.Garage == null || sim.Garage.Available == false ||
+                                 !Directory.Exists(sim.Session.GameDirectory));
                 if (File.Exists("Simulators/" + sim.ProcessName + ".png"))
                 {
                     ucResizableImage pb = new ucResizableImage("Simulators/" + sim.ProcessName + ".png");
                     pb.Margin = new Padding(10);
                     pb.Name = sim.Name;
-                    if (sim.Garage == null)
+                    if (validSim)
                     {
                         pb.Disabled = true;
                     }
@@ -69,7 +71,7 @@ namespace LiveTelemetry.Garage
                     l.Font = new Font("Tahoma", 24.0f, FontStyle.Bold);
                     l.TextAlign = ContentAlignment.MiddleCenter;
                     l.Name = sim.Name;
-                    if (sim.Garage == null)
+                    if (validSim)
                     {
                         l.ForeColor = Color.Gray;
                     }
