@@ -20,18 +20,11 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using SimTelemetry.Objects.Garage;
-using Triton.Maths;
-using ElapsedEventHandler = System.Timers.ElapsedEventHandler;
 using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
 using Timer = System.Timers.Timer;
 using SimTelemetry.Objects;
-using System.Globalization;
 using Triton;
 
 namespace SimTelemetry.Data.Track
@@ -39,24 +32,22 @@ namespace SimTelemetry.Data.Track
     public class Track : ITrackParser
     {
         public List<Lap> TrackLogger = new List<Lap>(); // logger data with laptimes.
-        
-        private double _Length;
-        public double Length { get { return _Length; } }
-        public SectionsCollection Sections { get; set; }
-        public RouteCollection Route { get; set; }
-        public ApexCollection Apexes { get; set; }
 
         private Timer LapLogger;
 
         public event AnonymousSignal DriverLap;
         public event AnonymousSignal PlayerLap;
 
+        #region Track information
+        public RouteCollection Route { get; set; }
+        public SectionsCollection Sections { get; set; }
+        public ApexCollection Apexes { get; set; }
 
         public string Location { get; protected set; }
-        public string LengthStr { get; protected set; }
+        public double Length { get { return Route.Length; } }
         public string Type { get; protected set; }
         public string Name { get; protected set; }
-
+        #endregion
 
         public Track(string name)
         {
@@ -74,7 +65,6 @@ namespace SimTelemetry.Data.Track
                     track.Scan();
                     track.ScanRoute();
                     Location = track.Location;
-                    LengthStr = string.Format("{0:00000.00}m", track.Length);
                     Type = track.Type;
                     Name = track.Name;
 
@@ -195,14 +185,14 @@ namespace SimTelemetry.Data.Track
         {
             int lap = driver.Laps - offset;
             int drv = driver.MemoryBlock;
-            List<Lap> l = TrackLogger.FindAll(delegate(Lap lm) { return lm.LapNo == lap && lm.DriverNo == drv; });
+            List<Lap> l = TrackLogger.Where(lm => lm.LapNo == lap && lm.DriverNo == drv).ToList();
 
             if (l.Count == 0) return new Lap { LapNo = -1 };
             else return l[0];
         }
         private void SetLap(IDriverGeneral driver, Lap l)
         {
-            int i = TrackLogger.FindIndex(delegate(Lap lm) { return l.LapNo == lm.LapNo && l.DriverNo == lm.DriverNo; });
+            int i = TrackLogger.FindIndex(lm => l.LapNo == lm.LapNo && l.DriverNo == lm.DriverNo);
 
             if (i < 0) TrackLogger.Add(l);
             else TrackLogger[i] = l;

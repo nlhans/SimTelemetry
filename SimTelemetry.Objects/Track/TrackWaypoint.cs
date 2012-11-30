@@ -18,9 +18,11 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System;
+
 namespace SimTelemetry.Objects
 {
-    public struct TrackWaypoint
+    public struct TrackWaypoint : ICloneable
     {
         public double X;
         public double Y;
@@ -32,5 +34,23 @@ namespace SimTelemetry.Objects
         public double[] CoordinateL;
         public double[] CoordinateR;
         public double[] PerpVector;
+
+        public object Clone()
+        {
+            TrackWaypoint wp = new TrackWaypoint();
+
+            wp.X = X;
+            wp.Y = Y;
+            wp.Z = Z;
+
+            wp.Route = Route;
+            wp.Sector = Sector;
+            wp.Meters = Meters;
+            wp.CoordinateL = CoordinateL;
+            wp.CoordinateR = CoordinateR;
+            wp.PerpVector = PerpVector;
+
+            return wp;
+        }
     }
 }

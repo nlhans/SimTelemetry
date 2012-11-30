@@ -87,8 +87,8 @@ namespace SimTelemetry.Data.Track
                     {
                         pos_x_max = Math.Max(wp.X, pos_x_max);
                         pos_x_min = Math.Min(wp.X, pos_x_min);
-                        pos_y_max = Math.Max(wp.Z, pos_y_max);
-                        pos_y_min = Math.Min(wp.Z, pos_y_min);
+                        pos_y_max = Math.Max(wp.Y, pos_y_max);
+                        pos_y_min = Math.Min(wp.Y, pos_y_min);
                     }
                 }
 
@@ -113,7 +113,7 @@ namespace SimTelemetry.Data.Track
                     if (wp.Route == TrackRoute.MAIN)
                     {
                         float x1 = Convert.ToSingle(6 + ((wp.X - pos_x_min)/scale*map_width) + offset_x);
-                        float y1 = Convert.ToSingle(6 + (1 - (wp.Z - pos_y_min)/scale)*map_height + offset_y);
+                        float y1 = Convert.ToSingle(6 + (1 - (wp.Y - pos_y_min)/scale)*map_height + offset_y);
 
                         x1 = Limits.Clamp(x1, -1000, 1000);
                         y1 = Limits.Clamp(y1, -1000, 1000);

@@ -146,13 +146,6 @@ namespace LiveTelemetry
                     if (line.StartsWith("controller"))
                         controller = p[1];
 
-                    if (line.StartsWith("trackmap"))
-                    {
-                        if (p[1] == "static")
-                            LiveTrackMap.StaticTrackMap = true;
-                        else
-                            LiveTrackMap.StaticTrackMap = false;
-                    }
 
                 }
 

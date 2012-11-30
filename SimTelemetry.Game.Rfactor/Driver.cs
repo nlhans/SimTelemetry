@@ -113,7 +113,7 @@ namespace SimTelemetry.Game.Rfactor
 
         }
         
-        public double CoordinateY
+        public double CoordinateZ
         {
             //get { return rFactor.Game.ReadDouble(new IntPtr(this.BaseAddress + 0x28A0)); }
             set { }
@@ -121,7 +121,7 @@ namespace SimTelemetry.Game.Rfactor
 
         }
         
-        public double CoordinateZ
+        public double CoordinateY
         {
             //get { return rFactor.Game.ReadDouble(new IntPtr(this.BaseAddress + 0x28A4)); }
             set { }

@@ -20,6 +20,7 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimTelemetry.Objects
 {
@@ -30,7 +31,8 @@ namespace SimTelemetry.Objects
 
         public RouteCollection()
         {
-            
+            Racetrack = new List<TrackWaypoint>();
+            Pitlane = new List<TrackWaypoint>();
         }
 
         public double Length = 0;
@@ -46,46 +48,18 @@ namespace SimTelemetry.Objects
             y_max = Math.Max(wp.Z, y_max);
 
             if (wp.Route == TrackRoute.MAIN)
-            {
-                if (Racetrack == null) Racetrack = new List<TrackWaypoint>();
                 Racetrack.Add(wp);
 
-            }
             if (wp.Route == TrackRoute.PITLANE)
-            {
-                if (Pitlane == null) Pitlane = new List<TrackWaypoint>();
                 Pitlane.Add(wp);
-
-            }
 
         }
 
         public void Finalize()
         {
-            if (Racetrack != null)
-            {
-                Racetrack.Sort(delegate(TrackWaypoint wp1, TrackWaypoint wp2)
-                                   {
-                                       if (wp1.Meters > wp2.Meters) return 1;
-                                       if (wp2.Meters > wp1.Meters) return -1;
-
-                                       return 0; // equal?
-
-                                   });
-                Length = Racetrack[Racetrack.Count - 1].Meters;
-            }
-            if (Pitlane != null)
-            {
-                Pitlane.Sort(delegate(TrackWaypoint wp1, TrackWaypoint wp2)
-                                 {
-                                     if (wp1.Meters > wp2.Meters) return 1;
-                                     if (wp2.Meters > wp1.Meters) return -1;
-                                     return 0; // equal?
-
-                                 });
-            }
-
-            // TODO: Check ascending order
+            Racetrack = Racetrack.OrderBy(x => x.Meters).ToList();
+            Pitlane = Pitlane.OrderBy(x => x.Meters).ToList();
+            Length = Racetrack.Max(x => x.Meters);
         }
 
         public object Clone()

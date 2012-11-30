@@ -24,8 +24,8 @@ namespace SimTelemetry.Objects
 {
     public interface ITrackParser
     {
-        string Location { get;  }
-        string LengthStr { get;  }
+        string Location { get; }
+        double Length { get; }
         string Type { get;  }
         string Name { get;  }
 
@@ -35,6 +35,5 @@ namespace SimTelemetry.Objects
         SectionsCollection Sections { get; set; }
         RouteCollection Route { get; set; }
         ApexCollection Apexes { get; set; }
-        double Length { get; }
     }
 }

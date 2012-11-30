@@ -47,19 +47,11 @@ namespace SimTelemetry
 
         protected override void OnPaint(PaintEventArgs e)
          {
-            AutoPosition = false;// let us do that!
-            AccurateTrackWidth = true;
-
             if (_mMaster.Data == null)
             {
                 e.Graphics.FillRectangle(Brushes.Black, e.ClipRectangle);
                 return;
             }
-            pos_x_max = -100000;
-            pos_x_min = 100000;
-            pos_y_max = -100000;
-            pos_y_min = 1000000;
-
 
             try
             {
@@ -72,24 +64,24 @@ namespace SimTelemetry
                         {
                             if (_mMaster.TimeLine[1] >= s.Key/1000.0 && s.Key/1000.0 >= _mMaster.TimeLine[0])
                             {
-                                pos_x_max = Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_max);
-                                pos_x_min = Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_min);
+                                pos_x_max = (float)Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_max);
+                                pos_x_min = (float)Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_min);
 
-                                pos_y_max = Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_max);
-                                pos_y_min = Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_min);
+                                pos_y_max = (float)Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_max);
+                                pos_y_min = (float)Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_min);
                             }
                         }
 
                         //:???
-                        double x_d = pos_x_max - pos_x_min;
-                        double y_d = pos_y_max - pos_y_min;
-                        double d = Math.Max(y_d, x_d);
+                        float x_d = pos_x_max - pos_x_min;
+                        float y_d = pos_y_max - pos_y_min;
+                        float d = Math.Max(y_d, x_d);
 
-                        pos_x_min -= (x_d - d)/2;
-                        pos_x_min += (x_d - d)/2;
+                        pos_x_min -= (x_d - d)/2.0f;
+                        pos_x_min += (x_d - d)/2.0f;
 
-                        pos_y_min -= (x_d - d)/2;
-                        pos_y_min += (x_d - d)/2;
+                        pos_y_min -= (x_d - d)/2.0f;
+                        pos_y_min += (x_d - d)/2.0f;
                     }
                 }
             }

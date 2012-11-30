@@ -23,6 +23,7 @@
     using System.Collections.Generic;
     using System.Drawing;
     using System.Drawing.Drawing2D;
+    using System.Linq;
     using System.Windows.Forms;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
@@ -33,21 +34,31 @@ namespace SimTelemetry.Controls
 {
     public partial class TrackMap : UserControl
     {
-        public static bool StaticTrackMap = false; // only static atm
+        protected float pos_x_max;
+        protected float pos_x_min;
+        protected float pos_y_max;
+        protected float pos_y_min;
 
-        public string AIW_File = "";
+        protected double map_width;
+        protected double map_height;
 
-        // Settings for inherited classes
-        protected bool AutoPosition = true;
-        protected bool AccurateTrackWidth = false;
+        protected Bitmap _EmptyTrackMap;
 
-        protected double pos_x_max = 1000000000.0;
-        protected double pos_x_min = -1000000000.0;
-        protected double pos_y_max = 1000000000.0;
-        protected double pos_y_min = -1000000000.0;
-        protected double map_width = 0;
-        protected double map_height = 0;
-        protected WayPoint[] waypoints = new WayPoint[25001];
+
+        #region Settings
+
+        Brush brush_sector1 = new SolidBrush(Color.FromArgb(105, 105, 105));
+        Brush brush_sector2 = new SolidBrush(Color.FromArgb(47, 79, 79));
+        Brush brush_sector3 = new SolidBrush(Color.FromArgb(85, 107, 47));
+
+        Font tf24 = new Font("Calibri", 24f);
+        Font tf16 = new Font("Calibri", 16f);
+        Font tf12 = new Font("Calibri", 12f);
+        Font tf18 = new Font("Calibri", 18f);
+
+        #endregion
+
+
         protected override void OnPaint(PaintEventArgs e)
         {
 
@@ -62,107 +73,36 @@ namespace SimTelemetry.Controls
                 g.DrawImage(_EmptyTrackMap, 0, 0);
             }
         }
-
-        protected Bitmap _EmptyTrackMap;
-
-
-        #region Settings
-        float track_width = 6f;
-        float pitlane_width = 4f;
-
-        Pen brush_start = new Pen(Color.FromArgb(200, 50, 30), 6f); // 6f=track_width
-        Brush brush_sector1 = new SolidBrush(Color.FromArgb(105, 105, 105));
-        Brush brush_sector2 = new SolidBrush(Color.FromArgb(47, 79, 79));
-        Brush brush_sector3 = new SolidBrush(Color.FromArgb(85, 107, 47));
-        Brush brush_pitlane = new SolidBrush(Color.FromArgb(100, Color.Orange));
-
-        Font tf24 = new Font("calibri", 24f);
-        Font tf16 = new Font("calibri", 16f);
-        Font tf12 = new Font("calibri", 12f);
-        Font tf18 = new Font("calibri", 18f);
-        #endregion
-
         public void UpdateTrackmap()
         {
             _EmptyTrackMap = new Bitmap(10 + this.Size.Width, 10 + this.Size.Height);
             Graphics g = Graphics.FromImage(_EmptyTrackMap);
             g.FillRectangle(Brushes.Black, 0, 0, this.Size.Width, this.Size.Height);
 
-            if (Telemetry.m.Track == null || Telemetry.m.Track.Route == null || Telemetry.m.Track.Route.Racetrack == null)
+            if (Telemetry.m.Track == null || Telemetry.m.Track.Route == null ||
+                Telemetry.m.Track.Route.Racetrack == null)
                 return;
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            if (AutoPosition)
-            {
 
-                pos_x_max = -100000;
-                pos_x_min = 100000;
-                pos_y_max = -100000;
-                pos_y_min = 1000000;
-
-                if (Telemetry.m.Track.Route.Pitlane != null)
-                {
-                    foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
-                    {
-                        pos_x_max = Math.Max(wp.X, pos_x_max);
-                        pos_x_min = Math.Min(wp.X, pos_x_min);
-                        pos_y_max = Math.Max(wp.Z, pos_y_max);
-                        pos_y_min = Math.Min(wp.Z, pos_y_min);
-                    }
-                }
-                foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
-                {
-                    pos_x_max = Math.Max(wp.X, pos_x_max);
-                    pos_x_min = Math.Min(wp.X, pos_x_min);
-                    pos_y_max = Math.Max(wp.Z, pos_y_max);
-                    pos_y_min = Math.Min(wp.Z, pos_y_min);
-                }
-
-
-            }
+            pos_x_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.X))*1.1f;
+            pos_x_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.X))*1.1f;
+            pos_y_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.Y))*1.1f;
+            pos_y_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.Y))*1.1f;
 
             if (this.Height > this.Width)
             {
                 map_width = this.Width;
                 map_height = this.Height - 150;
-                if (map_height / map_width > 1.2)
+                if (map_height/map_width > 1.2)
                     map_height = Math.Min(this.Height, this.Width);
             }
             else
             {
                 map_width = Math.Min(this.Height, this.Width);
-                map_height = this.Height-200;
+                map_height = this.Height - 200;
             }
 
-            List<PointF> pitlane_a = new List<PointF>();
-            List<PointF> pitlane_b = new List<PointF>();
-            if (Telemetry.m.Track.Route.Pitlane != null)
-            {
-                foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Pitlane)
-                {
-                    float x1 =
-                        Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
-                    float y1 =
-                        Convert.ToSingle(100 +
-                                         (1 - (wp.CoordinateL[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
-                    float x2 =
-                        Convert.ToSingle(10 + ((wp.CoordinateR[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
-                    float y2 =
-                        Convert.ToSingle(100 +
-                                         (1 - (wp.CoordinateR[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
-
-                    // This is for your own safety :)
-                    x1 = Limits.Clamp(x1, -100000, 100000);
-                    y1 = Limits.Clamp(y1, -100000, 100000);
-                    x2 = Limits.Clamp(x2, -100000, 100000);
-                    y2 = Limits.Clamp(y2, -100000, 100000);
-
-                    //g.FillEllipse(brush_pitlane, x1, y1, 6.0f, 6.0f);
-
-
-                }
-            }
-            double wp_lastMeters = 0;
             Font f = new Font("Tahoma", 9f);
             List<PointF> sector1a = new List<PointF>();
             List<PointF> sector2a = new List<PointF>();
@@ -170,21 +110,31 @@ namespace SimTelemetry.Controls
             List<PointF> sector1b = new List<PointF>();
             List<PointF> sector2b = new List<PointF>();
             List<PointF> sector3b = new List<PointF>();
-            
+
+            // Create sector arrays.
             foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
             {
-                float x1 = Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
-                float y1 = Convert.ToSingle(100 + (1 - (wp.CoordinateL[1] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
-                float x2 = Convert.ToSingle(10 + ((wp.CoordinateR[0] - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
-                float y2 = Convert.ToSingle(100 + (1 - (wp.CoordinateR[1] - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
+                // Left side
+                float x1 =
+                    Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
+                float y1 =
+                    Convert.ToSingle(100 +
+                                     (1 - (wp.CoordinateL[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
+                // Right side
+                float x2 =
+                    Convert.ToSingle(10 + ((wp.CoordinateR[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
+                float y2 =
+                    Convert.ToSingle(100 +
+                                     (1 - (wp.CoordinateR[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
 
-                // This is for your own safety :)
-                x1 = Limits.Clamp(x1, -100000, 100000);
-                y1 = Limits.Clamp(y1, -100000, 100000);
-                x2 = Limits.Clamp(x2, -100000, 100000);
-                y2 = Limits.Clamp(y2, -100000, 100000);
+                // Reject invalid values.
+                if (x1 != Limits.Clamp(x1, pos_x_min, pos_x_max)) continue;
+                if (y1 != Limits.Clamp(y1, pos_y_min, pos_y_max)) continue;
+                if (x2 != Limits.Clamp(x2, pos_x_min, pos_x_max)) continue;
+                if (y2 != Limits.Clamp(y2, pos_y_min, pos_y_max)) continue;
 
-                switch(wp.Sector+1)
+                // Add by sector
+                switch (wp.Sector)
                 {
                     case 1:
                         sector1a.Add(new PointF(x1, y1));
@@ -199,41 +149,45 @@ namespace SimTelemetry.Controls
                         sector3b.Add(new PointF(x2, y2));
                         break;
                 }
-                wp_lastMeters = wp.Meters;
             }
 
-            // Combine both a&b polygon , but in reverse (i.e. a + reverse b)
+            // Add overlapping sections.
+            var sector1aLast = sector1a.LastOrDefault();
+            var sector2aLast = sector2a.LastOrDefault();
+            var sector3aLast = sector3a.LastOrDefault();
+
+            var sector1bLast = sector1b.LastOrDefault();
+            var sector2bLast = sector2b.LastOrDefault();
+            var sector3bLast = sector3b.LastOrDefault();
+
+            // Insert them at the beginning of each.
+            sector2a.Insert(0, sector1aLast);
+            sector3a.Insert(0, sector2aLast);
+            sector1a.Insert(0, sector3aLast);
+
+            sector2b.Insert(0, sector1bLast);
+            sector3b.Insert(0, sector2bLast);
+            sector1b.Insert(0, sector3bLast);
+
+            // Reverse 'right side' of the track and add it opposite to left side, so a polygon is created which can be filled.
             sector1b.Reverse();
             sector2b.Reverse();
             sector3b.Reverse();
-            pitlane_b.Reverse();
             sector1a.AddRange(sector1b);
             sector2a.AddRange(sector2b);
             sector3a.AddRange(sector3b);
-            pitlane_a.AddRange(pitlane_b);
 
-            // Draw polygons!
-            if (pitlane_a.Count > 0) g.FillPolygon(brush_pitlane, pitlane_a.ToArray());
-            if(sector1a.Count > 0)g.FillPolygon(brush_sector1, sector1a.ToArray());
+            // Draw the track itself.
+            if (sector1a.Count > 0) g.FillPolygon(brush_sector1, sector1a.ToArray());
             if (sector2a.Count > 0) g.FillPolygon(brush_sector2, sector2a.ToArray());
             if (sector3a.Count > 0) g.FillPolygon(brush_sector3, sector3a.ToArray());
 
-            // draw track name
-            try
-            {
-                g.DrawString(Telemetry.m.Track.Name, tf24, Brushes.White, 10f, 10f);
-                g.DrawString(Telemetry.m.Track.Location, tf18, Brushes.White, 10f, 40f);
-                g.DrawString(Telemetry.m.Track.Length.ToString("0000.0m") + " , " + Telemetry.m.Track.Type, tf12, Brushes.White, 10f, 65f);
+            // Draw track details.
+            g.DrawString(Telemetry.m.Track.Name, tf24, Brushes.White, 10f, 10f);
+            g.DrawString(Telemetry.m.Track.Location, tf18, Brushes.White, 10f, 40f);
+            g.DrawString(Telemetry.m.Track.Length.ToString("0000.0m") + " , " + Telemetry.m.Track.Type, tf12,  Brushes.White, 10f, 65f);
 
-            }
-            catch (Exception ex)
-            {
-
-
-            }
-            
-            this.Invalidate();
-
+            Invalidate();
         }
 
         public TrackMap()
@@ -242,21 +196,21 @@ namespace SimTelemetry.Controls
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            this.SizeChanged += new EventHandler(TrackMap_SizeChanged);
 
-            Telemetry.m.Track_Loaded += new Triton.Signal(m_Track_Load);
+            SizeChanged += TrackMap_SizeChanged;
+            Telemetry.m.Track_Loaded += m_Track_Load;
         }
 
-        void TrackMap_SizeChanged(object sender, EventArgs e)
+        private void TrackMap_SizeChanged(object sender, EventArgs e)
         {
             UpdateTrackmap();
         }
 
-        void m_Track_Load(object sender)
+        private void m_Track_Load(object sender)
         {
-            if (this.InvokeRequired)
+            if (InvokeRequired)
             {
-                this.Invoke(new Signal(m_Track_Load), new object[1] { sender });
+                Invoke(new Signal(m_Track_Load), new object[1] { sender });
                 return;
             }
             UpdateTrackmap();
