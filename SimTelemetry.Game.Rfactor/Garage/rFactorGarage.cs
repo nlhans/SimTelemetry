@@ -154,5 +154,14 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
             return null;
         }
+
+        public ITrack SearchTrack(string path)
+        {
+            if (ScannedTracks == false)
+                ScanTracks();
+            path = path.ToLower();
+            path = Path.GetFileNameWithoutExtension(path);
+            return _tracks.Where(x => x.File.Contains(path)).FirstOrDefault();
+        }
     }
 }

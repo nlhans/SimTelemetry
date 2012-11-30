@@ -29,7 +29,6 @@ namespace SimTelemetry.Objects
         string Type { get;  }
         string Name { get;  }
 
-
         event AnonymousSignal DriverLap;
         event AnonymousSignal PlayerLap;
 

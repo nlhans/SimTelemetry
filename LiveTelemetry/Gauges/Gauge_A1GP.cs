@@ -39,30 +39,34 @@ namespace LiveTelemetry
         private List<double> EngineUsage = new List<double>();
         private Filter PowerUsage = new Filter(5);
 
+
+        // Properties of car
+        private double RPM_Min;
+        private double RPM_Max;
+        private double Speed_Min;
+        private double Speed_Max;
+        private double Speed_Step;
+        private double Power_Max;
+
+
         private double Engine_LastLap = 1;
         private double Engine_Max;
-        private double Fuel_LastLap = 0;
+        private double Fuel_LastLap;
         private double Fuel_LastLapNo;
-        private double Engine_Shortterm = 0;
 
         private Joystick joy; 
         private Timer t = new Timer();
-        private int Counter = 0; // Timer used to reset engine wear.
-        private double fps = 10;
-        private DateTime lastrender = DateTime.Now; // FPS counter.
+        private int Counter; // Timer used to reset engine wear.
 
         private Image _EmptyGauges;
-
-        // Color scheme settings:
-        private Color DimColor = Color.FromArgb(70, 70, 70);
-        private SolidBrush DimBrush = new SolidBrush(Color.FromArgb(70, 70, 70));
         
         public Gauge_A1GP(Joystick j)
         {
+            Counter = 0;
             if (j != null)
             {
                 joy = j;
-                j.Release += new JoystickButtonEvent(j_Release);
+                j.Release += j_Release;
             }
             InitializeComponent();
             SetStyle(ControlStyles.UserPaint, true);
@@ -131,12 +135,6 @@ namespace LiveTelemetry
         #endregion
         #region UI drawing code
 
-        // Properties of car
-        private double RPM_Min;
-        private double RPM_Max;
-        private double Speed_Min;
-        private double Speed_Max;
-        private double SpeedStep;
         private void PaintBackground(object sender)
         {
 
@@ -167,19 +165,17 @@ namespace LiveTelemetry
                 Speed_Min = 0;
                 Speed_Max = Telemetry.m.Computations.TopSpeed();
 
-                SpeedStep = 30;
-                if (Speed_Max < 300) SpeedStep = 25;
-                if (Speed_Max < 200) SpeedStep = 20;
+                Speed_Step = 30;
+                if (Speed_Max < 300) Speed_Step = 25;
+                if (Speed_Max < 200) Speed_Step = 20;
 
-                if (Speed_Max%SpeedStep > 0)
-                    Speed_Max += SpeedStep - (Speed_Max%SpeedStep);
+                if (Speed_Max%Speed_Step > 0)
+                    Speed_Max += Speed_Step - (Speed_Max%Speed_Step);
 
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.DrawArc(new Pen(Color.White, 2f), border_bounds/2, border_bounds/2, height, height, 90, 225);
-                g.DrawArc(new Pen(Color.White, 2f), border_bounds/2 + 8, border_bounds/2 + 8, height - 16, height - 16,
-                          90, 225);
-                g.DrawArc(new Pen(Color.White, 2f), border_bounds/2 + 25, border_bounds/2 + 25, height - 50, height - 50,
-                          90, 225);
+                g.DrawArc(new Pen(Color.White, 2f), border_bounds/2 + 8, border_bounds/2 + 8, height - 16, height - 16, 90, 225);
+                g.DrawArc(new Pen(Color.White, 2f), border_bounds/2 + 25, border_bounds/2 + 25, height - 50, height - 50, 90, 225);
 
                 // ---------------------------------        RPM       ---------------------------------
                 int retry = 10;
@@ -188,9 +184,11 @@ namespace LiveTelemetry
                     RPM_Max = 1000*Math.Ceiling(Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live)/1000);
                     Thread.Sleep(10);
                 } while (RPM_Max < 100 && retry-- > 0);
+
                 RPM_Min = 0;
 
                 double RPM_Step = 2000;
+
                 // Ranges.
                 if (RPM_Max <= 8000) RPM_Step = 1000;
                 else if (RPM_Max <= 12000) RPM_Step = 2000;
@@ -215,7 +213,6 @@ namespace LiveTelemetry
                         RPM_Min -= (RPM_Min%RPM_Step);
 
                 }
-
 
                 if (RPM_Min%RPM_Step != 0)
                     RPM_Min += RPM_Step - (RPM_Min%RPM_Step);
@@ -295,7 +292,7 @@ namespace LiveTelemetry
                     this.BackgroundImage = _EmptyGauges;
                 }
 
-                for (double angle = 90; angle <= 90 + 225.1; angle += 225.0/((Speed_Max - Speed_Min)/SpeedStep))
+                for (double angle = 90; angle <= 90 + 225.1; angle += 225.0/((Speed_Max - Speed_Min)/Speed_Step))
                 {
 
                     double sin_a = Math.Sin(angle/180.0*Math.PI);
@@ -316,7 +313,13 @@ namespace LiveTelemetry
 
                 }
 
+                // Maximum power
+                Power_Max = Telemetry.m.Computations.MaximumPower(Telemetry.m.Sim, null);
+                if (Power_Max <= 0 || Power_Max >= 1000)
+                    Power_Max = 1000;
+
                 // ---------------------------------    Labels   ---------------------------------
+                SolidBrush DimBrush = new SolidBrush(Color.FromArgb(70, 70, 70));
 
                 // Throttle/brake
                 g.DrawString("PEDALS", font_arial_10, DimBrush, height - 50, 119);
@@ -406,16 +409,16 @@ namespace LiveTelemetry
                                Convert.ToSingle(Speed_gauge_yb));
                     g.FillEllipse(Brushes.DarkGreen, clip_height/2 - 10, clip_height/2 - 10, 20, 20);
 
-                    /* Bars filling up the speed bar proved  CPU intensive
-                    for (double angle = 90; angle <= fAngle_Speed; angle += 3.5)
+                    /* Bars filling up the speed bar proved  CPU intensive */
+                    /*for (double angle = 90; angle <= fAngle_Speed; angle += 3.5)
                     {
-                        double Spd = SpeedMin+(SpeedMax-SpeedMin)*(angle - 90)/225;
+                        double Spd = Speed_Min+(Speed_Max-Speed_Min)*(angle - 90)/225;
                         if (Spd > SpeedLive || Math.Abs(Spd - SpeedLive) < 0.5) break;
                         double le = 3;
                         if (angle + 3 > fAngle_Speed) le = fAngle_Speed - angle;
-                        Color clr = Color.FromArgb(Convert.ToInt32(100 + Spd*155/SpeedMax),
-                                                   Convert.ToInt32(255 - Spd*255/SpeedMax), 0);
-                        /g.DrawArc(new Pen(clr, 4f), Convert.ToSingle(border_bounds/2 + 4),
+                        Color clr = Color.FromArgb(Convert.ToInt32(100 + Spd*155/Speed_Max),
+                                                   Convert.ToInt32(255 - Spd*255/Speed_Max), 0);
+                        g.DrawArc(new Pen(clr, 4f), Convert.ToSingle(border_bounds/2 + 4),
                                   Convert.ToSingle(border_bounds/2 + 4), Convert.ToSingle(height - 8),
                                   Convert.ToSingle(height - 8), Convert.ToSingle(angle), Convert.ToSingle(le));
                     }*/
@@ -490,6 +493,8 @@ namespace LiveTelemetry
                                      width + border_bounds - 45, 139);
 
                     // Laps estimation.
+                    SolidBrush DimBrush = new SolidBrush(Color.FromArgb(70, 70, 70));
+
                     if (FuelUsage.Count > 5)
                     {
                         double avg = 0;
@@ -556,40 +561,24 @@ namespace LiveTelemetry
                     }
 
                     // Power
-                    double power, power_max;
+                    double power;
 
                     if (Telemetry.m.Sim.Modules.Engine_Power)
-                        power = Telemetry.m.Sim.Player.Engine_Torque*
-                                Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM)*Math.PI*2/60000.0;
+                        power = Telemetry.m.Sim.Player.Engine_Torque* Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM)*Math.PI*2/60000.0;
                     else power = 0;
-                    power /= 0.745699872; // TODO: Fix, this turns kW -> HP
+                    power = Power.KW_HP(power);
                     PowerUsage.Add(power);
                     PowerUsage.MaxSize = 3;
-                    //power = PowerUsage.Average;
 
-                    if (Telemetry.m.Sim.Modules.Engine_PowerCurve)
-                        power_max = 1000;
-                    else
-                        power_max = 1000; // TODO: Add minimum/maximum power plug-in support.
-
-                    float power_factor = Convert.ToSingle(power/power_max);
+                    float power_factor = Convert.ToSingle(power/Power_Max);
                     if (power_factor > 1f) power_factor = 1f;
+                    if (power_factor < 0f) power_factor = 0f;
 
                     g.FillRectangle(Brushes.Yellow, height + 10, 220, power_factor*120f, 13);
-                    g.DrawString((power).ToString("0000"), font_arial_10, Brushes.Yellow, width + border_bounds - 45,
-                                 220);
+                    g.DrawString((power).ToString("0000"), font_arial_10, Brushes.Yellow, width + border_bounds - 45, 220);
 
-                    // TMP:
+                    // Todo: temporary location.
                     g.DrawString(Splits.Split.ToString("0.000"), font_arial_10, Brushes.Red, 0, 10);
-
-                    // ---------------------------------      FPS     ---------------------------------
-                    /*
-                    TimeSpan dt = DateTime.Now.Subtract(lastrender);
-                    fps = fps*0.7 + 0.3*(1000/dt.TotalMilliseconds);
-                    if (double.IsInfinity(fps) || double.IsNaN(fps))
-                        fps = 0;
-                    g.DrawString(fps.ToString("00fps"), small_font, Brushes.White, 0, 0);
-                    lastrender = DateTime.Now;*/
                 }
             }
             catch (Exception ex)

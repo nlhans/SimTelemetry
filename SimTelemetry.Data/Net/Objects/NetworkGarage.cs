@@ -50,5 +50,10 @@ namespace SimTelemetry.Game.Network
         {
             return null;
         }
+
+        public ITrack SearchTrack(string path)
+        {
+            return null;
+        }
     }
 }

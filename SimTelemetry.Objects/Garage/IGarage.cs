@@ -56,5 +56,12 @@ namespace SimTelemetry.Objects.Garage
         /// <param name="?"></param>
         /// <returns></returns>
         ICar SearchCar(string CarClass, string CarModel);
+
+        /// <summary>
+        /// Searches for a track based on path
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        ITrack SearchTrack(string  path);
     }
 }

@@ -281,6 +281,10 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
         }
 
+        public string ToString()
+        {
+            return Name;
+        }
 
         public void ScanRoute()
         {

@@ -53,21 +53,24 @@ namespace SimTelemetry.Data
         /// </summary>
         [ImportMany(typeof(ISimulator))]
         public List<ISimulator> _Sims { get; set; }
-        public List<ISimulator> Sims{get
+        public List<ISimulator> Sims
         {
-            if (Telemetry.m.Net.IsClient)
+            get
             {
-                List<ISimulator> simList= new List<ISimulator>();
-                simList.Add(Network);
-                return simList;
-            }
-            else
-            {
+                if (Telemetry.m.Net.IsClient)
+                {
+                    List<ISimulator> simList = new List<ISimulator>();
+                    simList.Add(Network);
+                    return simList;
+                }
                 return _Sims;
             }
+            set { _Sims = value; }
         }
-        set { _Sims = value; }}
 
+        /// <summary>
+        /// Specific 'simulator' for network use.
+        /// </summary>
         public ISimulator Network { get; set; }
 
         /// <summary>
@@ -133,14 +136,12 @@ namespace SimTelemetry.Data
         /// <returns></returns>
         public ISimulator GetRunning()
         {
-            
             if (Network != null && Network.Attached)
                 return Network;
 
-            if (Sims.Count(x=>x.Attached) > 0)
+            if (Available)
                 return Sims.Where(x => x.Attached).FirstOrDefault();
-            else
-                return null;
+            return null;
         }
 
     }

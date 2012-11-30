@@ -23,11 +23,15 @@ using System.Collections.Generic;
 
 namespace SimTelemetry.Objects
 {
-    public class RouteCollection
+    public class RouteCollection : ICloneable
     {
         public List<TrackWaypoint> Racetrack { get; private set; }
         public List<TrackWaypoint> Pitlane { get; private set; }
 
+        public RouteCollection()
+        {
+            
+        }
 
         public double Length = 0;
 
@@ -82,6 +86,24 @@ namespace SimTelemetry.Objects
             }
 
             // TODO: Check ascending order
+        }
+
+        public object Clone()
+        {
+
+            RouteCollection c = new RouteCollection();
+            c.y_min = y_min;
+            c.y_max = y_max;
+            c.x_min = x_min;
+            c.x_max = x_max;
+
+            c.Racetrack = new List<TrackWaypoint>(Racetrack);
+            c.Pitlane = new List<TrackWaypoint>(Pitlane);
+            c.Length = Length;
+
+            return c;
+
+
         }
     }
 }

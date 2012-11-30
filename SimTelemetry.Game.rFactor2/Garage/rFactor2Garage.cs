@@ -123,28 +123,33 @@ namespace SimTelemetry.Game.rFactor2.Garage
 
             Debug.WriteLine(count + " mod(s) found");
         }
+        public ICar SearchCar(string CarClass, string CarModel)
+        {
+            // TODO: Implement.
+            return null;
+        }
+
+        public ITrack SearchTrack(string path)
+        {
+            // TODO: Implement.
+            return null;
+        }
 
         public ICar CarFactory(IMod mod, string veh)
         {
             if (veh.ToLower().EndsWith(".veh") == false) return null;
             if (!Cars.ContainsKey(veh))
             {
-                Cars.Add(veh,  new rFactor2Car(veh));
+                Cars.Add(veh, new rFactor2Car(veh));
                 Cars[veh].Scan();
             }
             return Cars[veh];
         }
 
-        public ICar SearchCar(string CarClass, string CarModel)
-        {
-
-            return null;
-        }
-
         public ITrack TrackFactory(string track, string directory)
         {
             string myversion = rFactor2Track.ParseVersion(directory);
-            ITrack t = Tracks.Find(delegate(ITrack tr) { return myversion == tr.Version && track.Equals(tr.Name); });
+            ITrack t = Tracks.Find(tr => myversion == tr.Version && track.Equals(tr.Name));
             if (t == null)
             {
                 t = new rFactor2Track(track, directory);

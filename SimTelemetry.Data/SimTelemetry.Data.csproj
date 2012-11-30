@@ -87,7 +87,7 @@
     <Compile Include="TrackMap.Designer.cs">
       <DependentUpon>TrackMap.cs</DependentUpon>
     </Compile>
-    <Compile Include="Track\TrackParser.cs" />
+    <Compile Include="Track\Track.cs" />
     <Compile Include="Track\TrackThumbnail.cs" />
   </ItemGroup>
   <ItemGroup>

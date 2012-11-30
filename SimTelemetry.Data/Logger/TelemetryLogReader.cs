@@ -406,7 +406,7 @@ namespace SimTelemetry.Data.Logger
                 if (Telemetry.m.Active_Session) return;
                 else
                 {
-                    Telemetry.m.Track_Load(GetString(time, "Session.GameDirectory") + "GameData/Locations/", GetString(time, "Session.CircuitName"));
+                    Telemetry.m.Track_Load(GetString(time, "Session.CircuitName"));
                 }
             }
         }

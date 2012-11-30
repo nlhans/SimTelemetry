@@ -354,7 +354,6 @@ namespace SimTelemetry
                                           while (_logReader.Progress != 1000) ;
                                           TelemetryFile = datafile;
                                           Telemetry.m.Track_Load(
-                                              _logReader.GetString(0.0, "Session.GameDirectory"),
                                               _logReader.GetString(0.0, "Session.GameData_TrackFile"));
                                           GraphFill();
                                           DrawPlotbounds();

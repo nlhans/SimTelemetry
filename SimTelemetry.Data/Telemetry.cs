@@ -27,7 +27,6 @@ using SimTelemetry.Data.Logger;
 using SimTelemetry.Data.Net;
 using SimTelemetry.Data.Stats;
 using SimTelemetry.Data.Track;
-using SimTelemetry.Game.Network;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Peripherals;
 using Triton;
@@ -40,8 +39,7 @@ namespace SimTelemetry.Data
         /// <summary>
         /// Single-ton Telemetry for general access everywhere.
         /// </summary>
-        private static Telemetry _m = new Telemetry();
-        public static Telemetry m { get { return _m; } }
+        public static readonly Telemetry m = new Telemetry();
 
         /// <summary>
         /// Track parser containing data about the current track.
@@ -76,7 +74,7 @@ namespace SimTelemetry.Data
         {
             get
             {
-                if (Sims == null) // in case Sims is not initialised yet.
+                if (Sims == null) // in case Sims is not initialized yet.
                     return false;
                 else
                     return Sims.Available;
@@ -107,12 +105,6 @@ namespace SimTelemetry.Data
         /// Thread for polling the status of all simulators and firing event whenever once has changed.
         /// </summary>
         private Thread Simulator_StatePollerThread;
-        
-        /// <summary>
-        /// Data logger that always runs in the background collecting and storing telemetry data. 
-        /// Is in co-junction with TelemetryStats which keeps track of driving statistics.
-        /// </summary>
-        private TelemetryLogger Logger;
         
         /// <summary>
         /// Class collecting driving stats, storing them into the log database and providing methods for
@@ -197,7 +189,7 @@ namespace SimTelemetry.Data
             // Initialize simulator collection, data logger and stats collector.
             Net = new TelemetryNetwork();
             Sims = new Simulators();
-            Logger = new TelemetryLogger(this);
+            new TelemetryLogger(this);
             Stats = new TelemetryStats();
             new Splits();
 
@@ -218,11 +210,11 @@ namespace SimTelemetry.Data
         /// <param name="sender"></param>
         private void Telemetry_Session_Start(object sender)
         {
-            // Start trackparser.
-            //Wait 500ms because the track-parser may need some time to complete parsing the track.
+            // Start track parser.
+            // Wait 500ms because the track-parser may need some time to complete parsing the track.
             if (!Net.IsClient)
             {
-                Track = new TrackParser(Sim.Session.GameDirectory, Sim.Session.GameData_TrackFile);
+                Track = new Track.Track(Sim.Session.GameData_TrackFile);
                 Thread.Sleep(500);
             }
 
@@ -391,11 +383,11 @@ namespace SimTelemetry.Data
         /// </summary>
         /// <param name="gamedir">Absolute path to gamedirectory.</param>
         /// <param name="track">Relative path from gamedirectory to track file.</param>
-        public void Track_Load(string gamedir, string track)
+        public void Track_Load(string track)
         {
             if (!Net.IsClient)
             {
-                Track = new TrackParser(gamedir, track);
+                Track = new Track.Track(track);
             }
         }
 
