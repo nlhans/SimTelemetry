@@ -37,16 +37,7 @@ namespace SimTelemetry.Data
     public sealed class Simulators
     {
 
-        /// <summary>
-        /// DLL catalog containing all simulator plug-ins. In debug the bin/ directory is used, because the program
-        /// has direct references to all plug-ins (meaning on compile they will be automatically recompiled and copied)
-        /// In release mode the simulators should be placed in the directory Simulators.
-        /// </summary>
-#if DEBUG
-        DirectoryCatalog catalog = new DirectoryCatalog("./", "SimTelemetry.Game.*.dll");
-#else
         DirectoryCatalog catalog = new DirectoryCatalog("simulators/", "SimTelemetry.Game.*.dll");
-#endif
 
         /// <summary>
         /// List of simulator objects available in catalog. Searches for objects implementing ISimulator.
