@@ -23,11 +23,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Threading;
 using System.Windows.Forms;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
 using Triton.Joysticks;
 using Triton.Maths;
+using Timer = System.Windows.Forms.Timer;
 
 namespace LiveTelemetry
 {
@@ -134,7 +136,7 @@ namespace LiveTelemetry
         private double RPM_Max;
         private double Speed_Min;
         private double Speed_Max;
-
+        private double SpeedStep;
         private void PaintBackground(object sender)
         {
 
@@ -162,34 +164,12 @@ namespace LiveTelemetry
                 if (!Telemetry.m.Active_Session) return;
 
                 // ---------------------------------       Speed      ---------------------------------
-                if (Telemetry.m.Sim.Modules.Aero_Drag == false || Telemetry.m.Sim.Modules.Engine_Power == false)
-                    Speed_Max = 300; // Considered as a typical topspeed for most driving simulators..
-                else
-#if DEBUG
-                    Speed_Max = SimTelemetry.Game.Rfactor.Computations.GetTheoraticalTopSpeed();
-#else
-                    Speed_Max = 400;
-#endif
-                        // TODO: Add interface to simulators to calculate this. Performance fix here.
-
-                if (double.IsNaN(Speed_Max) || double.IsInfinity(Speed_Max))
-                    Speed_Max = 300;
-
                 Speed_Min = 0;
-                double SpeedStep = 30;
+                Speed_Max = Telemetry.m.Computations.TopSpeed();
 
+                SpeedStep = 30;
                 if (Speed_Max < 300) SpeedStep = 25;
                 if (Speed_Max < 200) SpeedStep = 20;
-                if (Speed_Max < 120)
-                {
-                    Speed_Max = 120;
-                }
-
-                if (Telemetry.m.Sim.Name=="FalconBMS")
-                {
-                    Speed_Max = 2000;
-                    SpeedStep = 100;
-                }
 
                 if (Speed_Max%SpeedStep > 0)
                     Speed_Max += SpeedStep - (Speed_Max%SpeedStep);
@@ -202,7 +182,12 @@ namespace LiveTelemetry
                           90, 225);
 
                 // ---------------------------------        RPM       ---------------------------------
-                RPM_Max = 1000*Math.Ceiling(Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live)/1000);
+                int retry = 10;
+                do
+                {
+                    RPM_Max = 1000*Math.Ceiling(Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live)/1000);
+                    Thread.Sleep(10);
+                } while (RPM_Max < 100 && retry-- > 0);
                 RPM_Min = 0;
 
                 double RPM_Step = 2000;
@@ -230,11 +215,6 @@ namespace LiveTelemetry
                         RPM_Min -= (RPM_Min%RPM_Step);
 
                 }
-
-                if (RPM_Max > 14000)
-                    RPM_Min = 6000;
-                if (RPM_Max > 20000)
-                    RPM_Min = 8000;
 
 
                 if (RPM_Min%RPM_Step != 0)

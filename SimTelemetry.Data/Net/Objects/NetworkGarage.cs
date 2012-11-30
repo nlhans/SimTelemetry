@@ -18,6 +18,7 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System;
 using System.Collections.Generic;
 using SimTelemetry.Objects.Garage;
 
@@ -41,6 +42,11 @@ namespace SimTelemetry.Game.Network
         }
 
         public ICar CarFactory(IMod mod, string veh)
+        {
+            return null;
+        }
+
+        public ICar SearchCar(string CarClass, string CarModel)
         {
             return null;
         }

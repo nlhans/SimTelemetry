@@ -143,7 +143,7 @@ namespace LiveTelemetry.UI
             else
             {
                 // TODO: Adjust settings.
-                Telemetry.m.Net.ConfigureServer(tb_Server_Port.Text, tb_Server_Clients.Text);
+                Telemetry.m.Net.ConfigureServer(tb_Server_Port.Text, tb_Server_Clients.Text, tb_Server_Bandwidth.Value);
 
             }
 
@@ -184,7 +184,7 @@ namespace LiveTelemetry.UI
 
             if (Telemetry.m.Net.Host != null)
             {
-                Telemetry.m.Net.Host.Bandwidth = tb_Server_Bandwidth.Value;
+                Telemetry.m.Net.HostData.Bandwidth = tb_Server_Bandwidth.Value;
             }
         }
     }

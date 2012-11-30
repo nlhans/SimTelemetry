@@ -168,7 +168,8 @@ namespace SimTelemetry.Game.Rfactor
         public string CarClass
         {
             set { }
-            get { return rFactor.Game.ReadString(new IntPtr(this.BaseAddress + 0x5C62), 0x20); }
+            get { return rFactor.Game.ReadString(new IntPtr(this.BaseAddress + 0x39BC), 128); }
+            //get { return rFactor.Game.ReadString(new IntPtr(this.BaseAddress + 0x5C62), 0x20); }
         }
 
 

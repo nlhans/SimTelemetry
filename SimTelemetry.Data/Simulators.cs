@@ -122,21 +122,10 @@ namespace SimTelemetry.Data
         {
             get
             {
-                return ((GetAllRunning().Count == 0) ? false : true);
+                return ((Sims.Count(x=>x.Attached) == 0) ? false : true);
             }
         }
 
-        /// <summary>
-        /// Gets all simulators that are running(in case of collisions).
-        /// </summary>
-        /// <returns></returns>
-        public List<ISimulator> GetAllRunning()
-        {
-            return Sims.FindAll(delegate(ISimulator sim)
-                                    {
-                                        return sim.Attached; // TODO: Use localized detection; not all may use memory.
-                                    });
-        }
 
         /// <summary>
         /// Gets the simulator that is running. If mutltiple are; the first one is picked.
@@ -147,10 +136,10 @@ namespace SimTelemetry.Data
             
             if (Network != null && Network.Attached)
                 return Network;
-            List<ISimulator> sms = GetAllRunning();
-            if (sms.Count > 0) 
-                return sms[0];
-            else 
+
+            if (Sims.Count(x=>x.Attached) > 0)
+                return Sims.Where(x => x.Attached).FirstOrDefault();
+            else
                 return null;
         }
 

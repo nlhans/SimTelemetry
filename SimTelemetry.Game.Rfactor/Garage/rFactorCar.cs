@@ -248,7 +248,11 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         public void ScanAerodynamics()
         {
-            
+            if (_aerodynamics == null)
+            {
+                // Aero exists inside HDV
+                _aerodynamics = new rFactorCarAerodynamics(_mHDV);
+            }
         }
 
         public void ScanEngine()
@@ -266,5 +270,4 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
         }
     }
-
 }

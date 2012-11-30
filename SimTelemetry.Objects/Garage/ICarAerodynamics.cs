@@ -18,11 +18,20 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System.Collections.Generic;
+using SimTelemetry.Objects.Game;
+
 namespace SimTelemetry.Objects.Garage
 {
     public interface ICarAerodynamics
     {
         string File { get; }
-        
+
+        /// <summary>
+        /// Gets aerodynamic drag factor.
+        /// </summary>
+        /// <returns></returns>
+        double GetAerodynamicDrag(ISetup setup);
+
     }
 }

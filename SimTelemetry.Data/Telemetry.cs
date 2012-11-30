@@ -65,6 +65,11 @@ namespace SimTelemetry.Data
         public ISimulator Sim { get { return Sims.GetRunning(); } }
 
         /// <summary>
+        /// General calculations based on game data.
+        /// </summary>
+        public Computations Computations = new Computations();
+
+        /// <summary>
         /// Returns true if a simulator is active. 
         /// </summary>
         public bool Active_Sim

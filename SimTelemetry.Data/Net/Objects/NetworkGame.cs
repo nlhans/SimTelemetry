@@ -30,6 +30,7 @@ using SimTelemetry.Data;
 using SimTelemetry.Data.Net;
 using SimTelemetry.Data.Net.Objects;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.HyperType;
 using SimTelemetry.Objects.Utilities;
@@ -41,6 +42,12 @@ namespace SimTelemetry.Game.Network
     {
         public bool Attached { get; private set; }
         public bool UseMemoryReader { get { return false; } }
+
+        public ISetup Setup
+        {
+            get { return null; }
+        }
+
         public ITelemetry Host { get; set; }
         public void Initialize()
         {

@@ -50,5 +50,11 @@ namespace SimTelemetry.Objects.Garage
         /// <returns></returns>
         ICar CarFactory(IMod mod, string veh);
 
+        /// <summary>
+        /// Searches for a car based on class and model
+        /// </summary>
+        /// <param name="?"></param>
+        /// <returns></returns>
+        ICar SearchCar(string CarClass, string CarModel);
     }
 }

@@ -135,6 +135,12 @@ namespace SimTelemetry.Game.rFactor2.Garage
             return Cars[veh];
         }
 
+        public ICar SearchCar(string CarClass, string CarModel)
+        {
+
+            return null;
+        }
+
         public ITrack TrackFactory(string track, string directory)
         {
             string myversion = rFactor2Track.ParseVersion(directory);

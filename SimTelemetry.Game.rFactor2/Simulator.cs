@@ -24,6 +24,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Utilities;
 
@@ -97,5 +98,10 @@ namespace SimTelemetry.Game.rFactor2
 
         public bool Attached { get { return Memory.Attached; } }
         public bool UseMemoryReader { get { return true; } }
+
+        public ISetup Setup
+        {
+            get { return null; }
+        }
     }
 }

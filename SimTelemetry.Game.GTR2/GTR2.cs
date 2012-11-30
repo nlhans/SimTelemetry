@@ -19,14 +19,11 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Utilities;
-using Triton.Memory;
 
 namespace SimTelemetry.Game.GTR2
 {
@@ -125,5 +122,10 @@ namespace SimTelemetry.Game.GTR2
         }
         public bool Attached { get { return Memory.Attached; } }
         public bool UseMemoryReader { get { return true; } }
+
+        public ISetup Setup
+        {
+            get { return null; }
+        }
     }
 }

@@ -31,6 +31,7 @@ namespace SimTelemetry.Data.Net
         public bool IsHost { get; protected set; }
         public bool IsClient { get; protected set; }
 
+        public TelemetryServerData HostData { get; set; }
         public TelemetryServer Host { get; set; }
         public TelemetryClient Listener { get; set; }
 
@@ -58,8 +59,10 @@ namespace SimTelemetry.Data.Net
 
         public void AbortServer()
         {
+            HostData.Stop();
             Host.Stop();
             Host = null;
+            HostData = null;
 
             IsHost = false;
             IsClient = false;
@@ -79,13 +82,14 @@ namespace SimTelemetry.Data.Net
             FireChange();
         }
 
-        public void ConfigureServer(string sPort, string sClients)
+        public void ConfigureServer(string sPort, string sClients, int iBandwidth)
         {
             int port, clients;
             if (Int32.TryParse(sPort, out port) && Int32.TryParse(sClients, out clients))
             {
                 Host = new TelemetryServer();
-                if (Host.Start())
+                HostData  = new TelemetryServerData(Host, iBandwidth);
+                if (Host.Start() && HostData.Start())
                 {
                     IsHost = true;
                     IsClient = false;

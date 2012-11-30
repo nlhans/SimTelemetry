@@ -84,14 +84,14 @@ namespace SimTelemetry.Game.Rfactor
             double Torq_Max = rFactor.Game.ReadDouble(new IntPtr(0x00ADBF30));
             double torque = Torq_Max * throttle + Torq_Min;
             torque = rFactor.Game.ReadDouble(new IntPtr(0x00ADC224)); // This seems to be the *real* torque figure.
-            double HP = rpm * torque / 5252;
+            double HP = Power.HP_KW(rpm*torque/5252);
             return HP;
 
         }
 
         private static double Get_Engine_Hp(double rpm)
         {
-            return Get_Engine_Torque(rpm, 1, 1) * rpm / 5252; ;
+            return Get_Engine_Torque(rpm, 1, 1)*rpm/5252;
         }
 
         public static double Get_Engine_MaxHP()
@@ -172,44 +172,8 @@ namespace SimTelemetry.Game.Rfactor
 
         public static double GetTheoraticalTopSpeed()
         {
-            double max_hp = Get_Engine_MaxHP();//TODO: Fix real hp figures (from Garage plug-ins!)
-            // TODO: Rolling resistance / speed effects
-            while(max_hp == 0)
-            {
-                System.Threading.Thread.Sleep(1); // TODO: Messy fix about weird bug returning all 0's on Driving_Start event.
-                max_hp = Get_Engine_MaxHP();
-            }
-            double aero = GetAeroDrag(); 
-
-            max_hp = Power.HP_KW(max_hp);
-            max_hp = Power.HP_KW(max_hp);
-
-            double TopSpeed = 3+3.6 * Math.Pow(max_hp / aero * 1000, 1 / 3.0);
-            return TopSpeed;
+            return 0;
         }
-        public static double GetPracticalTopSpeed()
-        {
-            // Get areo drag
-            // Get engine powerrrr
-            double aero = Computations.GetAeroDrag();
 
-            // get spd-rpm factor for last gear*
-            double rpm_spd = 8500/300*3.6;
-            double Aero = 0.5*GetAirDensity()*aero*1.64;
-            double max_spd = 0;
-            double RPM_Max = Rotations.Rads_RPM(rFactor.Player.Engine_RPM_Max_Live);
-            for (int spd = 0; spd < 100; spd++ )
-            {
-                double rpm = rpm_spd*spd;
-                if (rpm > RPM_Max) continue;
-                double pwr = Power.HP_KW(Get_Engine_Hp(rpm));
-                double req_pwr = Aero*Math.Pow(spd, 3)/1000;
-
-                if (req_pwr > pwr) continue;
-                else max_spd = spd;
-            }
-
-            return max_spd;
-        }
     }
 }

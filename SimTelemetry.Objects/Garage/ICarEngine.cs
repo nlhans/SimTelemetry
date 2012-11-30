@@ -87,5 +87,11 @@ namespace SimTelemetry.Objects.Garage
         /// <param name="engine_mode">Engine mode.</param>
         /// <returns>RPM vs power map</returns>
         Dictionary<double, double> GetPowerCurve(double speed, double throttle, int engine_mode);
+
+        /// <summary>
+        /// Gets maximum power
+        /// </summary>
+        /// <returns></returns>
+        double GetMaximumPower();
     }
 }

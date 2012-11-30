@@ -20,6 +20,7 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
 using Triton;
@@ -71,6 +72,8 @@ namespace SimTelemetry.Game.rFactor2.Garage
         private double _lifetimeTemperatureOil;
 
         private double _lifetimeTemperatureWater;
+
+        private double _maxPower;
 
         public rFactor2CarEngine(MAS2File file, IniScanner mHdv)
         {
@@ -240,6 +243,14 @@ namespace SimTelemetry.Game.rFactor2.Garage
             }
             return PowerCurve;
 
+        }
+
+        public double GetMaximumPower()
+        {
+            if (_maxPower == 0)
+                _maxPower = GetPowerCurve(0, 1, 0).Max(x=> x.Value);
+
+            return _maxPower;
         }
 
         public string File

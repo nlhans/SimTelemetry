@@ -44,6 +44,8 @@
   <ItemGroup>
     <Compile Include="ByteMethods.cs" />
     <Compile Include="Conversions.cs" />
+    <Compile Include="Game\ISetup.cs" />
+    <Compile Include="Garage\Polynomial.cs" />
     <Compile Include="Garage\CarEngineTools.cs" />
     <Compile Include="Garage\FileList.cs" />
     <Compile Include="Garage\GarageTools.cs" />

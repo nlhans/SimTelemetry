@@ -18,8 +18,8 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
-using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Objects
 {
@@ -45,5 +45,6 @@ namespace SimTelemetry.Objects
         //MemoryPolledReader Memory { get; }
         bool Attached { get; }
         bool UseMemoryReader { get; }
+        ISetup Setup { get; }
     }
 }

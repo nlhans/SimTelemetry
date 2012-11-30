@@ -18,8 +18,10 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System;
 using System.ComponentModel.Composition;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Utilities;
 
@@ -97,5 +99,10 @@ namespace SimTelemetry.Game.LFS
         }
         public bool Attached { get { return Memory.Attached; } }
         public bool UseMemoryReader { get { return true; } }
+
+        public ISetup Setup
+        {
+            get { return null; }
+        }
     }
 }

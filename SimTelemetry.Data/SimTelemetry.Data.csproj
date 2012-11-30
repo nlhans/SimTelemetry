@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Computations.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Logger\TelemetryLogger.cs" />
     <Compile Include="Logger\TelemetryLogReader.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Net\TelemetryNetwork.cs" />
     <Compile Include="Net\TelemetryServer.cs" />
     <Compile Include="Net\TelemetryServerClient.cs" />
+    <Compile Include="Net\TelemetryServerData.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
