@@ -147,10 +147,8 @@ namespace LiveTelemetry
             Font small_font = new Font("Arial", 8f);
 
             int border_bounds = 60;
-            int width = this.Width;
-            int height = this.Height;
-            width -= border_bounds;
-            height -= border_bounds;
+            int width = this.Width - border_bounds;
+            int height = this.Height - border_bounds;
             int clip_height = this.Height;
             int clip_width = this.Width;
 
@@ -181,7 +179,7 @@ namespace LiveTelemetry
                 int retry = 10;
                 do
                 {
-                    RPM_Max = 1000*Math.Ceiling(Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live)/1000);
+                    RPM_Max = 1000*Math.Ceiling(Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live)/1000);
                     Thread.Sleep(10);
                 } while (RPM_Max < 100 && retry-- > 0);
 
@@ -204,7 +202,7 @@ namespace LiveTelemetry
                     RPM_Min = RPM_Max - 7*2000;
 
                 }
-                double rpm_idle = Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Idle_Max);
+                double rpm_idle = Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Idle_Max);
                 if (RPM_Min > rpm_idle)
                 {
                     RPM_Min = rpm_idle;
@@ -221,13 +219,13 @@ namespace LiveTelemetry
                     RPM_Max += RPM_Step - (RPM_Max%RPM_Step);
 
                 // ---------------------------------     RPM Gauge    ---------------------------------
-                double fAngle_RPM_RedLine = (Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live) - RPM_Step/2 - RPM_Min)/
+                double fAngle_RPM_RedLine = (Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live) - RPM_Step / 2 - RPM_Min) /
                                             (RPM_Max - RPM_Min)*225;
                 if (double.IsInfinity(fAngle_RPM_RedLine) || double.IsNaN(fAngle_RPM_RedLine)) fAngle_RPM_RedLine = 200;
                 int Angle_RPM_RedLine = Convert.ToInt32(Math.Round(fAngle_RPM_RedLine));
 
 
-                double fAngle_RPM_WarningLine = (Rads_RPM(Telemetry.m.Sim.Player.Engine_Lifetime_RPM_Base) - RPM_Step/2 -
+                double fAngle_RPM_WarningLine = (Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_Lifetime_RPM_Base) - RPM_Step / 2 -
                                                  RPM_Min)/(RPM_Max - RPM_Min)*225;
                 if (double.IsInfinity(fAngle_RPM_WarningLine) || double.IsNaN(fAngle_RPM_WarningLine))
                     fAngle_RPM_WarningLine = 180;
@@ -373,7 +371,7 @@ namespace LiveTelemetry
                 {
 
                     // ---------------------------------      RPM Needle    ---------------------------------
-                    double RPMLive = Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM);
+                    double RPMLive = Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM);
                     double fAngle_RPM = 90 + (RPMLive - RPM_Min)/(RPM_Max - RPM_Min)*225;
                     if (fAngle_RPM < 90) fAngle_RPM = 90;
                     if (fAngle_RPM > 90 + 225) fAngle_RPM = 90 + 225;
@@ -592,11 +590,6 @@ namespace LiveTelemetry
 
 
             }
-        }
-
-        private static double Rads_RPM(double inp)
-        {
-            return inp / 2.0 / Math.PI * 60.0;
         }
         #endregion
     }

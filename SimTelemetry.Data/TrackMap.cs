@@ -85,21 +85,24 @@ namespace SimTelemetry.Controls
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            pos_x_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.X))*1.1f;
-            pos_x_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.X))*1.1f;
-            pos_y_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.Y))*1.1f;
-            pos_y_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.Y))*1.1f;
+            pos_x_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.X));
+            pos_x_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.X));
+            pos_y_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.Y));
+            pos_y_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.Y));
+
+            double scale_x = pos_x_max - pos_x_min;
+            double scale_y = pos_y_max - pos_y_min;
+            double scale = Math.Max(scale_x, scale_y);
 
             if (this.Height > this.Width)
             {
                 map_width = this.Width;
-                map_height = this.Height - 150;
-                if (map_height/map_width > 1.2)
+                map_height = this.Height - 200;
+                if (map_height / map_width > 1.2)
                     map_height = Math.Min(this.Height, this.Width);
             }
             else
             {
-                map_width = Math.Min(this.Height, this.Width);
                 map_height = this.Height - 200;
             }
 
@@ -116,22 +119,16 @@ namespace SimTelemetry.Controls
             {
                 // Left side
                 float x1 =
-                    Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
+                    Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min)/scale_x)*(map_width - 20));
                 float y1 =
                     Convert.ToSingle(100 +
-                                     (1 - (wp.CoordinateL[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
+                                     (1 - (wp.CoordinateL[1] - pos_y_min) / scale_y) * (map_height - 20));
                 // Right side
                 float x2 =
-                    Convert.ToSingle(10 + ((wp.CoordinateR[0] - pos_x_min)/(pos_x_max - pos_x_min))*(map_width - 20));
+                    Convert.ToSingle(10 + ((wp.CoordinateR[0] - pos_x_min)/scale_x) *(map_width - 20));
                 float y2 =
                     Convert.ToSingle(100 +
-                                     (1 - (wp.CoordinateR[1] - pos_y_min)/(pos_y_max - pos_y_min))*(map_height - 20));
-
-                // Reject invalid values.
-                if (x1 != Limits.Clamp(x1, pos_x_min, pos_x_max)) continue;
-                if (y1 != Limits.Clamp(y1, pos_y_min, pos_y_max)) continue;
-                if (x2 != Limits.Clamp(x2, pos_x_min, pos_x_max)) continue;
-                if (y2 != Limits.Clamp(y2, pos_y_min, pos_y_max)) continue;
+                                     (1 - (wp.CoordinateR[1] - pos_y_min) / scale_y) * (map_height - 20));
 
                 // Add by sector
                 switch (wp.Sector)
