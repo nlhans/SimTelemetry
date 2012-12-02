@@ -37,6 +37,23 @@ namespace SimTelemetry.Data
     public sealed class Telemetry : ITelemetry
     {
         /// <summary>
+        /// Class containing whether a simulator is running and has a session active.
+        /// </summary>
+        internal class Telemetry_SimState
+        {
+            public bool Active;
+            public bool Session;
+            public bool Driving;
+            public int Laps;
+            public Telemetry_SimState()
+            {
+                Laps = -1;
+                Driving = false;
+                Active = false;
+                Session = false;
+            }
+        }
+        /// <summary>
         /// Single-ton Telemetry for general access everywhere.
         /// </summary>
         public static readonly Telemetry m = new Telemetry();

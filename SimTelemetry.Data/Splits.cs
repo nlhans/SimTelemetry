@@ -67,6 +67,8 @@ namespace SimTelemetry.Data
             // Trigger-once timer
             _mUpdateBestLap = new Timer {Interval = 2000};
             _mUpdateBestLap.AutoReset = false;
+
+            // TODO: This is some quality helloween code right here.
             _mUpdateBestLap.Elapsed += (s, e) =>
                                            {
                                                bool RemoveLapTelemetryPath = false;
