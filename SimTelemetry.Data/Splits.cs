@@ -21,10 +21,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
 using Triton.Database;
@@ -69,7 +65,7 @@ namespace SimTelemetry.Data
                                            };
 
             // Trigger-once timer
-            _mUpdateBestLap = new Timer {Interval = 100};
+            _mUpdateBestLap = new Timer {Interval = 2000};
             _mUpdateBestLap.AutoReset = false;
             _mUpdateBestLap.Elapsed += (s, e) =>
                                            {

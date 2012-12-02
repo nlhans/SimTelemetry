@@ -20,14 +20,9 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using SimTelemetry.Controls;
-using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
 
 namespace SimTelemetry
@@ -111,7 +106,7 @@ namespace SimTelemetry
                 }
 
                 //g.FillRectangle(new SolidBrush(new PlotterPalette().Background), bounds);
-                g.DrawImage(_EmptyTrackMap, 0, 0);
+                g.DrawImage(_BackgroundTrackMap, 0, 0);
 
                 double px = 0;
                 double py = 0;

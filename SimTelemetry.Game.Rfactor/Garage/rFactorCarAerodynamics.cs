@@ -3,6 +3,7 @@ using System.Linq;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Game.Rfactor.Garage
 {

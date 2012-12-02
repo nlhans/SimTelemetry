@@ -42,7 +42,7 @@ namespace SimTelemetry.Controls
         protected double map_width;
         protected double map_height;
 
-        protected Bitmap _EmptyTrackMap;
+        protected Bitmap _BackgroundTrackMap;
 
 
         #region Settings
@@ -59,24 +59,36 @@ namespace SimTelemetry.Controls
         #endregion
 
 
+        public TrackMap()
+        {
+            InitializeComponent();
+            SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+
+            SizeChanged += TrackMap_SizeChanged;
+            Telemetry.m.Track_Loaded += m_Track_Load;
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
 
             Graphics g = e.Graphics;
 
-            if (_EmptyTrackMap == null)
+            if (_BackgroundTrackMap == null)
             {
                 g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
             }
             else
             {
-                g.DrawImage(_EmptyTrackMap, 0, 0);
+                g.DrawImage(_BackgroundTrackMap, 0, 0);
             }
         }
+
         public void UpdateTrackmap()
         {
-            _EmptyTrackMap = new Bitmap(10 + this.Size.Width, 10 + this.Size.Height);
-            Graphics g = Graphics.FromImage(_EmptyTrackMap);
+            _BackgroundTrackMap = new Bitmap(10 + this.Size.Width, 10 + this.Size.Height);
+            Graphics g = Graphics.FromImage(_BackgroundTrackMap);
             g.FillRectangle(Brushes.Black, 0, 0, this.Size.Width, this.Size.Height);
 
             if (Telemetry.m.Track == null || Telemetry.m.Track.Route == null ||
@@ -85,11 +97,11 @@ namespace SimTelemetry.Controls
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            pos_x_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.X));
-            pos_x_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.X));
-            pos_y_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.Y));
-            pos_y_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.Y));
-
+            pos_x_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.X)+100);
+            pos_x_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.X)-100);
+            pos_y_max = (float) (Telemetry.m.Track.Route.Racetrack.Max(x => x.Y)+100);
+            pos_y_min = (float) (Telemetry.m.Track.Route.Racetrack.Min(x => x.Y)-100);
+            
             double scale_x = pos_x_max - pos_x_min;
             double scale_y = pos_y_max - pos_y_min;
             double scale = Math.Max(scale_x, scale_y);
@@ -104,6 +116,8 @@ namespace SimTelemetry.Controls
             else
             {
                 map_height = this.Height - 200;
+                map_width = this.Width;
+
             }
 
             Font f = new Font("Tahoma", 9f);
@@ -185,17 +199,6 @@ namespace SimTelemetry.Controls
             g.DrawString(Telemetry.m.Track.Length.ToString("0000.0m") + " , " + Telemetry.m.Track.Type, tf12,  Brushes.White, 10f, 65f);
 
             Invalidate();
-        }
-
-        public TrackMap()
-        {
-            InitializeComponent();
-            SetStyle(ControlStyles.UserPaint, true);
-            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-
-            SizeChanged += TrackMap_SizeChanged;
-            Telemetry.m.Track_Loaded += m_Track_Load;
         }
 
         private void TrackMap_SizeChanged(object sender, EventArgs e)

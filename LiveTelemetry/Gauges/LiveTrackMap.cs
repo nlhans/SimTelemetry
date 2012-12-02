@@ -33,7 +33,7 @@ namespace LiveTelemetry
     {
         public LiveTrackMap()
         {
-            BackgroundImage = _EmptyTrackMap;
+            BackgroundImage = _BackgroundTrackMap;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -43,7 +43,7 @@ namespace LiveTelemetry
 
                 Graphics g = e.Graphics;
                 if (!Telemetry.m.Active_Session) return;
-                if (_EmptyTrackMap == null)
+                if (_BackgroundTrackMap == null)
                 {
                     g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
                 }
@@ -52,7 +52,7 @@ namespace LiveTelemetry
                     CompositingMode compMode = g.CompositingMode;
                     g.InterpolationMode = InterpolationMode.NearestNeighbor;
                     g.CompositingMode = CompositingMode.SourceCopy;
-                    g.DrawImage(_EmptyTrackMap, 0, 0);
+                    g.DrawImage(_BackgroundTrackMap, 0, 0);
                     g.CompositingMode = compMode;
                 }
                 g.SmoothingMode = SmoothingMode.AntiAlias;
