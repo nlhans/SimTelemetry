@@ -127,6 +127,8 @@ namespace SimTelemetry.Data
         /// <returns></returns>
         public ISimulator GetRunning()
         {
+            if (Sims == null)
+                return null;
             if (Network != null && Network.Attached)
                 return Network;
 
@@ -135,5 +137,14 @@ namespace SimTelemetry.Data
             return null;
         }
 
+        public ISimulator Get(string sim)
+        {
+            if (Sims == null)
+                return null;
+            else
+            {
+                return Sims.Where(x => x.ProcessName.Equals(sim)).FirstOrDefault();
+            }
+        }
     }
 }

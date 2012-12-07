@@ -62,8 +62,8 @@ namespace SimTelemetry
                                 pos_x_max = (float)Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_max);
                                 pos_x_min = (float)Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_min);
 
-                                pos_y_max = (float)Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_max);
-                                pos_y_min = (float)Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_min);
+                                pos_y_max = (float)Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateY"), pos_y_max);
+                                pos_y_min = (float)Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateY"), pos_y_min);
                             }
                         }
 
@@ -137,7 +137,7 @@ namespace SimTelemetry
                                 }
 
                                 double x = 10 + ((_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX") - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                                double y = 100 + (1 - (_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+                                double y = 100 + (1 - (_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateY") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
 
                                 if (px == 0 || Math.Abs(x - px) > 4 || Math.Abs(y - py) > 4)
                                 {
@@ -156,7 +156,7 @@ namespace SimTelemetry
                         if (_mMaster.TimeCursor[1] > 0 && Math.Abs(Leastdt) < 2000)
                         {
                             double x = 10 + ((_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateX") - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                            double y = 100 + (1 - (_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateZ") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+                            double y = 100 + (1 - (_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateY") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
                             g.FillEllipse(new SolidBrush(Color.Yellow), x - 3, y - 3, 6, 6);
 
                         }

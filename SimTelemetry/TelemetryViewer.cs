@@ -171,10 +171,7 @@ namespace SimTelemetry
                         cPlotter.Graphs[1].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Driver.Speed") * 3.6);
                         cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Pedals_Throttle")*100);
                         cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Pedals_Brake") * 100);
-                        cPlotter.Graphs[3].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_LF"));
-                        cPlotter.Graphs[3].Curves[1].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_LR"));
-                        cPlotter.Graphs[3].Curves[2].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_RF"));
-                        cPlotter.Graphs[3].Curves[3].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_RR"));
+
 
                         /*double x = (double)sample.Data[3][7];
                         double y = (double)sample.Data[3][8];
@@ -205,6 +202,7 @@ namespace SimTelemetry
                     catch (Exception ex)
                     {
                         Debug.WriteLine("Data conversion in TelemetryViewer error!");
+                        break;
                     }
                 }
             }
@@ -353,8 +351,6 @@ namespace SimTelemetry
                                           while (_logReader.Progress == 0) ;
                                           while (_logReader.Progress != 1000) ;
                                           TelemetryFile = datafile;
-                                          Telemetry.m.Track_Load(
-                                              _logReader.GetString(0.0, "Session.GameData_TrackFile"));
                                           GraphFill();
                                           DrawPlotbounds();
                                           _logReader.Start();

@@ -76,7 +76,7 @@ namespace SimTelemetry.Data
         /// <summary>
         /// Gets the running simulator. Returns null if not available.
         /// </summary>
-        public ISimulator Sim { get { return Sims.GetRunning(); } }
+        public ISimulator Sim { get {  return Sims.GetRunning(); } }
 
         /// <summary>
         /// General calculations based on game data.
@@ -228,9 +228,9 @@ namespace SimTelemetry.Data
         {
             // Start track parser.
             // Wait 500ms because the track-parser may need some time to complete parsing the track.
-            if (!Net.IsClient)
+            if (Net == null || !Net.IsClient)
             {
-                Track = new Track.Track(Sim.Session.GameData_TrackFile);
+                Track = new Track.Track(Telemetry.m.Sim, Sim.Session.GameData_TrackFile);
                 Thread.Sleep(500);
             }
 
@@ -399,12 +399,12 @@ namespace SimTelemetry.Data
         /// </summary>
         /// <param name="gamedir">Absolute path to gamedirectory.</param>
         /// <param name="track">Relative path from gamedirectory to track file.</param>
-        public void Track_Load(string track)
+        public void Track_Load(ISimulator sim, string track)
         {
-            if (!Net.IsClient)
-            {
-                Track = new Track.Track(track);
-            }
+                if (Net == null || !Net.IsClient)
+                {
+                    Track = new Track.Track(sim, track);
+                }
         }
 
         /// <summary>

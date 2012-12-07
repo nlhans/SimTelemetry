@@ -51,7 +51,7 @@ namespace SimTelemetry.Data.Logger
         public static TKey GetKeyByValue<TKey, TValue>(this Dictionary<TKey, TValue> dict, TValue value)
         {
             if (dict.ContainsValue(value) == false)
-                return (TKey) new object();
+                return (TKey)new object();
             else
             {
                 foreach (KeyValuePair<TKey, TValue> kvp in dict)
@@ -125,7 +125,7 @@ namespace SimTelemetry.Data.Logger
                     case 3:
                         return 1000;
                         break;
-                    default: 
+                    default:
                         return 0;
                         break;
                 }
@@ -139,7 +139,13 @@ namespace SimTelemetry.Data.Logger
             {
                 TelemetrySample sample = Samples[frame];
                 if (ParameterCache.ContainsKey(key))
-                    return sample.Data[ParameterCache[key].id][ParameterCache[key].parameter];
+                {
+                    if (sample.Data.ContainsKey(ParameterCache[key].id) &&
+                        sample.Data[ParameterCache[key].id].ContainsKey(ParameterCache[key].parameter))
+                        return sample.Data[ParameterCache[key].id][ParameterCache[key].parameter];
+                    else
+                        return 0.0;
+                }
                 else
                 {
                     string[] saKey = key.Split(".".ToCharArray());
@@ -240,7 +246,7 @@ namespace SimTelemetry.Data.Logger
                                                      {
                                                          Data = PacketData,
                                                          ID = PacketID,
-                                                         Type = (TelemetryLogPacket) Type,
+                                                         Type = (TelemetryLogPacket)Type,
                                                          InstanceID = InstanceID,
                                                          Size = PacketSize
                                                      };
@@ -303,7 +309,7 @@ namespace SimTelemetry.Data.Logger
 
                             int instance_id = BitConverter.ToInt16(packet.Data, 0);
                             int last_typeid = 0;
-                            for (int i = 2; i < packet.Data.Length;)
+                            for (int i = 2; i < packet.Data.Length; )
                             {
                                 int id_type = BitConverter.ToInt32(packet.Data, i);
                                 object v = 0;
@@ -372,7 +378,7 @@ namespace SimTelemetry.Data.Logger
                                             break;
                                     }
 
-                                    Sample.Data[instance_id][id_type] = (object) v;
+                                    Sample.Data[instance_id][id_type] = (object)v;
                                     last_typeid = id_type;
                                 }
                             }
@@ -403,10 +409,12 @@ namespace SimTelemetry.Data.Logger
                 _ReadStage = 3;
 
                 // Set the telemetry track.
-                if (Telemetry.m.Active_Session) return;
-                else
+                if (Telemetry.m.Active_Session)
+                    return;
+                else if (Telemetry.m.Sims != null)
                 {
-                    Telemetry.m.Track_Load(GetString(time, "Session.CircuitName"));
+                    // TODO: Urgent; add simulator type to log file.
+                    Telemetry.m.Track_Load(Telemetry.m.Sims.Get("rfactor"), GetString(time, "Session.CircuitName"));
                 }
             }
         }
@@ -423,11 +431,11 @@ namespace SimTelemetry.Data.Logger
 
         public double GetDouble(TelemetrySample frame, string key)
         {
-            return (double)Get(frame.Time, key);
+            return Convert.ToDouble(Get(frame.Time, key));
         }
         public double GetDouble(double frame, string key)
         {
-            return (double)Get(frame, key);
+            return Convert.ToDouble(Get(frame, key));
         }
     }
 }

@@ -32,7 +32,7 @@ namespace SimTelemetry
         #region Laptimes
 
         private VisualListDetails _vldLaptimes;
-        private Timer _tList = new Timer { Interval = 20 };
+        private Timer _tList = new Timer { Interval = 1000 };
         public string Datafile { set; get; }
         public bool DatafileNew { get; set; }
         #endregion
@@ -126,7 +126,7 @@ namespace SimTelemetry
 
             // Update the list
             OleDbConnection con = DatabaseOleDbConnectionPool.GetOleDbConnection();
-            using(OleDbCommand sLaps = new OleDbCommand("SELECT id, Simulator, Circuit, Series, Car, Laptime, S1, S2, S3, Driven, LapNo, FilePath FROM laptimes",con))
+            using (OleDbCommand sLaps = new OleDbCommand("SELECT id, Simulator, Circuit, Series, Car, Laptime, S1, S2, S3, Driven, LapNo, FilePath FROM laptimes WHERE InvalidLapData = 0", con))
             using (OleDbDataReader rLaps = sLaps.ExecuteReader())
             {
                 while(rLaps.HasRows && rLaps.Read())

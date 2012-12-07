@@ -49,17 +49,18 @@ namespace SimTelemetry.Data.Track
         public string Name { get; protected set; }
         #endregion
 
-        public Track(string name)
+        public Track(ISimulator sim, string name)
         {
             if (name == null) return;
             Route = new RouteCollection();
             Apexes = new ApexCollection();
             Sections = new SectionsCollection();
 
-            if (Telemetry.m.Sim.Garage != null && Telemetry.m.Sim.Garage.Available
-                 && Telemetry.m.Sim.Garage.Available_Tracks)
+            // TODO: Make possible without Telemetry.m.Sim available!
+            if (sim.Garage != null && sim.Garage.Available
+                 && sim.Garage.Available_Tracks)
             {
-                ITrack track = Telemetry.m.Sim.Garage.SearchTrack(name);
+                ITrack track = sim.Garage.SearchTrack(name);
                 if (track != null)
                 {
                     track.Scan();
