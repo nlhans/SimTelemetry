@@ -22,6 +22,9 @@ namespace SimTelemetry.Data
         /// <returns></returns>
         public double MaximumPower(ISimulator sim, ICar car)
         {
+            if (sim.Garage == null)
+                return 0;
+
             if (car == null)
             {
                 // Look up car.
@@ -39,6 +42,12 @@ namespace SimTelemetry.Data
             return car.Engine.GetMaximumPower();
         }
 
+        /// <summary>
+        /// Returns top speed in km/h
+        /// </summary>
+        /// <param name="sim"></param>
+        /// <param name="car"></param>
+        /// <returns></returns>
         public double TopSpeed(ISimulator sim, ICar car)
         {
             if (sim.Garage != null && sim.Garage.Available)

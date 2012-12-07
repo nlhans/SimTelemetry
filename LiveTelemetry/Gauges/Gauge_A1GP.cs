@@ -185,18 +185,19 @@ namespace LiveTelemetry
 
                 RPM_Min = 0;
 
-                double RPM_Step = 2000;
+                double RPM_Step = 1000;
 
                 // Ranges.
-                if (RPM_Max <= 8000) RPM_Step = 1000;
-                else if (RPM_Max <= 12000) RPM_Step = 2000;
-                else if (RPM_Max <= 20000)
+                if (RPM_Max >= 0 && RPM_Max <= 10000) RPM_Step = 1000;
+                if (RPM_Max > 12000) RPM_Step = 2000;
+
+                if (RPM_Max >= 12000 && RPM_Max < 20000)
                 {
                     RPM_Step = 2000;
                     RPM_Min = RPM_Max - 6*2000;
 
                 }
-                else if (RPM_Max <= 30000)
+                if (RPM_Max >= 20000)
                 {
                     RPM_Step = 2000;
                     RPM_Min = RPM_Max - 7*2000;

@@ -145,7 +145,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
             _mods.ForEach(x => x.Scan());
 
-            foreach(rFactorMod mod in _mods.Where(x => x.Classes.Contains(CarClass)))
+            foreach(rFactorMod mod in _mods.Where(x => x.Classes.Contains(CarModel) || x.Classes.Contains(CarClass)))
             {
                 if( mod.Models.Any(x => x.Team == CarModel))
                 {

@@ -26,7 +26,6 @@ using System.Threading;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Data.Net;
 using SimTelemetry.Data.Stats;
-using SimTelemetry.Data.Track;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Peripherals;
 using Triton;
