@@ -59,7 +59,7 @@ namespace SimTelemetry.Data.Logger
         {
             if (!Telemetry.m.Net.IsClient)
             {
-                master.Track.DriverLap += new Triton.AnonymousSignal(AnnotateLap);
+                master.Track.PlayerLap += AnnotateLap;
 
                 _logWriter = new TelemetryLogWriter();
                 _logWriter.Subscribe<ISession>("Session", master.Sim.Session);

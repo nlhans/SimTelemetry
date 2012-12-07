@@ -218,7 +218,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
                     Directory.CreateDirectory("./Cache/");
                 if (Directory.Exists("./Cache/Tracks/"))
                     Directory.CreateDirectory("./Cache/Tracks/");
-                return "Cache/Tracks/rfactor_" + Path.GetFileNameWithoutExtension(File) + ".png";
+                return "Cache/Tracks/rfactor_" + Path.GetFileNameWithoutExtension(File).FileNameSafe() + ".png";
             }
         }
 
@@ -236,8 +236,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 _name = track_gdb.TryGetString("TrackName");
                 _location = track_gdb.TryGetString("Location");
                 _type = track_gdb.TryGetString("TrackType");
-                _imageCache = System.IO.File.Exists("Cache/Tracks/rfactor_" + File.Replace(".gdb", ".png"));
-                    // TODO: Fix a more unique ID globally!
+                _imageCache = System.IO.File.Exists(Thumbnail);
 
                 _length = 0; // Read from AIW.
 

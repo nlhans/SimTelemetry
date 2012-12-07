@@ -119,10 +119,17 @@ namespace SimTelemetry.Data.Track
 
                                     //TrackLogger.Add(l);
 
-                                    if (drv == Telemetry.m.Sim.Drivers.Player.MemoryBlock && PlayerLap != null)
-                                        PlayerLap();
+                                    if (drv == Telemetry.m.Sim.Drivers.Player.MemoryBlock)
+                                    {
+                                        if (PlayerLap != null)
+                                        {
+                                            PlayerLap();
+                                        }
+                                    }
                                     else if (DriverLap != null)
+                                    {
                                         DriverLap();
+                                    }
 
                                     Lap lastLap = GetLap(driver, 1);
                                     if (lastLap.LapNo != -1)

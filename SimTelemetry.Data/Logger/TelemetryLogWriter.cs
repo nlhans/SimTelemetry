@@ -112,38 +112,60 @@ namespace SimTelemetry.Data.Logger
             if (AllLaps.Count != 0)
             {
                 ILap LastLap = AllLaps.Find(delegate(ILap l) { return l.LapNumber == LapNo; });
-                if(LastLap == null)
+                if (LastLap == null)
                     if (AllLaps.Count > LapNo)
                         LastLap = AllLaps[LapNo - 1];
                     else
-                        LastLap = AllLaps[AllLaps.Count-1];
+                        LastLap = AllLaps[AllLaps.Count - 1];
 
                 try
                 {
+                    // TODO: This really needs a database object manager..
+                    string query = "";
+                    int splitcnt = Telemetry.m.Stats.Stats_AnnotationQuery.Split(',').Length;
+                    // Normally, AnnotationQuery = "0,0,0,0,0,NOW(),-1".
+                    // This contains 7 parts.
+                    if (Telemetry.m.Stats.Stats_AnnotationQuery != "" &&
+                        splitcnt == 7)
+                    {
+                        // 18 fields.
+                        query =
+                            "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath,distance,enginerevs,fuelused,gearchanges,samplelength,localtime,simulatortime) " +
+                            "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
+                            Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
+                            LastLap.LapTime + "," + LastLap.Sector1 + "," +
+                            LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
+                            (LapNo).ToString() +
+                            ",'" + AnnotationFileCompress.Replace(".dat", ".gz") + // field 11
+                            "', " + Telemetry.m.Stats.Stats_AnnotationQuery + ");"; // +7
+                    }
+                    else
+                    {
+                        // 11
+                        query =
+                            "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath) " +
+                            "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
+                            Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
+                            LastLap.LapTime + "," + LastLap.Sector1 + "," +
+                            LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
+                            (LapNo).ToString() +
+                            ",'" + AnnotationFileCompress.Replace(".dat", ".gz") + ");"; // field 11
+
+                    }
+
                     // Insert into log
-                    OleDbConnection con =
-                        DatabaseOleDbConnectionPool.GetOleDbConnection();
-                    using (
-                        OleDbCommand newTime =
-                            new OleDbCommand(
-                                "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath" +
-                                ((Telemetry.m.Stats.Stats_AnnotationQuery != "")
-                                     ? ",distance,enginerevs,fuelused,gearchanges,samplelength,localtime,simulatortime"
-                                     : "") + ") " +
-                                "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
-                                Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
-                                Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
-                                Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
-                                LastLap.LapTime + "," + LastLap.Sector1 + "," +
-                                LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
-                                (LapNo).ToString() +
-                                ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
-                                "', " + Telemetry.m.Stats.Stats_AnnotationQuery + ");", con))
+                    OleDbConnection con = DatabaseOleDbConnectionPool.GetOleDbConnection();
+                    using (OleDbCommand newTime = new OleDbCommand(query, con))
                     {
                         newTime.ExecuteNonQuery();
                     }
                     DatabaseOleDbConnectionPool.Freeup();
-                }catch(Exception Ex)
+                }
+                catch (Exception Ex)
                 {
                     Debug.WriteLine("Failed to insert laptime @ AnnotateDatabase");
                     Debug.WriteLine(Ex.Message);

@@ -55,8 +55,13 @@ namespace SimTelemetry.Data
                 if (car == null)
                 {
                     // Look up car.
-                    car = sim.Garage.SearchCar(sim.Drivers.Player.CarClass, sim.Drivers.Player.CarModel);
+                    try
+                    {
+                        car = sim.Garage.SearchCar(sim.Drivers.Player.CarClass, sim.Drivers.Player.CarModel);
+                    }catch(Exception ex)
+                    {
 
+                    }
                     if (car == null)
                         return TopSpeed_Stock;
 

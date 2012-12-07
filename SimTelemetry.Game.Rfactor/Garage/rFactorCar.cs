@@ -194,15 +194,18 @@ namespace SimTelemetry.Game.Rfactor.Garage
                     _description = _mScanner.TryGetString("Description");
                     _number = _mScanner.TryGetInt32("Number");
 
+                    if(_team.Length>3)
                     _team = _team.Substring(1, _team.Length - 2);
+                    if(_driver.Length>3)
                     _driver = _driver.Substring(1, _driver.Length - 2);
+                    if(_description.Length>3)
                     _description = _description.Substring(1, _description.Length - 2);
 
                     string c = _mScanner.TryGetString("Classes");
-                    if (c.StartsWith("\""))
+                    if (c.StartsWith("\"") && c.Length>3)
                         c = c.Substring(1, c.Length - 2);
 
-                    if (c.StartsWith("\""))
+                    if (c.StartsWith("\"") && c.Length>3)
                         c = c.Substring(1, c.Length - 2);
                     if (c.Contains(" "))
                     {
