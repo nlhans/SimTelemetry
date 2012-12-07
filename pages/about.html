@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SimTelemetry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Race telemetry from your favorite simulator.">
+    <meta name="author" content="Hans de Jong">
+
+    <!-- Le styles -->
+    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <style>
+
+    /* GLOBAL STYLES
+    -------------------------------------------------- */
+    /* Padding below the footer and lighter body text */
+
+    body {
+      padding-bottom: 40px;
+      color: #5a5a5a;
+    }
+
+
+
+    /* CUSTOMIZE THE NAVBAR
+    -------------------------------------------------- */
+
+    /* Special class on .container surrounding .navbar, used for positioning it into place. */
+    .navbar-wrapper {
+      position: relative;
+      z-index: 10;
+      margin-top: 20px;
+      margin-bottom: -90px; /* Negative margin to pull up carousel. 90px is roughly margins and height of navbar. */
+    }
+
+    /* Remove border and change up box shadow for more contrast */
+    .navbar .navbar-inner {
+      border: 0;
+      -webkit-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+         -moz-box-shadow: 0 2px 10px rgba(0,0,0,.25);
+              box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    }
+
+    /* Downsize the brand/project name a bit */
+    .navbar .brand {
+      padding: 14px 20px 16px; /* Increase vertical padding to match navbar links */
+      font-size: 16px;
+      font-weight: bold;
+      text-shadow: 0 -1px 0 rgba(0,0,0,.5);
+    }
+
+    /* Navbar links: increase padding for taller navbar */
+    .navbar .nav > li > a {
+      padding: 15px 20px;
+    }
+
+    /* Offset the responsive button for proper vertical alignment */
+    .navbar .btn-navbar {
+      margin-top: 10px;
+    }
+
+
+
+    /* CUSTOMIZE THE NAVBAR
+    -------------------------------------------------- */
+
+    /* Carousel base class */
+    .carousel {
+      margin-bottom: 60px;
+    }
+
+    .carousel .container {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+    .carousel-control {
+      background-color: transparent;
+      border: 0;
+      font-size: 120px;
+      margin-top: 0;
+      text-shadow: 0 1px 1px rgba(0,0,0,.4);
+    }
+
+    .carousel .item {
+      height: 500px;
+    }
+    .carousel img {
+      min-width: 100%;
+      height: 500px;
+    }
+
+    .carousel-caption {
+      background-color: transparent;
+      position: static;
+      max-width: 550px;
+      padding: 0 20px;
+      margin-bottom: 100px;
+    }
+    .carousel-caption h1,
+    .carousel-caption .lead {
+      margin: 0;
+      line-height: 1.25;
+      color: #fff;
+      text-shadow: 0 1px 1px rgba(0,0,0,.4);
+    }
+    .carousel-caption .btn {
+      margin-top: 10px;
+    }
+
+
+
+    /* MARKETING CONTENT
+    -------------------------------------------------- */
+
+    /* Center align the text within the three columns below the carousel */
+    .marketing .span4 {
+      text-align: center;
+    }
+    .marketing h2 {
+      font-weight: normal;
+    }
+    .marketing .span4 p {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+
+    /* Featurettes
+    ------------------------- */
+
+    .featurette-divider {
+      margin: 80px 0; /* Space out the Bootstrap <hr> more */
+    }
+    .featurette {
+      padding-top: 120px; /* Vertically center images part 1: add padding above and below text. */
+      overflow: hidden; /* Vertically center images part 2: clear their floats. */
+    }
+    .featurette-image {
+      margin-top: -120px; /* Vertically center images part 3: negative margin up the image the same amount of the padding to center it. */
+    }
+
+    /* Give some space on the sides of the floated elements so text doesn't run right into it. */
+    .featurette-image.pull-left {
+      margin-right: 40px;
+    }
+    .featurette-image.pull-right {
+      margin-left: 40px;
+    }
+
+    /* Thin out the marketing headings */
+    .featurette-heading {
+      font-size: 50px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+
+
+    /* RESPONSIVE CSS
+    -------------------------------------------------- */
+
+    @media (max-width: 979px) {
+
+      .container.navbar-wrapper {
+        margin-bottom: 0;
+        width: auto;
+      }
+      .navbar-inner {
+        border-radius: 0;
+        margin: -20px 0;
+      }
+
+      .carousel .item {
+        height: 500px;
+      }
+      .carousel img {
+        width: auto;
+        height: 500px;
+      }
+
+      .featurette {
+        height: auto;
+        padding: 0;
+      }
+      .featurette-image.pull-left,
+      .featurette-image.pull-right {
+        display: block;
+        float: none;
+        max-width: 40%;
+        margin: 0 auto 20px;
+      }
+    }
+
+
+    @media (max-width: 767px) {
+
+      .navbar-inner {
+        margin: -20px;
+      }
+
+      .carousel {
+        margin-left: -20px;
+        margin-right: -20px;
+      }
+      .carousel .container {
+
+      }
+      .carousel .item {
+        height: 300px;
+      }
+      .carousel img {
+        height: 300px;
+      }
+      .carousel-caption {
+        width: 65%;
+        padding: 0 70px;
+        margin-bottom: 40px;
+      }
+      .carousel-caption h1 {
+        font-size: 30px;
+      }
+      .carousel-caption .lead,
+      .carousel-caption .btn {
+        font-size: 18px;
+      }
+
+      .marketing .span4 + .span4 {
+        margin-top: 40px;
+      }
+
+      .featurette-heading {
+        font-size: 30px;
+      }
+      .featurette .lead {
+        font-size: 18px;
+        line-height: 1.5;
+      }
+
+    }
+    </style>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+
+
+    <!-- NAVBAR
+    ================================================== -->
+    <!-- Wrap the .navbar in .container to center it on the page and provide easy way to target it with .navbar-wrapper. -->
+    <div class="container navbar-wrapper">
+
+      <div class="navbar navbar-inverse">
+        <div class="navbar-inner">
+          <!-- Responsive Navbar Part 1: Button for triggering responsive navbar (not covered in tutorial). Include responsive CSS to utilize. -->
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/SimTelemetry/pages/index.html">SimTelemetry</a>
+          <!-- Responsive Navbar Part 2: Place all navbar contents you want collapsed withing .navbar-collapse.collapse. -->
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/SimTelemetry/pages/index.html">Home</a></li>
+              <li class="active"><a href="/SimTelemetry/pages/about.html">About</a></li>
+              <!-- Read about Bootstrap dropdowns at http://twitter.github.com/bootstrap/javascript.html#dropdowns -->
+              <li class="dropdown">
+                <a href="/SimTelemetry/pages/browse.html" class="dropdown-toggle" data-toggle="dropdown">Browse <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li class="nav-header">Simulators</li>
+                  <li><a href="/SimTelemetry/pages/simulators/rfactor.html">rFactor</a></li>
+                  <li><a href="/SimTelemetry/pages/simulators/gtr2.html">GTR2</a></li>
+                  <li><a href="/SimTelemetry/pages/simulators/race07.html">Race 2007</a></li>
+                  <li class="divider"></li>
+                  <li><a href="/SimTelemetrypages/simulators/more.html"><i>More</i></a></li>
+                  <li class="divider"></li>
+                  <li class="nav-header">Hardware</li>
+                  <li><a href="/SimTelemetry/pages/hardware.html">About</a></li>
+                  <li><a href="/SimTelemetry/pages/hardware/rs232.html">RS232 documentation</a></li>
+                </ul>
+              </li>
+              <li><a href="/SimTelemetry/pages/downloads.html">Downloads</a></li>
+              <li><a href="/SimTelemetry/pages/development.html">Development</a></li>
+              <li><a href="/SimTelemetry/pages/contact.html">Contact</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!-- /.navbar-inner -->
+      </div><!-- /.navbar -->
+
+    </div><!-- /.container -->
+
+
+
+    <!-- Carousel
+    ================================================== -->
+    <div id="myCarousel" class="carousel slide">
+      <div class="carousel-inner">
+        <div class="item active">
+          <img src="../assets/img/carousel/slide-01.jpg" alt="">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Live simulator telemetry</h1>
+              <p class="lead">Stream live telemetry from your favorite simulator to a secondary monitor or laptop. See what is happening with your car and what's going on track at a glance!</p>
+              <a class="btn btn-large btn-primary" href="/SimTelemetry/pages/downloads.html">Download for free</a>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="../assets/img/carousel/slide-02.jpg" alt="">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Analyse your driving</h1>
+              <p class="lead">Review your telemetry data afterwards to improve your driving, set-up and race strategy.</p>
+              <a class="btn btn-large btn-primary" href="/SimTelemetry/pages/about.html">Learn more</a>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <img src="../assets/img/carousel/slide-03.jpg" alt="">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Help the project</h1>
+              <p class="lead">Are you experienced in C# and want to contribute to this project? That's possible!</p>
+              <a class="btn btn-large btn-primary" href="/SimTelemetry/pages/development.html">Read more</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+    </div><!-- /.carousel -->
+
+
+
+    <!-- About messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+
+    <div class="container marketing">
+	
+		<h1>About</h1>
+		<p>SimTelemetry is an open source application providing telemetry from various racing or driving simulators. Development silentely started in mid 2011 by Hans de Jong in the aim of providing a purpose for it's secondary screen, not used during racing. Initial versions started out only for rFactor v1.255, but quickly a plug-in system was implemented so various simulators could be supported.</p>
+		<p>Currently SimTelemetry has support for 'only' 3 simulators: rFactor 1 (V1.255), rFactor 2 (build 61) and GTR2.</p>
+		<p>Once core development has stabilised the aim is primiraly focus on getting support for a wider range of simulators, and also deeper for support for existing ones. I will highly appreciate any one who can make contributions to either the core program or simulator plug-ins.</p>
+		
+		<h1>Features</h1>
+		<p>SimTelemetry aims to be an all-in-one for telemetry needs. It can live display and record telemetry for further analysis. In contrast to some other game plug-ins, which overlay timing screens, traclmaps and car information on the gaming screen, SimTelemetry can only work on secondary monitors or secondary computers/laptops connected via network.</p>
+		<p>This can be a preference of the user. Personally I don't like the main monitor to be clutted full with gauges, timing sheets, and other icons. This is all seperated out so a complete view is maintained of the track.</p>
+		<p>At this moment, Simtelemetry has support for the following items:</p>
+		<div class="row">
+			<div class="span2">&nbsp;</div>
+			<div class="span4" style="text-align: left;">
+				<b>Simulators</b><br />
+				<ul>
+					<li>rFactor v1.255 (full)</li>
+					<li>rFactor 2 build 61 (limited)</li>
+					<li>GTR2 v1.1.0.0 (limited)</li>
+				</ul>
+			</div>
+			<div class="span6">
+				<b>Widgets</b><br />
+				<ul>
+					<li>Live trackmap</li>
+					<li>Timing displays with sector and lap time information</li>
+					<li>Speedo/tachometer display</li>
+					<li>Fuel consumption and engine wear estimations</li>
+					<li>Tyre/brake temperature and wear graphic</li>
+				</ul>
+				<b>Telemetry</b><br/>
+				<ul>
+					<li>Efficient Telemetry logging of 200+ car parameters</li>
+					<li>Analysis tool for every hot lap</li>
+					<li>Soon more...</li>
+				</ul>
+			</div>
+		</div>
+      <hr class="featurette-divider">
+
+      <!-- /END THE FEATURETTES -->
+
+
+      <!-- FOOTER -->
+      <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>&copy; 2012 Hans de Jong &middot; <a href="/SimTelemetry/pages/terms.html">Terms</a></p>
+      </footer>
+
+    </div><!-- /.container -->
+
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/js/bootstrap.js"></script>
+    <script src="../assets/js/bootstrap-dropdown.js"></script>
+    <script src="../assets/js/bootstrap.min.js"></script>
+    <script>
+      !function ($) {
+        $(function(){
+          // carousel demo
+          $('#myCarousel').carousel()
+        })
+      }(window.jQuery)
+    </script>
+  </body>
+</html>
