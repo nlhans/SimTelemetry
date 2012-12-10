@@ -1,4 +1,24 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -151,10 +171,7 @@ namespace SimTelemetry
                         cPlotter.Graphs[1].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Driver.Speed") * 3.6);
                         cPlotter.Graphs[2].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Pedals_Throttle")*100);
                         cPlotter.Graphs[2].Curves[1].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Pedals_Brake") * 100);
-                        cPlotter.Graphs[3].Curves[0].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_LF"));
-                        cPlotter.Graphs[3].Curves[1].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_LR"));
-                        cPlotter.Graphs[3].Curves[2].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_RF"));
-                        cPlotter.Graphs[3].Curves[3].Data.Add(sample.Time / 1000.0, _logReader.GetDouble(sample, "Player.Brake_Temperature_RR"));
+
 
                         /*double x = (double)sample.Data[3][7];
                         double y = (double)sample.Data[3][8];
@@ -185,6 +202,7 @@ namespace SimTelemetry
                     catch (Exception ex)
                     {
                         Debug.WriteLine("Data conversion in TelemetryViewer error!");
+                        break;
                     }
                 }
             }
@@ -333,9 +351,6 @@ namespace SimTelemetry
                                           while (_logReader.Progress == 0) ;
                                           while (_logReader.Progress != 1000) ;
                                           TelemetryFile = datafile;
-                                          Telemetry.m.Track_Load(
-                                              _logReader.GetString(0.0, "Session.GameDirectory"),
-                                              _logReader.GetString(0.0, "Session.GameData_TrackFile"));
                                           GraphFill();
                                           DrawPlotbounds();
                                           _logReader.Start();

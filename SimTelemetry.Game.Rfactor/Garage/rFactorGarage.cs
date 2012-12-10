@@ -1,7 +1,28 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using SimTelemetry.Objects.Garage;
 
 namespace SimTelemetry.Game.Rfactor.Garage
@@ -45,6 +66,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
         // Cache with all data files
         private Dictionary<string, ICar> Cars = new Dictionary<string, ICar>();
 
+        private bool ScannedCars = false;
+        private bool ScannedTracks = false;
         private bool Scanned = false;
         public void Scan()
         {
@@ -63,45 +86,46 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private void ScanTracks()
         {
-            _tracks = new List<ITrack>();
-            // rFactor stores data in GDB files.
-            // All relevant path data is in stored in AIW files.
-            List<string> tracks = rFactor.Garage.Files.SearchFiles(GamedataDirectory, "*.gdb");
-            int count = 0;
-            foreach(string track in tracks)
+            if (!ScannedTracks)
             {
-                // If AIW file exists
-                if(File.Exists(track.Replace(".gdb",".aiw")))
-                {
-                    _tracks.Add(new rFactorTrack(track));
-                    count++;
-                }
-            }
+                if (Scanned == false) Scan();
 
-            Debug.WriteLine(count + " track(s) found");
+                _tracks = new List<ITrack>();
+                // rFactor stores data in GDB files.
+                // All relevant path data is in stored in AIW files.
+                List<string> tracks = rFactor.Garage.Files.SearchFiles(GamedataDirectory, "*.gdb");
+                int count = 0;
+                foreach (string track in tracks)
+                {
+                    // If AIW file exists
+                    if (File.Exists(track.Replace(".gdb", ".aiw")))
+                    {
+                        _tracks.Add(new rFactorTrack(track));
+                        count++;
+                    }
+                }
+
+                Debug.WriteLine(count + " track(s) found");
+                ScannedTracks = true;
+            }
         }
 
         private void ScanCars()
         {
-            _mods = new List<IMod>();
-
-            // rFactor stores data in GDB files.
-            // All relevant path data is in stored in AIW files.
-            List<string> vehicles = GarageTools.SearchFiles(InstallationDirectory + "rFM\\", "*.rfm");
-            int count = 0;
-            foreach (string mod in vehicles)
+            if (!ScannedCars)
             {
-#if DEBUG
-            if(true||mod.Contains("05"))
-#endif
-                if (mod.Contains("ANY_DEV_ONLY")==false)
-                {
-                    _mods.Add(new rFactorMod(mod));
-                    count++;
-                }
-            }
+                if (Scanned == false) Scan();
 
-            Debug.WriteLine(count + " mod(s) found");
+                // rFactor stores data in GDB files.
+                // All relevant path data is in stored in AIW files.
+                List<string> vehicles = GarageTools.SearchFiles(InstallationDirectory + "rFM\\", "*.rfm");
+
+                _mods = new List<IMod>();
+                foreach (string mod in vehicles.Where(x => !x.Contains("ANY_DEV_ONLY")))
+                    _mods.Add(new rFactorMod(mod));
+
+                ScannedCars = true;
+            }
         }
 
         public ICar CarFactory(IMod mod, string veh)
@@ -112,6 +136,32 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 Cars[veh].Scan();
             }
             return Cars[veh];
+        }
+
+        public ICar SearchCar(string CarClass, string CarModel)
+        {
+            if (ScannedCars==false)
+                ScanCars();
+
+            _mods.ForEach(x => x.Scan());
+
+            foreach(rFactorMod mod in _mods.Where(x => x.Classes.Contains(CarModel) || x.Classes.Contains(CarClass)))
+            {
+                if( mod.Models.Any(x => x.Team == CarModel))
+                {
+                    return mod.Models.Where(x => x.Team == CarModel).FirstOrDefault();
+                }
+            }
+            return null;
+        }
+
+        public ITrack SearchTrack(string path)
+        {
+            if (ScannedTracks == false)
+                ScanTracks();
+            path = path.ToLower();
+            path = Path.GetFileNameWithoutExtension(path);
+            return _tracks.Where(x => x.File.Contains(path)).FirstOrDefault();
         }
     }
 }

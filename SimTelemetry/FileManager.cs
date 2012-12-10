@@ -1,4 +1,24 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Data.OleDb;
 using System.Windows.Forms;
 using Triton.Controls;
@@ -12,7 +32,7 @@ namespace SimTelemetry
         #region Laptimes
 
         private VisualListDetails _vldLaptimes;
-        private Timer _tList = new Timer { Interval = 20 };
+        private Timer _tList = new Timer { Interval = 1000 };
         public string Datafile { set; get; }
         public bool DatafileNew { get; set; }
         #endregion
@@ -106,7 +126,7 @@ namespace SimTelemetry
 
             // Update the list
             OleDbConnection con = DatabaseOleDbConnectionPool.GetOleDbConnection();
-            using(OleDbCommand sLaps = new OleDbCommand("SELECT id, Simulator, Circuit, Series, Car, Laptime, S1, S2, S3, Driven, LapNo, FilePath FROM laptimes",con))
+            using (OleDbCommand sLaps = new OleDbCommand("SELECT id, Simulator, Circuit, Series, Car, Laptime, S1, S2, S3, Driven, LapNo, FilePath FROM laptimes WHERE InvalidLapData = 0", con))
             using (OleDbDataReader rLaps = sLaps.ExecuteReader())
             {
                 while(rLaps.HasRows && rLaps.Read())

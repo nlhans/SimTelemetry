@@ -59,19 +59,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Error.cs">
+    <Compile Include="UI\Error.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Error.Designer.cs">
+    <Compile Include="UI\Error.Designer.cs">
       <DependentUpon>Error.cs</DependentUpon>
     </Compile>
-    <Compile Include="fGarage.cs">
+    <Compile Include="UI\fGarage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="fGarage.Designer.cs">
+    <Compile Include="UI\fGarage.Designer.cs">
       <DependentUpon>fGarage.cs</DependentUpon>
     </Compile>
-    <Compile Include="BufferedFlowLayoutPanel.cs">
+    <Compile Include="UI\BufferedFlowLayoutPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Garage\ucSelectModel.cs">
@@ -86,7 +86,7 @@
     <Compile Include="Garage\ucSelectModel_EngineCurve.Designer.cs">
       <DependentUpon>ucSelectModel_EngineCurve.cs</DependentUpon>
     </Compile>
-    <Compile Include="IGarageUserControl.cs" />
+    <Compile Include="Garage\IGarageUserControl.cs" />
     <Compile Include="Garage\ucSelectGame.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -99,34 +99,34 @@
     <Compile Include="Garage\ucSelectTrackCars.Designer.cs">
       <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gauge_A1GP.cs">
+    <Compile Include="Gauges\Gauge_A1GP.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Gauge_A1GP.Designer.cs">
+    <Compile Include="Gauges\Gauge_A1GP.Designer.cs">
       <DependentUpon>Gauge_A1GP.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gauge_Laps.cs">
+    <Compile Include="Gauges\Gauge_Laps.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Gauge_Laps.Designer.cs">
+    <Compile Include="Gauges\Gauge_Laps.Designer.cs">
       <DependentUpon>Gauge_Laps.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gauge_Splits.cs">
+    <Compile Include="Gauges\Gauge_Splits.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Gauge_Splits.Designer.cs">
+    <Compile Include="Gauges\Gauge_Splits.Designer.cs">
       <DependentUpon>Gauge_Splits.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gauge_Tyres.cs">
+    <Compile Include="Gauges\Gauge_Tyres.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Gauge_Tyres.Designer.cs">
+    <Compile Include="Gauges\Gauge_Tyres.Designer.cs">
       <DependentUpon>Gauge_Tyres.cs</DependentUpon>
     </Compile>
-    <Compile Include="LapChart.cs">
+    <Compile Include="Gauges\LapChart.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="LapChart.Designer.cs">
+    <Compile Include="Gauges\LapChart.Designer.cs">
       <DependentUpon>LapChart.cs</DependentUpon>
     </Compile>
     <Compile Include="LiveTelemetry.cs">
@@ -137,25 +137,31 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LiveTrackMap.cs">
+    <Compile Include="Gauges\LiveTrackMap.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ucResizableImage.cs">
+    <Compile Include="UI\fNetwork.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\fNetwork.Designer.cs">
+      <DependentUpon>fNetwork.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ucResizableImage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ucResizableImage.Designer.cs">
+    <Compile Include="UI\ucResizableImage.Designer.cs">
       <DependentUpon>ucResizableImage.cs</DependentUpon>
     </Compile>
-    <Compile Include="ucSessionInfo.cs">
+    <Compile Include="Gauges\ucSessionInfo.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ucSessionInfo.Designer.cs">
+    <Compile Include="Gauges\ucSessionInfo.Designer.cs">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Error.resx">
+    <EmbeddedResource Include="UI\Error.resx">
       <DependentUpon>Error.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="fGarage.resx">
+    <EmbeddedResource Include="UI\fGarage.resx">
       <DependentUpon>fGarage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Garage\ucSelectGame.resx">
@@ -170,26 +176,29 @@
     <EmbeddedResource Include="Garage\ucSelectTrackCars.resx">
       <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Gauge_A1GP.resx">
+    <EmbeddedResource Include="Gauges\Gauge_A1GP.resx">
       <DependentUpon>Gauge_A1GP.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Gauge_Laps.resx">
+    <EmbeddedResource Include="Gauges\Gauge_Laps.resx">
       <DependentUpon>Gauge_Laps.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Gauge_Splits.resx">
+    <EmbeddedResource Include="Gauges\Gauge_Splits.resx">
       <DependentUpon>Gauge_Splits.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Gauge_Tyres.resx">
+    <EmbeddedResource Include="Gauges\Gauge_Tyres.resx">
       <DependentUpon>Gauge_Tyres.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LapChart.resx">
+    <EmbeddedResource Include="Gauges\LapChart.resx">
       <DependentUpon>LapChart.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LiveTelemetry.resx">
       <DependentUpon>LiveTelemetry.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ucSessionInfo.resx">
+    <EmbeddedResource Include="Gauges\ucSessionInfo.resx">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\fNetwork.resx">
+      <DependentUpon>fNetwork.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

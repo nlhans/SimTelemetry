@@ -1,4 +1,24 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
@@ -33,13 +53,13 @@ namespace SimTelemetry.Peripherals.Dashboard
                 for (offset = 0; offset < 500; offset++)
                 {
 
-                    double curve_rpm, Tl_Now, Th_Now;
+                    double curve_rpm = 0, Tl_Now = 0, Th_Now = 0;
                     // read rpm
                     // TOOD: RFACTOR ONLY
                     // TODO: these operations need to be moved to game DLL's!!!
-                    curve_rpm = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 3 * offset));
+                    /*curve_rpm = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 3 * offset));
                     Tl_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 1 + 0x8 * 3 * offset));
-                    Th_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 2 + 0x8 * 3 * offset));
+                    Th_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 2 + 0x8 * 3 * offset));*/
 
                     DoubleList.Add(curve_rpm);
                     DoubleList.Add(Tl_Now);

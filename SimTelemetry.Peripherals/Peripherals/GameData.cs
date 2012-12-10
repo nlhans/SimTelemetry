@@ -1,4 +1,24 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
@@ -72,11 +92,16 @@ namespace SimTelemetry.Peripherals.Dashboard
                     return Telemetry.m.Sim.Drivers.Player.GearRatio6;
                     break;
 
+                case 7:
+                    return Telemetry.m.Sim.Drivers.Player.GearRatio7;
+                    break;
+
             }
             // TODO: globalize
-            double ratio = Telemetry.m.Sim.Memory.ReadFloat((IntPtr)(0x7154C0 + 0x31F8 + 0x4 * g));
-            ratio = Telemetry.m.Sim.Memory.ReadDouble((IntPtr)(0x00ADC248 + 0x8 * (g - 1)));
-            return ratio;
+            //double ratio = Telemetry.m.Sim.Memory.ReadFloat((IntPtr)(0x7154C0 + 0x31F8 + 0x4 * g));
+            //ratio = Telemetry.m.Sim.Memory.ReadDouble((IntPtr)(0x00ADC248 + 0x8 * (g - 1)));
+            //return ratio;
+            return 1.0f;
 
         }
 
@@ -276,7 +301,7 @@ namespace SimTelemetry.Peripherals.Dashboard
 
             /*** Temporarely do cardata here as well ***/
             CarData cardata = new CarData();
-            cardata.RPM_Max = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Max_Live * rads_to_rpm,0,25000)-200);
+            cardata.RPM_Max = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Max_Live * rads_to_rpm,200,25000)-200);
             cardata.RPM_Idle = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Idle_Max * rads_to_rpm,0,7000));
 
             //cardata.HP_Max = Convert.ToUInt16(EngineCurve.GetMaxHP());

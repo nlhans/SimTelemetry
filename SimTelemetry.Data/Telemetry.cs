@@ -1,11 +1,32 @@
-﻿using System.Collections.Generic;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.Threading;
 using SimTelemetry.Data.Logger;
+using SimTelemetry.Data.Net;
 using SimTelemetry.Data.Stats;
-using SimTelemetry.Data.Track;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Peripherals;
 using Triton;
@@ -16,10 +37,26 @@ namespace SimTelemetry.Data
     public sealed class Telemetry : ITelemetry
     {
         /// <summary>
+        /// Class containing whether a simulator is running and has a session active.
+        /// </summary>
+        internal class Telemetry_SimState
+        {
+            public bool Active;
+            public bool Session;
+            public bool Driving;
+            public int Laps;
+            public Telemetry_SimState()
+            {
+                Laps = -1;
+                Driving = false;
+                Active = false;
+                Session = false;
+            }
+        }
+        /// <summary>
         /// Single-ton Telemetry for general access everywhere.
         /// </summary>
-        private static Telemetry _m = new Telemetry();
-        public static Telemetry m { get { return _m; } }
+        public static readonly Telemetry m = new Telemetry();
 
         /// <summary>
         /// Track parser containing data about the current track.
@@ -40,7 +77,12 @@ namespace SimTelemetry.Data
         /// <summary>
         /// Gets the running simulator. Returns null if not available.
         /// </summary>
-        public ISimulator Sim { get { return Sims.GetRunning(); } }
+        public ISimulator Sim { get {  return Sims.GetRunning(); } }
+
+        /// <summary>
+        /// General calculations based on game data.
+        /// </summary>
+        public Computations Computations = new Computations();
 
         /// <summary>
         /// Returns true if a simulator is active. 
@@ -49,7 +91,7 @@ namespace SimTelemetry.Data
         {
             get
             {
-                if (Sims == null) // in case Sims is not initialised yet.
+                if (Sims == null) // in case Sims is not initialized yet.
                     return false;
                 else
                     return Sims.Available;
@@ -82,16 +124,12 @@ namespace SimTelemetry.Data
         private Thread Simulator_StatePollerThread;
         
         /// <summary>
-        /// Data logger that always runs in the background collecting and storing telemetry data. 
-        /// Is in co-junction with TelemetryStats which keeps track of driving statistics.
-        /// </summary>
-        private TelemetryLogger Logger;
-        
-        /// <summary>
         /// Class collecting driving stats, storing them into the log database and providing methods for
         /// searching and analyzing data.
         /// </summary>
         public TelemetryStats Stats { get; set; }
+
+        public TelemetryNetwork Net { get; set; }
 
         #region Events
         /// <summary>
@@ -166,10 +204,12 @@ namespace SimTelemetry.Data
         public void Bootup(object no)
         {
             // Initialize simulator collection, data logger and stats collector.
+            Net = new TelemetryNetwork();
             Sims = new Simulators();
-            Logger = new TelemetryLogger(this);
+            new TelemetryLogger(this);
             Stats = new TelemetryStats();
             new Splits();
+
 
             Simulator_StatePollerThread = new Thread(Simulator_StatePoller);
             Simulator_StatePollerThread.Start();
@@ -187,10 +227,13 @@ namespace SimTelemetry.Data
         /// <param name="sender"></param>
         private void Telemetry_Session_Start(object sender)
         {
-            // Start trackparser.
-            //Wait 500ms because the track-parser may need some time to complete parsing the track.
-            Track = new TrackParser(Sim.Session.GameDirectory, Sim.Session.GameData_TrackFile);
-            Thread.Sleep(500);
+            // Start track parser.
+            // Wait 500ms because the track-parser may need some time to complete parsing the track.
+            if (Net == null || !Net.IsClient)
+            {
+                Track = new Track.Track(Telemetry.m.Sim, Sim.Session.GameData_TrackFile);
+                Thread.Sleep(500);
+            }
 
             if (Track_Loaded != null)
                 Track_Loaded(null);
@@ -203,20 +246,24 @@ namespace SimTelemetry.Data
         /// <remarks>For proper shutdown of this thread, call TritonBase.TriggerExit();</remarks>
         private void Simulator_StatePoller()
         {
-            // Run whenver the TritonBase (Framework) is active.
+            // Run whenever the TritonBase (Framework) is active.
             while (TritonBase.Active)
             {
                 foreach (ISimulator sim in this.Sims.Sims)
                 {
+                    if (Telemetry.m.Net.IsClient
+                        && sim != Telemetry.m.Sims.Network)
+                        continue;
+
                     if (Simulator_StateCollection.ContainsKey(sim.ProcessName) == false)
                         Simulator_StateCollection.Add(sim.ProcessName, new Telemetry_SimState());
 
                     Telemetry_SimState state = Simulator_StateCollection[sim.ProcessName];
 
-                    if (sim.Memory.Attached != state.Active) // Simulator events.
+                    if (sim.Attached != state.Active) // Simulator events.
                     {
-                        state.Active = sim.Memory.Attached;
-                        if (sim.Memory.Attached)
+                        state.Active = sim.Attached;
+                        if (sim.Attached)
                         {
                             Report_SimStart(sim);
                         }
@@ -241,7 +288,7 @@ namespace SimTelemetry.Data
                             Report_SessionStop(sim);
                         }
                     }
-                    if (sim.Session.Active && sim.Drivers.Player != null)
+                    if (sim.Session != null && sim.Drivers != null && sim.Session.Active && sim.Drivers.Player != null)
                     {
                         if (state.Active && sim.Drivers.Player.Driving != state.Driving)
                         {
@@ -353,9 +400,12 @@ namespace SimTelemetry.Data
         /// </summary>
         /// <param name="gamedir">Absolute path to gamedirectory.</param>
         /// <param name="track">Relative path from gamedirectory to track file.</param>
-        public void Track_Load(string gamedir, string track)
+        public void Track_Load(ISimulator sim, string track)
         {
-            Track = new TrackParser(gamedir, track);
+            if (Net == null || !Net.IsClient)
+            {
+                Track = new Track.Track(sim, track);
+            }
         }
 
         /// <summary>
@@ -373,6 +423,35 @@ namespace SimTelemetry.Data
         {
             Peripherals = new Devices();
             ThreadPool.QueueUserWorkItem(new WaitCallback(Bootup));
+        }
+
+        //TODO: move to track class
+        /// <summary>
+        /// Loads route from network.
+        /// </summary>
+        /// <param name="routeCollection"></param>
+        public void NetworkTrack_LoadRoute(RouteCollection routeCollection)
+        {
+            if (Net != null && Net.IsClient)
+            {
+                Track = new Track.Track(routeCollection);
+            }
+        }
+        
+        //TODO: move to track class
+        /// <summary>
+        /// Loads track info from network.
+        /// </summary>
+        /// <param name="routeInfo"></param>
+        public void NetworkTrack_LoadInfo(NetworkTrackInformation routeInfo)
+        {
+            if(Net != null && Track != null)
+            {
+                ((Track.Track)Track).NetworkSetInfo(routeInfo);
+
+                if (Track_Loaded != null)
+                    Track_Loaded(null);
+            }
         }
     }
 }

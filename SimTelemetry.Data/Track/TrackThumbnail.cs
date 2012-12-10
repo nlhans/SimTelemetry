@@ -1,4 +1,24 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -67,8 +87,8 @@ namespace SimTelemetry.Data.Track
                     {
                         pos_x_max = Math.Max(wp.X, pos_x_max);
                         pos_x_min = Math.Min(wp.X, pos_x_min);
-                        pos_y_max = Math.Max(wp.Z, pos_y_max);
-                        pos_y_min = Math.Min(wp.Z, pos_y_min);
+                        pos_y_max = Math.Max(wp.Y, pos_y_max);
+                        pos_y_min = Math.Min(wp.Y, pos_y_min);
                     }
                 }
 
@@ -93,7 +113,7 @@ namespace SimTelemetry.Data.Track
                     if (wp.Route == TrackRoute.MAIN)
                     {
                         float x1 = Convert.ToSingle(6 + ((wp.X - pos_x_min)/scale*map_width) + offset_x);
-                        float y1 = Convert.ToSingle(6 + (1 - (wp.Z - pos_y_min)/scale)*map_height + offset_y);
+                        float y1 = Convert.ToSingle(6 + (1 - (wp.Y - pos_y_min)/scale)*map_height + offset_y);
 
                         x1 = Limits.Clamp(x1, -1000, 1000);
                         y1 = Limits.Clamp(y1, -1000, 1000);

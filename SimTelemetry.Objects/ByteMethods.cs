@@ -1,10 +1,54 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SimTelemetry.Objects
 {
     public class ByteMethods
     {
+
+        public static object DeserializeFromBytes(byte[] bytes)
+        {
+            var formatter = new BinaryFormatter();
+            var mstream = new MemoryStream();
+            mstream.Write(bytes, 0, bytes.Length);
+            mstream.Seek(0, SeekOrigin.Begin);
+            return formatter.Deserialize(mstream);
+        }
+
+        public static byte[] SerializeToBytes(object obj)
+        {
+            var mstream = new MemoryStream();
+            var formatter = new BinaryFormatter();
+            formatter.Serialize(mstream, obj);
+            byte[] d = new byte[mstream.Position];
+            mstream.Seek(0, SeekOrigin.Begin);
+            mstream.Read(d, 0, d.Length);
+            return d;
+        }
+
+
         public static void memcpy(byte[] destination, byte[] source, int length, int dst_offset, int src_offset)
         {
             for (int i = 0; i < length; i++)
