@@ -59,6 +59,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\Data.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\Data.Designer.cs">
+      <DependentUpon>Data.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\Error.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -158,6 +164,9 @@
     <Compile Include="Gauges\ucSessionInfo.Designer.cs">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="UI\Data.resx">
+      <DependentUpon>Data.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Error.resx">
       <DependentUpon>Error.cs</DependentUpon>
     </EmbeddedResource>

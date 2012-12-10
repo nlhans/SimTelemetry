@@ -427,6 +427,17 @@ namespace LiveTelemetry
                 Controls.Add(btGarage);
                 Controls.Add(btSettings);
                 Controls.Add(btNetwork);
+
+#if DEBUG
+                Button dataDebug = new Button
+                                       {Text = "Data debug", Size = new Size(75, 25), Location = new Point(280, 10), BackColor= Color.Red};
+                dataDebug.Click += (s, e) =>
+                                       {
+                                           Data d = new Data();
+                                           d.Show();
+                                       };
+                Controls.Add(dataDebug);
+#endif
             }
         }
 
