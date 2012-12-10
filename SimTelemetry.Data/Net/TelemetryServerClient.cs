@@ -52,7 +52,7 @@ namespace SimTelemetry.Data.Net
             Configured = false; // indicates whether received header info about game data
 
             _rxBuffer = new byte[16 * 1024];
-            _txBuffer = new byte[128 * 1024];
+            _txBuffer = new byte[1024 * 1024];
             _txPtr = 0;
 
             _mTcpConnection = tcp_connection;

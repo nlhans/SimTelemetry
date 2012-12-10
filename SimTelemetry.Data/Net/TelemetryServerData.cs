@@ -41,8 +41,10 @@ namespace SimTelemetry.Data.Net
         }
         private void DataCreator()
         {
+            int SecTimer = 0;
             while (_mServer.Running)
             {
+                SecTimer++;
                 try
                 {
                     NetworkPacket packet = new NetworkPacket();
@@ -80,6 +82,22 @@ namespace SimTelemetry.Data.Net
                         packet.Type = NetworkTypes.PLAYER;
                         packet.Data = ByteMethods.SerializeToBytes(NetworkDriverPlayer.Create(Telemetry.m.Sim.Player));
                         _mServer.Write(packet);
+
+                        if (SecTimer % (5*Bandwidth) == 0 && Telemetry.m.Track.Route != null) // every 5 seconds
+                        {
+                            // Send complete track route
+                            packet.Type = NetworkTypes.TRACKMAP;
+                            packet.Data = ByteMethods.SerializeToBytes(Telemetry.m.Track.Route);
+                            _mServer.Write(packet);
+
+                            packet.Type = NetworkTypes.TRACK;
+                            NetworkTrackInformation trackInfo = new NetworkTrackInformation();
+                            trackInfo.Type = Telemetry.m.Track.Type;
+                            trackInfo.Location = Telemetry.m.Track.Location;
+                            trackInfo.Name = Telemetry.m.Track.Name;
+                            packet.Data = ByteMethods.SerializeToBytes(trackInfo);
+                            _mServer.Write(packet);
+                        }
                     }
                 }
                 catch(Exception ex )

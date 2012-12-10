@@ -18,6 +18,7 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
@@ -401,10 +402,10 @@ namespace SimTelemetry.Data
         /// <param name="track">Relative path from gamedirectory to track file.</param>
         public void Track_Load(ISimulator sim, string track)
         {
-                if (Net == null || !Net.IsClient)
-                {
-                    Track = new Track.Track(sim, track);
-                }
+            if (Net == null || !Net.IsClient)
+            {
+                Track = new Track.Track(sim, track);
+            }
         }
 
         /// <summary>
@@ -422,6 +423,35 @@ namespace SimTelemetry.Data
         {
             Peripherals = new Devices();
             ThreadPool.QueueUserWorkItem(new WaitCallback(Bootup));
+        }
+
+        //TODO: move to track class
+        /// <summary>
+        /// Loads route from network.
+        /// </summary>
+        /// <param name="routeCollection"></param>
+        public void NetworkTrack_LoadRoute(RouteCollection routeCollection)
+        {
+            if (Net != null && Net.IsClient)
+            {
+                Track = new Track.Track(routeCollection);
+            }
+        }
+        
+        //TODO: move to track class
+        /// <summary>
+        /// Loads track info from network.
+        /// </summary>
+        /// <param name="routeInfo"></param>
+        public void NetworkTrack_LoadInfo(NetworkTrackInformation routeInfo)
+        {
+            if(Net != null && Track != null)
+            {
+                ((Track.Track)Track).NetworkSetInfo(routeInfo);
+
+                if (Track_Loaded != null)
+                    Track_Loaded(null);
+            }
         }
     }
 }

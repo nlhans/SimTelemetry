@@ -22,6 +22,7 @@ using System;
 
 namespace SimTelemetry.Objects
 {
+    [Serializable]
     public struct TrackWaypoint : ICloneable
     {
         public double X;

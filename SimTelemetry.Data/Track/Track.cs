@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SimTelemetry.Data.Net;
 using SimTelemetry.Objects.Garage;
 using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
 using Timer = System.Timers.Timer;
@@ -48,6 +49,19 @@ namespace SimTelemetry.Data.Track
         public string Type { get; protected set; }
         public string Name { get; protected set; }
         #endregion
+
+        public Track(RouteCollection route)
+        {
+            Route = route;
+            Apexes = new ApexCollection();
+            Sections = new SectionsCollection();
+
+            Location = "??";
+            Type = "??";
+            Name = "??";
+
+            // Laplogger?
+        }
 
         public Track(ISimulator sim, string name)
         {
@@ -77,6 +91,14 @@ namespace SimTelemetry.Data.Track
             LapLogger.Elapsed += LapLogger_Elapsed;
             LapLogger.AutoReset = true;
             LapLogger.Start();
+        }
+
+        public void NetworkSetInfo(NetworkTrackInformation routeInfo)
+        {
+            
+                Name = routeInfo.Name;
+                Location = routeInfo.Location;
+                Type = routeInfo.Type;
         }
 
         private double PreviousTime;

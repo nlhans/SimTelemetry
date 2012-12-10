@@ -185,10 +185,15 @@ namespace SimTelemetry.Data.Net
             if (_mClients != null)
             {
                 byte[] data = ByteMethods.SerializeToBytes(packet);
+                byte[] header = new byte[6];
+                header[0] = (byte)'$';
+                header[1] = (byte) '#';
+                Array.Copy(BitConverter.GetBytes(data.Length), 0, header, 2, 4);
 
                 foreach (var sc in _mClients)
                 {
-                    Traffic += data.Length;
+                    Traffic += data.Length+6;
+                    sc.PushGameData(header);
                     sc.PushGameData(data);
                     sc.FlushGameData();
                 }

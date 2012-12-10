@@ -18,21 +18,13 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using SimTelemetry.Data;
 using SimTelemetry.Data.Net;
 using SimTelemetry.Data.Net.Objects;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
-using SimTelemetry.Objects.HyperType;
 using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Game.Network
@@ -70,18 +62,6 @@ namespace SimTelemetry.Game.Network
             Garage = new NetworkGarage();
             Memory = null;
 
-            // For speed:
-
-            HyperTypeDescriptionProvider.Add(typeof(NetworkDrivers));
-            HyperTypeDescriptionProvider.Add(typeof(NetworkDriverPlayer));
-            HyperTypeDescriptionProvider.Add(typeof(NetworkDriverGeneral));
-            HyperTypeDescriptionProvider.Add(typeof(NetworkSession));
-
-            Types = new Dictionary<string, Dictionary<int, int>>();
-            Properties = new Dictionary<string, Dictionary<int, string>>();
-            Instances = new Dictionary<int, string>();
-            Descriptor = new Dictionary<string, Dictionary<string, PropertyDescriptor>>();
-
             Telemetry.m.Net.Change += Net_Change;
         }
 
@@ -109,46 +89,13 @@ namespace SimTelemetry.Game.Network
         {
 
             Telemetry.m.Net.Listener.Packet += Listener_Packet;
+            Telemetry.m.Net.Listener.Disconnected += Listener_Disconnected;
             // Do what must be done to catch events.
-
         }
 
-        public Dictionary<int, string> Instances { get; set; }
-        public Dictionary<string, Dictionary<int, string>> Properties { get; set; }
-        public Dictionary<string, Dictionary<int, int>> Types { get; set; }
-        public Dictionary<string, Dictionary<string, PropertyDescriptor>> Descriptor { get; set; }
-
-        private void ParseDescriptors(string sType)
+        void Listener_Disconnected()
         {
-            Type type = typeof (int);
-            switch(sType.ToLower())
-            {
-                case "session":
-                    type = typeof (NetworkSession);
-                    break;
-
-                case "driver":
-                    type = typeof (NetworkDriverGeneral);
-                    break;
-
-                case "player":
-                    type = typeof (NetworkDriverPlayer);
-                    break;
-            }
-
-            Descriptor.Add(sType, new Dictionary<string, PropertyDescriptor>());
-            PropertyDescriptorCollection PropertyDescriptors;
-
-            PropertyDescriptors = TypeDescriptor.GetProperties(type);
-            PropertyInfo[] pic = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            foreach (PropertyInfo pi in pic)
-            {
-                PropertyDescriptor fi = PropertyDescriptors[pi.Name];
-                if (fi == null || fi.Attributes.Contains(new Unloggable()))
-                    continue;
-
-                Descriptor[sType].Add(pi.Name, fi);
-            }
+            Disconnected();
         }
 
 
@@ -201,6 +148,15 @@ namespace SimTelemetry.Game.Network
                 case NetworkTypes.HEADER:
                     break;
 
+                case NetworkTypes.TRACKMAP:
+                    Telemetry.m.NetworkTrack_LoadRoute((RouteCollection) ByteMethods.DeserializeFromBytes(packet.Data));
+                    break;
+
+                case NetworkTypes.TRACK:
+                    Telemetry.m.NetworkTrack_LoadInfo(
+                        (NetworkTrackInformation) ByteMethods.DeserializeFromBytes(packet.Data));
+                    break;
+
                     // Others.. do later
             }
         }
@@ -208,6 +164,8 @@ namespace SimTelemetry.Game.Network
         private void Disconnected()
         {
             Attached = false;
+            _name = "Network";
+            _processname = "Network";
 
         }
 

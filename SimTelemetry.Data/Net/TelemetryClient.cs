@@ -50,6 +50,7 @@ namespace SimTelemetry.Data.Net
             {
                 _mClient = new TcpClient(IP, Port);
                 _mThread = new Thread(AcceptPackets);
+                _mThread.IsBackground = true;
                 _mThread.Start();
                 if (Connected != null)
                     Connected();
@@ -79,20 +80,38 @@ namespace SimTelemetry.Data.Net
                     Array.Copy(rxbuf, rxbuf2, available);
                     RxBuffer.AddRange(rxbuf2);
 
-                    for (int i = 0; i < RxBuffer.Count; i++)
+                    while (RxBuffer.Count >= 6)
                     {
+                        if (RxBuffer.Count > 2*1024*1024) // Cap buffer at 2MiB
+                            RxBuffer.RemoveRange(0, RxBuffer.Count - 2*1024*1024); // remove x bytes so 2 MiB remains.
+
                         try
                         {
-                            NetworkPacket pack = (NetworkPacket)ByteMethods.DeserializeFromBytes(RxBuffer.ToArray());
-                            if (Packet != null)
-                                Packet(pack);
-                            RxBuffer.RemoveRange(0, ByteMethods.SerializeToBytes(pack).Length);
+                            if (RxBuffer[0] == (byte) '$' && RxBuffer[1] == (byte) '#') /// 0x24 + 0x23
+                            {
+                                int size = BitConverter.ToInt32(RxBuffer.ToArray(), 2);
+                                if (RxBuffer.Count > size)
+                                {
+                                    RxBuffer.RemoveRange(0, 6);
+
+                                    NetworkPacket pack =
+                                        (NetworkPacket) ByteMethods.DeserializeFromBytes(RxBuffer.ToArray());
+                                    if (Packet != null)
+                                        Packet(pack);
+
+                                    RxBuffer.RemoveRange(0, size);
+                                }
+                                else
+                                    break;
+                            }
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
 
-                            RxBuffer.RemoveAt(0);
                         }
+                        int next = RxBuffer.IndexOf((byte) '$');
+                        if (next >= 2)
+                            RxBuffer.RemoveRange(0, next - 1);
                     }
 
 

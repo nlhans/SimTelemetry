@@ -24,6 +24,7 @@ using System.Linq;
 
 namespace SimTelemetry.Objects
 {
+    [Serializable]
     public class RouteCollection : ICloneable
     {
         public List<TrackWaypoint> Racetrack { get; private set; }
