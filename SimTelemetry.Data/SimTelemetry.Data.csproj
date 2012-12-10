@@ -49,12 +49,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Computations.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Logger\TelemetryLogger.cs" />
     <Compile Include="Logger\TelemetryLogReader.cs" />
     <Compile Include="Logger\TelemetryLogReplay.cs" />
     <Compile Include="Logger\TelemetryLogWriter.cs" />
     <Compile Include="Logger\TelemetryLoggerSubscribedInstance.cs" />
+    <Compile Include="Net\NetworkAppState.cs" />
+    <Compile Include="Net\NetworkPacket.cs" />
+    <Compile Include="Net\NetworkStateReport.cs" />
+    <Compile Include="Net\NetworkTrackInformation.cs" />
+    <Compile Include="Net\NetworkTypes.cs" />
+    <Compile Include="Net\Objects\NetworkDriverGeneral.cs" />
+    <Compile Include="Net\Objects\NetworkDriverPlayer.cs" />
+    <Compile Include="Net\Objects\NetworkDrivers.cs" />
+    <Compile Include="Net\Objects\NetworkGame.cs" />
+    <Compile Include="Net\Objects\NetworkGarage.cs" />
+    <Compile Include="Net\Objects\NetworkSession.cs" />
+    <Compile Include="Net\TelemetryClient.cs" />
+    <Compile Include="Net\TelemetryNetwork.cs" />
+    <Compile Include="Net\TelemetryServer.cs" />
+    <Compile Include="Net\TelemetryServerClient.cs" />
+    <Compile Include="Net\TelemetryServerData.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -65,14 +82,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Telemetry.cs" />
     <Compile Include="Simulators.cs" />
-    <Compile Include="Telemetry_SimState.cs" />
     <Compile Include="TrackMap.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="TrackMap.Designer.cs">
       <DependentUpon>TrackMap.cs</DependentUpon>
     </Compile>
-    <Compile Include="Track\TrackParser.cs" />
+    <Compile Include="Track\Track.cs" />
     <Compile Include="Track\TrackThumbnail.cs" />
   </ItemGroup>
   <ItemGroup>

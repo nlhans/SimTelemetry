@@ -1,4 +1,24 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Diagnostics;
@@ -92,38 +112,60 @@ namespace SimTelemetry.Data.Logger
             if (AllLaps.Count != 0)
             {
                 ILap LastLap = AllLaps.Find(delegate(ILap l) { return l.LapNumber == LapNo; });
-                if(LastLap == null)
+                if (LastLap == null)
                     if (AllLaps.Count > LapNo)
                         LastLap = AllLaps[LapNo - 1];
                     else
-                        LastLap = AllLaps[AllLaps.Count-1];
+                        LastLap = AllLaps[AllLaps.Count - 1];
 
                 try
                 {
+                    // TODO: This really needs a database object manager..
+                    string query = "";
+                    int splitcnt = Telemetry.m.Stats.Stats_AnnotationQuery.Split(',').Length;
+                    // Normally, AnnotationQuery = "0,0,0,0,0,NOW(),-1".
+                    // This contains 7 parts.
+                    if (Telemetry.m.Stats.Stats_AnnotationQuery != "" &&
+                        splitcnt == 7)
+                    {
+                        // 18 fields.
+                        query =
+                            "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath,distance,enginerevs,fuelused,gearchanges,samplelength,localtime,simulatortime) " +
+                            "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
+                            Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
+                            LastLap.LapTime + "," + LastLap.Sector1 + "," +
+                            LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
+                            (LapNo).ToString() +
+                            ",'" + AnnotationFileCompress.Replace(".dat", ".gz") + // field 11
+                            "', " + Telemetry.m.Stats.Stats_AnnotationQuery + ");"; // +7
+                    }
+                    else
+                    {
+                        // 11
+                        query =
+                            "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath) " +
+                            "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
+                            Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
+                            LastLap.LapTime + "," + LastLap.Sector1 + "," +
+                            LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
+                            (LapNo).ToString() +
+                            ",'" + AnnotationFileCompress.Replace(".dat", ".gz") + ");"; // field 11
+
+                    }
+
                     // Insert into log
-                    OleDbConnection con =
-                        DatabaseOleDbConnectionPool.GetOleDbConnection();
-                    using (
-                        OleDbCommand newTime =
-                            new OleDbCommand(
-                                "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath" +
-                                ((Telemetry.m.Stats.Stats_AnnotationQuery != "")
-                                     ? ",distance,enginerevs,fuelused,gearchanges,samplelength,localtime,simulatortime"
-                                     : "") + ") " +
-                                "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
-                                Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
-                                Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
-                                Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
-                                LastLap.LapTime + "," + LastLap.Sector1 + "," +
-                                LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
-                                (LapNo).ToString() +
-                                ",'" + AnnotationFileCompress.Replace(".dat", ".gz") +
-                                "', " + Telemetry.m.Stats.Stats_AnnotationQuery + ");", con))
+                    OleDbConnection con = DatabaseOleDbConnectionPool.GetOleDbConnection();
+                    using (OleDbCommand newTime = new OleDbCommand(query, con))
                     {
                         newTime.ExecuteNonQuery();
                     }
                     DatabaseOleDbConnectionPool.Freeup();
-                }catch(Exception Ex)
+                }
+                catch (Exception Ex)
                 {
                     Debug.WriteLine("Failed to insert laptime @ AnnotateDatabase");
                     Debug.WriteLine(Ex.Message);
@@ -167,23 +209,6 @@ namespace SimTelemetry.Data.Logger
 
         }
 
-        /* DEPRECATED
-        public void Start()
-        {
-            if (Active == false)
-            {
-                Active = true;
-
-
-                _Worker = new Timer();
-                _Worker.Elapsed += new ElapsedEventHandler(_Worker_Elapsed);
-                _Worker.Interval = 2; // 100Hz
-                _Worker.AutoReset = true;
-                _Worker.Start();
-            }
-
-        }*/
-
         public void Start(string file, int lapno)
         {
             if (Active == false)
@@ -195,7 +220,7 @@ namespace SimTelemetry.Data.Logger
 
                 _Worker = new Timer();
                 _Worker.Elapsed += new ElapsedEventHandler(_Worker_Elapsed);
-                _Worker.Interval = 2; // 50Hz
+                _Worker.Interval = 2; // 500Hz
                 _Worker.AutoReset = true;
                 _Worker.Start();
             }
@@ -206,6 +231,7 @@ namespace SimTelemetry.Data.Logger
         {
             List<byte> tmpheader = new List<byte>();
 
+            // TODO: Move to TelemetryLoggerSubcribedInstance
             foreach (KeyValuePair<string, TelemetryLoggerSubscribedInstance> tel_instance in Instances)
             {
                 byte[] data = new byte[64];
@@ -228,6 +254,9 @@ namespace SimTelemetry.Data.Logger
                     data = new byte[68];
                     short type = 0xFF;
                     Type t = tel_instance.Value.PropertyDescriptors.Find(properyMap.Key, true).PropertyType;
+
+                    // TODO: Put in enumerator
+                    // Or find something nicer for this.
                     if (t == typeof(double)) type = 0;
                     if (t == typeof(float)) type = 1;
                     if (t == typeof(Int32)) type = 2;
@@ -268,8 +297,10 @@ namespace SimTelemetry.Data.Logger
 
         void _Worker_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if(Telemetry.m.Net.IsClient)
+                Stop();
             if (Telemetry.m.Active_Session == false)
-                this.Stop();
+                Stop();
 
 
             if (_mWrite != null)
@@ -311,7 +342,6 @@ namespace SimTelemetry.Data.Logger
                             _mWrite.BaseStream.Write(header, 0, header.Length);
                             _mWrite.BaseStream.Write(data, 0, data.Length);
 
-
                             /************** DATA *************/
                             lock (EventsFired)
                             {
@@ -322,12 +352,13 @@ namespace SimTelemetry.Data.Logger
                                     {
 
                                         // Write a packet to the stream.
-                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)TelemetryLogPacket.Data), 2, 4,
+                                        ByteMethods.memcpy(header,
+                                                           BitConverter.GetBytes((ushort) TelemetryLogPacket.Data), 2, 4,
                                                            0);
                                         // Packet ID
                                         ByteMethods.memcpy(header, BitConverter.GetBytes(tel_instance.Value.ID), 2, 6, 0);
                                         // Instance ID
-                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort)data.Length), 2, 8, 0);
+                                        ByteMethods.memcpy(header, BitConverter.GetBytes((ushort) data.Length), 2, 8, 0);
                                         // Data length
 
 

@@ -1,13 +1,28 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using SimTelemetry.Controls;
-using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
 
 namespace SimTelemetry
@@ -27,19 +42,11 @@ namespace SimTelemetry
 
         protected override void OnPaint(PaintEventArgs e)
          {
-            AutoPosition = false;// let us do that!
-            AccurateTrackWidth = true;
-
             if (_mMaster.Data == null)
             {
                 e.Graphics.FillRectangle(Brushes.Black, e.ClipRectangle);
                 return;
             }
-            pos_x_max = -100000;
-            pos_x_min = 100000;
-            pos_y_max = -100000;
-            pos_y_min = 1000000;
-
 
             try
             {
@@ -52,24 +59,24 @@ namespace SimTelemetry
                         {
                             if (_mMaster.TimeLine[1] >= s.Key/1000.0 && s.Key/1000.0 >= _mMaster.TimeLine[0])
                             {
-                                pos_x_max = Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_max);
-                                pos_x_min = Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_min);
+                                pos_x_max = (float)Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_max);
+                                pos_x_min = (float)Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX"), pos_x_min);
 
-                                pos_y_max = Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_max);
-                                pos_y_min = Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ"), pos_y_min);
+                                pos_y_max = (float)Math.Max(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateY"), pos_y_max);
+                                pos_y_min = (float)Math.Min(_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateY"), pos_y_min);
                             }
                         }
 
                         //:???
-                        double x_d = pos_x_max - pos_x_min;
-                        double y_d = pos_y_max - pos_y_min;
-                        double d = Math.Max(y_d, x_d);
+                        float x_d = pos_x_max - pos_x_min;
+                        float y_d = pos_y_max - pos_y_min;
+                        float d = Math.Max(y_d, x_d);
 
-                        pos_x_min -= (x_d - d)/2;
-                        pos_x_min += (x_d - d)/2;
+                        pos_x_min -= (x_d - d)/2.0f;
+                        pos_x_min += (x_d - d)/2.0f;
 
-                        pos_y_min -= (x_d - d)/2;
-                        pos_y_min += (x_d - d)/2;
+                        pos_y_min -= (x_d - d)/2.0f;
+                        pos_y_min += (x_d - d)/2.0f;
                     }
                 }
             }
@@ -99,7 +106,7 @@ namespace SimTelemetry
                 }
 
                 //g.FillRectangle(new SolidBrush(new PlotterPalette().Background), bounds);
-                g.DrawImage(_EmptyTrackMap, 0, 0);
+                g.DrawImage(_BackgroundTrackMap, 0, 0);
 
                 double px = 0;
                 double py = 0;
@@ -130,7 +137,7 @@ namespace SimTelemetry
                                 }
 
                                 double x = 10 + ((_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateX") - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                                double y = 100 + (1 - (_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateZ") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+                                double y = 100 + (1 - (_mMaster.Data.GetDouble(s.Key, "Driver.CoordinateY") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
 
                                 if (px == 0 || Math.Abs(x - px) > 4 || Math.Abs(y - py) > 4)
                                 {
@@ -149,7 +156,7 @@ namespace SimTelemetry
                         if (_mMaster.TimeCursor[1] > 0 && Math.Abs(Leastdt) < 2000)
                         {
                             double x = 10 + ((_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateX") - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20);
-                            double y = 100 + (1 - (_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateZ") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
+                            double y = 100 + (1 - (_mMaster.Data.GetDouble(LeastTime, "Driver.CoordinateY") - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20);
                             g.FillEllipse(new SolidBrush(Color.Yellow), x - 3, y - 3, 6, 6);
 
                         }

@@ -1,4 +1,24 @@
-﻿namespace SimTelemetry.Objects
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+namespace SimTelemetry.Objects
 {
     public interface IDriverPlayer
     {
@@ -72,15 +92,19 @@
         double Suspension_RideHeight_RR_G { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_LF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_LR { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_RF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Suspension_RideHeight_RR { set; get; }
 
         [LogOnChange]
@@ -111,15 +135,19 @@
         double Tyre_Pressure_Optimal_RR { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_LF { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_LR { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_RF { set; get; }
 
         [Loggable(1)]
+        [LogOnChange]
         double Tyre_Pressure_RR { set; get; }
 
         [LogOnChange]
@@ -147,51 +175,67 @@
         double Tyre_Grip_Sidewards_RR { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_LF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_LR { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_RF { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Tyre_Speed_RR { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LF_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LR_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RF_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RR_Inside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LF_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LR_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RF_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RR_Middle { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LF_Outside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_LR_Outside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RF_Outside { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Tyre_Temperature_RR_Outside { set; get; }
 
         [LogOnChange]
@@ -282,6 +326,7 @@
         int Aerodynamics_BrakeDuct_Setting { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Engine_RPM { set; get; }
 
         [LogOnChange]
@@ -309,9 +354,11 @@
         double Engine_Idle_ThrottleGain { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Engine_Torque_Negative { set; get; }
 
         [Loggable(10)]
+        [LogOnChange]
         double Engine_Torque { set; get; }
 
         [LogOnChange]
@@ -333,15 +380,19 @@
         double Brake_TypicalFailure_RR { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_LF { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_LR { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_RF { set; get; }
 
         [Loggable(5)]
+        [LogOnChange]
         double Brake_Temperature_RR { set; get; }
 
         [LogOnChange]
@@ -399,15 +450,19 @@
         double Clutch_Friction { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Pedals_Clutch { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Pedals_Throttle { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Pedals_Brake { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double SteeringAngle { set; get; }
 
         [LogOnChange]
@@ -432,6 +487,7 @@
         bool DrivingHelp_AutoClutch { set; get; }
 
         [Loggable(25)]
+        [LogOnChange]
         double Speed { set; get; }
 
         [LogOnChange]
@@ -447,6 +503,7 @@
         double Brake_InitialThickness_RR { get; set; }
 
         [Loggable(25)]
+        [LogOnChange]
         double SpeedSlipping { get; set; }
     }
 

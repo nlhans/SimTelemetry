@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Game.rFactor",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveTelemetry", "LiveTelemetry\LiveTelemetry.csproj", "{8A946732-F275-449E-92D3-53FBDA69865E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTech-Pro", "GTech-Pro\GTech-Pro.csproj", "{7CDDC844-9319-4750-8944-570958B2B2C0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Game.GTR2", "SimTelemetry.Game.GTR2\SimTelemetry.Game.GTR2.csproj", "{705CD38F-897F-4AE3-8461-739A84657D23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Game.rFactor2", "SimTelemetry.Game.rFactor2\SimTelemetry.Game.rFactor2.csproj", "{BE808CB9-AF50-43A3-83D0-D719E52957B8}"
@@ -75,16 +73,6 @@ Global
 		{8A946732-F275-449E-92D3-53FBDA69865E}.Release|Mixed Platforms.Build.0 = Release|x86
 		{8A946732-F275-449E-92D3-53FBDA69865E}.Release|x86.ActiveCfg = Release|x86
 		{8A946732-F275-449E-92D3-53FBDA69865E}.Release|x86.Build.0 = Release|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Debug|x86.ActiveCfg = Debug|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Debug|x86.Build.0 = Debug|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Release|Any CPU.ActiveCfg = Release|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Release|Mixed Platforms.Build.0 = Release|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Release|x86.ActiveCfg = Release|x86
-		{7CDDC844-9319-4750-8944-570958B2B2C0}.Release|x86.Build.0 = Release|x86
 		{705CD38F-897F-4AE3-8461-739A84657D23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{705CD38F-897F-4AE3-8461-739A84657D23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{705CD38F-897F-4AE3-8461-739A84657D23}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

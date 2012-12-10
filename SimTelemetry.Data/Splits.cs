@@ -1,10 +1,26 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
 using Triton.Database;
@@ -34,6 +50,9 @@ namespace SimTelemetry.Data
             UpdateSplitTime = new Timer {Interval = 50};
             UpdateSplitTime.Elapsed += (s, e) =>
                                            {
+                                               if (Telemetry.m.Sim == null || Telemetry.m.Sim.Drivers == null || Telemetry.m.Sim.Drivers.Player == null)
+                                                   return;
+
                                                double MyMeters = Telemetry.m.Sim.Drivers.Player.MetersDriven;
                                                double MyDt = Telemetry.m.Sim.Session.Time - Time_Start;
                                                double OldTime = GetTimeFromTable(MyMeters);
@@ -46,8 +65,10 @@ namespace SimTelemetry.Data
                                            };
 
             // Trigger-once timer
-            _mUpdateBestLap = new Timer {Interval = 100};
+            _mUpdateBestLap = new Timer {Interval = 2000};
             _mUpdateBestLap.AutoReset = false;
+
+            // TODO: This is some quality helloween code right here.
             _mUpdateBestLap.Elapsed += (s, e) =>
                                            {
                                                bool RemoveLapTelemetryPath = false;
@@ -55,6 +76,8 @@ namespace SimTelemetry.Data
                                                if (Telemetry.m.Sim == null) return;
                                                if (Telemetry.m.Track == null) return;
                                                if (Telemetry.m.Track.Name == null) return;
+                                               if (Telemetry.m.Net.IsClient) return;
+
                                                OleDbConnection con =
                                                    DatabaseOleDbConnectionPool.GetOleDbConnection();
                                                using (

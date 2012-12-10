@@ -1,6 +1,28 @@
-﻿using System;
+﻿/*************************************************************************
+ *                         SimTelemetry                                  *
+ *        providing live telemetry read-out for simulators               *
+ *             Copyright (C) 2011-2012 Hans de Jong                      *
+ *                                                                       *
+ *  This program is free software: you can redistribute it and/or modify *
+ *  it under the terms of the GNU General Public License as published by *
+ *  the Free Software Foundation, either version 3 of the License, or    *
+ *  (at your option) any later version.                                  *
+ *                                                                       *
+ *  This program is distributed in the hope that it will be useful,      *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of       *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        *
+ *  GNU General Public License for more details.                         *
+ *                                                                       *
+ *  You should have received a copy of the GNU General Public License    *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.*
+ *                                                                       *
+ * Source code only available at https://github.com/nlhans/SimTelemetry/ *
+ ************************************************************************/
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
 using Triton;
@@ -95,7 +117,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         public double Length
         {
-            get { return _length; }
+            get { return _Route.Length; }
         }
 
         public string Qualify_Day
@@ -190,7 +212,14 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         public string Thumbnail
         {
-            get { return "Cache/Tracks/rfactor_" + Path.GetFileNameWithoutExtension(File) + ".png"; }
+            get
+            {
+                if (Directory.Exists("./Cache/") == false)
+                    Directory.CreateDirectory("./Cache/");
+                if (Directory.Exists("./Cache/Tracks/"))
+                    Directory.CreateDirectory("./Cache/Tracks/");
+                return "Cache/Tracks/rfactor_" + Path.GetFileNameWithoutExtension(File).FileNameSafe() + ".png";
+            }
         }
 
         public rFactorTrack(string file)
@@ -207,8 +236,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 _name = track_gdb.TryGetString("TrackName");
                 _location = track_gdb.TryGetString("Location");
                 _type = track_gdb.TryGetString("TrackType");
-                _imageCache = System.IO.File.Exists("tracks/rfactor_" + File.Replace(".gdb", ".png"));
-                    // TODO: Fix a more unique ID globally!
+                _imageCache = System.IO.File.Exists(Thumbnail);
 
                 _length = 0; // Read from AIW.
 
@@ -254,6 +282,10 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
         }
 
+        public string ToString()
+        {
+            return Name;
+        }
 
         public void ScanRoute()
         {
@@ -270,12 +302,13 @@ namespace SimTelemetry.Game.Rfactor.Garage
                                                              "Main.wp_perp", "Main.wp_width", "Main.wp_ptrs"
                                                          });
                 track_aiw.Read();
+                _Route.Finalize();
+
                 ScannedAIW = true;
             }
         }
 
         private TrackWaypoint Waypoint_Temp;
-
         private void Scan_AIWKey(object d)
         {
             object[] a = (object[])d;
@@ -284,24 +317,24 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
             switch (key)
             {
-                // pos = coordinates)
+                    // pos = coordinates)
                 case "Main.wp_pos":
 
                     // 0=x, 1=0y, 2=z
                     Waypoint_Temp = new TrackWaypoint();
 
                     Waypoint_Temp.X = Convert.ToDouble(values[0]);
-                    Waypoint_Temp.Y = Convert.ToDouble(values[1]);
-                    Waypoint_Temp.Z = Convert.ToDouble(values[2]);
+                    Waypoint_Temp.Z = Convert.ToDouble(values[1]);
+                    Waypoint_Temp.Y = Convert.ToDouble(values[2]);
                     break;
 
-                // score = sector, distance
+                    // score = sector, distance
                 case "Main.wp_score":
-                    Waypoint_Temp.Sector = Convert.ToInt32(values[0]);
+                    Waypoint_Temp.Sector = Convert.ToInt32(values[0]) + 1;
                     Waypoint_Temp.Meters = Convert.ToDouble(values[1]);
                     break;
 
-                // branchID = path ID, 0=main, 1=pitlane
+                    // branchID = path ID, 0=main, 1=pitlane
                 case "Main.wp_branchid":
                     if (values.Length == 1)
                     {
@@ -326,23 +359,27 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
                 case "Main.wp_perp":
 
-                    Waypoint_Temp.PerpVector = new double[2] { Convert.ToDouble(values[0]), Convert.ToDouble(values[2]) };
+                    Waypoint_Temp.PerpVector = new double[3] { Convert.ToDouble(values[0]), Convert.ToDouble(values[1]), Convert.ToDouble(values[2]) };
                     break;
 
                 case "Main.wp_width":
                     Waypoint_Temp.CoordinateL = new double[2]
                                                     {
-                                                        Waypoint_Temp.X - Waypoint_Temp.PerpVector[0]*Convert.ToDouble(values[0]),
-                                                        Waypoint_Temp.Z - Waypoint_Temp.PerpVector[1]*Convert.ToDouble(values[0])
+                                                        Waypoint_Temp.X -
+                                                        Waypoint_Temp.PerpVector[0]*Convert.ToDouble(values[0]),
+                                                        Waypoint_Temp.Y -
+                                                        Waypoint_Temp.PerpVector[2]*Convert.ToDouble(values[0])
                                                     };
                     Waypoint_Temp.CoordinateR = new double[2]
                                                     {
-                                                        Waypoint_Temp.X + Waypoint_Temp.PerpVector[0]*Convert.ToDouble(values[1]),
-                                                        Waypoint_Temp.Z + Waypoint_Temp.PerpVector[1]*Convert.ToDouble(values[1])
+                                                        Waypoint_Temp.X +
+                                                        Waypoint_Temp.PerpVector[0]*Convert.ToDouble(values[1]),
+                                                        Waypoint_Temp.Y +
+                                                        Waypoint_Temp.PerpVector[2]*Convert.ToDouble(values[1])
                                                     };
                     break;
 
-                // ptrs = next path, previous path, pitbox route (-1 for no pitbox), following branchID
+                    // ptrs = next path, previous path, pitbox route (-1 for no pitbox), following branchID
                 case "Main.wp_ptrs":
                     switch (values[3])
                     {
