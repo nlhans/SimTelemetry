@@ -19,7 +19,12 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
+using SimTelemetry.Objects;
 using Triton;
 
 namespace SimTelemetry.Data.Net
@@ -34,24 +39,18 @@ namespace SimTelemetry.Data.Net
         public int Port { get; set; }
         public string IP { get; set; }
 
-        private byte[] rx_buffer = new byte[128 * 1024];
-        private byte[] tx_buffer = new byte[128 * 1024];
-
         private TcpClient _mClient;
 
         private NetworkStream _mStream { get { return _mClient.GetStream(); } }
-        public TelemetryClient()
-        {
-
-
-        }
+        private Thread _mThread;
 
         public bool Connect()
         {
             try
             {
                 _mClient = new TcpClient(IP, Port);
-                _mStream.BeginRead(rx_buffer, 0, rx_buffer.Length, RxDone, this);
+                _mThread = new Thread(AcceptPackets);
+                _mThread.Start();
                 if (Connected != null)
                     Connected();
                 return true;
@@ -65,71 +64,45 @@ namespace SimTelemetry.Data.Net
             }
         }
 
-
-        private void RxDone(IAsyncResult ar)
+        public void AcceptPackets()
         {
-            byte[] rx_data = new byte[0];
-            int read = 0;
-            try
+            List<byte> RxBuffer = new List<byte>();
+            while(_mClient.Connected)
             {
 
-                if (ar != null)
+                try
                 {
-                    read = _mStream.EndRead(ar);
+                    // TODO: This is really really messy.
+                    byte[] rxbuf = new byte[256*1024];
+                    int available = _mStream.Read(rxbuf, 0, 256 * 1024);
+                    byte[] rxbuf2 = new byte[available];
+                    Array.Copy(rxbuf, rxbuf2, available);
+                    RxBuffer.AddRange(rxbuf2);
 
-                    rx_data = new byte[read];
-                    Array.Copy(rx_buffer, rx_data, read);
-
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            if (read > 0)
-            {
-                int last_i = 0;
-                // Process.
-                for (int i = 0; i < read - 8; i++)
-                {
-                    if (rx_data[i] == '^' && rx_data[i + 1] == '%')
+                    for (int i = 0; i < RxBuffer.Count; i++)
                     {
                         try
                         {
-                            short type = BitConverter.ToInt16(rx_data, i + 2);
-                            int length = BitConverter.ToInt32(rx_data, i + 4);
-
-                            byte[] packet = new byte[length];
-                            Array.Copy(rx_data, i + 8, packet, 0, length);
-                            i += length;
-                            last_i = i;
-                            NetworkPacket np = new NetworkPacket(type, packet);
+                            NetworkPacket pack = (NetworkPacket)ByteMethods.DeserializeFromBytes(RxBuffer.ToArray());
                             if (Packet != null)
-                                Packet(np);
+                                Packet(pack);
+                            RxBuffer.RemoveRange(0, ByteMethods.SerializeToBytes(pack).Length);
                         }
-                        catch (Exception ex)
+                        catch(Exception ex)
                         {
 
+                            RxBuffer.RemoveAt(0);
                         }
                     }
+
+
                 }
-                if (last_i < read)
+                catch (Exception ex)
                 {
-                    int left = read - last_i;
-                    // We haven't read till end of buffer.
-                    // So copy bytes back into rx_buffer.
-                    Array.Copy(rx_data, last_i, rx_buffer, 0, left);
 
-
-                    if (_mStream != null)
-                        _mStream.BeginRead(rx_buffer, left, rx_buffer.Length-left, RxDone, this);
                 }
-                else if (_mStream != null)
-                    _mStream.BeginRead(rx_buffer, 0, rx_buffer.Length, RxDone, this);
+                Thread.Sleep(5);
             }
-            else if (_mStream != null)
-                _mStream.BeginRead(rx_buffer, 0, rx_buffer.Length, RxDone, this);
         }
 
         public void Disconnect()

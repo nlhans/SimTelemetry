@@ -18,8 +18,11 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System;
+
 namespace SimTelemetry.Objects
 {
+    [Serializable]
     public struct SessionInfo
     {
         public SessionType Type;

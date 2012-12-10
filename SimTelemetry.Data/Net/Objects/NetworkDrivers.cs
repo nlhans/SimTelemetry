@@ -26,20 +26,28 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data.Net.Objects
 {
+    [Serializable]
     public class NetworkDrivers : IDriverCollection
     {
-        private IDriverGeneral p = new NetworkDriverGeneral();
-        public List<IDriverGeneral> AllDrivers
-        {
-            get { List<IDriverGeneral> drg = new List<IDriverGeneral>();
-                drg.Add(p);
-                return drg;
-            }
-        }
-
+        public List<IDriverGeneral> AllDrivers { get; set; }
         public IDriverGeneral Player
         {
-            get { return p; }
+            get
+            {
+                if (AllDrivers == null)
+                    return new NetworkDriverGeneral();
+                return AllDrivers.Where(x => x.IsPlayer).FirstOrDefault();
+            }
+
+        }
+
+        public static NetworkDrivers Create(IDriverCollection Drivers)
+        {
+            NetworkDrivers nwDrivers = new NetworkDrivers();
+            nwDrivers.AllDrivers = new List<IDriverGeneral>();
+            Drivers.AllDrivers.ForEach(x => nwDrivers.AllDrivers.Add(NetworkDriverGeneral.Create(x)));
+
+            return nwDrivers;
         }
     }
 }

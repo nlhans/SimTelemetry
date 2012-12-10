@@ -23,6 +23,7 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Game.Rfactor
 {
+    [Serializable]
     public class DriverPlayer : IDriverPlayer
     {
         public double Engine_Lifetime_Live

@@ -80,6 +80,8 @@ namespace LiveTelemetry
             Telemetry.m.Session_Start += PaintBackground;
             Telemetry.m.Session_Stop += PaintBackground;
             Telemetry.m.Driving_Start += PaintBackground;
+
+            _EmptyGauges = new Bitmap(this.Size.Width, this.Size.Height);
         }
 
         #region Joystick Engine Wear control

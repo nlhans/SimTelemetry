@@ -28,6 +28,7 @@ using Triton.Memory;
 
 namespace SimTelemetry.Game.Rfactor
 {
+    [Serializable]
     public class Session : ISession
     {
         public bool Active

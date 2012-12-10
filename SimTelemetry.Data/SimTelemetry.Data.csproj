@@ -58,6 +58,7 @@
     <Compile Include="Logger\TelemetryLoggerSubscribedInstance.cs" />
     <Compile Include="Net\NetworkAppState.cs" />
     <Compile Include="Net\NetworkPacket.cs" />
+    <Compile Include="Net\NetworkStateReport.cs" />
     <Compile Include="Net\NetworkTypes.cs" />
     <Compile Include="Net\Objects\NetworkDriverGeneral.cs" />
     <Compile Include="Net\Objects\NetworkDriverPlayer.cs" />

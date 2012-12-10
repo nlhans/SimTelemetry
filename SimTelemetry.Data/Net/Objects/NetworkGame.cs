@@ -151,125 +151,6 @@ namespace SimTelemetry.Game.Network
             }
         }
 
-        private void ParseGameData(NetworkPacket packet)
-        {
-            try
-            {
-                int instance_id = BitConverter.ToInt16(packet.Data, 0);
-                int last_typeid = 0;
-                for (int i = 2; i < packet.Data.Length - 4;)
-                {
-
-                    int id_type = BitConverter.ToInt32(packet.Data, i);
-                    object v = 0;
-                    i += 4;
-                    if (Instances.ContainsKey(instance_id) && Types.ContainsKey(Instances[instance_id]))
-                    {
-                        Dictionary<int, int> TypeArray = Types[Instances[instance_id]];
-                        if (TypeArray.ContainsKey(id_type))
-                        {
-                            switch (TypeArray[id_type])
-                            {
-                                case 0: //double
-                                    v = BitConverter.ToDouble(packet.Data, i);
-                                    i += 8;
-                                    break;
-
-                                case 1: //float
-                                    v = BitConverter.ToSingle(packet.Data, i);
-                                    i += 4;
-                                    break;
-
-                                case 2: // int32
-                                    v = BitConverter.ToInt32(packet.Data, i);
-                                    i += 4;
-                                    break;
-
-                                case 3: // int16
-                                    v = BitConverter.ToInt16(packet.Data, i);
-                                    i += 2;
-                                    break;
-
-                                case 4: // int8
-                                    v = packet.Data[i];
-                                    i += 1;
-                                    break;
-
-                                case 5: // uint32
-                                    v = BitConverter.ToUInt32(packet.Data, i);
-                                    i += 4;
-                                    break;
-
-                                case 6: // uint16
-                                    v = BitConverter.ToUInt16(packet.Data, i);
-                                    i += 2;
-                                    break;
-
-                                case 7: // uint8
-                                    v = packet.Data[i];
-                                    i += 1;
-                                    break;
-
-                                case 8: // string
-                                    int k = i;
-                                    for (; k < packet.Data.Length; k++)
-                                    {
-                                        if (packet.Data[k] == 0) break;
-                                    }
-                                    v = ASCIIEncoding.ASCII.GetString(packet.Data, i, k - i);
-                                    i = k + 1;
-                                    break;
-
-                                case 9: // bool
-                                    v = ((packet.Data[i] == 1) ? true : false);
-                                    i += 1;
-                                    break;
-                                default:
-                                    v = 0;
-                                    break;
-                            }
-
-                            string instance_name = Instances[instance_id];
-                            string property_key = Properties[instance_name][id_type];
-
-                            if (Descriptor.ContainsKey(instance_name) &&
-                                Descriptor[instance_name].ContainsKey(property_key))
-                            {
-
-                                PropertyDescriptor pd = Descriptor[instance_name][property_key];
-
-                                switch (instance_name)
-                                {
-                                    case "Session":
-                                        pd.SetValue(Session, v);
-                                        break;
-
-
-                                    case "Player":
-                                        pd.SetValue(Player, v);
-                                        break;
-
-                                    case "Driver":
-                                        // Temporary:
-                                        pd.SetValue(Drivers.Player, v);
-                                        break;
-
-                                }
-                            }
-
-                            //Console.WriteLine( + "=" + v.ToString());
-                            //Sample.Data[instance_id][id_type] = (object)v;
-                            last_typeid = id_type;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error parsing network game data");
-            }
-
-        }
 
         private void Listener_Packet(object sender)
         {
@@ -279,88 +160,48 @@ namespace SimTelemetry.Game.Network
             int lsb = ((ushort) packet.Type) & 0xFF;
             NetworkTypes type = (NetworkTypes) ((ushort) packet.Type & 0xFF00);
 
-            switch(type)
+            switch (type)
             {
-                    case NetworkTypes.SIMULATOR:
-                    NetworkAppState state = (NetworkAppState) packet.Data[0];
-                    if (state == NetworkAppState.WAITING_SIM)
-                        Attached = false;
-                    if (state == NetworkAppState.WAITING_SESSION)
+                case NetworkTypes.SIMULATOR:
+                    NetworkStateReport report = (NetworkStateReport)ByteMethods.DeserializeFromBytes(packet.Data);
+
+                    switch(report.State)
                     {
-                        Attached = true;
-                        string SimName = ASCIIEncoding.ASCII.GetString(packet.Data, 1, packet.Data.Length - 1);
-                        string[] SimData =SimName.Split(",".ToCharArray());
+                        case NetworkAppState.RUNNING:
+                            Attached = true;
+                            _name = report.SimRunning;
+                            _processname = report.ProcessRunning;
+                            break;
 
-                        _name = SimData[0];
-                        _processname = SimData[1];
+                            case NetworkAppState.WAITING_SIM:
+                            Attached = false;
+                            break;
 
+                        case NetworkAppState.WAITING_SESSION:
+                            Attached = true;
+                            _name = report.SimRunning;
+                            _processname = report.ProcessRunning;
+                            break;
                     }
+
                     break;
 
                 case NetworkTypes.DRIVER:
-                    ParseGameData(packet);
+                    Drivers = (IDriverCollection) ByteMethods.DeserializeFromBytes(packet.Data);
                     break;
 
                 case NetworkTypes.PLAYER:
-                    ParseGameData(packet);
+                    Player = (IDriverPlayer) ByteMethods.DeserializeFromBytes(packet.Data);
                     break;
 
                 case NetworkTypes.SESSION:
-                    ParseGameData(packet);
+                    Session = (ISession) ByteMethods.DeserializeFromBytes(packet.Data);
                     break;
 
                 case NetworkTypes.HEADER:
-                    ParseGameHeader(packet);
                     break;
 
                     // Others.. do later
-            }
-        }
-
-        private void ParseGameHeader(NetworkPacket packet)
-        {
-            //
-            byte[] data = packet.Data;
-            string last_type = "";
-            for (int i = 0; i < data.Length-8; i++)
-            {
-                if(data[i] == '$' && data[i+1] == '#')
-                {
-                    ushort packet_type = BitConverter.ToUInt16(data, i + 4);// name or member?
-                    ushort instance = BitConverter.ToUInt16(data, i + 6);// name or member?
-                    ushort length = BitConverter.ToUInt16(data, i + 8);// name or member?
-                    if (length > 0)
-                    {
-
-                        byte[] tmp_data = new byte[length];
-                        Array.Copy(data, i + 10, tmp_data, 0, length);
-
-
-                        if ((TelemetryLogPacket) packet_type == TelemetryLogPacket.InstanceName)
-                        {
-                            last_type = ASCIIEncoding.ASCII.GetString(tmp_data).Replace('\0', ' ').Trim();
-                            int last_type_id = instance;
-                            Instances.Add(last_type_id, last_type);
-                            Types.Add(last_type, new Dictionary<int, int>());
-                            Properties.Add(last_type, new Dictionary<int, string>());
-                            ParseDescriptors(last_type);
-                        }
-                        else
-                        {
-                            int id = BitConverter.ToInt16(tmp_data, 2);
-                            int type_id = BitConverter.ToInt16(tmp_data, 0);
-
-                            if (Types[last_type].ContainsKey(id) == false)
-                            {
-                                Types[last_type].Add(id, type_id);
-
-                                string key = ASCIIEncoding.ASCII.GetString(tmp_data, 4, tmp_data.Length - 4).Replace('\0', ' ').Trim();
-                                Properties[last_type].Add(id, key);
-                            }
-                        }
-                    }
-                }
-
             }
         }
 

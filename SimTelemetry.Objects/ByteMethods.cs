@@ -19,12 +19,36 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SimTelemetry.Objects
 {
     public class ByteMethods
     {
+
+        public static object DeserializeFromBytes(byte[] bytes)
+        {
+            var formatter = new BinaryFormatter();
+            var mstream = new MemoryStream();
+            mstream.Write(bytes, 0, bytes.Length);
+            mstream.Seek(0, SeekOrigin.Begin);
+            return formatter.Deserialize(mstream);
+        }
+
+        public static byte[] SerializeToBytes(object obj)
+        {
+            var mstream = new MemoryStream();
+            var formatter = new BinaryFormatter();
+            formatter.Serialize(mstream, obj);
+            byte[] d = new byte[mstream.Position];
+            mstream.Seek(0, SeekOrigin.Begin);
+            mstream.Read(d, 0, d.Length);
+            return d;
+        }
+
+
         public static void memcpy(byte[] destination, byte[] source, int length, int dst_offset, int src_offset)
         {
             for (int i = 0; i < length; i++)

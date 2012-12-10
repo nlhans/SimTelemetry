@@ -18,16 +18,35 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+
 using System;
+using System.Collections.Generic;
 
 namespace SimTelemetry.Data.Net
 {
     [Serializable]
-    public class NetworkPacket
+    public class NetworkStateReport
     {
-        public string PacketSync = "$PACKET$";
-        public int Length { get { return Data.Length; } set { return; } }
-        public NetworkTypes Type { get; set; }
-        public byte[] Data { get; set; }
+        public NetworkAppState State { get; set; }
+        public string SimRunning { get; set; }
+        public string ProcessRunning { get; set; }
+        public List<string> Simulators { get; set; }
+
+        public NetworkStateReport(NetworkAppState st)
+        {
+            State = st;
+            Simulators = new List<string>();
+        }
+        public NetworkStateReport(NetworkAppState st, string sim, string process)
+        {
+            State = st;
+            ProcessRunning = process;
+            SimRunning = sim;
+            Simulators = new List<string>();
+        }
+        public NetworkStateReport(NetworkAppState st, List<string> SimNames)
+        {
+            Simulators = SimNames;
+        }
     }
 }

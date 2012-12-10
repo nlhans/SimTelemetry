@@ -25,6 +25,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Sockets;
 using System.Threading;
+using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data.Net
 {
@@ -151,22 +152,12 @@ namespace SimTelemetry.Data.Net
 
         public void PushGameData(byte[] data)
         {
-            if (_mClients != null)
-            {
-                foreach (TelemetryServerClient sc in _mClients)
-                {
-                    Traffic += data.Length;
-                    sc.PushGameData(data);
-                }
-            }
         }
 
         public void FlushGameData()
         {
             if (_mClients != null)
             {
-                foreach (TelemetryServerClient sc in _mClients)
-                    sc.FlushGameData();
             }
         }
 
@@ -186,6 +177,22 @@ namespace SimTelemetry.Data.Net
                 _mServer = null;
                 _mKeeper = null;
                 _mClients = new List<TelemetryServerClient>();
+            }
+        }
+
+        public void Write(NetworkPacket packet)
+        {
+            if (_mClients != null)
+            {
+                byte[] data = ByteMethods.SerializeToBytes(packet);
+
+                foreach (var sc in _mClients)
+                {
+                    Traffic += data.Length;
+                    sc.PushGameData(data);
+                    sc.FlushGameData();
+                }
+
             }
         }
     }

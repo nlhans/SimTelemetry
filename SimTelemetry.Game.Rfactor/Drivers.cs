@@ -27,6 +27,7 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Game.Rfactor
 {
+    [Serializable]
     public class Drivers : IDriverCollection
     {
         // rFactor has support up to 108 cars?

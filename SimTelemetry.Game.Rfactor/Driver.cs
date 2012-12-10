@@ -24,6 +24,7 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Game.Rfactor
 {
+    [Serializable]
     public class DriverGeneral : IDriverGeneral
     {
         private int Base = 0;

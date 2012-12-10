@@ -26,6 +26,7 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data.Net.Objects
 {
+    [Serializable]
     public class NetworkDriverGeneral : IDriverGeneral
     {
         public double GetSplitTime(IDriverGeneral player)
@@ -131,5 +132,92 @@ namespace SimTelemetry.Data.Net.Objects
         public bool Flag_Blue { get; set; }
         public bool Flag_Yellow { get; set; }
         public bool Flag_Black { get; set; }
+
+        public static IDriverGeneral Create(IDriverGeneral player)
+        {
+            NetworkDriverGeneral nwGeneral = new NetworkDriverGeneral();
+
+            // TODO: Make a object copy machine.
+            nwGeneral.Driving = player.Driving;
+            nwGeneral.Ignition = player.Ignition;
+            nwGeneral.MemoryBlock = player.MemoryBlock;
+            nwGeneral.SectorsDriven = player.SectorsDriven;
+            nwGeneral.Active = player.Active;
+            nwGeneral.IsPlayer = player.IsPlayer;
+            nwGeneral.Name = player.Name;
+            nwGeneral.BaseAddress = player.BaseAddress;
+            nwGeneral.CoordinateX = player.CoordinateX;
+            nwGeneral.CoordinateY = player.CoordinateY;
+            nwGeneral.CoordinateZ = player.CoordinateZ;
+            nwGeneral.Throttle = player.Throttle;
+            nwGeneral.Brake = player.Brake;
+            nwGeneral.Fuel = player.Fuel;
+            nwGeneral.Fuel_Max = player.Fuel_Max;
+            nwGeneral.CarModel = player.CarModel;
+            nwGeneral.CarClass = player.CarClass;
+            nwGeneral.Control_AI_Aid = player.Control_AI_Aid;
+            nwGeneral.PitLimiter = player.PitLimiter;
+            nwGeneral.Pits = player.Pits;
+            nwGeneral.HeadLights = player.HeadLights;
+            nwGeneral.Laps = player.Laps;
+            nwGeneral.LapTime_Best = player.LapTime_Best;
+            nwGeneral.LapTime_Last = player.LapTime_Last;
+            nwGeneral.LapTime_Best_Sector1 = player.LapTime_Best_Sector1;
+            nwGeneral.LapTime_Best_Sector2 = player.LapTime_Best_Sector2;
+            nwGeneral.LapTime_Best_Sector3 = player.LapTime_Best_Sector3;
+            nwGeneral.Sector_1_Best = player.Sector_1_Best;
+            nwGeneral.Sector_2_Best = player.Sector_2_Best;
+            nwGeneral.Sector_3_Best = player.Sector_3_Best;
+            nwGeneral.Sector_1_Last = player.Sector_1_Last;
+            nwGeneral.Sector_2_Last = player.Sector_2_Last;
+            nwGeneral.Sector_3_Last = player.Sector_3_Last;
+            nwGeneral.MetersDriven = player.MetersDriven;
+            nwGeneral.PitStopRuns = player.PitStopRuns;
+            nwGeneral.Retired = player.Retired;
+            nwGeneral.TrackPosition = player.TrackPosition;
+            nwGeneral.SteeringHelp = player.SteeringHelp;
+            nwGeneral.PitStop_FrontWingSetting = player.PitStop_FrontWingSetting;
+            nwGeneral.PitStop_RearWingSetting = player.PitStop_RearWingSetting;
+            nwGeneral.PitStop_FuelSetting = player.PitStop_FuelSetting;
+            nwGeneral.FuelSetting_Offset = player.FuelSetting_Offset;
+            nwGeneral.FuelSetting_Scale = player.FuelSetting_Scale;
+            nwGeneral.MassEmpty = player.MassEmpty;
+            nwGeneral.Mass = player.Mass;
+            nwGeneral.RPM_Stationary = player.RPM_Stationary;
+            nwGeneral.RPM_Max_Offset = player.RPM_Max_Offset;
+            nwGeneral.RPM_Max_Scale = player.RPM_Max_Scale;
+            nwGeneral.Speed = player.Speed;
+            nwGeneral.RPM = player.RPM;
+            nwGeneral.Position = player.Position;
+            nwGeneral.Gear = player.Gear;
+            nwGeneral.Gears = player.Gears;
+            nwGeneral.GearRatio1 = player.GearRatio1;
+            nwGeneral.GearRatio2 = player.GearRatio2;
+            nwGeneral.GearRatio3 = player.GearRatio3;
+            nwGeneral.GearRatio4 = player.GearRatio4;
+            nwGeneral.GearRatio5 = player.GearRatio5;
+            nwGeneral.GearRatio6 = player.GearRatio6;
+            nwGeneral.GearRatio7 = player.GearRatio7;
+            nwGeneral.GearRatio8 = player.GearRatio8;
+            nwGeneral.GearRatio9 = player.GearRatio9;
+            nwGeneral.GearRatio10 = player.GearRatio10;
+            nwGeneral.GearRatio11 = player.GearRatio11;
+            nwGeneral.GearRatio12 = player.GearRatio12;
+            nwGeneral.GearRatio13 = player.GearRatio13;
+            nwGeneral.GearRatio14 = player.GearRatio14;
+            nwGeneral.GearRatio15 = player.GearRatio15;
+            nwGeneral.GearRatio16 = player.GearRatio16;
+            nwGeneral.GearRatio17 = player.GearRatio17;
+            nwGeneral.GearRatio18 = player.GearRatio18;
+            nwGeneral.GearRatioR = player.GearRatioR;
+            nwGeneral.TyreWear_LF = player.TyreWear_LF;
+            nwGeneral.TyreWear_RF = player.TyreWear_RF;
+            nwGeneral.TyreWear_LR = player.TyreWear_LR;
+            nwGeneral.TyreWear_RR = player.TyreWear_RR;
+            nwGeneral.Flag_Blue = player.Flag_Blue;
+            nwGeneral.Flag_Yellow = player.Flag_Yellow;
+            nwGeneral.Flag_Black = player.Flag_Black;
+            return nwGeneral;
+        }
     }
 }

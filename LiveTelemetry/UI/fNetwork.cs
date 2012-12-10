@@ -49,7 +49,7 @@ namespace LiveTelemetry.UI
                                            {
                                                txt = "Running server - " + Telemetry.m.Net.Host.Clients +
                                                      " clients connected - " +
-                                                     Math.Round(Telemetry.m.Net.Host.Traffic/1024.0, 1)
+                                                     Math.Round(Telemetry.m.Net.Host.Traffic/3/1024.0, 1)
                                                      + "kB/s upload";
                                                Telemetry.m.Net.Host.Traffic = 0;
                                            }

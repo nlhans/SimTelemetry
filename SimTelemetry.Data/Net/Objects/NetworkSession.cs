@@ -26,8 +26,10 @@ using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data.Net.Objects
 {
+    [Serializable]
     public class NetworkSession : ISession
     {
+
         public string GameData_TrackFile { get; set; }
         public string GameDirectory { get; set; }
         public int RaceLaps { get; set; }
@@ -52,5 +54,31 @@ namespace SimTelemetry.Data.Net.Objects
         public bool Flag_Green { get; set; }
         public bool Flag_Finish { get; set; }
         public bool IsOffline { get; set; }
+
+        public static NetworkSession Create(ISession sess)
+        {
+            NetworkSession nwSess = new NetworkSession();
+
+            nwSess.GameData_TrackFile = sess.GameData_TrackFile;
+            nwSess.GameDirectory = sess.GameDirectory;
+            nwSess.RaceLaps = sess.RaceLaps;
+            nwSess.IsRace = sess.IsRace;
+            nwSess.CircuitName = sess.CircuitName;
+            nwSess.TrackTemperature = sess.TrackTemperature;
+            nwSess.AmbientTemperature = sess.AmbientTemperature;
+            nwSess.Type = sess.Type;
+            nwSess.Time = sess.Time;
+            nwSess.TimeClock = sess.TimeClock;
+            nwSess.Cars_InPits = sess.Cars_InPits;
+            nwSess.Cars_OnTrack = sess.Cars_OnTrack;
+            nwSess.Cars = sess.Cars;
+            nwSess.Flag_YellowFull = sess.Flag_YellowFull;
+            nwSess.Flag_Red = sess.Flag_Red;
+            nwSess.Flag_Green = sess.Flag_Green;
+            nwSess.Flag_Finish = sess.Flag_Finish;
+            nwSess.IsOffline = sess.IsOffline;
+
+            return nwSess;
+        }
     }
 }
