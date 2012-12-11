@@ -67,7 +67,7 @@ namespace SimTelemetry.Game.Rfactor
         public int SectorsDriven
         {
             set { }
-            get { return rFactor.Game.ReadInt32(new IntPtr(0x0070F988 + 0x04 + 0x04*3*MemoryBlock)); }
+            get { return rFactor.Game.ReadInt32(new IntPtr(rFactor.Game.Base + 0x0030F988 + 0x04 + 0x04*3*MemoryBlock)); }
         }
 
         
@@ -88,7 +88,7 @@ namespace SimTelemetry.Game.Rfactor
         public bool IsPlayer
         {
             set { }
-            get { return ((rFactor.Game.ReadInt32(new IntPtr(0x0071528C)) == BaseAddress) ? true : false); }
+            get { return ((rFactor.Game.ReadInt32(new IntPtr(rFactor.Game.Base + 0x0031528C)) == BaseAddress) ? true : false); }
         }
 
 

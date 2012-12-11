@@ -29,6 +29,15 @@ namespace SimTelemetry.Objects.Utilities
     {
         public ISimulator sim;
 
+        public int Base
+        {
+            get
+            {
+                if (m_ReadProcess == null) return 0;
+                return (int)m_ReadProcess.MainModule.BaseAddress;
+            }
+        }
+
         public bool Attached { get; internal set; }
         public string ProcessName { get; set; }
 

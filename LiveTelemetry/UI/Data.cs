@@ -21,7 +21,7 @@ namespace LiveTelemetry.UI
         {
             InitializeComponent();
 
-            t = new Timer {Interval = 100};
+            t = new Timer {Interval =500};
             t.Tick += new EventHandler(t_Tick);
             t.Start();
             SetStyle(ControlStyles.UserPaint, true);
@@ -42,7 +42,7 @@ namespace LiveTelemetry.UI
             // Sim.Session
             // Sim.Drivers.Player
             // Sim.Player
-            if (Telemetry.m.Active_Session)
+            if (Telemetry.m.Active_Sim)
             {
                 List<string> session = DumpToLabels(Telemetry.m.Sim.Session, typeof(ISession));
                 List<string> driver = DumpToLabels(Telemetry.m.Sim.Drivers.Player, typeof(IDriverGeneral));
