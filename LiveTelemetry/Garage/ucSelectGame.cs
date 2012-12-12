@@ -67,7 +67,7 @@ namespace LiveTelemetry.Garage
             foreach (ISimulator sim in Telemetry.m.Sims.Sims)
             {
                 bool validSim = (sim.Garage == null || sim.Garage.Available == false ||
-                                 !Directory.Exists(sim.Session.GameDirectory));
+                                 !Directory.Exists(sim.Garage.InstallationDirectory));
                 if (File.Exists("Simulators/" + sim.ProcessName + ".png"))
                 {
                     ucResizableImage pb = new ucResizableImage("Simulators/" + sim.ProcessName + ".png");

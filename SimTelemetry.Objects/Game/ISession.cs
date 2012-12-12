@@ -22,13 +22,10 @@ namespace SimTelemetry.Objects
 {
     public interface ISession
     {
+        // Link with garage tools ASAP
         [LogOnChange]
-        [LogProperty("Track Location", "Used for track loader. Location of track AIW.")]
+        [LogProperty("Track Location", "Location of track data file.")]
         string GameData_TrackFile { get; set; }
-
-        [LogOnChange]
-        [LogProperty("Game Location", "Used for track loader. Location of game directory.")]
-        string GameDirectory { get; set; }
 
         [LogOnChange]
         [LogProperty("No. of race laps", "Number of race laps in this session.")]
@@ -37,10 +34,6 @@ namespace SimTelemetry.Objects
         [LogOnChange]
         [LogProperty("Is Race Session", "Indicates TRUE or FALSE whether this is a race session")]
         bool IsRace { get; set; }
-
-        [LogOnChange]
-        [LogProperty("Track", "Name of the track")]
-        string CircuitName { get; set; }
 
         [Loggable(1)]
         [LogProperty("Track Temperature", "The track asphalt temperature in degrees Celsius.")]
@@ -63,18 +56,10 @@ namespace SimTelemetry.Objects
         float TimeClock { get; set; }
 
         [LogOnChange]
-        [LogProperty("No. of cars in pits", "The amount of cars in the pit street.")]
-        int Cars_InPits { get; set; }
-
-        [LogOnChange]
-        [LogProperty("No. of cars on track", "The amount of cars on track.")]
-        int Cars_OnTrack { get; set; }
-
-        [LogOnChange]
         [LogProperty("No. of cars", "Total amount of cars in session")]
         int Cars { get; set; }
 
-        //[Unloggable]
+        [Unloggable]
         [Loggable(1)]
         [LogProperty("Session Active", "Is the game currently running a session?")]
         bool Active { get; set; }
@@ -83,9 +68,9 @@ namespace SimTelemetry.Objects
         [LogProperty("Flags: Full Course Yellow", "Indicates a full course yellow situation.")]
         bool Flag_YellowFull { get; set; }
 
-        [LogOnChange]
+        /*[LogOnChange]
         [LogProperty("Flags: Red", "Indicates a red flag situation.")]
-        bool Flag_Red { get; set; }
+        bool Flag_Red { get; set; }*/
 
         [LogOnChange]
         [LogProperty("Flags: Green", "Indicates a green flag situation, start/restart.")]
