@@ -50,8 +50,8 @@ namespace SimTelemetry.Game.Rfactor
                 {
                 }
                 if (AllDrivers.Count == 0)
-                    _AllDrivers.Add(new DriverGeneral(rFactor.Game.Base + 0x3154C0));
-                return new DriverGeneral(rFactor.Game.Base + 0x3154C0);
+                    _AllDrivers.Add(new DriverGeneral(0x7154C0));
+                return new DriverGeneral(0x7154C0);
             }
         }
 
@@ -89,7 +89,7 @@ namespace SimTelemetry.Game.Rfactor
                     // Create XX drivers
                     for (int i = 0; i < MaxCars; i++)
                     {
-                        int pos = rFactor.Game.ReadInt32(new IntPtr(0x04 * i + rFactor.Game.Base + 0x315298));
+                        int pos = rFactor.Game.ReadInt32(new IntPtr(0x04*i + 0x715298));
                         int d = pos - dpos;
                         dpos = pos;
                         DriverGeneral c = new DriverGeneral(pos);
@@ -97,7 +97,7 @@ namespace SimTelemetry.Game.Rfactor
                             _AllDrivers.Add(c);
                     }
                     if(_AllDrivers.Count == 0)
-                        _AllDrivers.Add(new DriverGeneral(rFactor.Game.Base + 0x3154C0));
+                        _AllDrivers.Add(new DriverGeneral(0x7154C0));
                 }
 
                 PrevCars = rFactor.Session.Cars;
