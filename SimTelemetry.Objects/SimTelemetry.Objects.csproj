@@ -45,6 +45,8 @@
     <Compile Include="ByteMethods.cs" />
     <Compile Include="Conversions.cs" />
     <Compile Include="Game\ISetup.cs" />
+    <Compile Include="Game\IWheel.cs" />
+    <Compile Include="LambdaComparer.cs" />
     <Compile Include="StringMethods.cs" />
     <Compile Include="Utilities\Polynomial.cs" />
     <Compile Include="Garage\CarEngineTools.cs" />
@@ -52,7 +54,6 @@
     <Compile Include="Garage\GarageTools.cs" />
     <Compile Include="Garage\IGarage.cs" />
     <Compile Include="Garage\ICarAerodynamics.cs" />
-    <Compile Include="Garage\ICarBrakes.cs" />
     <Compile Include="Garage\ICar.cs" />
     <Compile Include="Garage\IModChampionship.cs" />
     <Compile Include="Garage\ICarEngine.cs" />

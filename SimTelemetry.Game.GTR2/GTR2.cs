@@ -127,5 +127,11 @@ namespace SimTelemetry.Game.GTR2
         {
             get { return null; }
         }
+
+        public ICar Car
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
     }
 }

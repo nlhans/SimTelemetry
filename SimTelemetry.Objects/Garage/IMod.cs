@@ -59,5 +59,6 @@ namespace SimTelemetry.Objects.Garage
         string Image { get; }
 
         void Scan();
+        void AddClasses(List<string> classes);
     }
 }

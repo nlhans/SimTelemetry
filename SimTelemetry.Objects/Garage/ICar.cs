@@ -42,12 +42,12 @@ namespace SimTelemetry.Objects.Garage
         int Info_Wins { get; }
         int Info_Championships { get; }
 
+        ICarGeneral General { get; }
         ICarEngine Engine { get; }
         ICarGearbox Gearbox { get; }
         ICarAerodynamics Aerodynamics { get; }
         ICarWheels Wheels { get;}
-        ICarBrakes Brakes { get; }
-        ICarGeneral General { get; }
+        string PhysicsFile { get; }
 
         void Scan();
         bool InClass(List<string> classes);

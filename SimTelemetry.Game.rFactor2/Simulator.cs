@@ -96,12 +96,20 @@ namespace SimTelemetry.Game.rFactor2
             get { return rFactor2.Game; }
         }
 
-        public bool Attached { get { return Memory.Attached; } }
+        public bool Attached { get {
+            if (Memory == null) return false;
+            return Memory.Attached; } }
         public bool UseMemoryReader { get { return true; } }
 
         public ISetup Setup
         {
             get { return null; }
+        }
+
+        public ICar Car
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
         }
     }
 }

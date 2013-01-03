@@ -139,21 +139,24 @@ namespace LiveTelemetry
                 string FastestDriver = "";
                 int DriverCount = 0;
                 // get all time best sector times
-                List<ILap> mylaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
-                foreach (ILap l in mylaps)
+                if (Telemetry.m.Sim.Modules.Times_History_LapTimes)
                 {
-                    if (l.Sector1 >0.1 && l.Sector2 >0.1 && l.Sector3 >0.1)
+                    List<ILap> mylaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
+                    foreach (ILap l in mylaps)
                     {
-                        MyBestSector1 = Math.Min(MyBestSector1, l.Sector1);
-                        MyBestSector2 = Math.Min(MyBestSector2, l.Sector2);
-                        MyBestSector3 = Math.Min(MyBestSector3, l.Sector3);
-                    }
+                        if (l.Sector1 > 0.1 && l.Sector2 > 0.1 && l.Sector3 > 0.1)
+                        {
+                            MyBestSector1 = Math.Min(MyBestSector1, l.Sector1);
+                            MyBestSector2 = Math.Min(MyBestSector2, l.Sector2);
+                            MyBestSector3 = Math.Min(MyBestSector3, l.Sector3);
+                        }
 
+                    }
                 }
 
                 foreach (IDriverGeneral driver in drivers)
                 {
-                    
+
                     if (driver.Position != 0 && driver.Position <= 120 && Math.Abs(driver.CoordinateX) >= 0.1)
                     {
                         driverIndex++;
@@ -205,204 +208,109 @@ namespace LiveTelemetry
                     LineHeight = 20f;
                 else
                     LineHeight = Math.Max(10, Convert.ToSingle((this.Size.Height - 20)/(4.0 + DriverCount)));
-                
+
 
                 // Go through all drivers
-                IDriverGeneral Lastdriver = drivers[0];
-                double Previous_SplitLeader = 0;
-                foreach (IDriverGeneral driver in drivers)
+                if (drivers.Count > 0)
                 {
-                    driverIndex++;
-                    Lastdriver = driver;
-                    if (ind * LineHeight > this.Size.Height - 20 - 3 * 20)
-                        break;
-
-                    if (Math.Abs(driver.CoordinateX) < 0.1) continue;
-                    //if (driver.Position >= 120 || driver.Position == 0 || driver.__LapsData.ToInt32() == 0) continue;
-                    //if (driver.Name.Trim() == "")
-                    //    continue;
-                    Brush OntrackBrush = ((!driver.Pits && driver.Speed > 5) ? Brushes.White : Brushes.Red);
-                    g.DrawString(driver.Position.ToString(), f, Brushes.White, 10f, 10f + ind*LineHeight);
-                    string[] name = driver.Name.ToUpper().Split(" ".ToCharArray());
-                    if (name.Length == 1)
-                        g.DrawString(name[0], f, OntrackBrush, 38f, 10f + ind*LineHeight);
-                    else if (name.Length > 1)
-                        g.DrawString(name[0].Substring(0, 1) + ". " + name[name.Length - 1], f, OntrackBrush, 38f,
-                                     10f + ind*LineHeight);
-
-                    if (!LastPitLap.ContainsKey(driver.Name))
-                        LastPitLap.Add(driver.Name, -1);
-                    if(driver.Pits)
+                    IDriverGeneral Lastdriver = drivers[0];
+                    double Previous_SplitLeader = 0;
+                    foreach (IDriverGeneral driver in drivers)
                     {
-                        LastPitLap[driver.Name] = driver.Laps;
-                    }
+                        driverIndex++;
+                        Lastdriver = driver;
+                        if (ind*LineHeight > this.Size.Height - 20 - 3*20)
+                            break;
 
-                    if (Telemetry.m.Sim.Session.Type.Type == SessionType.RACE)
-                    {
-                        if (driver.LapTime_Last < lapTimeBest && driver.LapTime_Last != -1f)
-                            lapTimeBest = driver.LapTime_Last;
-                        if (driver.LapTime_Last != -1f)
-                            g.DrawString(PrintLapTime(driver.LapTime_Last, false), f, Brushes.White, 140f,
+                        if (Math.Abs(driver.CoordinateX) < 0.1) continue;
+                        //if (driver.Position >= 120 || driver.Position == 0 || driver.__LapsData.ToInt32() == 0) continue;
+                        //if (driver.Name.Trim() == "")
+                        //    continue;
+                        Brush OntrackBrush = ((!driver.Pits && driver.Speed > 5) ? Brushes.White : Brushes.Red);
+                        g.DrawString(driver.Position.ToString(), f, Brushes.White, 10f, 10f + ind*LineHeight);
+                        string[] name = driver.Name.ToUpper().Split(" ".ToCharArray());
+                        if (name.Length == 1)
+                            g.DrawString(name[0], f, OntrackBrush, 38f, 10f + ind*LineHeight);
+                        else if (name.Length > 1)
+                            g.DrawString(name[0].Substring(0, 1) + ". " + name[name.Length - 1], f, OntrackBrush, 38f,
                                          10f + ind*LineHeight);
 
-                        if (driver.Position == 1)
-                            g.DrawString("LAP " + drivers[0].Laps, f, Brushes.Yellow, 190f, 10f + ind * LineHeight);
-                        else
+                        if (!LastPitLap.ContainsKey(driver.Name))
+                            LastPitLap.Add(driver.Name, -1);
+                        if (driver.Pits)
                         {
-                            double split_leader = driver.GetSplitTime(drivers[0]);
-                            if (split_leader >= 10000)
-                            {
-                                int laps = Convert.ToInt32(split_leader/10000);
-                                if (laps < 100)
-                                    g.DrawString("+" + laps + "L", f, Brushes.Yellow, 190f, 10f + ind*LineHeight);
-                                else
-                                    g.DrawString("???", f, Brushes.Yellow, 190f, 10f + ind*LineHeight);
-                            }
+                            LastPitLap[driver.Name] = driver.Laps;
+                        }
+
+                        if (Telemetry.m.Sim.Session.Type.Type == SessionType.RACE)
+                        {
+                            if (driver.LapTime_Last < lapTimeBest && driver.LapTime_Last != -1f)
+                                lapTimeBest = driver.LapTime_Last;
+                            if (driver.LapTime_Last != -1f)
+                                g.DrawString(PrintLapTime(driver.LapTime_Last, false), f, Brushes.White, 140f,
+                                             10f + ind*LineHeight);
+
+                            if (driver.Position == 1)
+                                g.DrawString("LAP " + drivers[0].Laps, f, Brushes.Yellow, 190f, 10f + ind*LineHeight);
                             else
-                                g.DrawString(Math.Round(split_leader, 1).ToString(), f, Brushes.White, 190f, 10f + ind*LineHeight);
-
-                            double split_next = split_leader - Previous_SplitLeader;
-                            Previous_SplitLeader = split_leader;
-                            if (split_next < 1000 && split_next > 0)
-                                g.DrawString(Math.Round(split_next, 1).ToString(), f,Brushes.White, 220f, 10f + ind*LineHeight);
-                            else if(split_next > 0)
                             {
-                                int laps = Convert.ToInt32(split_next/10000);
-                                g.DrawString("+" + laps + "L", f, Brushes.Yellow, 220f, 10f + ind*LineHeight);
+                                double split_leader = driver.GetSplitTime(drivers[0]);
+                                if (split_leader >= 10000)
+                                {
+                                    int laps = Convert.ToInt32(split_leader/10000);
+                                    if (laps < 100)
+                                        g.DrawString("+" + laps + "L", f, Brushes.Yellow, 190f, 10f + ind*LineHeight);
+                                    else
+                                        g.DrawString("???", f, Brushes.Yellow, 190f, 10f + ind*LineHeight);
+                                }
+                                else
+                                    g.DrawString(Math.Round(split_leader, 1).ToString(), f, Brushes.White, 190f,
+                                                 10f + ind*LineHeight);
+
+                                double split_next = split_leader - Previous_SplitLeader;
+                                Previous_SplitLeader = split_leader;
+                                if (split_next < 1000 && split_next > 0)
+                                    g.DrawString(Math.Round(split_next, 1).ToString(), f, Brushes.White, 220f,
+                                                 10f + ind*LineHeight);
+                                else if (split_next > 0)
+                                {
+                                    int laps = Convert.ToInt32(split_next/10000);
+                                    g.DrawString("+" + laps + "L", f, Brushes.Yellow, 220f, 10f + ind*LineHeight);
+                                }
+
                             }
 
-                        }
 
-
-                        if (driver.Pits && driver.Sector_1_Best > 0)
-                        {
-                            Brush Sector1Brush = Brushes.Yellow;
-                            Brush Sector2Brush = Brushes.Yellow;
-                            Brush Sector3Brush = Brushes.Yellow;
-                            if (driver.Sector_1_Best <= BestSector1) Sector1Brush = Brushes.Magenta;
-                            if (driver.Sector_2_Best <= BestSector2) Sector2Brush = Brushes.Magenta;
-                            if (driver.Sector_3_Best <= BestSector3) Sector3Brush = Brushes.Magenta;
-                            g.DrawString(PrintLapTime(driver.Sector_1_Best, true), f, Sector1Brush, 245f,
-                                         10f + ind*LineHeight);
-                            g.DrawString(PrintLapTime(driver.Sector_2_Best, true), f, Sector2Brush, 295f,
-                                         10f + ind*LineHeight);
-                            g.DrawString(PrintLapTime(driver.Sector_3_Best, true), f, Sector3Brush, 345f,
-                                         10f + ind*LineHeight);
-                        }
-                        else if (driver.Sector_1_Last > 0)
-                        {
-                            bool DisplayAllSectors = false;
-
-                            if (!DisplayTimers.ContainsKey(driver.Name))
-                                DisplayTimers.Add(driver.Name, -1);
-                            if (driver.TrackPosition == TrackPosition.SECTOR1)
-                                DisplayTimers[driver.Name]--;
-                            if (driver.TrackPosition == TrackPosition.SECTOR2)
-                                DisplayTimers[driver.Name] = 10;
-                            if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPosition.SECTOR1)
-                                DisplayAllSectors = true;
-                            //if (data[driverIndex].CurrentSector >= 2 || data[driverIndex].CurrentSector == 0)
-                            if (driver.TrackPosition == TrackPosition.SECTOR2 ||
-                                driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                            if (driver.Pits && driver.Sector_1_Best > 0)
                             {
                                 Brush Sector1Brush = Brushes.Yellow;
-                                if (driver.TrackPosition == TrackPosition.SECTOR2) Sector1Brush = Brushes.White;
-                                if (driver.Sector_1_Last == driver.LapTime_Best_Sector1) Sector1Brush = Brushes.Green;
-                                if (driver.Sector_1_Last <= BestSector1) Sector1Brush = Brushes.Magenta;
-                                g.DrawString(PrintLapTime(driver.Sector_1_Last, true), f, Sector1Brush, 245f,
-                                             10f + ind*LineHeight);
-                            }
-                            if (driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
-                                //if (data[driverIndex].CurrentSector == 3 || data[driverIndex].CurrentSector == 0)
-                            {
-
                                 Brush Sector2Brush = Brushes.Yellow;
-                                if (driver.TrackPosition == TrackPosition.SECTOR3) Sector2Brush = Brushes.White;
-                                if (driver.Sector_2_Last == driver.LapTime_Best_Sector2) Sector2Brush = Brushes.Green;
-                                if (driver.Sector_2_Last <= BestSector2) Sector2Brush = Brushes.Magenta;
-                                g.DrawString(PrintLapTime(driver.Sector_2_Last, true), f, Sector2Brush, 295f,
-                                             10f + ind*LineHeight);
-                            }
-                            if (DisplayAllSectors && driver.Sector_3_Last > 0)
-                                //if (data[driverIndex].CurrentSector == 0)
-                            {
                                 Brush Sector3Brush = Brushes.Yellow;
-                                if (driver.TrackPosition == TrackPosition.SECTOR1) Sector3Brush = Brushes.White;
-                                if (driver.Sector_3_Last == driver.LapTime_Best_Sector3) Sector3Brush = Brushes.Green;
-                                if (driver.Sector_3_Last <= BestSector3) Sector3Brush = Brushes.Magenta;
-                                g.DrawString(PrintLapTime(driver.Sector_3_Last, true), f, Sector3Brush, 345f,
+                                if (driver.Sector_1_Best <= BestSector1) Sector1Brush = Brushes.Magenta;
+                                if (driver.Sector_2_Best <= BestSector2) Sector2Brush = Brushes.Magenta;
+                                if (driver.Sector_3_Best <= BestSector3) Sector3Brush = Brushes.Magenta;
+                                g.DrawString(PrintLapTime(driver.Sector_1_Best, true), f, Sector1Brush, 245f,
+                                             10f + ind*LineHeight);
+                                g.DrawString(PrintLapTime(driver.Sector_2_Best, true), f, Sector2Brush, 295f,
+                                             10f + ind*LineHeight);
+                                g.DrawString(PrintLapTime(driver.Sector_3_Best, true), f, Sector3Brush, 345f,
                                              10f + ind*LineHeight);
                             }
-                            if (!driver.Pits && driver.Speed < 5)
+                            else if (driver.Sector_1_Last > 0)
                             {
+                                bool DisplayAllSectors = false;
+
+                                if (!DisplayTimers.ContainsKey(driver.Name))
+                                    DisplayTimers.Add(driver.Name, -1);
                                 if (driver.TrackPosition == TrackPosition.SECTOR1)
-                                    g.DrawString("[STOP]", f, Brushes.Red, 245f, 10f + ind * LineHeight);
+                                    DisplayTimers[driver.Name]--;
                                 if (driver.TrackPosition == TrackPosition.SECTOR2)
-                                    g.DrawString("[STOP]", f, Brushes.Red, 295f, 10f + ind * LineHeight);
-                                if (driver.TrackPosition == TrackPosition.SECTOR3)
-                                    g.DrawString("[STOP]", f, Brushes.Red, 345f, 10f + ind * LineHeight);
-
-                            }
-                        }
-                        else if (driver.Laps > 0 || (driver.Laps == 0 && driver.Pits == false))
-                            g.DrawString("OUT", f, Brushes.Red, 265f, 10f + ind*LineHeight);
-
-                        g.DrawString(driver.PitStopRuns.ToString(), f, Brushes.White, 395f, 10f + ind*LineHeight);
-                    }
-                    else
-                    {
-
-/*if (driver.Retired && driver.Speed < 5)
-{
-    g.DrawString("[RETIRED]", f, Brushes.Red, 265f, 10f + ind * LineHeight);
-
-}
-else */
-                        if (driver.Pits && driver.Sector_1_Best > 0)
-                        {
-
-                            if (driver.LapTime_Best < lapTimeBest && driver.LapTime_Best != -1f)
-                                lapTimeBest = driver.LapTime_Best;
-                            if (driver.LapTime_Best != -1f)
-                                g.DrawString(PrintLapTime(driver.LapTime_Best, false), f, Brushes.Yellow, 140f,
-                                             10f + ind * LineHeight);
-                            if (driver.LapTime_Best != lapTimeBest && driver.LapTime_Best != -1f)
-                            {
-                                double diff = driver.LapTime_Best - lapTimeBest;
-                                g.DrawString(diff.ToString("0.000"), f, Brushes.Yellow, 195f, 10f + ind * LineHeight);
-                            }
-
-                            Brush Sector1Brush = Brushes.Yellow;
-                            Brush Sector2Brush = Brushes.Yellow;
-                            Brush Sector3Brush = Brushes.Yellow;
-                            if (driver.Sector_1_Best <= BestSector1) Sector1Brush = Brushes.Magenta;
-                            if (driver.Sector_2_Best <= BestSector2) Sector2Brush = Brushes.Magenta;
-                            if (driver.Sector_3_Best <= BestSector3) Sector3Brush = Brushes.Magenta;
-                            g.DrawString(PrintLapTime(driver.Sector_1_Best, true), f, Sector1Brush, 245f,
-                                         10f + ind*LineHeight);
-                            g.DrawString(PrintLapTime(driver.Sector_2_Best, true), f, Sector2Brush, 295f,
-                                         10f + ind*LineHeight);
-                            g.DrawString(PrintLapTime(driver.Sector_3_Best, true), f, Sector3Brush, 345f,
-                                         10f + ind*LineHeight);
-                        }
-                        else 
-                        {
-                            bool DisplayAllSectors = false;
-                            if (!DisplayTimers.ContainsKey(driver.Name))
-                                DisplayTimers.Add(driver.Name, -1);
-                            if (driver.TrackPosition == TrackPosition.SECTOR1)
-                                DisplayTimers[driver.Name]--;
-                            if (driver.TrackPosition == TrackPosition.SECTOR2)
-                                DisplayTimers[driver.Name] = 10;
-                            if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPosition.SECTOR1)
-                                DisplayAllSectors = true;
-                            //if (data[driverIndex].CurrentSector >= 2 || data[driverIndex].CurrentSector == 0)
-
-                            if ((LastPitLap[driver.Name] == driver.Laps || driver.Sector_1_Last < 0) && !driver.Pits)
-                                    g.DrawString("OUT", f, Brushes.Red, 245f, 10f + ind*LineHeight);
-                                else
-                                    if (driver.TrackPosition == TrackPosition.SECTOR2 ||
-                                        driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                    DisplayTimers[driver.Name] = 10;
+                                if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPosition.SECTOR1)
+                                    DisplayAllSectors = true;
+                                //if (data[driverIndex].CurrentSector >= 2 || data[driverIndex].CurrentSector == 0)
+                                if (driver.TrackPosition == TrackPosition.SECTOR2 ||
+                                    driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
                                 {
                                     Brush Sector1Brush = Brushes.Yellow;
                                     if (driver.TrackPosition == TrackPosition.SECTOR2) Sector1Brush = Brushes.White;
@@ -412,107 +320,215 @@ else */
                                     g.DrawString(PrintLapTime(driver.Sector_1_Last, true), f, Sector1Brush, 245f,
                                                  10f + ind*LineHeight);
                                 }
-                            
-                            if (driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
-                                //if (data[driverIndex].CurrentSector == 3 || data[driverIndex].CurrentSector == 0)
-                            {
-
-                                Brush Sector2Brush = Brushes.Yellow;
-                                if (driver.TrackPosition == TrackPosition.SECTOR3) Sector2Brush = Brushes.White;
-                                if (driver.Sector_2_Last == driver.LapTime_Best_Sector2) Sector2Brush = Brushes.Green;
-                                if (driver.Sector_2_Last <= BestSector2) Sector2Brush = Brushes.Magenta;
-                                g.DrawString(PrintLapTime(driver.Sector_2_Last, true), f, Sector2Brush, 295f,
-                                             10f + ind*LineHeight);
-                            }
-                            if (DisplayAllSectors && driver.Sector_3_Last > 0)
-                                //if (data[driverIndex].CurrentSector == 0)
-                            {
-                                Brush Sector3Brush = Brushes.Yellow;
-                                if (driver.TrackPosition == TrackPosition.SECTOR1) Sector3Brush = Brushes.White;
-                                if (driver.Sector_3_Last == driver.LapTime_Best_Sector3) Sector3Brush = Brushes.Green;
-                                if (driver.Sector_3_Last <= BestSector3) Sector3Brush = Brushes.Magenta;
-                                g.DrawString(PrintLapTime(driver.Sector_3_Last, true), f, Sector3Brush, 345f,
-                                             10f + ind*LineHeight);
-
-
-
-                                if (driver.LapTime_Last < lapTimeBest && driver.LapTime_Last != -1f)
-                                    lapTimeBest = driver.LapTime_Best;
-                                if (driver.LapTime_Last != -1f)
-                                    g.DrawString(PrintLapTime(driver.LapTime_Last, false), f, Brushes.White, 140f,
-                                                 10f + ind * LineHeight);
-                                if (driver.LapTime_Last != lapTimeBest && driver.LapTime_Last != -1f)
+                                if (driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                    //if (data[driverIndex].CurrentSector == 3 || data[driverIndex].CurrentSector == 0)
                                 {
-                                    double diff = driver.LapTime_Last - lapTimeBest;
-                                    g.DrawString(diff.ToString("0.000"), f, Brushes.White, 195f, 10f + ind * LineHeight);
+
+                                    Brush Sector2Brush = Brushes.Yellow;
+                                    if (driver.TrackPosition == TrackPosition.SECTOR3) Sector2Brush = Brushes.White;
+                                    if (driver.Sector_2_Last == driver.LapTime_Best_Sector2)
+                                        Sector2Brush = Brushes.Green;
+                                    if (driver.Sector_2_Last <= BestSector2) Sector2Brush = Brushes.Magenta;
+                                    g.DrawString(PrintLapTime(driver.Sector_2_Last, true), f, Sector2Brush, 295f,
+                                                 10f + ind*LineHeight);
+                                }
+                                if (DisplayAllSectors && driver.Sector_3_Last > 0)
+                                    //if (data[driverIndex].CurrentSector == 0)
+                                {
+                                    Brush Sector3Brush = Brushes.Yellow;
+                                    if (driver.TrackPosition == TrackPosition.SECTOR1) Sector3Brush = Brushes.White;
+                                    if (driver.Sector_3_Last == driver.LapTime_Best_Sector3)
+                                        Sector3Brush = Brushes.Green;
+                                    if (driver.Sector_3_Last <= BestSector3) Sector3Brush = Brushes.Magenta;
+                                    g.DrawString(PrintLapTime(driver.Sector_3_Last, true), f, Sector3Brush, 345f,
+                                                 10f + ind*LineHeight);
+                                }
+                                if (!driver.Pits && driver.Speed < 5)
+                                {
+                                    if (driver.TrackPosition == TrackPosition.SECTOR1)
+                                        g.DrawString("[STOP]", f, Brushes.Red, 245f, 10f + ind*LineHeight);
+                                    if (driver.TrackPosition == TrackPosition.SECTOR2)
+                                        g.DrawString("[STOP]", f, Brushes.Red, 295f, 10f + ind*LineHeight);
+                                    if (driver.TrackPosition == TrackPosition.SECTOR3)
+                                        g.DrawString("[STOP]", f, Brushes.Red, 345f, 10f + ind*LineHeight);
+
                                 }
                             }
-                            else
-                            {
+                            else if (driver.Laps > 0 || (driver.Laps == 0 && driver.Pits == false))
+                                g.DrawString("OUT", f, Brushes.Red, 265f, 10f + ind*LineHeight);
 
+                            g.DrawString(driver.Pitstops.ToString(), f, Brushes.White, 395f, 10f + ind*LineHeight);
+                        }
+                        else
+                        {
+
+                            /*if (driver.Retired && driver.Speed < 5)
+                            {
+                                g.DrawString("[RETIRED]", f, Brushes.Red, 265f, 10f + ind * LineHeight);
+
+                            }
+                            else */
+                            if (driver.Pits && driver.Sector_1_Best > 0)
+                            {
 
                                 if (driver.LapTime_Best < lapTimeBest && driver.LapTime_Best != -1f)
                                     lapTimeBest = driver.LapTime_Best;
                                 if (driver.LapTime_Best != -1f)
                                     g.DrawString(PrintLapTime(driver.LapTime_Best, false), f, Brushes.Yellow, 140f,
-                                                 10f + ind * LineHeight);
+                                                 10f + ind*LineHeight);
                                 if (driver.LapTime_Best != lapTimeBest && driver.LapTime_Best != -1f)
                                 {
                                     double diff = driver.LapTime_Best - lapTimeBest;
-                                    g.DrawString(diff.ToString("0.000"), f, Brushes.Yellow, 195f, 10f + ind * LineHeight);
+                                    g.DrawString(diff.ToString("0.000"), f, Brushes.Yellow, 195f, 10f + ind*LineHeight);
+                                }
+
+                                Brush Sector1Brush = Brushes.Yellow;
+                                Brush Sector2Brush = Brushes.Yellow;
+                                Brush Sector3Brush = Brushes.Yellow;
+                                if (driver.Sector_1_Best <= BestSector1) Sector1Brush = Brushes.Magenta;
+                                if (driver.Sector_2_Best <= BestSector2) Sector2Brush = Brushes.Magenta;
+                                if (driver.Sector_3_Best <= BestSector3) Sector3Brush = Brushes.Magenta;
+                                g.DrawString(PrintLapTime(driver.Sector_1_Best, true), f, Sector1Brush, 245f,
+                                             10f + ind*LineHeight);
+                                g.DrawString(PrintLapTime(driver.Sector_2_Best, true), f, Sector2Brush, 295f,
+                                             10f + ind*LineHeight);
+                                g.DrawString(PrintLapTime(driver.Sector_3_Best, true), f, Sector3Brush, 345f,
+                                             10f + ind*LineHeight);
+                            }
+                            else
+                            {
+                                bool DisplayAllSectors = false;
+                                if (!DisplayTimers.ContainsKey(driver.Name))
+                                    DisplayTimers.Add(driver.Name, -1);
+                                if (driver.TrackPosition == TrackPosition.SECTOR1)
+                                    DisplayTimers[driver.Name]--;
+                                if (driver.TrackPosition == TrackPosition.SECTOR2)
+                                    DisplayTimers[driver.Name] = 10;
+                                if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPosition.SECTOR1)
+                                    DisplayAllSectors = true;
+                                //if (data[driverIndex].CurrentSector >= 2 || data[driverIndex].CurrentSector == 0)
+
+                                if ((LastPitLap[driver.Name] == driver.Laps || driver.Sector_1_Last < 0) && !driver.Pits)
+                                    g.DrawString("OUT", f, Brushes.Red, 245f, 10f + ind*LineHeight);
+                                else if (driver.TrackPosition == TrackPosition.SECTOR2 ||
+                                         driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                {
+                                    Brush Sector1Brush = Brushes.Yellow;
+                                    if (driver.TrackPosition == TrackPosition.SECTOR2) Sector1Brush = Brushes.White;
+                                    if (driver.Sector_1_Last == driver.LapTime_Best_Sector1)
+                                        Sector1Brush = Brushes.Green;
+                                    if (driver.Sector_1_Last <= BestSector1) Sector1Brush = Brushes.Magenta;
+                                    g.DrawString(PrintLapTime(driver.Sector_1_Last, true), f, Sector1Brush, 245f,
+                                                 10f + ind*LineHeight);
+                                }
+
+                                if (driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                    //if (data[driverIndex].CurrentSector == 3 || data[driverIndex].CurrentSector == 0)
+                                {
+
+                                    Brush Sector2Brush = Brushes.Yellow;
+                                    if (driver.TrackPosition == TrackPosition.SECTOR3) Sector2Brush = Brushes.White;
+                                    if (driver.Sector_2_Last == driver.LapTime_Best_Sector2)
+                                        Sector2Brush = Brushes.Green;
+                                    if (driver.Sector_2_Last <= BestSector2) Sector2Brush = Brushes.Magenta;
+                                    g.DrawString(PrintLapTime(driver.Sector_2_Last, true), f, Sector2Brush, 295f,
+                                                 10f + ind*LineHeight);
+                                }
+                                if (DisplayAllSectors && driver.Sector_3_Last > 0)
+                                    //if (data[driverIndex].CurrentSector == 0)
+                                {
+                                    Brush Sector3Brush = Brushes.Yellow;
+                                    if (driver.TrackPosition == TrackPosition.SECTOR1) Sector3Brush = Brushes.White;
+                                    if (driver.Sector_3_Last == driver.LapTime_Best_Sector3)
+                                        Sector3Brush = Brushes.Green;
+                                    if (driver.Sector_3_Last <= BestSector3) Sector3Brush = Brushes.Magenta;
+                                    g.DrawString(PrintLapTime(driver.Sector_3_Last, true), f, Sector3Brush, 345f,
+                                                 10f + ind*LineHeight);
+
+
+
+                                    if (driver.LapTime_Last < lapTimeBest && driver.LapTime_Last != -1f)
+                                        lapTimeBest = driver.LapTime_Best;
+                                    if (driver.LapTime_Last != -1f)
+                                        g.DrawString(PrintLapTime(driver.LapTime_Last, false), f, Brushes.White, 140f,
+                                                     10f + ind*LineHeight);
+                                    if (driver.LapTime_Last != lapTimeBest && driver.LapTime_Last != -1f)
+                                    {
+                                        double diff = driver.LapTime_Last - lapTimeBest;
+                                        g.DrawString(diff.ToString("0.000"), f, Brushes.White, 195f,
+                                                     10f + ind*LineHeight);
+                                    }
+                                }
+                                else
+                                {
+
+
+                                    if (driver.LapTime_Best < lapTimeBest && driver.LapTime_Best != -1f)
+                                        lapTimeBest = driver.LapTime_Best;
+                                    if (driver.LapTime_Best != -1f)
+                                        g.DrawString(PrintLapTime(driver.LapTime_Best, false), f, Brushes.Yellow, 140f,
+                                                     10f + ind*LineHeight);
+                                    if (driver.LapTime_Best != lapTimeBest && driver.LapTime_Best != -1f)
+                                    {
+                                        double diff = driver.LapTime_Best - lapTimeBest;
+                                        g.DrawString(diff.ToString("0.000"), f, Brushes.Yellow, 195f,
+                                                     10f + ind*LineHeight);
+                                    }
+                                }
+                                if (!driver.Pits && driver.Speed < 5)
+                                {
+                                    if (driver.TrackPosition == TrackPosition.SECTOR1)
+                                        g.DrawString("[STOP]", f, Brushes.Red, 245f, 10f + ind*LineHeight);
+                                    if (driver.TrackPosition == TrackPosition.SECTOR2)
+                                        g.DrawString("[STOP]", f, Brushes.Red, 295f, 10f + ind*LineHeight);
+                                    if (driver.TrackPosition == TrackPosition.SECTOR3)
+                                        g.DrawString("[STOP]", f, Brushes.Red, 345f, 10f + ind*LineHeight);
+
                                 }
                             }
-                        if (!driver.Pits && driver.Speed < 5)
-                        {
-                            if (driver.TrackPosition == TrackPosition.SECTOR1)
-                                g.DrawString("[STOP]", f, Brushes.Red, 245f, 10f + ind * LineHeight);
-                            if (driver.TrackPosition == TrackPosition.SECTOR2)
-                                g.DrawString("[STOP]", f, Brushes.Red, 295f, 10f + ind * LineHeight);
-                            if (driver.TrackPosition == TrackPosition.SECTOR3)
-                                g.DrawString("[STOP]", f, Brushes.Red, 345f, 10f + ind * LineHeight);
 
-                        }
+                            g.DrawString(driver.Laps.ToString(), f, Brushes.White, 395f, 10f + ind*LineHeight);
                         }
 
-                        g.DrawString(driver.Laps.ToString(), f, Brushes.White, 395f, 10f + ind*LineHeight);
+                        ind++;
+
                     }
 
-                    ind++;
-
-                }
-
-                // Place fastest lap & combined lap
-                if (BestSector3Position != 0)
-                {
-                    g.DrawString("Fastest lap: ", f, Brushes.DarkGray, 10f, 10f + ind*LineHeight);
-                    g.DrawString(FastestDriver, f, Brushes.Yellow, 195f, 10f + ind*LineHeight);
-                    g.DrawString(PrintLapTime(FastestLap, false), f, Brushes.Magenta, 140f, 10f + ind*LineHeight);
+                    // Place fastest lap & combined lap
+                    if (BestSector3Position != 0)
+                    {
+                        g.DrawString("Fastest lap: ", f, Brushes.DarkGray, 10f, 10f + ind*LineHeight);
+                        g.DrawString(FastestDriver, f, Brushes.Yellow, 195f, 10f + ind*LineHeight);
+                        g.DrawString(PrintLapTime(FastestLap, false), f, Brushes.Magenta, 140f, 10f + ind*LineHeight);
 
 
 
-                    g.DrawString("P" + BestSector1Position, f, Brushes.Yellow, 275f, 10f + ind*LineHeight);
-                    g.DrawString("P" + BestSector2Position, f, Brushes.Yellow, 325f, 10f + ind*LineHeight);
-                    g.DrawString("P" + BestSector3Position, f, Brushes.Yellow, 375f, 10f + ind*LineHeight);
+                        g.DrawString("P" + BestSector1Position, f, Brushes.Yellow, 275f, 10f + ind*LineHeight);
+                        g.DrawString("P" + BestSector2Position, f, Brushes.Yellow, 325f, 10f + ind*LineHeight);
+                        g.DrawString("P" + BestSector3Position, f, Brushes.Yellow, 375f, 10f + ind*LineHeight);
 
-                }
-                if (BestSector3 != 1000)
-                {
-                    ind++;
-                    g.DrawString("Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(BestSector1 + BestSector2 + BestSector3, false), f, Brushes.Magenta, 140f,
-                                 10f + ind * LineHeight);
+                    }
+                    if (BestSector3 != 1000)
+                    {
+                        ind++;
+                        g.DrawString("Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind*LineHeight);
+                        g.DrawString(PrintLapTime(BestSector1 + BestSector2 + BestSector3, false), f, Brushes.Magenta,
+                                     140f,
+                                     10f + ind*LineHeight);
 
-                    g.DrawString(PrintLapTime(BestSector1, true), f, Brushes.Magenta, 245f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(BestSector2, true), f, Brushes.Magenta, 295f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(BestSector3, true), f, Brushes.Magenta, 345f, 10f + ind * LineHeight);
-                    ind++;
-                    g.DrawString("Personal Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(MyBestSector1 + MyBestSector2 + MyBestSector3, false), f, Brushes.Magenta, 140f,
-                                 10f + ind * LineHeight);
+                        g.DrawString(PrintLapTime(BestSector1, true), f, Brushes.Magenta, 245f, 10f + ind*LineHeight);
+                        g.DrawString(PrintLapTime(BestSector2, true), f, Brushes.Magenta, 295f, 10f + ind*LineHeight);
+                        g.DrawString(PrintLapTime(BestSector3, true), f, Brushes.Magenta, 345f, 10f + ind*LineHeight);
+                        ind++;
+                        g.DrawString("Personal Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind*LineHeight);
+                        g.DrawString(PrintLapTime(MyBestSector1 + MyBestSector2 + MyBestSector3, false), f,
+                                     Brushes.Magenta, 140f,
+                                     10f + ind*LineHeight);
 
-                    g.DrawString(PrintLapTime(MyBestSector1, true), f, Brushes.Magenta, 245f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(MyBestSector2, true), f, Brushes.Magenta, 295f, 10f + ind * LineHeight);
-                    g.DrawString(PrintLapTime(MyBestSector3, true), f, Brushes.Magenta, 345f, 10f + ind * LineHeight);
+                        g.DrawString(PrintLapTime(MyBestSector1, true), f, Brushes.Magenta, 245f, 10f + ind*LineHeight);
+                        g.DrawString(PrintLapTime(MyBestSector2, true), f, Brushes.Magenta, 295f, 10f + ind*LineHeight);
+                        g.DrawString(PrintLapTime(MyBestSector3, true), f, Brushes.Magenta, 345f, 10f + ind*LineHeight);
+                    }
                 }
             }
             catch (Exception ex)

@@ -104,7 +104,7 @@ namespace SimTelemetry.Data.Track
         private double PreviousTime;
         public void LapLogger_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (Telemetry.m.Active_Session && Telemetry.m.Sim.Modules.Time_Available)
+            if (Telemetry.m.Active_Session && Telemetry.m.Sim.Modules.Time_Available )
             {
                 try
                 {
@@ -167,35 +167,39 @@ namespace SimTelemetry.Data.Track
                                     continue;
                                 }
 
-                                // Apex speeds
-                                int i = 0;
-                                foreach (KeyValuePair<double, string> apex in Apexes.Positions)
+                                if (Telemetry.m.Sim.Modules.DistanceOnLap)
                                 {
-                                    if (l.ApexSpeeds[i] == -1 && l.PrevMeters < apex.Key &&
-                                        driver.MetersDriven >= apex.Key && apex.Key > (driver.MetersDriven - 100))
+                                    // Apex speeds
+                                    int i = 0;
+                                    foreach (KeyValuePair<double, string> apex in Apexes.Positions)
                                     {
-                                        l.ApexSpeeds[i] = driver.Speed;
-                                        break;
+                                        if (l.ApexSpeeds[i] == -1 && l.PrevMeters < apex.Key &&
+                                            driver.MetersDriven >= apex.Key && apex.Key > (driver.MetersDriven - 100))
+                                        {
+                                            l.ApexSpeeds[i] = driver.Speed;
+                                            break;
+                                        }
+
+                                        i++;
                                     }
 
-                                    i++;
-                                }
-
-                                // Sections
-                                i = 0;
-                                foreach (KeyValuePair<double, string> checkpoint in Sections.Lines)
-                                {
-                                    if (l.Checkpoints[i] == -1 && l.PrevMeters <= checkpoint.Key &&
-                                        driver.MetersDriven >= checkpoint.Key &&
-                                        checkpoint.Key > (driver.MetersDriven - 100))
+                                    // Sections
+                                    i = 0;
+                                    foreach (KeyValuePair<double, string> checkpoint in Sections.Lines)
                                     {
-                                        l.Checkpoints[i] = Telemetry.m.Sim.Session.Time;
-                                        break;
-                                    }
+                                        if (l.Checkpoints[i] == -1 && l.PrevMeters <= checkpoint.Key &&
+                                            driver.MetersDriven >= checkpoint.Key &&
+                                            checkpoint.Key > (driver.MetersDriven - 100))
+                                        {
+                                            l.Checkpoints[i] = Telemetry.m.Sim.Session.Time;
+                                            break;
+                                        }
 
-                                    i++;
+                                        i++;
+                                    }
+                                    l.PrevMeters = driver.MetersDriven;
                                 }
-                                l.PrevMeters = driver.MetersDriven;
+
                                 l.MaxTime = Telemetry.m.Sim.Session.Time;
                                 /*int ind = TrackLogger.FindIndex(delegate(Lap lm) { return lm.LapNo == lap && lm.DriverNo == drv; });
                                 TrackLogger[ind] = l;*/

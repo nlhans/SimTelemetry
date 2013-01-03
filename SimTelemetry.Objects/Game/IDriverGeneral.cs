@@ -19,6 +19,7 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using System.Collections.Generic;
+using SimTelemetry.Objects.Game;
 
 namespace SimTelemetry.Objects
 {
@@ -98,10 +99,6 @@ namespace SimTelemetry.Objects
         double Fuel { set; get; }
 
         [LogOnChange]
-        [LogProperty("Fuel Capacity", "Maximum litres of fuel the car's fuel tank can contain.")]
-        double Fuel_Max { set; get; }
-
-        [LogOnChange]
         [LogProperty("Car Model", "Specific model of the car")]
         string CarModel { set; get; }
 
@@ -128,7 +125,7 @@ namespace SimTelemetry.Objects
         [LogOnChange]
         [LogProperty("Lap no.", "Current lap no. the car is on?")]
         int Laps { set; get; }
-
+        
         [LogOnChange]
         [LogProperty("Laptime Best Overall", "Overall best laptime of the session.")]
         float LapTime_Best { set; get; }
@@ -172,7 +169,7 @@ namespace SimTelemetry.Objects
         [LogOnChange]
         [LogProperty("Sector 3 last", "The last sector 3 time of this session.")]
         float Sector_3_Last { get; set; }
-
+        
         [Loggable(25)]
         [LogOnChange]
         [LogProperty("Meters Driven", "Number of meters driven from start/finish line (per lap).")]
@@ -180,7 +177,7 @@ namespace SimTelemetry.Objects
 
         [LogOnChange]
         [LogProperty("Pitstops", "Numbers of pitstops made in a race.")]
-        int PitStopRuns { get; set; }
+        int Pitstops { get; set; }
 
         [LogOnChange]
         [LogProperty("Retired", "Indicates a retirement.")]
@@ -193,7 +190,7 @@ namespace SimTelemetry.Objects
         [LogOnChange]
         [LogProperty("AID: Steering help", "Indicates the level of steering help AID active.")]
         LevelIndicator SteeringHelp { set; get; }
-
+        /*
         [LogOnChange]
         int PitStop_FrontWingSetting { set; get; }
 
@@ -208,13 +205,15 @@ namespace SimTelemetry.Objects
 
         [LogOnChange]
         double FuelSetting_Scale { set; get; }
-
+        
         [LogOnChange]
         double MassEmpty { set; get; }
+        */
 
         [LogOnChange]
         double Mass { set; get; }
 
+        /*
         [LogOnChange]
         double RPM_Stationary { set; get; }
 
@@ -223,7 +222,7 @@ namespace SimTelemetry.Objects
 
         [LogOnChange]
         double RPM_Max_Scale { set; get; }
-
+        */
         [Loggable(25)]
         [LogOnChange]
         [DisplayConversion( DataConversions.SPEED_MS_TO_KMH)]
@@ -231,17 +230,17 @@ namespace SimTelemetry.Objects
 
         [Loggable(25)]
         [LogOnChange]
-        [DisplayConversion(DataConversions.ROTATION_RADS_TO_RPM)]
         double RPM { set; get; }
+
+        [Loggable(25)]
+        [LogOnChange]
+        double RPM_Max { set; get; }
 
         [LogOnChange]
         int Position { set; get; }
 
         [LogOnChange]
         int Gear { set; get; }
-
-        [LogOnChange]
-        int Gears { set; get; }
 
         [LogOnChange]
         float GearRatio1 { set; get; }
@@ -300,26 +299,24 @@ namespace SimTelemetry.Objects
         [LogOnChange]
         float GearRatioR { set; get; }
 
-        [Loggable(1)]
-        [LogOnChange]
-        float TyreWear_LF { set; get; }
+        [Loggable(25)]
+        IWheel Wheel_LeftFront { get; set; }
 
-        [Loggable(1)]
-        [LogOnChange]
-        float TyreWear_RF { set; get; }
+        [Loggable(25)]
+        IWheel Wheel_RightFront { get; set; }
 
-        [Loggable(1)]
-        [LogOnChange]
-        float TyreWear_LR { set; get; }
+        [Loggable(25)]
+        IWheel Wheel_LeftRear { get; set; }
 
-        [Loggable(1)]
-        [LogOnChange]
-        float TyreWear_RR { set; get; }
+        [Loggable(25)]
+        IWheel Wheel_RightRear { get; set; }
 
         [LogOnChange]
         bool Flag_Blue { get; set; }
+
         [LogOnChange]
         bool Flag_Yellow { get; set; }
+
         [LogOnChange]
         bool Flag_Black { get; set; }
     }

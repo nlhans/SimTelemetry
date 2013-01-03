@@ -32,10 +32,7 @@ namespace SimTelemetry.Objects.Garage
         double[] Ratios { get; }
         double[] Finals { get; }
 
-        double[] Ratio_Setup { get; }
         double[] Ratio_Stock { get; }
-
-        double Final_Setup { get; }
         double Final_Stock{ get; }
     }
 }

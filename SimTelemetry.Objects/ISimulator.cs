@@ -46,5 +46,6 @@ namespace SimTelemetry.Objects
         bool Attached { get; }
         bool UseMemoryReader { get; }
         ISetup Setup { get; }
+        ICar Car { get; set; }
     }
 }

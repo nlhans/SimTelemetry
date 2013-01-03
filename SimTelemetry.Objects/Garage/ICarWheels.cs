@@ -23,6 +23,18 @@ namespace SimTelemetry.Objects.Garage
     public interface ICarWheels
     {
         string File { get; }
-        
+        ICarWheel LeftFront { get; set; }
+        ICarWheel RightFront { get; set; }
+        ICarWheel LeftRear { get; set; }
+        ICarWheel RightRear { get; set; }
+    }
+
+    public interface ICarWheel
+    {
+        double WheelRadius { get; set; }
+        double BrakeTemperature_OptimalHigh { get; set; }
+        double BrakeTemperature_OptimalLow { get; set; }
+        double BrakeThickness_TypicalFailure { get; set; }
+        double OptimalPressure { get; set; }
     }
 }

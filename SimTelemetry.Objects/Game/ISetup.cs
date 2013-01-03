@@ -14,5 +14,11 @@ namespace SimTelemetry.Objects.Game
 
         int Aero_FenderLeft { get; }
         int Aero_FenderRight { get; }
+
+        ISetupWheel Wheel_LeftFront { get; }
+        ISetupWheel Wheel_RightFront { get; }
+        ISetupWheel Wheel_LeftRear { get; }
+        ISetupWheel Wheel_RightRear { get; }
+
     }
 }

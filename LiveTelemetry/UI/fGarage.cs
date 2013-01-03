@@ -19,12 +19,7 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using LiveTelemetry.Garage;
 using SimTelemetry.Data;
@@ -33,19 +28,6 @@ using SimTelemetry.Objects.Garage;
 
 namespace LiveTelemetry
 {
-    public enum GarageWindow
-    {
-        GameSelect,
-        TrackCars,
-        Mod,
-        Car,
-        Engine,
-        Aerodynamics,
-        Tyres,
-        Gearbox,
-        Analysis
-    }
-
     public partial class fGarage : Form
     {
         private GarageWindow Window;
@@ -64,13 +46,14 @@ namespace LiveTelemetry
             Window = GarageWindow.GameSelect;
             InitializeComponent();
 
-            this.Padding = new Padding(0, 50, 0, 0);
+            Padding = new Padding(0, 50, 0, 0);
+
             // Window: Game
             ucGame = new ucSelectGame();
-            ucGame.Chosen += new Triton.Signal(ucGame_Chosen);
+            ucGame.Chosen += ucGame_Chosen;
 
             ucTrackCars = new ucSelectTrackCars();
-            ucTrackCars.Chosen += new Triton.Signal(ucTrackCars_Chosen);
+            ucTrackCars.Chosen += ucTrackCars_Chosen;
 
             ucMod = new ucSelectModel();
 
@@ -80,16 +63,16 @@ namespace LiveTelemetry
             btBack.Size = new Size(50, 25);
             btBack.Location = new Point(10, 10);
             btBack.BackColor = Color.White;
-            btBack.Click += new EventHandler(btBack_Click);
+            btBack.Click += btBack_Click;
 
             Resize += fGarage_Resize;
             Redraw();
         }
 
-        void ucTrackCars_Chosen(object sender)
+        private void ucTrackCars_Chosen(object sender)
         {
             // TODO: ADd track selection as well!
-            string smod = sender.ToString();
+            var smod = sender.ToString();
             Mod = Sim.Garage.Mods.Find(delegate(IMod m) { if(m.Name == null) m.Scan();
                 return m.Name.Equals(smod); });
             if (Mod == null)
@@ -102,7 +85,7 @@ namespace LiveTelemetry
             Redraw();
         }
 
-        void ucGame_Chosen(object sim)
+        private void ucGame_Chosen(object sim)
         {
             Sim = Telemetry.m.Sims.Sims.Find(delegate(ISimulator s) { return s.Name.Equals(sim.ToString()); });
             if (Sim.Garage == null)
@@ -139,20 +122,20 @@ namespace LiveTelemetry
             Redraw();
         }
 
-        void btBack_Click(object sender, EventArgs e)
+        private void btBack_Click(object sender, EventArgs e)
         {
             ActionBack();
         }
 
-        void ucGame_Close()
+        private void ucGame_Close()
         {
             ActionBack();
         }
 
-        void Redraw()
+        private void Redraw()
         {
             if (Controls.Count > 0)
-                ((IGarageUserControl) Controls[0]).Close -= new Triton.AnonymousSignal(ucGame_Close);
+                ((IGarageUserControl) Controls[0]).Close -= ucGame_Close;
             Controls.Clear();
             BackColor = Color.Black;
             switch(Window)
@@ -170,7 +153,7 @@ namespace LiveTelemetry
                     break;
             }
 
-            ((IGarageUserControl)Controls[0]).Close += new Triton.AnonymousSignal(ucGame_Close);
+            ((IGarageUserControl)Controls[0]).Close += ucGame_Close;
             Controls[0].Dock = DockStyle.Fill;
             ((IGarageUserControl)Controls[0]).Draw();
             ((IGarageUserControl)Controls[0]).Resize();
@@ -181,7 +164,7 @@ namespace LiveTelemetry
 
         void fGarage_Resize(object sender, EventArgs e)
         {
-            IGarageUserControl uc = (IGarageUserControl) Controls[0];
+            var uc = (IGarageUserControl) Controls[0];
             uc.Resize();
         }
 

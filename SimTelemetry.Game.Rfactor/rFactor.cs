@@ -18,6 +18,7 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using SimTelemetry.Game.Rfactor.MMF;
 using SimTelemetry.Objects.Utilities;
 using SimTelemetry.Objects;
 using SimTelemetry.Game.Rfactor.Garage;
@@ -26,9 +27,11 @@ namespace SimTelemetry.Game.Rfactor
 {
     public class rFactor
     {
+
         public static ISimulator Simulator { get; set; }
         public const double Revision = 0.1;
 
+        public static rFactorMMF MMF;
         public static Session Session;
         public static Drivers Drivers;
         public static DriverPlayer Player;
@@ -38,7 +41,16 @@ namespace SimTelemetry.Game.Rfactor
         public rFactor(ISimulator sim)
         {
             Simulator = sim;
-            Game = new MemoryPolledReader(sim);
+            MMF = new rFactorMMF();
+            
+            if (Simulator.UseMemoryReader)
+            {
+                Game = new MemoryPolledReader(sim);
+            }
+            else
+            {
+                Game = null;
+            }
 
             Garage = new rFactorGarage();
             Session = new Session();
@@ -49,7 +61,11 @@ namespace SimTelemetry.Game.Rfactor
 
         public static void Kill()
         {
-            Game.Active = false;
+            if (Simulator.UseMemoryReader)
+            {
+                Game.Active = false;
+            }
+
         }
     }
 }

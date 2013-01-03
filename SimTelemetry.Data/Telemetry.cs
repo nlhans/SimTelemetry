@@ -182,7 +182,7 @@ namespace SimTelemetry.Data
         /// <permission cref="Triton.Database">Only used by Triton.Database namespace.</permission>
         private IDbConnection GetConnection()
         {
-            OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data source=Laptimes.accdb");
+            var con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data source=Laptimes.accdb");
             return con;
         }
 
@@ -232,11 +232,14 @@ namespace SimTelemetry.Data
             if (Net == null || !Net.IsClient)
             {
                 Track = new Track.Track(Telemetry.m.Sim, Sim.Session.GameData_TrackFile);
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
+
             }
 
             if (Track_Loaded != null)
                 Track_Loaded(null);
+
+
         }
 
         /// <summary>
@@ -279,6 +282,7 @@ namespace SimTelemetry.Data
                     else if (state.Active && sim.Session.Active != state.Session)// Session events.
                     {
                         state.Session = sim.Session.Active;
+                        state.Driving = false;
                         if (state.Session)
                         {
                             Report_SessionStart(sim);
@@ -398,8 +402,8 @@ namespace SimTelemetry.Data
         /// <summary>
         /// Load new track. Specify location of gamedirectory and file.
         /// </summary>
-        /// <param name="gamedir">Absolute path to gamedirectory.</param>
-        /// <param name="track">Relative path from gamedirectory to track file.</param>
+        /// <param name="sim">Source simulator of track</param>
+        /// <param name="track">Relative path from gamedirectory to track file OR track name.</param>
         public void Track_Load(ISimulator sim, string track)
         {
             if (Net == null || !Net.IsClient)
@@ -451,6 +455,17 @@ namespace SimTelemetry.Data
 
                 if (Track_Loaded != null)
                     Track_Loaded(null);
+            }
+        }
+
+        /// <summary>
+        /// 'Force' a track reload.
+        /// </summary>
+        public void ForceTrackLoad()
+        {
+            if (Net != null && Telemetry.m.Sim != null)
+            {
+                Track = new Track.Track(Telemetry.m.Sim, Sim.Session.GameData_TrackFile);
             }
         }
     }

@@ -56,11 +56,19 @@
     <Compile Include="Garage\rFactorMod.cs" />
     <Compile Include="Garage\rFactorTrack.cs" />
     <Compile Include="Lap.cs" />
+    <Compile Include="MMF\rFactorMMF.cs" />
+    <Compile Include="MMF\rFactorSessionType.cs" />
+    <Compile Include="MMF\rFactorDriver.cs" />
+    <Compile Include="MMF\rFactorPlayer.cs" />
+    <Compile Include="MMF\rFactorSession.cs" />
+    <Compile Include="MMF\rFactorTelemetry.cs" />
+    <Compile Include="MMF\rFactorWheel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="rFactorSetup.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="rFactor.cs" />
     <Compile Include="Simulator.cs" />
+    <Compile Include="Versions\rFactor_v1255b.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">

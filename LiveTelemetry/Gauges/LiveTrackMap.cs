@@ -49,11 +49,15 @@ namespace LiveTelemetry
                 }
                 else
                 {
+                    if (!IsValidTrackmap())
+                        Telemetry.m.ForceTrackLoad();
+
                     CompositingMode compMode = g.CompositingMode;
                     g.InterpolationMode = InterpolationMode.NearestNeighbor;
                     g.CompositingMode = CompositingMode.SourceCopy;
                     g.DrawImage(_BackgroundTrackMap, 0, 0);
                     g.CompositingMode = compMode;
+
                 }
                 g.SmoothingMode = SmoothingMode.AntiAlias;
 

@@ -66,8 +66,6 @@ namespace SimTelemetry.Game.rFactor2.Garage
 
         private ICarWheels _wheels;
 
-        private ICarBrakes _brakes;
-
         private ICarGeneral _general;
 
 
@@ -171,9 +169,9 @@ namespace SimTelemetry.Game.rFactor2.Garage
             get { return _wheels; }
         }
 
-        public ICarBrakes Brakes
+        public string PhysicsFile
         {
-            get { return _brakes; }
+            get { return masfile.Filename; }
         }
 
         public ICarGeneral General

@@ -18,6 +18,7 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System;
 using System.ComponentModel.Composition;
 using SimTelemetry.Data;
 using SimTelemetry.Data.Net;
@@ -38,6 +39,12 @@ namespace SimTelemetry.Game.Network
         public ISetup Setup
         {
             get { return null; }
+        }
+
+        public ICar Car
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
         }
 
         public ITelemetry Host { get; set; }

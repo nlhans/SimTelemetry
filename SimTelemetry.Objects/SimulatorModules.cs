@@ -32,6 +32,8 @@ namespace SimTelemetry.Objects
         public bool Times_History_SectorTimes;
         public bool Times_RaceSplits;
 
+        public bool DistanceOnLap;
+
         public bool Engine_Power;
         public bool Engine_PowerCurve;
         public bool Engine_Health;

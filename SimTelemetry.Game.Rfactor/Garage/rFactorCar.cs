@@ -62,8 +62,6 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         private ICarWheels _wheels;
 
-        private ICarBrakes _brakes;
-
         private ICarGeneral _general;
         private IniScanner _mScanner;
         private IniScanner _mHDV;
@@ -160,9 +158,9 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _wheels; }
         }
 
-        public ICarBrakes Brakes
+        public string PhysicsFile
         {
-            get { return _brakes; }
+            get { return _mHDV.IniFile; }
         }
 
         public ICarGeneral General
@@ -170,12 +168,15 @@ namespace SimTelemetry.Game.Rfactor.Garage
             get { return _general; }
         }
 
-        public rFactorCar(string file)
+        public rFactorCar(IMod mod, string file)
         {
+            _mod = mod;
             _file = file;
         }
 
         private bool Scanned = false;
+        private IMod _mod;
+
         public void Scan()
         {
             if (!Scanned)
@@ -216,6 +217,19 @@ namespace SimTelemetry.Game.Rfactor.Garage
                         _classes = new List<string>(c.Split(",".ToCharArray()));
                     }
 
+                    // Add category to classes as well!
+                    string _category = _mScanner.TryGetString("Category");
+                    if (_category.Length > 3)
+                    {
+                        if (_category.StartsWith("\"") && _category.Length > 3)
+                            _category = _category.Substring(1, _category.Length - 2);
+
+
+                        _classes.AddRange(_category.Split(','));
+                    }
+                    _mod.AddClasses(_classes);
+
+                    if (_files.ContainsKey("Vehicle") == false)
                     _files.Add("Vehicle",
                                rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory,
                                                                _mScanner.TryGetString("HDVehicle")));
@@ -257,6 +271,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         public bool InClass(List<string> classes)
         {
+            if (Classes == null) return false;
             bool match = false;
             foreach (string f in classes)
                 if (Classes.Contains(f)) match = true;

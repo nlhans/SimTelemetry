@@ -192,5 +192,14 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
 
         }
+
+        public void AddClasses(List<string> classes)
+        {
+            classes.ForEach(x=>
+                                {
+                                    if(_classes.Contains(x)==false)
+                                        _classes.Add(x);
+                                });
+        }
     }
 }

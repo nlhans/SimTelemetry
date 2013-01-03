@@ -143,7 +143,7 @@ namespace LiveTelemetry
                     else
                     g.DrawString(PrintLapTime(driver.LapTime_Last, false), f, Brushes.Yellow, 300f, 10f + ind * LineHeight);
 
-                    g.DrawString(driver.PitStopRuns.ToString(), f, Brushes.White, 380f, 10f + ind * LineHeight);
+                    g.DrawString(driver.Pitstops.ToString(), f, Brushes.White, 380f, 10f + ind * LineHeight);
 
 
                     ind++;

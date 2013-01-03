@@ -25,7 +25,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 {
     public class DriverPlayer : IDriverPlayer
     {
-        public double Engine_Lifetime_Live
+        public double Engine_Lifetime
         {
             get { return 0; }
             set { throw new NotImplementedException(); }
@@ -68,7 +68,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
             set { throw new NotImplementedException(); }
         }
 
-        public int Engine_BoostSetting
+        public int EngineMode
         {
             get { return 0; }
             set { throw new NotImplementedException(); }
@@ -592,7 +592,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 
         public double Engine_RPM_Max_Live
         {
-            get { return  rFactor2.Drivers.Player.RPM_Max_Offset; }
+            get { return  rFactor2.Drivers.Player.RPM_Max; }
             set { throw new NotImplementedException(); }
         }
 

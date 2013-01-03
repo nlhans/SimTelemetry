@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using SimTelemetry.Game.Rfactor.MMF;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
@@ -37,20 +38,21 @@ namespace SimTelemetry.Game.Rfactor
         private SimulatorModules _Modules;
         public ITelemetry Host { get; set; }
 
+
         public void Initialize()
         {
-            new rFactor(this);
+            new rFactor(this); // old v1.255 only, not v1.255 patch F!!!
             _Modules = new SimulatorModules();
             _Modules.Time_Available = true;             // The plug-in knows the session time.
             _Modules.Track_Coordinates = true;
             _Modules.Track_MapFile = true;
             _Modules.Times_LapsBasic = true;
             _Modules.Times_LastSectors = true;
-            _Modules.Times_History_LapTimes = true;
-            _Modules.Times_History_SectorTimes = true;
-            _Modules.Engine_Power = true;
+            _Modules.Times_History_LapTimes = UseMemoryReader;
+            _Modules.Times_History_SectorTimes = UseMemoryReader;
+            _Modules.Engine_Power = UseMemoryReader;
             _Modules.Engine_PowerCurve = true;
-            _Modules.Aero_Drag = true;
+            _Modules.Aero_Drag = UseMemoryReader;
         }
 
         public void Deinitialize()
@@ -97,12 +99,44 @@ namespace SimTelemetry.Game.Rfactor
         {
             get { return rFactor.Game; }
         }
-        public bool Attached { get { return Memory.Attached; } }
+        public bool Attached { get
+        {
+            if (UseMemoryReader)
+            {
+                return Memory.Attached;
+            }
+            else
+            {
+                return rFactor.MMF.Hooked;
+            }
+        } }
         public bool UseMemoryReader { get { return true; } }
 
         public ISetup Setup
         {
             get { return new rFactorSetup(); }
+        }
+
+        public ICar Car
+        {
+            get
+            {
+                if(rFactor.Drivers.Player == null)
+                    return null;
+                if (UseMemoryReader)
+                {
+                    ICar c = rFactor.Garage.SearchCar(rFactor.Drivers.Player.CarClass, rFactor.Drivers.Player.CarModel);
+                    if (c == null)
+                        // Try MMF.
+                        c = rFactor.Garage.SearchCar(rFactor.MMF.Telemetry.Player.VehicleName, "");
+
+                    return c;
+                }else
+                {
+                    return rFactor.Garage.SearchCar(rFactor.MMF.Telemetry.Player.VehicleName, rFactor.Drivers.Player.CarModel);
+                }
+            }
+            set { throw new NotImplementedException(); }
         }
     }
 }

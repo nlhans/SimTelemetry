@@ -39,6 +39,7 @@ namespace LiveTelemetry
         private List<double> EngineUsage = new List<double>();
         private Filter PowerUsage = new Filter(5);
 
+        private bool RPM_AutoRange;
 
         // Properties of car
         private double RPM_Min;
@@ -101,7 +102,7 @@ namespace LiveTelemetry
                 if (Counter >= 4 && Counter != 10) // Timer for resetting engine wear.
                 {
                     LiveTelemetry.StatusMenu = 0;
-                    Engine_Max = Telemetry.m.Sim.Player.Engine_Lifetime_Live;
+                    Engine_Max = Telemetry.m.Sim.Player.Engine_Lifetime;
                     Counter = 10;
                 }
             }
@@ -113,33 +114,40 @@ namespace LiveTelemetry
         public void Update()
         {
             if (!Telemetry.m.Active_Session) return;
-
-            // TOOD: Move back to Data libraries so they can be used without the UI.
-            if(Fuel_LastLapNo != Telemetry.m.Sim.Drivers.Player.Laps)
+            if (Telemetry.m.Sim.Drivers.Player == null) return;
+            if (Telemetry.m.Sim.Car == null) return;
+            try
             {
-                double engine_state = Telemetry.m.Sim.Player.Engine_Lifetime_Live / Telemetry.m.Sim.Player.Engine_Lifetime_Typical;
+                // TOOD: Move back to Data libraries so they can be used without the UI.
+                if (Fuel_LastLapNo != Telemetry.m.Sim.Drivers.Player.Laps)
+                {
+                    double engine_state = Telemetry.m.Sim.Player.Engine_Lifetime/
+                                          Telemetry.m.Sim.Car.Engine.Lifetime_Average;
 
-                Fuel_LastLapNo = Telemetry.m.Sim.Drivers.Player.Laps;
-                double usedF = Telemetry.m.Sim.Drivers.Player.Fuel - Fuel_LastLap;
-                double usedE = Engine_LastLap-engine_state;
-                Engine_LastLap = engine_state;
-                Fuel_LastLap = Telemetry.m.Sim.Drivers.Player.Fuel;
+                    Fuel_LastLapNo = Telemetry.m.Sim.Drivers.Player.Laps;
+                    double usedF = Telemetry.m.Sim.Drivers.Player.Fuel - Fuel_LastLap;
+                    double usedE = Engine_LastLap - engine_state;
+                    Engine_LastLap = engine_state;
+                    Fuel_LastLap = Telemetry.m.Sim.Drivers.Player.Fuel;
 
-                if (usedF < 0)
-                    FuelUsage.Add(0 - usedF);
-                if(usedE > 0 && usedE < 0.15)
-                    EngineUsage.Add(usedE);
+                    if (usedF < 0)
+                        FuelUsage.Add(0 - usedF);
+                    if (usedE > 0 && usedE < 0.15)
+                        EngineUsage.Add(usedE);
 
 
+                }
+            }catch(Exception ex)
+            {
+                //
             }
-
         }
         #endregion
         #region UI drawing code
 
         private void PaintBackground(object sender)
         {
-
+            System.Threading.Thread.Sleep(500);
             // Fonts
             Font font_arial_10 = new Font("Arial", 10f, FontStyle.Bold);
 
@@ -159,7 +167,7 @@ namespace LiveTelemetry
             lock (g)
             {
                 g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
-                if (!Telemetry.m.Active_Session) return;
+                if (!Telemetry.m.Active_Session || Telemetry.m.Sim.Car == null) return;
 
                 // ---------------------------------       Speed      ---------------------------------
                 Speed_Min = 0;
@@ -179,11 +187,18 @@ namespace LiveTelemetry
 
                 // ---------------------------------        RPM       ---------------------------------
                 int retry = 10;
+                RPM_AutoRange = false;
                 do
                 {
-                    RPM_Max = 1000*Math.Ceiling(Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live)/1000);
+                    RPM_Max = 1000*Math.Ceiling(Telemetry.m.Sim.Player.Engine_RPM_Max_Live/1000);
                     Thread.Sleep(10);
                 } while (RPM_Max < 100 && retry-- > 0);
+
+                if(RPM_Max < 1000)
+                {
+                    RPM_AutoRange = true;
+                    RPM_Max = Math.Max(1000*Math.Ceiling(Telemetry.m.Sim.Player.Engine_RPM/1000), 6000);
+                }
 
                 RPM_Min = 0;
 
@@ -205,15 +220,6 @@ namespace LiveTelemetry
                     RPM_Min = RPM_Max - 7*2000;
 
                 }
-                double rpm_idle = Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Idle_Max);
-                if (RPM_Min > rpm_idle)
-                {
-                    RPM_Min = rpm_idle;
-
-                    if (RPM_Min%RPM_Step != 0)
-                        RPM_Min -= (RPM_Min%RPM_Step);
-
-                }
 
                 if (RPM_Min%RPM_Step != 0)
                     RPM_Min += RPM_Step - (RPM_Min%RPM_Step);
@@ -222,13 +228,13 @@ namespace LiveTelemetry
                     RPM_Max += RPM_Step - (RPM_Max%RPM_Step);
 
                 // ---------------------------------     RPM Gauge    ---------------------------------
-                double fAngle_RPM_RedLine = (Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live) - RPM_Step / 2 - RPM_Min) /
+                double fAngle_RPM_RedLine = (Telemetry.m.Sim.Player.Engine_RPM_Max_Live - RPM_Step / 2 - RPM_Min) /
                                             (RPM_Max - RPM_Min)*225;
                 if (double.IsInfinity(fAngle_RPM_RedLine) || double.IsNaN(fAngle_RPM_RedLine)) fAngle_RPM_RedLine = 200;
                 int Angle_RPM_RedLine = Convert.ToInt32(Math.Round(fAngle_RPM_RedLine));
+                
 
-
-                double fAngle_RPM_WarningLine = (Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_Lifetime_RPM_Base) - RPM_Step / 2 -
+                double fAngle_RPM_WarningLine = (Telemetry.m.Sim.Car.Engine.Lifetime_RPM - RPM_Step / 2 -
                                                  RPM_Min)/(RPM_Max - RPM_Min)*225;
                 if (double.IsInfinity(fAngle_RPM_WarningLine) || double.IsNaN(fAngle_RPM_WarningLine))
                     fAngle_RPM_WarningLine = 180;
@@ -369,12 +375,12 @@ namespace LiveTelemetry
 
                 
                 //g.DrawImage(_EmptyGauges,0,0);
-                if (!Telemetry.m.Active_Session) return;
+                if (!Telemetry.m.Active_Session || Telemetry.m.Sim.Car == null) return;
                 lock (g)
                 {
 
                     // ---------------------------------      RPM Needle    ---------------------------------
-                    double RPMLive = Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM);
+                    double RPMLive = Telemetry.m.Sim.Player.Engine_RPM;
                     double fAngle_RPM = 90 + (RPMLive - RPM_Min)/(RPM_Max - RPM_Min)*225;
                     if (fAngle_RPM < 90) fAngle_RPM = 90;
                     if (fAngle_RPM > 90 + 225) fAngle_RPM = 90 + 225;
@@ -385,6 +391,16 @@ namespace LiveTelemetry
                     double rpm_gauge_xa = clip_height/2 + rpm_gauge_cos*-15;
                     double rpm_gauge_yb = clip_height/2 + rpm_gauge_sin*80;
                     double rpm_gauge_xb = clip_height/2 + rpm_gauge_cos*80;
+
+                    if (RPM_AutoRange)
+                    {
+                        if (RPMLive > RPM_Max)
+                        {
+                            RPM_Max += 1000;
+                            PaintBackground(null);
+                        }
+
+                    }
 
                     g.DrawLine(new Pen(Color.DarkRed, 4f), Convert.ToSingle(rpm_gauge_xa),
                                Convert.ToSingle(rpm_gauge_ya),
@@ -454,25 +470,29 @@ namespace LiveTelemetry
 
                     // Throttle
                     g.FillRectangle(Brushes.DarkRed, height + 10, 120,
-                                    Convert.ToSingle(Telemetry.m.Sim.Drivers.Player.Brake*120), 13);
+                                    Convert.ToSingle(Telemetry.m.Sim.Player.Pedals_Brake*120), 13);
                     g.FillRectangle(Brushes.DarkGreen, height + 10, 120,
-                                    Convert.ToSingle(Telemetry.m.Sim.Drivers.Player.Throttle*120), 13);
-                    if (Telemetry.m.Sim.Drivers.Player.Brake > Telemetry.m.Sim.Drivers.Player.Throttle)
+                                    Convert.ToSingle(Telemetry.m.Sim.Player.Pedals_Throttle*120), 13);
+                    if (Telemetry.m.Sim.Player.Pedals_Brake > Telemetry.m.Sim.Player.Pedals_Throttle)
                     {
-                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Brake.ToString("000%"), font_arial_10,
+                        g.DrawString(Telemetry.m.Sim.Player.Pedals_Brake.ToString("000%"), font_arial_10,
                                      Brushes.DarkRed,
                                      width + border_bounds - 45, 119);
                     }
                     else
                     {
-                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Throttle.ToString("000%"), font_arial_10,
+                        g.DrawString(Telemetry.m.Sim.Player.Pedals_Throttle.ToString("000%"), font_arial_10,
                                      Brushes.DarkGreen,
                                      width + border_bounds - 45, 119);
                     }
 
                     // Fuel
+                    double fuel_state = 0;
                     // TODO: Fix bug where red bar doesn't decrease.
-                    double fuel_state = Telemetry.m.Sim.Drivers.Player.Fuel/Telemetry.m.Sim.Drivers.Player.Fuel_Max;
+                    if (Telemetry.m.Sim.Car.General == null)
+                        fuel_state = Telemetry.m.Sim.Player.Fuel/100.0;
+                    else
+                        fuel_state = Telemetry.m.Sim.Player.Fuel/Telemetry.m.Sim.Car.General.Fueltank;
 
                     if (fuel_state > 0.1)
                     {
@@ -485,11 +505,11 @@ namespace LiveTelemetry
                         g.FillRectangle(Brushes.Red, height + 10, 180, Convert.ToSingle(fuel_state*120), 13);
                     }
                     if (fuel_state < 0.1)
-                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("00.0").Replace(".", "L"),
+                        g.DrawString(Telemetry.m.Sim.Player.Fuel.ToString("00.0").Replace(".", "L"),
                                      font_arial_10, Brushes.Red,
                                      width + border_bounds - 45, 139);
                     else
-                        g.DrawString(Telemetry.m.Sim.Drivers.Player.Fuel.ToString("000.0").Replace(".", "L"),
+                        g.DrawString(Telemetry.m.Sim.Player.Fuel.ToString("000.0").Replace(".", "L"),
                                      font_arial_10, Brushes.DarkOrange,
                                      width + border_bounds - 45, 139);
 
@@ -514,7 +534,7 @@ namespace LiveTelemetry
                         g.DrawString("(???)", font_arial_10, DimBrush, width + border_bounds - 45, 159);
 
                     // Engine
-                    double engine_live = Telemetry.m.Sim.Player.Engine_Lifetime_Live;
+                    double engine_live = Telemetry.m.Sim.Player.Engine_Lifetime;
                     double engine_perc = engine_live/Engine_Max;
                     if (double.IsInfinity(engine_perc) || double.IsNaN(engine_perc)) engine_perc = 1;
 
@@ -565,8 +585,8 @@ namespace LiveTelemetry
                     double power;
 
                     if (Telemetry.m.Sim.Modules.Engine_Power)
-                        power = Telemetry.m.Sim.Player.Engine_Torque* Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM)*Math.PI*2/60000.0;
-                    else power = 0;
+                        power = Telemetry.m.Sim.Player.Engine_Torque* Telemetry.m.Sim.Player.Engine_RPM*Math.PI*2/60000.0;
+                    else power = Telemetry.m.Computations.GetPower(Telemetry.m.Sim.Player.Engine_RPM, Telemetry.m.Sim.Player.Pedals_Throttle);
                     power = Power.KW_HP(power);
                     PowerUsage.Add(power);
                     PowerUsage.MaxSize = 3;

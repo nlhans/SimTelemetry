@@ -25,7 +25,7 @@ namespace SimTelemetry.Game.GTR2
 {
     public class DriverPlayer : IDriverPlayer
     {
-        public double Engine_Lifetime_Live
+        public double Engine_Lifetime
         {
             get { return GTR2.Game.ReadDouble(new IntPtr(0x00B68370)); }
             set { }
@@ -67,7 +67,7 @@ namespace SimTelemetry.Game.GTR2
             set { }
         }
 
-        public int Engine_BoostSetting
+        public int EngineMode
         {
             get { return 0; } // TODO: Search memory address.
             set { }

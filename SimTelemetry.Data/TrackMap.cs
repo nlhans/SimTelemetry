@@ -28,12 +28,13 @@
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
     using Triton;
-    using Timer = System.Windows.Forms.Timer;
 
 namespace SimTelemetry.Controls
 {
     public partial class TrackMap : UserControl
     {
+        protected string TrackMapPainted = "";
+
         protected float pos_x_max;
         protected float pos_x_min;
         protected float pos_y_max;
@@ -43,6 +44,8 @@ namespace SimTelemetry.Controls
         protected double map_height;
 
         protected Bitmap _BackgroundTrackMap;
+
+        private Timer _mUpdateBackground;
 
 
         #region Settings
@@ -68,6 +71,17 @@ namespace SimTelemetry.Controls
 
             SizeChanged += TrackMap_SizeChanged;
             Telemetry.m.Track_Loaded += m_Track_Load;
+            Telemetry.m.Driving_Start += m_Track_Load;
+
+            _mUpdateBackground = new Timer {Interval = 1000};
+            _mUpdateBackground.Tick += new EventHandler(_mUpdateBackground_Tick);
+            _mUpdateBackground.Start();
+        }
+
+        void _mUpdateBackground_Tick(object sender, EventArgs e)
+        {
+            if (!IsValidTrackmap())
+                UpdateTrackmap();
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -83,6 +97,14 @@ namespace SimTelemetry.Controls
             {
                 g.DrawImage(_BackgroundTrackMap, 0, 0);
             }
+        }
+
+        protected bool IsValidTrackmap()
+        {
+            if (Telemetry.m.Active_Sim == false)
+                return true;
+
+            return (TrackMapPainted == Telemetry.m.Sim.Session.CircuitName);
         }
 
         public void UpdateTrackmap()
@@ -128,9 +150,13 @@ namespace SimTelemetry.Controls
             List<PointF> sector2b = new List<PointF>();
             List<PointF> sector3b = new List<PointF>();
 
+            TrackMapPainted = Telemetry.m.Sim.Session.CircuitName;
+
             // Create sector arrays.
             foreach (TrackWaypoint wp in Telemetry.m.Track.Route.Racetrack)
             {
+                if (wp.CoordinateR == null || wp.CoordinateL == null) continue;
+
                 // Left side
                 float x1 =
                     Convert.ToSingle(10 + ((wp.CoordinateL[0] - pos_x_min)/scale_x)*(map_width - 20));

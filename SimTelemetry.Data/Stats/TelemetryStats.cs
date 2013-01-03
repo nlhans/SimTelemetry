@@ -132,6 +132,8 @@ namespace SimTelemetry.Data.Stats
         }
         public void Reset()
         {
+            if (Telemetry.m.Sim.Drivers.Player == null) return;
+
             Car = Telemetry.m.Sim.Drivers.Player.CarModel;
             Series = Telemetry.m.Sim.Drivers.Player.CarClass;
 
@@ -159,46 +161,57 @@ namespace SimTelemetry.Data.Stats
 
         private void Count(object sender, ElapsedEventArgs e)
         {
-            if (Telemetry.m.Active_Session && !Telemetry.m.Net.IsClient)
+            try
             {
-                double dt_ms = 0;
-                if (Telemetry.m.Sim.Modules.Time_Available)
+                if (Telemetry.m.Active_Session && !Telemetry.m.Net.IsClient)
                 {
-                    dt_ms = Telemetry.m.Sim.Session.Time - Last_T;
-                    Last_T = Telemetry.m.Sim.Session.Time;
+                    if (Telemetry.m.Sim.Player == null)
+                        return;
+
+                    double dt_ms = 0;
+                    if (Telemetry.m.Sim.Modules.Time_Available)
+                    {
+                        dt_ms = Telemetry.m.Sim.Session.Time - Last_T;
+                        Last_T = Telemetry.m.Sim.Session.Time;
+                    }
+                    else
+                    {
+                        TimeSpan dt = DateTime.Now.Subtract(Last_DT);
+                        dt_ms = dt.TotalMilliseconds/1000.0;
+                        Last_DT = DateTime.Now;
+                    }
+                    if (dt_ms > 0 && !Telemetry.m.Sim.Drivers.Player.Control_AI_Aid &&
+                        Telemetry.m.Sim.Drivers.Player.Driving) // time is ticking and player is driving
+                    {
+
+                        if (_dStats_Fuel < 0) _dStats_Fuel = 0;
+                        if (_dStats_Time < 0) _dStats_Time = 0;
+                        if (_dStats_Gears < 0) _dStats_Gears = 0;
+                        if (_dStats_Engines < 0) _dStats_Engines = 0;
+                        if (_dStats_Distance < 0) _dStats_Distance = 0;
+
+                        if (Telemetry.m.Sim.Player.Gear != Last_Gear)
+                            _dStats_Gears++;
+
+                        double dFuel = (Last_Fuel - Telemetry.m.Sim.Player.Fuel);
+                        if (Telemetry.m.Sim.Player.Fuel < Last_Fuel && dFuel < 0.5) // do not count refueling
+                            _dStats_Fuel += (Last_Fuel - Telemetry.m.Sim.Player.Fuel);
+
+                        _dStats_Engines += dt_ms*Telemetry.m.Sim.Player.Engine_RPM/2.0/Math.PI; // rad/s to rps
+                        _dStats_Distance += dt_ms*Math.Abs(Telemetry.m.Sim.Player.Speed)/1000.0; // km's
+                        TodaysDistance += dt_ms*Math.Abs(Telemetry.m.Sim.Player.Speed)/1000.0;
+                            // quick approximation of odometer
+
+                        _dStats_Time += dt_ms;
+
+                        Last_Gear = Telemetry.m.Sim.Player.Gear;
+                        Last_Fuel = Telemetry.m.Sim.Player.Fuel;
+                    }
+
                 }
-                else
-                {
-                    TimeSpan dt = DateTime.Now.Subtract(Last_DT);
-                    dt_ms = dt.TotalMilliseconds / 1000.0;
-                    Last_DT = DateTime.Now;
-                }
-                if (dt_ms > 0 && !Telemetry.m.Sim.Drivers.Player.Control_AI_Aid && Telemetry.m.Sim.Drivers.Player.Driving) // time is ticking and player is driving
-                {
-
-                    if (_dStats_Fuel < 0) _dStats_Fuel = 0;
-                    if (_dStats_Time < 0) _dStats_Time = 0;
-                    if (_dStats_Gears < 0) _dStats_Gears = 0;
-                    if (_dStats_Engines < 0) _dStats_Engines = 0;
-                    if (_dStats_Distance < 0) _dStats_Distance = 0;
-
-                    if (Telemetry.m.Sim.Player.Gear != Last_Gear)
-                        _dStats_Gears++;
-
-                    double dFuel = (Last_Fuel - Telemetry.m.Sim.Player.Fuel);
-                    if (Telemetry.m.Sim.Player.Fuel < Last_Fuel && dFuel < 0.5) // do not count refueling
-                        _dStats_Fuel += (Last_Fuel - Telemetry.m.Sim.Player.Fuel);
-
-                    _dStats_Engines += dt_ms * Telemetry.m.Sim.Player.Engine_RPM / 2.0 / Math.PI; // rad/s to rps
-                    _dStats_Distance += dt_ms * Math.Abs(Telemetry.m.Sim.Player.Speed) / 1000.0;// km's
-                    TodaysDistance += dt_ms * Math.Abs(Telemetry.m.Sim.Player.Speed) / 1000.0; // quick approximation of odometer
-
-                    _dStats_Time += dt_ms;
-
-                    Last_Gear = Telemetry.m.Sim.Player.Gear;
-                    Last_Fuel = Telemetry.m.Sim.Player.Fuel;
-                }
-
+            }catch(Exception ex)
+            {
+                
             }
         }
     }

@@ -33,8 +33,15 @@ namespace SimTelemetry.Objects.Utilities
         {
             get
             {
-                if (m_ReadProcess == null) return 0;
-                return (int)m_ReadProcess.MainModule.BaseAddress;
+                if (m_ReadProcess == null) return 0; try
+                {
+                    return (int) m_ReadProcess.MainModule.BaseAddress;
+                }catch(Exception ex)
+                {
+                    CloseHandle();
+
+                    return 0;
+                }
             }
         }
 

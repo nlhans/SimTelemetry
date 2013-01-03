@@ -133,6 +133,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 _maxRpmMode.Add(i, mode_rpm * i + MaxRPM);
             }
 
+            _lifetimeRpm = scanner.TryGetDouble("Main", "lifetimeenginerpm");
+
         }
 
         private void HandleEngineLine(object data)

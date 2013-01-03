@@ -39,9 +39,12 @@ namespace LiveTelemetry
         static void Main()
         {
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+#if DEBUG
+#else
             Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+#endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new LiveTelemetry());

@@ -247,6 +247,8 @@ namespace SimTelemetry.Peripherals.Dashboard
 
         private void Fire_LS(object o)
         {
+            return;
+
             try
             {
             GameData_LS package = new GameData_LS();
@@ -265,8 +267,8 @@ namespace SimTelemetry.Peripherals.Dashboard
             catch (Exception ex)
             { }
             /** TYRE & BRAKE WEAR **/
-            package.TyreWear_F = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.TyreWear_LF + Telemetry.m.Sim.Drivers.Player.TyreWear_RF, 0, 2) / 2.0);
-            package.TyreWear_R = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.TyreWear_LR + Telemetry.m.Sim.Drivers.Player.TyreWear_RR, 0, 2) / 2.0);
+            package.TyreWear_F = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.Wheel_LeftFront.Wear + Telemetry.m.Sim.Drivers.Player.Wheel_RightFront.Wear, 0, 2) / 2.0);
+            package.TyreWear_R = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.Wheel_LeftRear.Wear + Telemetry.m.Sim.Drivers.Player.Wheel_RightRear.Wear, 0, 2) / 2.0);
             package.BrakeWear_F = 0;
             package.BrakeWear_R = 0;
 
@@ -301,12 +303,12 @@ namespace SimTelemetry.Peripherals.Dashboard
 
             /*** Temporarely do cardata here as well ***/
             CarData cardata = new CarData();
-            cardata.RPM_Max = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Max_Live * rads_to_rpm,200,25000)-200);
-            cardata.RPM_Idle = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Idle_Max * rads_to_rpm,0,7000));
+            cardata.RPM_Max = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Max * rads_to_rpm,200,25000)-200);
+            cardata.RPM_Idle = Convert.ToUInt16(Limits(Telemetry.m.Sim.Car.Engine_RPM_Idle_Max * rads_to_rpm, 0, 7000));
 
             //cardata.HP_Max = Convert.ToUInt16(EngineCurve.GetMaxHP());
-            cardata.Gears = (byte)Limits(Telemetry.m.Sim.Drivers.Player.Gears,0, 10);
-            cardata.Fuel_Max = (byte)Limits(Telemetry.m.Sim.Drivers.Player.Fuel_Max,0,100);
+            cardata.Gears = (byte)Limits(Telemetry.m.Sim.Car.Gears,0, 10);
+            cardata.Fuel_Max = (byte)Limits(Telemetry.m.Sim.Car.Fuel_Max,0,100);
 
             cardata.GearRatio0 = Convert.ToSingle(Limits(GetGearRatio_Pure(0),0,20));
             cardata.GearRatio1 = Convert.ToSingle(Limits(GetGearRatio_Pure(1),0,20));
@@ -416,6 +418,7 @@ namespace SimTelemetry.Peripherals.Dashboard
         }
         private void Fire_HS(object o)
         {
+            return;
             try
             {
 
@@ -479,6 +482,7 @@ namespace SimTelemetry.Peripherals.Dashboard
                                                 torque * Telemetry.m.Sim.Player.Engine_RPM *
                                                 rads_to_rpm / 5252)));
                 }
+                if (Telemetry.m.Sim.Modules.DistanceOnLap)
                 package.MetersDriven = Convert.ToUInt16(Math.Max(0, Telemetry.m.Sim.Drivers.Player.MetersDriven));
 
                 /** LIVE DRIVING TIMES **/

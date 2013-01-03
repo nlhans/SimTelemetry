@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Game;
 
 namespace SimTelemetry.Game.GTR2
 {
@@ -257,7 +258,7 @@ namespace SimTelemetry.Game.GTR2
             set { }
         }
 
-        public int PitStopRuns
+        public int Pitstops
         {
             get { return 0; }
             set { }
@@ -353,6 +354,12 @@ namespace SimTelemetry.Game.GTR2
             set { }
         }
 
+        public double RPM_Max
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
         public int Position
         {
             get { return GTR2.Game.ReadInt32(new IntPtr(BaseAddress + 0x4B7C)); }
@@ -434,6 +441,30 @@ namespace SimTelemetry.Game.GTR2
         {
             get { return 0; }
             set { }
+        }
+
+        public IWheel Wheel_LeftFront
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public IWheel Wheel_RightFront
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public IWheel Wheel_LeftRear
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public IWheel Wheel_RightRear
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
         }
 
         public float TyreWear_LF

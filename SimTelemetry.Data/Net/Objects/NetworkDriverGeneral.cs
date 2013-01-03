@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Game;
 
 namespace SimTelemetry.Data.Net.Objects
 {
@@ -87,7 +88,7 @@ namespace SimTelemetry.Data.Net.Objects
         public float Sector_2_Last { get; set; }
         public float Sector_3_Last { get; set; }
         public double MetersDriven { get; set; }
-        public int PitStopRuns { get; set; }
+        public int Pitstops { get; set; }
         public bool Retired { get; set; }
         public TrackPosition TrackPosition { get; set; }
         public LevelIndicator SteeringHelp { get; set; }
@@ -103,6 +104,9 @@ namespace SimTelemetry.Data.Net.Objects
         public double RPM_Max_Scale { get; set; }
         public double Speed { get; set; }
         public double RPM { get; set; }
+
+        public double RPM_Max { get; set; }
+
         public int Position { get; set; }
         public int Gear { get; set; }
         public int Gears { get; set; }
@@ -125,10 +129,12 @@ namespace SimTelemetry.Data.Net.Objects
         public float GearRatio17 { get; set; }
         public float GearRatio18 { get; set; }
         public float GearRatioR { get; set; }
-        public float TyreWear_LF { get; set; }
-        public float TyreWear_RF { get; set; }
-        public float TyreWear_LR { get; set; }
-        public float TyreWear_RR { get; set; }
+
+        public IWheel Wheel_LeftFront { get; set; }
+        public IWheel Wheel_RightFront { get; set; }
+        public IWheel Wheel_LeftRear { get; set; }
+        public IWheel Wheel_RightRear { get; set; }
+
         public bool Flag_Blue { get; set; }
         public bool Flag_Yellow { get; set; }
         public bool Flag_Black { get; set; }
@@ -152,7 +158,6 @@ namespace SimTelemetry.Data.Net.Objects
             nwGeneral.Throttle = player.Throttle;
             nwGeneral.Brake = player.Brake;
             nwGeneral.Fuel = player.Fuel;
-            nwGeneral.Fuel_Max = player.Fuel_Max;
             nwGeneral.CarModel = player.CarModel;
             nwGeneral.CarClass = player.CarClass;
             nwGeneral.Control_AI_Aid = player.Control_AI_Aid;
@@ -160,37 +165,17 @@ namespace SimTelemetry.Data.Net.Objects
             nwGeneral.Pits = player.Pits;
             nwGeneral.HeadLights = player.HeadLights;
             nwGeneral.Laps = player.Laps;
-            nwGeneral.LapTime_Best = player.LapTime_Best;
-            nwGeneral.LapTime_Last = player.LapTime_Last;
-            nwGeneral.LapTime_Best_Sector1 = player.LapTime_Best_Sector1;
-            nwGeneral.LapTime_Best_Sector2 = player.LapTime_Best_Sector2;
-            nwGeneral.LapTime_Best_Sector3 = player.LapTime_Best_Sector3;
-            nwGeneral.Sector_1_Best = player.Sector_1_Best;
-            nwGeneral.Sector_2_Best = player.Sector_2_Best;
-            nwGeneral.Sector_3_Best = player.Sector_3_Best;
-            nwGeneral.Sector_1_Last = player.Sector_1_Last;
-            nwGeneral.Sector_2_Last = player.Sector_2_Last;
-            nwGeneral.Sector_3_Last = player.Sector_3_Last;
             nwGeneral.MetersDriven = player.MetersDriven;
-            nwGeneral.PitStopRuns = player.PitStopRuns;
+            nwGeneral.Pitstops = player.Pitstops;
             nwGeneral.Retired = player.Retired;
             nwGeneral.TrackPosition = player.TrackPosition;
             nwGeneral.SteeringHelp = player.SteeringHelp;
-            nwGeneral.PitStop_FrontWingSetting = player.PitStop_FrontWingSetting;
-            nwGeneral.PitStop_RearWingSetting = player.PitStop_RearWingSetting;
-            nwGeneral.PitStop_FuelSetting = player.PitStop_FuelSetting;
-            nwGeneral.FuelSetting_Offset = player.FuelSetting_Offset;
-            nwGeneral.FuelSetting_Scale = player.FuelSetting_Scale;
-            nwGeneral.MassEmpty = player.MassEmpty;
             nwGeneral.Mass = player.Mass;
-            nwGeneral.RPM_Stationary = player.RPM_Stationary;
-            nwGeneral.RPM_Max_Offset = player.RPM_Max_Offset;
-            nwGeneral.RPM_Max_Scale = player.RPM_Max_Scale;
             nwGeneral.Speed = player.Speed;
             nwGeneral.RPM = player.RPM;
+            nwGeneral.RPM_Max = player.RPM_Max;
             nwGeneral.Position = player.Position;
             nwGeneral.Gear = player.Gear;
-            nwGeneral.Gears = player.Gears;
             nwGeneral.GearRatio1 = player.GearRatio1;
             nwGeneral.GearRatio2 = player.GearRatio2;
             nwGeneral.GearRatio3 = player.GearRatio3;
@@ -210,13 +195,10 @@ namespace SimTelemetry.Data.Net.Objects
             nwGeneral.GearRatio17 = player.GearRatio17;
             nwGeneral.GearRatio18 = player.GearRatio18;
             nwGeneral.GearRatioR = player.GearRatioR;
-            nwGeneral.TyreWear_LF = player.TyreWear_LF;
-            nwGeneral.TyreWear_RF = player.TyreWear_RF;
-            nwGeneral.TyreWear_LR = player.TyreWear_LR;
-            nwGeneral.TyreWear_RR = player.TyreWear_RR;
             nwGeneral.Flag_Blue = player.Flag_Blue;
             nwGeneral.Flag_Yellow = player.Flag_Yellow;
             nwGeneral.Flag_Black = player.Flag_Black;
+            // TODO: Copy wheel info.
             return nwGeneral;
         }
     }

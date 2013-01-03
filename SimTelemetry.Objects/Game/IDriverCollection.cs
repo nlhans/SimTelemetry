@@ -26,7 +26,6 @@ namespace SimTelemetry.Objects
     {
         List<IDriverGeneral> AllDrivers { get; }
 
-
         IDriverGeneral Player { get; }
     }
 }

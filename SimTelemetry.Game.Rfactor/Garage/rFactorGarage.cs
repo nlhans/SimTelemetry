@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
 
 namespace SimTelemetry.Game.Rfactor.Garage
@@ -73,14 +74,16 @@ namespace SimTelemetry.Game.Rfactor.Garage
         {
             if (!Scanned)
             {
-                Scanned = true;
-
                 // Index ALL files in GameDataDirectory:
                 Files = new FileList(GamedataDirectory,
                     new string[6] { ".aiw", ".gdb", ".veh", ".rfm", ".ini", ".hdv" });
 
+                Scanned = true;
+
                 ScanTracks();
                 ScanCars();
+
+
             }
         }
 
@@ -130,10 +133,13 @@ namespace SimTelemetry.Game.Rfactor.Garage
 
         public ICar CarFactory(IMod mod, string veh)
         {
-            if (!Cars.ContainsKey(veh))
+            lock (Cars)
             {
-                Cars.Add(veh,  new rFactorCar(veh));
-                Cars[veh].Scan();
+                if (!Cars.ContainsKey(veh))
+                {
+                    Cars.Add(veh, new rFactorCar(mod, veh));
+                    Cars[veh].Scan();
+                }
             }
             return Cars[veh];
         }
@@ -143,14 +149,36 @@ namespace SimTelemetry.Game.Rfactor.Garage
             if (ScannedCars==false)
                 ScanCars();
 
-            _mods.ForEach(x => x.Scan());
+            _mods.ForEach(x =>
+                              {
+                                  if (x != null)
+                                  {
+                                      x.Scan();
+                                  }
+                              }
+                );
 
-            foreach(rFactorMod mod in _mods.Where(x => x.Classes.Contains(CarModel) || x.Classes.Contains(CarClass)))
+            foreach(rFactorMod mod in _mods.Where(x =>
+                                                      {
+
+                                                          if (x == null) return false;
+                                                          return x.Classes.Contains(CarModel) ||
+                                                                 x.Classes.Contains(CarClass) ||
+                                                                 x.Models.Any(y => y.Team.Equals(CarModel)) ||
+                                                                 x.Models.Any(y => y.Team.Equals(CarClass));
+                                                      }))
             {
                 if( mod.Models.Any(x => x.Team == CarModel))
                 {
                     return mod.Models.Where(x => x.Team == CarModel).FirstOrDefault();
                 }
+                IEnumerable<ICar> UniqueCarHdvs =
+                    mod.Models.Where(x => x.Classes.Contains(CarModel) || x.Classes.Contains(CarClass))
+                    .Distinct(new LambdaComparer<ICar>((a, b) => { return a.PhysicsFile.Equals(b.PhysicsFile); }));
+                int uniquecars = UniqueCarHdvs.Count();
+                if (uniquecars== 1)
+                    return mod.Models.FirstOrDefault();
+
             }
             return null;
         }
@@ -161,7 +189,16 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 ScanTracks();
             path = path.ToLower();
             path = Path.GetFileNameWithoutExtension(path);
+            if(_tracks.Count(x=>x.File.Contains(path)) > 0)
             return _tracks.Where(x => x.File.Contains(path)).FirstOrDefault();
+            else
+            {
+                return _tracks.Where(x =>
+                                         {
+                                             x.Scan();
+                                             return x.Name.ToLower().Contains(path);
+                                         }).FirstOrDefault();
+            }
         }
     }
 }

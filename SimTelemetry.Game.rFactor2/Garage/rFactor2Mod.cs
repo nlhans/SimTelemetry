@@ -212,6 +212,15 @@ namespace SimTelemetry.Game.rFactor2.Garage
 
         }
 
+        public void AddClasses(List<string> classes)
+        {
+            classes.ForEach(x =>
+            {
+                if (_classes.Contains(x) == false)
+                    _classes.Add(x);
+            });
+        }
+
         private void Scan_AddTeamAndLayout(object sender)
         {
             object[] d = (object[])sender;

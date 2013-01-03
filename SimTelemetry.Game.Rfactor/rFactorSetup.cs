@@ -34,5 +34,73 @@ namespace SimTelemetry.Game.Rfactor
         {
             get { return 0; }
         }
+
+        public ISetupWheel Wheel_LeftFront
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public ISetupWheel Wheel_RightFront
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public ISetupWheel Wheel_LeftRear
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public ISetupWheel Wheel_RightRear
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public double Suspension_RideHeight_LF
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double Suspension_RideHeight_LR
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double Suspension_RideHeight_RF
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double Suspension_RideHeight_RR
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double Tyre_Pressure_LF
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double Tyre_Pressure_LR
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double Tyre_Pressure_RF
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double Tyre_Pressure_RR
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
     }
 }
