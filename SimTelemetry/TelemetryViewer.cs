@@ -39,7 +39,7 @@ namespace SimTelemetry
 
         //private TelemetryLogReader _logReader;
         private TelemetryLogReplay _logReader;
-        private ReplaySFX _logSound ;
+        //private ReplaySFX _logSound ;
 
         private DataChannels Channels;
         private Plotter cPlotter;
@@ -324,7 +324,7 @@ namespace SimTelemetry
 
             if (_logReader != null)
             {
-                _logSound = new ReplaySFX(this, _logReader);
+                //_logSound = new ReplaySFX(this, _logReader);
                 _logReader.Start();
 
                 Timer t = new Timer();
@@ -366,11 +366,11 @@ namespace SimTelemetry
         private void ReplayStop()
         {
 
-            if (_logSound != null)
+            /*if (_logSound != null)
             {
                 _logSound.Stop();
                 _logSound = null;
-            }
+            }*/
             if (_logReader != null)
                 _logReader.Stop();
 

@@ -26,6 +26,7 @@ using SimTelemetry.Data.Net.Objects;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Plugins;
 using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Game.Network
@@ -48,6 +49,17 @@ namespace SimTelemetry.Game.Network
         }
 
         public ITelemetry Host { get; set; }
+
+        public string Description
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string PluginId
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public void Initialize()
         {
             SimulatorModules _Modules = new SimulatorModules();
@@ -179,6 +191,17 @@ namespace SimTelemetry.Game.Network
         private string _name = "Network";
         private string _processname = "Network";
         public string Name { get { return _name; } }
+
+        public string Version
+        {
+            get { return "0.1 beta"; }
+        }
+
+        public string Author
+        {
+            get { return "H. de Jong"; }
+        }
+
         public string ProcessName { get { return _processname; } }
         public SimulatorModules Modules { get; private set; }
         public IDriverCollection Drivers { get; private set; }

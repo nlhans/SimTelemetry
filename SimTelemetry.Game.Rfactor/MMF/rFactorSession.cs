@@ -2,7 +2,7 @@
 
 namespace SimTelemetry.Game.Rfactor.MMF
 {
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Size=124, Pack=1)]
     public struct rFactorSession
     {
         [FieldOffset(0)]
@@ -50,6 +50,7 @@ namespace SimTelemetry.Game.Rfactor.MMF
         public float AmbientTemperature;
         [FieldOffset(116)]
         public float Wetness_OnPath;
+
         [FieldOffset(120)]
         public float Wetness_OffPath;
 

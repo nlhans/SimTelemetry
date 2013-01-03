@@ -19,6 +19,7 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using SimTelemetry.Game.Rfactor.MMF;
+using SimTelemetry.Objects.Plugins;
 using SimTelemetry.Objects.Utilities;
 using SimTelemetry.Objects;
 using SimTelemetry.Game.Rfactor.Garage;

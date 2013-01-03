@@ -29,6 +29,7 @@ using SimTelemetry.Data.Net;
 using SimTelemetry.Data.Stats;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Peripherals;
+using SimTelemetry.Objects.Plugins;
 using Triton;
 using Triton.Database;
 
@@ -122,7 +123,9 @@ namespace SimTelemetry.Data
         /// Thread for polling the status of all simulators and firing event whenever once has changed.
         /// </summary>
         private Thread Simulator_StatePollerThread;
-        
+
+        public string binaryDirectory;
+
         /// <summary>
         /// Class collecting driving stats, storing them into the log database and providing methods for
         /// searching and analyzing data.
@@ -200,9 +203,11 @@ namespace SimTelemetry.Data
         /// <summary>
         /// This method actually boots up the data frame-work. This method is called via the ThreadPool from Run().
         /// </summary>
-        /// <param name="no">Do not pass any argument</param>
-        public void Bootup(object no)
+        /// <param name="workingDirectory">Pass string.Empty for default; otherwise provide working directory for SimTelemetry</param>
+        public void Bootup(string workingDirectory)
         {
+            binaryDirectory = workingDirectory != string.Empty ? workingDirectory : "./";
+
             // Initialize simulator collection, data logger and stats collector.
             Net = new TelemetryNetwork();
             Sims = new Simulators();
@@ -426,7 +431,7 @@ namespace SimTelemetry.Data
         public void Run()
         {
             Peripherals = new Devices();
-            ThreadPool.QueueUserWorkItem(new WaitCallback(Bootup));
+            Bootup(string.Empty);
         }
 
         //TODO: move to track class

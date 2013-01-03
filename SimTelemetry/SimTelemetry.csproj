@@ -135,10 +135,6 @@
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
       <Name>SimTelemetry.Objects</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SimTelemetry.SFX\SimTelemetry.SFX.csproj">
-      <Project>{C6ACC942-B090-4B91-BD21-41C27486FF20}</Project>
-      <Name>SimTelemetry.SFX</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\folder-horizontal-open-icon.png" />

@@ -30,6 +30,7 @@ using System.Text;
 using System.Windows.Forms;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Plugins;
 using Triton;
 
 namespace LiveTelemetry.Garage

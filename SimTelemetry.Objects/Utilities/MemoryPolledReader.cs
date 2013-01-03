@@ -21,6 +21,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using SimTelemetry.Objects.Plugins;
 using Triton.Memory;
 
 namespace SimTelemetry.Objects.Utilities

@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Data.OleDb;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Plugins;
 using Triton.Database;
 using Triton.Maths;
 using Timer = System.Timers.Timer;
@@ -146,6 +147,11 @@ namespace SimTelemetry.Data
                                                    
                                                }
                                            };
+        }
+
+        private void m_Lap(ILap lap)
+        {
+            m_Lap(default(ISimulator), lap);
         }
 
         private void m_Lap(ISimulator sim, ILap lap)

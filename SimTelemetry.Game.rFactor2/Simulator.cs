@@ -26,6 +26,7 @@ using System.Text;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Plugins;
 using SimTelemetry.Objects.Utilities;
 
 namespace SimTelemetry.Game.rFactor2
@@ -35,6 +36,16 @@ namespace SimTelemetry.Game.rFactor2
     {
         private SimulatorModules _Modules;
         public ITelemetry Host { get; set; }
+
+        public string Description
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string PluginId
+        {
+            get { return ""; }
+        }
 
         public void Initialize()
         {
@@ -69,6 +80,16 @@ namespace SimTelemetry.Game.rFactor2
         public string Name
         {
             get { return "rFactor2"; }
+        }
+
+        public string Version
+        {
+            get { return "1.2.0.0"; }
+        }
+
+        public string Author
+        {
+            get { return "H. de Jong"; }
         }
 
         public IDriverCollection Drivers

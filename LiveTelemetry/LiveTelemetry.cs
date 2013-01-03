@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using LiveTelemetry.UI;
 using SimTelemetry;
 using SimTelemetry.Data;
+using SimTelemetry.Objects.Plugins;
 using SimTelemetry.Peripherals.Dashboard;
 using Triton;
 using Triton.Joysticks;

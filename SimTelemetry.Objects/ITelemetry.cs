@@ -19,6 +19,7 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using System;
+using SimTelemetry.Objects.Plugins;
 using Triton;
 
 namespace SimTelemetry.Objects

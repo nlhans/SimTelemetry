@@ -55,7 +55,7 @@ namespace SimTelemetry.Game.Rfactor
             {
                 if (rFactor.Simulator.UseMemoryReader)
                     return rFactor.Game.ReadString((IntPtr)(rFactor.Game.Base + 0x00309D28), 256);
-                return rFactor.MMF.Telemetry.Session.TrackName;
+                return ""; //return rFactor.MMF.Telemetry.Session.TrackName;
             }
             set { }
         }
@@ -68,10 +68,10 @@ namespace SimTelemetry.Game.Rfactor
                     return "";
                 else
                 {
-                 
-                string rfactor_exe = rFactor.Game.ReadString((IntPtr)(rFactor.Game.Base + 0x006EB320), 256);
-                string rfactor_map = rfactor_exe.Substring(0, rfactor_exe.Length - Path.GetFileName(rfactor_exe).Length);
-                return rfactor_map;
+
+                    string rfactor_exe = rFactor.Game.ReadString((IntPtr)(rFactor.Game.Base + 0x006EB320), 256);
+                    string rfactor_map = rfactor_exe.Substring(0, rfactor_exe.Length - Path.GetFileName(rfactor_exe).Length);
+                    return rfactor_map;
                 }
             }
             set { }
@@ -95,7 +95,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return false; 
+                if (!rFactor.Simulator.UseMemoryReader) return false;
                 return ((rFactor.Game.ReadByte((IntPtr)(rFactor.Game.Base + 0x00315444)) == 0) ? true : false);
             }
         }
@@ -104,7 +104,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.MaximumLaps;
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.MaximumLaps;
                 return rFactor.Game.ReadInt32((IntPtr)(rFactor.Game.Base + 0x00314654));
             }
             set { }
@@ -115,7 +115,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.TrackName; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.TrackName; 
                 return rFactor.Game.ReadString((IntPtr)(rFactor.Game.Base + 0x00309D3B), 128);
             }
         }
@@ -125,8 +125,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x006E2CD8));
-                return rFactor.MMF.Telemetry.Session.TrackTemperature;
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.TrackTemperature; 
+                return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x006E2CD8));
             }
         }
 
@@ -135,8 +135,9 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (rFactor.Simulator.UseMemoryReader)return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x006E2CD4));
-                return rFactor.MMF.Telemetry.Session.AmbientTemperature;  }
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.AmbientTemperature; 
+                return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x006E2CD4));
+            }
         }
 
         public SessionInfo Type
@@ -146,7 +147,7 @@ namespace SimTelemetry.Game.Rfactor
             {
                 SessionInfo i = new SessionInfo();
                 if (!rFactor.Simulator.UseMemoryReader)
-                return i;
+                    return i;
                 int val = rFactor.Game.ReadInt32((IntPtr)(rFactor.Game.Base + 0x68696C));
                 switch (val)
                 {
@@ -203,9 +204,9 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (rFactor.Simulator.UseMemoryReader)
-                    return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x60022C));
-                return rFactor.MMF.Telemetry.Session.Time;
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.Time;
+
+                return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x60022C));
             }
         }
 
@@ -214,8 +215,9 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x6E2CFC));
-                return rFactor.MMF.Telemetry.Session.TimeClock; }
+                // if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.TimeClock; 
+                return rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x6E2CFC));
+            }
         }
 
         public int Cars_InPits
@@ -243,9 +245,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (rFactor.Simulator.UseMemoryReader)
-                    return rFactor.Game.ReadByte((IntPtr)(rFactor.Game.Base + 0x315290));
-                return rFactor.MMF.Telemetry.Session.Cars;
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Session.Cars;
+                return rFactor.Game.ReadByte((IntPtr)(rFactor.Game.Base + 0x315290));
 
             }
 

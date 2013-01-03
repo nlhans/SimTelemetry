@@ -18,6 +18,8 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using SimTelemetry.Objects.Plugins;
+
 namespace SimTelemetry.Objects
 {
     public delegate void LapEvent(ISimulator sim, ILap lap);

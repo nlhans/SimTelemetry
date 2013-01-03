@@ -27,6 +27,7 @@ using SimTelemetry.Game.Rfactor.MMF;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Plugins;
 using SimTelemetry.Objects.Utilities;
 using Triton.Memory;
 
@@ -38,6 +39,16 @@ namespace SimTelemetry.Game.Rfactor
         private SimulatorModules _Modules;
         public ITelemetry Host { get; set; }
 
+
+        public string Description
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public string PluginId
+        {
+            get { return ""; }
+        }
 
         public void Initialize()
         {
@@ -73,6 +84,16 @@ namespace SimTelemetry.Game.Rfactor
         public string Name
         {
             get { return "rFactor"; }
+        }
+
+        public string Version
+        {
+            get { return "v1.255 no-cd"; }
+        }
+
+        public string Author
+        {
+            get { return "H. de Jong"; }
         }
 
         public IDriverCollection Drivers
@@ -125,15 +146,18 @@ namespace SimTelemetry.Game.Rfactor
                     return null;
                 if (UseMemoryReader)
                 {
+                    return null;
+                    /*
                     ICar c = rFactor.Garage.SearchCar(rFactor.Drivers.Player.CarClass, rFactor.Drivers.Player.CarModel);
                     if (c == null)
                         // Try MMF.
                         c = rFactor.Garage.SearchCar(rFactor.MMF.Telemetry.Player.VehicleName, "");
 
-                    return c;
+                    return c;*/
                 }else
                 {
-                    return rFactor.Garage.SearchCar(rFactor.MMF.Telemetry.Player.VehicleName, rFactor.Drivers.Player.CarModel);
+                    //return rFactor.Garage.SearchCar(rFactor.MMF.Telemetry.Player.VehicleName, rFactor.Drivers.Player.CarModel);
+                    return rFactor.Garage.SearchCar(rFactor.Drivers.Player.CarClass, rFactor.Drivers.Player.CarModel);
                 }
             }
             set { throw new NotImplementedException(); }

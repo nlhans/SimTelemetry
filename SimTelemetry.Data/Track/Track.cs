@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SimTelemetry.Data.Net;
 using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Plugins;
 using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
 using Timer = System.Timers.Timer;
 using SimTelemetry.Objects;

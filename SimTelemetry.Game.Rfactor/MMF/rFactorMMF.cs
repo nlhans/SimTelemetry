@@ -59,8 +59,7 @@ namespace SimTelemetry.Game.Rfactor.MMF
                 {
                     Update();
 
-                    Thread.Sleep(
-                        1);
+                    Thread.Sleep(1);
                 }
 
                 Connect();
@@ -79,7 +78,7 @@ namespace SimTelemetry.Game.Rfactor.MMF
 
             // Update all drivers:
             Drivers = new List<rFactorDriver>();
-            for (int i = 0; i < Telemetry.Session.Cars; i++)
+            /*for (int i = 0; i < Telemetry.Session.Cars; i++)
             {
                 int offset = 4 + 124 + 296 + i * 108;// TODO: autodetect
                 byte[] DriverData = new byte[Marshal.SizeOf(typeof(rFactorDriver))];
@@ -87,7 +86,7 @@ namespace SimTelemetry.Game.Rfactor.MMF
 
                 rFactorDriver driver = ByteMethods.ToObject<rFactorDriver>(DriverData);
                 Drivers.Add(driver);
-            }
+            }*/
         }
     }
 

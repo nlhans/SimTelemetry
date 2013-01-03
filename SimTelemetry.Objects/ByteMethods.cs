@@ -48,7 +48,14 @@ namespace SimTelemetry.Objects
             return d;
         }
 
-
+        /// <summary>
+        /// Deprecate this.
+        /// </summary>
+        /// <param name="destination"></param>
+        /// <param name="source"></param>
+        /// <param name="length"></param>
+        /// <param name="dst_offset"></param>
+        /// <param name="src_offset"></param>
         public static void memcpy(byte[] destination, byte[] source, int length, int dst_offset, int src_offset)
         {
             for (int i = 0; i < length; i++)

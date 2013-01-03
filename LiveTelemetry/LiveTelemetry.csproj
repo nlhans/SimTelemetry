@@ -41,7 +41,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="TargaImage">
+    <Reference Include="TargaImage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Binaries\TargaImage.dll</HintPath>
     </Reference>
     <Reference Include="Triton">
@@ -152,6 +153,7 @@
     <Compile Include="UI\fNetwork.Designer.cs">
       <DependentUpon>fNetwork.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\GarageWindow.cs" />
     <Compile Include="UI\ucResizableImage.cs">
       <SubType>UserControl</SubType>
     </Compile>

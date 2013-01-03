@@ -67,8 +67,8 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                if (rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC044)) - 273.15;
-                return rFactor.MMF.Telemetry.Player.EngineTemp_Oil; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.EngineTemp_Oil; 
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC044)) - 273.15;
             }
             set { }
         }
@@ -77,8 +77,8 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                if (rFactor.Simulator.UseMemoryReader)  return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC084)) - 273.15;
-                return rFactor.MMF.Telemetry.Player.EngineTemp_Water; }
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.EngineTemp_Water;
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC084)) - 273.15; }
             set { }
         }
 
@@ -87,7 +87,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006DBF70));
             }
             set { }
@@ -96,8 +96,10 @@ namespace SimTelemetry.Game.Rfactor
 
         public int Gear { set { } get
             {
-                if (rFactor.Simulator.UseMemoryReader)  return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006DC280));
-            return rFactor.MMF.Telemetry.Player.Gear; } }
+            //    if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Gear; 
+            return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006DC280));
+            }
+        }
 
         // Pit stop strategy
 
@@ -106,7 +108,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0;
+                //if (!rFactor.Simulator.UseMemoryReader) return 0;
                 return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006E1E6C));
             }
         }
@@ -129,8 +131,9 @@ namespace SimTelemetry.Game.Rfactor
 
         public double Fuel { set { } get
         {
-            if (rFactor.Simulator.UseMemoryReader)  return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9A40));
-            return rFactor.MMF.Telemetry.Player.Fuel; } }
+            //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Fuel; 
+            return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9A40));
+           } }
 
         // Suspension
 
@@ -139,7 +142,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0;
+                //if (!rFactor.Simulator.UseMemoryReader) return 0;
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA098));
             }
         }
@@ -149,7 +152,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA698));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA698));
             }
         }
 
@@ -159,7 +163,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB7FC));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB7FC));
             }
         }
 
@@ -168,7 +173,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB80C));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0;
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB80C));
             }
         }
 
@@ -177,7 +183,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB804));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0;
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB804));
             }
         }
 
@@ -186,7 +193,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB814));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB814));
             }
         }
 
@@ -196,7 +204,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB778));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0;
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB778));
             }
         }
 
@@ -205,7 +214,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB788));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB788));
             }
         }
 
@@ -214,7 +224,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB780));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0;
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB780));
             }
         }
 
@@ -223,7 +234,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB790));
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB790));
             }
         }
 
@@ -234,7 +246,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return "Tyre";
+                //if (!rFactor.Simulator.UseMemoryReader) return "Tyre";
                 return rFactor.Game.ReadString(new IntPtr(rFactor.Game.Base + 0x006E1177), 32);
             }
         }
@@ -244,7 +256,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return "Tyre"; return rFactor.Game.ReadString(new IntPtr(rFactor.Game.Base + 0x006E11B7), 32);
+                //if (!rFactor.Simulator.UseMemoryReader) return "Tyre"; 
+                return rFactor.Game.ReadString(new IntPtr(rFactor.Game.Base + 0x006E11B7), 32);
             }
         }
 
@@ -254,7 +267,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 1;
+                //if (!rFactor.Simulator.UseMemoryReader) return 1;
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9E28));
             }
         }
@@ -287,7 +300,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 1000;
+                //if (!rFactor.Simulator.UseMemoryReader) return 1000;
                 return 75 + rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DCFB4));
             }
             set { }
@@ -343,7 +356,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyrePressure; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyrePressure; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9F5C));
             }
         }
@@ -353,7 +366,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyrePressure; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyrePressure; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DAB5C));
             }
         }
@@ -363,7 +376,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyrePressure; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyrePressure; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA55C));
             }
         }
@@ -373,7 +386,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyrePressure; 
+               // if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyrePressure; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB15C));
             }
         }
@@ -402,7 +415,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.Speed; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.Speed; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9C04));
             }
         }
@@ -412,7 +425,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.Speed; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.Speed; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA804));
             }
         }
@@ -422,7 +435,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.Speed; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.Speed; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA204));
             }
         }
@@ -432,7 +445,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.Speed; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.Speed; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DAE04));
             }
         }
@@ -443,7 +456,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreTemp_Inner; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreTemp_Inner; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9F44));
             }
         }
@@ -453,7 +466,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreTemp_Inner; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreTemp_Inner; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DAB44));
             }
         }
@@ -463,7 +476,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreTemp_Inner; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreTemp_Inner; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA534));
             }
         }
@@ -473,7 +486,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreTemp_Inner; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreTemp_Inner; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB134));
             }
         }
@@ -485,7 +498,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreTemp_Middle; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreTemp_Middle; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9F3C));
             }
         }
@@ -495,7 +508,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreTemp_Middle; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreTemp_Middle; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DAB3C));
             }
         }
@@ -505,7 +518,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreTemp_Middle; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreTemp_Middle; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA53C));
             }
         }
@@ -515,7 +528,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreTemp_Middle; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreTemp_Middle; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB13C));
             }
         }
@@ -526,7 +539,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreTemp_Outer; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreTemp_Outer; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9F34));
             }
         }
@@ -536,7 +549,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreTemp_Outer; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreTemp_Outer; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DAB34));
             }
         }
@@ -546,7 +559,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreTemp_Outer; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreTemp_Outer; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA544));
             }
         }
@@ -556,7 +569,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreTemp_Outer; 
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreTemp_Outer; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB144));
             }
         }
@@ -569,7 +582,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9EF4));
             }
         }
@@ -579,7 +592,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DAAF4));
             }
         }
@@ -589,7 +602,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA4F4));
             }
         }
@@ -599,7 +612,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; //TODO: Get from car.tyres 
+                //if (!rFactor.Simulator.UseMemoryReader) return 95 + 273; //TODO: Get from car.tyres 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB0F4));
             }
         }
@@ -610,7 +623,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9EEC));
             }
         }
@@ -620,7 +633,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DAAEC));
             }
         }
@@ -630,7 +643,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DA4EC));
             }
         }
@@ -640,7 +653,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; //TODO: Get from car.tyres
+                //if (!rFactor.Simulator.UseMemoryReader) return 75 + 273; //TODO: Get from car.tyres
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB0EC));
             }
         }
@@ -652,21 +665,21 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
+                //if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9D74));
             }
         }
         
         public double Wheel_Radius_LR { set { } get { 
-                if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
+                //if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
             return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base +0x006DA974)); } }
         
         public double Wheel_Radius_RF { set { } get {
-                if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
+                //if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
             return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base +0x006DA374)); } }
         
         public double Wheel_Radius_RR { set { } get {
-                if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
+                //if (!rFactor.Simulator.UseMemoryReader) return 3;//TODO: Get from car.tyres
             return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base +0x006DAF74)); } }
 
 
@@ -677,7 +690,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006E182C));
             }
         }
@@ -687,7 +700,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBA94));
             }
         }
@@ -698,7 +711,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006E186C));
             }
         }
@@ -708,7 +721,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBB88));
             }
         }
@@ -719,7 +732,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBB64));
             }
         }
@@ -729,7 +742,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB8D4));
             }
         }
@@ -740,7 +753,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBC58));
             }
         }
@@ -750,7 +763,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB904));
             }
         }
@@ -761,7 +774,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DD2B4));
             }
         }
@@ -771,7 +784,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DD320));
             }
         }
@@ -782,7 +795,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DD5C0));
             }
         }
@@ -793,7 +806,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DD5D0));
             }
         }
@@ -804,7 +817,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBC80));
             }
         }
@@ -815,7 +828,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DB934));
             }
         }
@@ -825,7 +838,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006E18AC));
             }
         }
@@ -836,7 +849,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DD794));
             }
         }
@@ -846,7 +859,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006E18EC));
             }
         }
@@ -855,18 +868,19 @@ namespace SimTelemetry.Game.Rfactor
         
         public double Engine_RPM { set { } get
         {
-            if (rFactor.Simulator.UseMemoryReader)  return Rotations.Rads_RPM(rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base +0x006DBE80)));
-            return rFactor.MMF.Telemetry.Player.EngineRPM; } }
+            //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.EngineRPM;
+            return Rotations.Rads_RPM(rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBE80)));
+             } }
 
 
         public double Engine_RPM_Max_Live { set { } get
         {
-            if (rFactor.Simulator.UseMemoryReader)
+            //if (rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.EngineRPM_Max;
                 return Rotations.Rads_RPM(rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBF08)));
-            return rFactor.MMF.Telemetry.Player.EngineRPM_Max; } }
+             } }
         
         public double Engine_RPM_Max_Scale { set { } get {
-                if (!rFactor.Simulator.UseMemoryReader) return 0;
+                //if (!rFactor.Simulator.UseMemoryReader) return 0;
             return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base +0x006E1B60)); } }
 
         public int Engine_RPM_Max_Step
@@ -874,7 +888,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadByte(new IntPtr(rFactor.Game.Base + 0x006E1B6C));
             }
         }
@@ -885,14 +899,14 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 1000; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 1000; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBEA0));
             }
         }
         
         public double Engine_RPM_Idle_Max { set { } get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 1500;
+                //if (!rFactor.Simulator.UseMemoryReader) return 1500;
             return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base +0x006DBEA8));
         } }
 
@@ -902,7 +916,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 4000; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 4000; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC034));
             }
         }
@@ -912,7 +926,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 5000; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 5000; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC03C));
             }
         }
@@ -923,7 +937,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 1; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 1; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBE98));
             }
         }
@@ -934,7 +948,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (!rFactor.Simulator.UseMemoryReader) return 0; 
+                //if (!rFactor.Simulator.UseMemoryReader) return 0; 
                 return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DBF28));
             }
         }
@@ -1024,16 +1038,18 @@ namespace SimTelemetry.Game.Rfactor
             get
             {
 
-                if (rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9744));
-                return rFactor.MMF.Telemetry.Player.Pedals_Clutch;
+                //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Pedals_Clutch;
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9744));
+                
             }
         }
         
         public double Pedals_Throttle { set { } get
         {
 
-            if (rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base +0x006D96F0)); 
-            return rFactor.MMF.Telemetry.Player.Pedals_Throttle;} }
+            //if (!rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Pedals_Throttle;
+            return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D96F0)); 
+           } }
 
         public double Pedals_Brake
         {
@@ -1041,8 +1057,9 @@ namespace SimTelemetry.Game.Rfactor
             get
             {
 
-                if (rFactor.Simulator.UseMemoryReader)return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D973C));
-                return rFactor.MMF.Telemetry.Player.Pedals_Brake; 
+                //if (rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Pedals_Brake; 
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D973C));
+                
             }
         }
 
@@ -1052,8 +1069,9 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D972C));
-                return rFactor.MMF.Telemetry.Player.Pedals_Steering;
+                //if (rFactor.Simulator.UseMemoryReader) return rFactor.MMF.Telemetry.Player.Pedals_Steering;
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D972C));
+                
             }
         }
 
@@ -1097,7 +1115,10 @@ namespace SimTelemetry.Game.Rfactor
         public double Speed
         {
             set { }
-            get { return rFactor.MMF.Telemetry.Player.Speed; }
+            get
+            {
+                return 0;// return rFactor.MMF.Telemetry.Player.Speed; 
+            }
         }
 
         

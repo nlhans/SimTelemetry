@@ -25,6 +25,7 @@ using LiveTelemetry.Garage;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Plugins;
 
 namespace LiveTelemetry
 {

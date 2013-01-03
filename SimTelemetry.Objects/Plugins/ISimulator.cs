@@ -21,16 +21,10 @@
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
 
-namespace SimTelemetry.Objects
+namespace SimTelemetry.Objects.Plugins
 {
-    public interface ISimulator
+    public interface ISimulator : IPlugin
     {
-        ITelemetry Host { get; set; }
-
-        void Initialize();
-        void Deinitialize();
-
-        string Name { get; }
         string ProcessName { get; }
 
         SimulatorModules Modules { get; }
@@ -40,7 +34,6 @@ namespace SimTelemetry.Objects
         ISession Session { get; }
 
         IGarage Garage { get; }
-
 
         //MemoryPolledReader Memory { get; }
         bool Attached { get; }

@@ -102,6 +102,7 @@ namespace SimTelemetry.Game.Rfactor
                 }
             else
             {
+                /*
                 try
                 {
                     lock (_AllDrivers)
@@ -109,7 +110,7 @@ namespace SimTelemetry.Game.Rfactor
                         if (rFactor.Session.Cars != PrevCars || PrevCars != _AllDrivers.Count)
                         {
                             _AllDrivers.Clear();
-
+                            
                             for (int i = 0; i < rFactor.MMF.Telemetry.Session.Cars; i++)
                             {
                                 _AllDrivers.Add(new DriverGeneral(rFactor.MMF.Drivers[i]));
@@ -134,7 +135,7 @@ namespace SimTelemetry.Game.Rfactor
                 catch (Exception ex)
                 {
 
-                }
+                }*/
             }
         }
 

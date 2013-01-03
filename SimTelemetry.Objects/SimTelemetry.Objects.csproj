@@ -35,6 +35,8 @@
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -47,6 +49,10 @@
     <Compile Include="Game\ISetup.cs" />
     <Compile Include="Game\IWheel.cs" />
     <Compile Include="LambdaComparer.cs" />
+    <Compile Include="Plugins\IExtension.cs" />
+    <Compile Include="Plugins\IPlugin.cs" />
+    <Compile Include="Plugins\IPluginHost.cs" />
+    <Compile Include="Plugins\IWidget.cs" />
     <Compile Include="StringMethods.cs" />
     <Compile Include="Utilities\Polynomial.cs" />
     <Compile Include="Garage\CarEngineTools.cs" />
@@ -72,7 +78,6 @@
     <Compile Include="Logger\TelemetrySample.cs" />
     <Compile Include="Peripherals\Device.cs" />
     <Compile Include="Peripherals\Devices.cs" />
-    <Compile Include="Exceptions.cs" />
     <Compile Include="Game\PowerTrainDrivenWheels.cs" />
     <Compile Include="Peripherals\DashboardPackages.cs" />
     <Compile Include="Peripherals\DashboardPacket.cs" />
@@ -94,7 +99,7 @@
     <Compile Include="Track\TrackRoute.cs" />
     <Compile Include="Track\TrackWaypoint.cs" />
     <Compile Include="ITelemetry.cs" />
-    <Compile Include="ISimulator.cs" />
+    <Compile Include="Plugins\ISimulator.cs" />
     <Compile Include="Game\LevelIndicator.cs" />
     <Compile Include="Logger\Loggable.cs" />
     <Compile Include="Peripherals\IDevice.cs" />

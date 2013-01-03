@@ -788,8 +788,11 @@ namespace SimTelemetry.Game.Rfactor
         public float TyreWear_LF
         {
             set { }
-            get { if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreWear;
-            else if(rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2A34));
+            get
+            {
+                //if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_LF.TyreWear; 
+                if (rFactor.Simulator.UseMemoryReader)
+                    return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2A34));
                 return 0;
             }
         }
@@ -800,8 +803,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreWear;
-                else if(rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2C1C));return 0;
+                //if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_RF.TyreWear;
+                if(rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2C1C));return 0;
             }
         }
 
@@ -811,8 +814,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreWear;
-                else if(rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2E04)); return 0;
+                //if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_LR.TyreWear;
+                if(rFactor.Simulator.UseMemoryReader) return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2E04)); return 0;
             }
         }
 
@@ -822,8 +825,8 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
-                if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreWear;
-                else if(rFactor.Simulator.UseMemoryReader)return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2FEC)); return 0;
+                //if (IsPlayer) return rFactor.MMF.Telemetry.Player.Wheel_RR.TyreWear;
+                if(rFactor.Simulator.UseMemoryReader)return rFactor.Game.ReadFloat(new IntPtr(BaseAddress + 0x2FEC)); return 0;
             }
         }
 

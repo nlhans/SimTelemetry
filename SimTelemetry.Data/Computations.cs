@@ -1,6 +1,7 @@
 ﻿using System;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Garage;
+using SimTelemetry.Objects.Plugins;
 
 namespace SimTelemetry.Data
 {

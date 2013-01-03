@@ -29,10 +29,10 @@ namespace LiveTelemetry
     public partial class ucResizableImage : UserControl
     {
         public string Caption { get; set; }
-        private string imagePath = "";
-        private Bitmap imageBMP;
-        private Size bmpSize;
-        public bool Disabled = false;
+        public bool Disabled;
+        private string _imagePath = "";
+        private Bitmap _imageBMP;
+        private Size _bmpSize;
 
         private ImageAttributes grayscaleAttributes;
 
@@ -40,7 +40,7 @@ namespace LiveTelemetry
         {
             get
             {
-                return bmpSize;
+                return _bmpSize;
             }
         }
 
@@ -50,11 +50,11 @@ namespace LiveTelemetry
             Caption = "";
             InitializeComponent();
 
-            imagePath = image;
+            _imagePath = image;
             if (image.ToLower().EndsWith(".tga"))
-                imageBMP = Paloma.TargaImage.LoadTargaImage(image); // http://www.codeproject.com/Articles/31702/NET-Targa-Image-Reader
+                _imageBMP = Paloma.TargaImage.LoadTargaImage(image); // http://www.codeproject.com/Articles/31702/NET-Targa-Image-Reader
             else
-                imageBMP = (Bitmap)Bitmap.FromFile(image);
+                _imageBMP = (Bitmap)Image.FromFile(image);
 
             SetStyle(
               ControlStyles.AllPaintingInWmPaint |
@@ -64,13 +64,13 @@ namespace LiveTelemetry
 
             //create the grayscale ColorMatrix
             ColorMatrix colorMatrix = new ColorMatrix(
-                new float[][]
+                new[]
                     {
-                        new float[] {.3f, .3f, .3f, 0, 0},
-                        new float[] {.59f, .59f, .59f, 0, 0},
-                        new float[] {.11f, .11f, .11f, 0, 0},
-                        new float[] {0, 0, 0, 1, 0},
-                        new float[] {0, 0, 0, 0, 1}
+                        new[] {0.3f, 0.3f, 0.3f, 0.0f, 0.0f},
+                        new[] {0.59f, 0.59f, 0.59f, 0.0f, 0.0f},
+                        new[] {0.11f, 0.11f, 0.11f, 0.0f, 0.0f},
+                        new[] {0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
+                        new[] {0.0f, 0.0f, 0.0f, 0.0f, 1.0f}
                     });
 
             //create some image attributes
@@ -87,32 +87,32 @@ namespace LiveTelemetry
 
         public void Crop(int w, int h, bool resize)
         {
-            if (imageBMP == null)
+            if (_imageBMP == null)
                 return;
 
-            if (h > imageBMP.Size.Height)
-                h = imageBMP.Size.Height;
+            if (h > _imageBMP.Size.Height)
+                h = _imageBMP.Size.Height;
 
             Size = new Size(w, h);
-            if (w > imageBMP.Size.Width)
-                w = imageBMP.Size.Width;
+            if (w > _imageBMP.Size.Width)
+                w = _imageBMP.Size.Width;
             
-            bmpSize = new Size(w, h);
+            _bmpSize = new Size(w, h);
             
-            if (w < imageBMP.Size.Height)
+            if (w < _imageBMP.Size.Height)
             {
-                bmpSize = new Size(h * imageBMP.Size.Width / imageBMP.Size.Height, h);
+                _bmpSize = new Size(h * _imageBMP.Size.Width / _imageBMP.Size.Height, h);
             }
             
-            if (imageBMP.Size.Width > w || w < imageBMP.Size.Width)
+            if (_imageBMP.Size.Width > w || w < _imageBMP.Size.Width)
             {
-                bmpSize = new Size(w, w * imageBMP.Size.Height / imageBMP.Size.Width);
+                _bmpSize = new Size(w, w * _imageBMP.Size.Height / _imageBMP.Size.Width);
             }
             
-            if (this.bmpSize.Height > h)
+            if (this._bmpSize.Height > h)
             {
                 // back to original..
-                bmpSize = new Size(h * imageBMP.Size.Width / imageBMP.Size.Height, h);
+                _bmpSize = new Size(h * _imageBMP.Size.Width / _imageBMP.Size.Height, h);
             }
 
             if (resize)
@@ -124,19 +124,19 @@ namespace LiveTelemetry
 
         protected override void OnResize(EventArgs e)
         {
-            if (this.bmpSize.Width == 0)
+            if (_bmpSize.Width == 0)
             {
-                Crop(this.Size.Width, this.Size.Height, false);
+                Crop(Size.Width, Size.Height, false);
             }
-            Bitmap b = new Bitmap(this.Size.Width, this.Size.Height);
-            Graphics g = Graphics.FromImage((Image)b);
+            var bitmapObject = new Bitmap(Size.Width, Size.Height);
+            var graphicsObject = Graphics.FromImage(bitmapObject);
 
-            Rectangle s = new Rectangle((this.Width - bmpSize.Width)/2, (this.Height - bmpSize.Height)/2,
-                                        this.bmpSize.Width, this.bmpSize.Height);
-            g.DrawImage(imageBMP, (this.Width - bmpSize.Width) / 2, (this.Height - bmpSize.Height) / 2, this.bmpSize.Width, this.bmpSize.Height);
-            g.DrawString(Caption, new Font("Tahoma", 10.0f, FontStyle.Underline), Brushes.White, 5, this.Height-15);
-            g.Dispose();
-            this.BackgroundImage = (Image)b;
+            var sizeRect = new Rectangle((Width - _bmpSize.Width)/2, (Height - _bmpSize.Height)/2,
+                                        _bmpSize.Width, _bmpSize.Height);
+            graphicsObject.DrawImage(_imageBMP, (Width - _bmpSize.Width) / 2, (Height - _bmpSize.Height) / 2, _bmpSize.Width, _bmpSize.Height);
+            graphicsObject.DrawString(Caption, new Font("Tahoma", 10.0f, FontStyle.Underline), Brushes.White, 5, Height-15);
+            graphicsObject.Dispose();
+            BackgroundImage = bitmapObject;
             if (e != null) base.OnResize(e);
         }
 

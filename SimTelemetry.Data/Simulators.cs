@@ -23,21 +23,20 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Timers;
 using SimTelemetry.Game.Network;
 using SimTelemetry.Objects;
-using Triton;
+using SimTelemetry.Objects.Plugins;
 
 namespace SimTelemetry.Data
 {
     public sealed class Simulators
     {
 
-        DirectoryCatalog catalog = new DirectoryCatalog("simulators/", "SimTelemetry.Game.*.dll");
+        public int Count
+        {
+            get { return _Sims.Count; }
+        }
 
         /// <summary>
         /// List of simulator objects available in catalog. Searches for objects implementing ISimulator.
@@ -81,8 +80,9 @@ namespace SimTelemetry.Data
         {
             try
             {
+                var catalog = new DirectoryCatalog(Telemetry.m.binaryDirectory + "simulators/", "SimTelemetry.Game.*.dll");
                 catalog.Refresh();
-                CompositionContainer container = new CompositionContainer(catalog);
+                var container = new CompositionContainer(catalog);
                 container.ComposeParts(this);
 
                 foreach (ISimulator sim in Sims)
