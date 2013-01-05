@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Tests", "SimTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Core", "SimTelemetry.Core\SimTelemetry.Core.csproj", "{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Plugins.Tests", "SimTelemetry.Plugins.Tests\SimTelemetry.Plugins.Tests.csproj", "{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,16 @@ Global
 		{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

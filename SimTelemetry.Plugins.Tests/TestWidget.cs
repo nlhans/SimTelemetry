@@ -2,8 +2,10 @@
 using System.ComponentModel.Composition;
 using System.Drawing;
 using System.Windows.Forms;
+using SimTelemetry.Core;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Plugins;
+using SimTelemetry.Tests.Events;
 
 namespace SimTelemetry.Game.Tests
 {
@@ -11,6 +13,11 @@ namespace SimTelemetry.Game.Tests
     public class TestWidget : IWidget
     {
         public ITelemetry Host { get; set; }
+
+        public TestWidget()
+        {
+            GlobalEvents.Fire(new PluginTestWidgetConstructor(), false);
+        }
 
         public string PluginId
         {

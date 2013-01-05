@@ -18,6 +18,9 @@ namespace SimTelemetry.Core.Plugins
         /// </summary>
         public string PluginDirectory { get; set; }
 
+        protected DirectoryCatalog PluginCatalog { get; set; }
+        protected CompositionContainer PluginContainer { get; set; }
+
         #region Imported objects
         /// <summary>
         /// List of simulator objects available in catalog. Searches for objects implementing ISimulator.
@@ -62,11 +65,11 @@ namespace SimTelemetry.Core.Plugins
             // Try to refresh DLL's from the plugin directory:
             try
             {
-                var catalog = new DirectoryCatalog(PluginDirectory, "SimTelemetry.Plugins.*.dll");
-                catalog.Refresh();
+                PluginCatalog = new DirectoryCatalog(PluginDirectory, "SimTelemetry.Plugins.*.dll");
+                PluginCatalog.Refresh();
 
-                var container = new CompositionContainer(catalog);
-                container.ComposeParts(this);
+               PluginContainer = new CompositionContainer(PluginCatalog);
+               PluginContainer.ComposeParts(this);
             }
             catch (ReflectionTypeLoadException ex)
             {
@@ -163,6 +166,9 @@ namespace SimTelemetry.Core.Plugins
 
         public void Unload()
         {
+            if (Simulators == null)
+                return;
+
             foreach (var sim in Simulators)
             {
                 try

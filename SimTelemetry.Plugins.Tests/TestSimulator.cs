@@ -1,10 +1,13 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using SimTelemetry.Core;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Game;
 using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Plugins;
+using SimTelemetry.Tests.Events;
+
 namespace SimTelemetry.Game.Tests
 {
     [Export(typeof(ISimulator))]
@@ -35,6 +38,11 @@ namespace SimTelemetry.Game.Tests
         public string Description
         {
             get { throw new NotImplementedException(); }
+        }
+
+        public TestSimulator()
+        {
+            GlobalEvents.Fire(new PluginTestSimulatorConstructor(), false);
         }
 
         public void Initialize()
