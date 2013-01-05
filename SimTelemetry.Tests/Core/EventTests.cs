@@ -34,8 +34,8 @@ namespace SimTelemetry.Tests.Core
 
         public void Dispose()
         {
-            Events.Reset();
-            Assert.AreEqual(0, Events.Count);
+            GlobalEvents.Reset();
+            Assert.AreEqual(0, GlobalEvents.Count);
         }
 
         private int _event1HandleCount;
@@ -54,50 +54,50 @@ namespace SimTelemetry.Tests.Core
         }
         
         [Test]
-        public void SimpleEventTester()
+        public void Events()
         {
             Initialize();
-            Assert.AreEqual(0, Events.Count);
+            Assert.AreEqual(0, GlobalEvents.Count);
 
             // Add two simple events:
-            Events.Hook<TestEvent1Handler>(handleEvent1, true);
-            Events.Hook<TestEvent2Handler>(handleEvent2, false);
+            GlobalEvents.Hook<TestEvent1Handler>(handleEvent1, true);
+            GlobalEvents.Hook<TestEvent2Handler>(handleEvent2, false);
 
-            Assert.AreEqual(2, Events.Count);
+            Assert.AreEqual(2, GlobalEvents.Count);
 
             // Cannot handle 1 event twice, even though network listening is different:7
-            Events.Hook<TestEvent2Handler>(handleEvent2, true);
-            Assert.AreEqual(2, Events.Count);
+            GlobalEvents.Hook<TestEvent2Handler>(handleEvent2, true);
+            Assert.AreEqual(2, GlobalEvents.Count);
 
             // Fire event 1 for network:
-            Events.Fire(new TestEvent1Handler("Hello event 1"), true);
+            GlobalEvents.Fire(new TestEvent1Handler("Hello event 1"), true);
             Assert.AreEqual(1, _event1HandleCount);
 
             // Fire event 2 for network:
-            Events.Fire(new TestEvent2Handler("Hello event 2"), true);
+            GlobalEvents.Fire(new TestEvent2Handler("Hello event 2"), true);
             Assert.AreEqual(1, _event2HandleCount);
 
             // Fire event 1 for local:
-            Events.Fire(new TestEvent1Handler("Hello event 1"), false);
+            GlobalEvents.Fire(new TestEvent1Handler("Hello event 1"), false);
             Assert.AreEqual(1, _event1HandleCount);
 
             // Fire event 2 for local:
-            Events.Fire(new TestEvent2Handler("Hello event 2"), false);
+            GlobalEvents.Fire(new TestEvent2Handler("Hello event 2"), false);
             Assert.AreEqual(2, _event2HandleCount);
 
             // Unhook
-            Events.Unhook<TestEvent1Handler>(handleEvent1);
-            Events.Unhook<TestEvent2Handler>(handleEvent2);
+            GlobalEvents.Unhook<TestEvent1Handler>(handleEvent1);
+            GlobalEvents.Unhook<TestEvent2Handler>(handleEvent2);
 
             // Count
-            Assert.AreEqual(0, Events.Count);
+            Assert.AreEqual(0, GlobalEvents.Count);
 
             // Fire event 1 for network, must remain unchanged
-            Events.Fire(new TestEvent1Handler("Hello event 1"), true);
+            GlobalEvents.Fire(new TestEvent1Handler("Hello event 1"), true);
             Assert.AreEqual(1, _event1HandleCount);
 
             // Fire event 2 for network, must remain unchanged
-            Events.Fire(new TestEvent2Handler("Hello event 2"), true);
+            GlobalEvents.Fire(new TestEvent2Handler("Hello event 2"), true);
             Assert.AreEqual(2, _event2HandleCount);
         }
     }

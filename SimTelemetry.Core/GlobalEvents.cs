@@ -4,19 +4,13 @@ using System.Linq;
 
 namespace SimTelemetry.Core
 {
-    public class EventDelegate
+    public class GlobalEvents
     {
-        public Delegate Action { get; set; }
-        public bool Network { get; set; }
-    }
-
-    public class Events
-    {
-        private static List<EventDelegate> _handlers = new List<EventDelegate>();
+        private static List<GlobalEventDelegate> _handlers = new List<GlobalEventDelegate>();
 
 #if DEBUG
         public static int Count { get { return _handlers.Count; } }
-        public static IEnumerable<EventDelegate> List { get { return _handlers; } }
+        public static IEnumerable<GlobalEventDelegate> List { get { return _handlers; } }
         // For testing only:
         public static void Reset()
         {
@@ -38,7 +32,7 @@ namespace SimTelemetry.Core
         {
             // Allow multiple inclusion??
             if (_handlers.Select(x => x.Action).Contains(handler) == false)
-                _handlers.Add(new EventDelegate { Action = handler, Network = includeNetwork });
+                _handlers.Add(new GlobalEventDelegate { Action = handler, Network = includeNetwork });
         }
 
 
@@ -53,9 +47,9 @@ namespace SimTelemetry.Core
         public static void Fire<T>(T Data, bool includeNetwork)
         {
             foreach (var handler in _handlers
-                    .Where(x => includeNetwork || !x.Network)
-                    .Select(x => x.Action)
-                    .OfType<Action<T>>())
+                .Where(x => includeNetwork || !x.Network)
+                .Select(x => x.Action)
+                .OfType<Action<T>>())
             {
                 handler(Data);
             }

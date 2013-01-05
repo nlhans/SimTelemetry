@@ -1,20 +1,20 @@
 ﻿using System;
 
-namespace SimTelemetry.Domain.Events
+namespace SimTelemetry.Core.Events
 {
-    public class DebugWarningException
+    public class DebugWarning
     {
         public string Message { get; protected set; }
         public Exception Exception { get; protected set; }
         public string StackTrace { get; protected set; }
 
-        public DebugWarningException(string message, Exception ex)
+        public DebugWarning(string message, Exception ex)
         {
             Message = message;
             Exception = ex;
         }
 
-        public DebugWarningException(string message, Exception ex, string stackTrace)
+        public DebugWarning(string message, Exception ex, string stackTrace)
             : this(message, ex)
         {
             StackTrace = stackTrace;

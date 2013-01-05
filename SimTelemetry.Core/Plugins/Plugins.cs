@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using SimTelemetry.Core.Events;
 using SimTelemetry.Core.Exceptions;
-using SimTelemetry.Domain.Events;
 using SimTelemetry.Objects.Plugins;
 
 namespace SimTelemetry.Core.Plugins
@@ -22,45 +23,62 @@ namespace SimTelemetry.Core.Plugins
         /// List of simulator objects available in catalog. Searches for objects implementing ISimulator.
         /// </summary>
         [ImportMany(typeof(ISimulator))]
-        public IEnumerable<ISimulator> Simulators { get; protected set; }
+        public IList<ISimulator> Simulators { get; protected set; }
 
         /// <summary>
         /// List of graphic interface plug-ins.
         /// </summary>
         [ImportMany(typeof(IWidget))]
-        public IEnumerable<IWidget> Widgets { get; protected set; }
+        public IList<IWidget> Widgets { get; protected set; }
 
         /// <summary>
         /// List of 'extension' objects; these can access simulator data and handle it for e.g. hardware devices.
         /// </summary>
         [ImportMany(typeof(IExtension))]
-        public IEnumerable<IExtension> Extensions { get; protected set; }
+        public IList<IExtension> Extensions { get; protected set; }
         #endregion
-
-        public Plugins()
-        {
-            //
-            
-        }
 
         public void Load()
         {
+            // Check if environmental settings are correct:
             if (!Directory.Exists(PluginDirectory))
+            {
                 throw new PluginHostException("Could not find plug-in directory!");
+            }
 
+            if (Simulators != null || Widgets != null || Extensions != null)
+            {
+                throw new PluginHostException("Can only load plug-ins from a clean set of lists.");
+            }
+
+            var simulatorsToDrop = new List<ISimulator>();
+            var widgetsToDrop = new List<IWidget>();
+            var extensionsToDrop = new List<IExtension>();
+
+            Simulators = new List<ISimulator>();
+            Widgets = new List<IWidget>();
+            Extensions = new List<IExtension>();
+
+            // Try to refresh DLL's from the plugin directory:
             try
             {
-                var catalog = new DirectoryCatalog(PluginDirectory, "SimTelemetry.Game.*.dll");
+                var catalog = new DirectoryCatalog(PluginDirectory, "SimTelemetry.Plugins.*.dll");
                 catalog.Refresh();
 
                 var container = new CompositionContainer(catalog);
                 container.ComposeParts(this);
-
             }
             catch (ReflectionTypeLoadException ex)
             {
                 foreach (var exc in ex.LoaderExceptions)
-                    Events.Fire(new DebugWarningException("Error whilst importing plugin namespaces; the following type couldn't be loaded correctly.", exc), false);
+                    GlobalEvents.Fire(new DebugWarning("Error whilst importing plugin namespaces; the following type couldn't be loaded correctly.", exc), false);
+                throw new PluginHostException("Could not initialize plug-ins!", ex);
+            }
+            catch (CompositionException ex)
+            {
+                foreach (var exc in ex.Errors)
+                    GlobalEvents.Fire(new DebugWarning("Error whilst importing plugin namespaces; the following type couldn't be loaded correctly.", exc.Exception), false);
+                throw new PluginHostException("Could not initialize plug-ins!", ex);
             }
             catch (Exception ex)
             {
@@ -79,18 +97,114 @@ namespace SimTelemetry.Core.Plugins
             {
                 throw new PluginHostException("Extensions aren't properly initialized");
             }
+            // Initialize all plug-ins
+            foreach (var sim in Simulators)
+            {
+                string simName = "??";
+                try
+                {
+                    simName = sim.Name;
+                    sim.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    simulatorsToDrop.Add(sim);
+                    GlobalEvents.Fire(new DebugWarning("Unloading simulator plugin '" + simName + "' (assembly " + ex.Source + "), exception was thrown during initialize()", ex), false);
+                }
+            }
+            Simulators = Simulators.Where(x => !simulatorsToDrop.Contains(x)).ToList();
 
-            // 'Initialize' all plug-ins
-            foreach (var sim in Simulators) sim.Initialize();
-            foreach (var widget in Widgets) widget.Initialize();
-            foreach (var ext in Extensions) ext.Initialize();
+            foreach (var widget in Widgets)
+            {
+                string widgetName = "??";
+                try
+                {
+                    widgetName = widget.Name;
+                    widget.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    widgetsToDrop.Add(widget);
+                    GlobalEvents.Fire(new DebugWarning("Unloading widget plugin '" + widgetName + "' (assembly " + ex.Source+ "), exception was thrown during initialize()", ex), false);
+                }
+            }
+            Widgets = Widgets.Where(x => !widgetsToDrop.Contains(x)).ToList();
+
+            foreach (var ext in Extensions)
+            {
+                string extName = "??";
+                try
+                {
+                    extName = ext.Name;
+                    ext.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    extensionsToDrop.Add(ext);
+                    GlobalEvents.Fire(new DebugWarning("Unloading extension plugin '" + extName + "' (assembly " + ex.Source + "), exception was thrown during initialize()", ex), false);
+                }
+            }
+            Extensions = Extensions.Where(x => !extensionsToDrop.Contains(x)).ToList();
+
+            // Fire PluginsLoaded event
+            var loadEvent = new PluginsLoaded
+                                {
+                                    Simulators = Simulators,
+                                    Widgets = Widgets,
+                                    Extensions = Extensions,
+                                    FailedSimulators = simulatorsToDrop,
+                                    FailedWidgets = widgetsToDrop,
+                                    FailedExtensions = extensionsToDrop
+                                };
+
+            GlobalEvents.Fire(loadEvent, true);
         }
+
 
         public void Unload()
         {
-            foreach (var sim in Simulators) sim.Deinitialize();
-            foreach (var widget in Widgets) widget.Deinitialize();
-            foreach (var ext in Extensions) ext.Deinitialize();
+            foreach (var sim in Simulators)
+            {
+                try
+                {
+                    sim.Deinitialize();
+                }
+                catch (Exception ex)
+                {
+                    GlobalEvents.Fire(
+                        new DebugWarning(
+                            "Unloading simulator plugin '" + sim.Name + "' (assembly " + ex.Source +
+                            ") failed; exception was thrown during deinitialize()", ex), false);
+                }
+            }
+            foreach (var widget in Widgets)
+            {
+                try
+                {
+                    widget.Deinitialize();
+                }
+                catch (Exception ex)
+                {
+                    GlobalEvents.Fire(
+                        new DebugWarning(
+                            "Unloading widget plugin '" + widget.Name + "' (assembly " + ex.Source +
+                            ") failed; exception was thrown during deinitialize()", ex), false);
+                }
+            }
+            foreach (var ext in Extensions)
+            {
+                try
+                {
+                    ext.Deinitialize();
+                }
+                catch (Exception ex)
+                {
+                    GlobalEvents.Fire(
+                        new DebugWarning(
+                            "Unloading extension plugin '" + ext.Name + "' (assembly " + ex.Source +
+                            ") failed; exception was thrown during deinitialize()", ex), false);
+                }
+            }
 
             Simulators = null;
             Widgets = null;
@@ -101,6 +215,7 @@ namespace SimTelemetry.Core.Plugins
         public void Dispose()
         {
             PluginDirectory = string.Empty;
+            Unload();
 
         }
     }
