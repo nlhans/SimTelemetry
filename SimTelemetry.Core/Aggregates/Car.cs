@@ -9,12 +9,12 @@ namespace SimTelemetry.Core.Aggregates
 {
     public class Car : IEntity, IEquatable<Car>
     {
-
         private IList<string> _carClass = new List<string>();
         private IList<Wheel> _wheels = new List<Wheel>();
         private IList<Brake> _brakes = new List<Brake>();
 
         public int ID { get; private set; }
+        public string File { get; private set; }
         public string Name { get; private set; }
         public string Driver { get; private set; }
         public string Description { get; private set; }
@@ -31,9 +31,10 @@ namespace SimTelemetry.Core.Aggregates
 
         public bool Equals(Car other) { return other.ID == ID; }
 
-        public Car(int id, string name, string driver, string description, int startNumber)
+        public Car(int id, string file, string name, string driver, string description, int startNumber)
         {
             ID = id;
+            File = file;
             Name = name;
             Driver = driver;
             Description = description;
@@ -70,7 +71,7 @@ namespace SimTelemetry.Core.Aggregates
             if (this.Wheels.Any(x => x.Location == wheel.Location) == false)
             {
                 this._wheels.Add(wheel);
-                this._wheels.OrderBy(x => x.Location);
+                this._wheels = this._wheels.OrderBy(x => x.Location).ToList();
             }
             else
             {
@@ -83,7 +84,7 @@ namespace SimTelemetry.Core.Aggregates
             if (this.Brakes.Any(x => x.Location == brake.Location) == false)
             {
                 this._brakes.Add(brake);
-                this._brakes.OrderBy(x => x.Location);
+                this._brakes = this._brakes.OrderBy(x => x.Location).ToList();
             }
             else
             {

@@ -4,7 +4,7 @@ using SimTelemetry.Core.Entities;
 
 namespace SimTelemetry.Core.Aggregates
 {
-    public class Simulator
+    public abstract class Simulator
     {
         public string Name { get; private set; }
         public string ProcessName { get; private set; }

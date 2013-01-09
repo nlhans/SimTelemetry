@@ -1,36 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using SimTelemetry.Core.Common;
 
 namespace SimTelemetry.Core.ValueObjects
 {
-    public class Polynomial
+    public class Polynomial : IValueObject<Polynomial>
     {
-        public List<double> Factors { get; private set; }
+        public IList<double> Factors { get; private set; }
 
-        public Polynomial(List<double> factors)
+        public Polynomial(IEnumerable<double> factors)
         {
-            Factors = factors;
+            Factors = new List<double>(factors);
         }
 
         public Polynomial(double order0)
         {
-            Factors = new List<double>();
-            Factors.Add(order0);
+            Factors = new List<double> {order0};
         }
 
         public Polynomial(double order0, double order1)
         {
-            Factors = new List<double>();
-            Factors.Add(order0);
-            Factors.Add(order1);
+            Factors = new List<double> {order0, order1};
         }
 
         public Polynomial(double order0, double order1, double order2)
         {
-            Factors = new List<double>();
-            Factors.Add(order0);
-            Factors.Add(order1);
-            Factors.Add(order2);
+            Factors = new List<double> {order0, order1, order2};
         }
 
         public double Get(double x)
@@ -42,6 +37,25 @@ namespace SimTelemetry.Core.ValueObjects
                 r += Math.Pow(x, exponent++) * c;
 
             return r;
+        }
+
+        public bool Equals(Polynomial other)
+        {
+            if (Factors.Count == other.Factors.Count)
+            {
+                for (int i = 0; i < Factors.Count; i++)
+                {
+                    if (Factors[i] != other.Factors[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

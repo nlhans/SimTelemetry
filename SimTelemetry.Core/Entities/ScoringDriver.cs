@@ -9,9 +9,9 @@ using SimTelemetry.Core.ValueObjects;
 
 namespace SimTelemetry.Core.Entities
 {
-    public class LiveScoringDriver : IEquatable<LiveScoringDriver>
+    public class ScoringDriver : IEquatable<ScoringDriver>
     {
-        private readonly IList<Lap> _lapTimes = new List<Lap>();
+        private IList<Lap> _lapTimes = new List<Lap>();
         private IList<double> _driverSplits = new List<double>();
         private IList<double> _trackSpeeds = new List<double>();
         private IList<double> _trackTimes = new List<double>();
@@ -36,7 +36,7 @@ namespace SimTelemetry.Core.Entities
         public IEnumerable<double> TrackSpeeds { get { return _trackSpeeds; } }
         public IEnumerable<double> TrackTimes { get { return _trackTimes; } }
 
-        public LiveScoringDriver(TelemetryDriver driver)
+        public ScoringDriver(TelemetryDriver driver)
         {
             Driver = driver;
         }
@@ -66,7 +66,7 @@ namespace SimTelemetry.Core.Entities
                 throw new LapWasAlreadyAddedException();
 
             _lapTimes.Add(lap);
-            _lapTimes.OrderBy(x => lap.LapNumber);
+            _lapTimes = _lapTimes.OrderBy(x => lap.LapNumber).ToList();
 
             // TODO: How fast does this run?
             LastLapTime = _lapTimes.Where(x => x.LapNumber == _lapTimes.Max(y => y.LapNumber)).FirstOrDefault().Total;
@@ -94,7 +94,7 @@ namespace SimTelemetry.Core.Entities
         }
 
 
-        public bool Equals(LiveScoringDriver other)
+        public bool Equals(ScoringDriver other)
         {
             return Driver.Equals(other.Driver);
         }

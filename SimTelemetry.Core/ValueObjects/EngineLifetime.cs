@@ -1,6 +1,9 @@
-﻿namespace SimTelemetry.Core.ValueObjects
+﻿using System;
+using SimTelemetry.Core.Common;
+
+namespace SimTelemetry.Core.ValueObjects
 {
-    public class EngineLifetime
+    public class EngineLifetime : IValueObject<EngineLifetime>
     {
         public int Time { get; private set; }
 
@@ -14,6 +17,12 @@
             EngineRpm = engineRpm;
             OilTemperature = oilTemperature;
             WaterTemperature = waterTemperature;
+        }
+
+        public bool Equals(EngineLifetime other)
+        {
+            return other.Time == Time && EngineRpm.Equals(other.EngineRpm) &&
+                   OilTemperature.Equals(other.OilTemperature) && WaterTemperature.Equals(WaterTemperature);
         }
     }
 }

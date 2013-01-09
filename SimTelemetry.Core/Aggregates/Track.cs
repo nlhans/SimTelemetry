@@ -19,6 +19,11 @@ namespace SimTelemetry.Core.Aggregates
         public float LaprecordRace { get; private set; }
         public float LaprecordQualify { get; private set; }
 
+        public float TrackCoordinateMinX { get; private set; }
+        public float TrackCoordinateMaxX { get; private set; }
+        public float TrackCoordinateMinY { get; private set; }
+        public float TrackCoordinateMaxY { get; private set; }
+
         public IEnumerable<TrackPoint> Route { get; private set; }
         public IEnumerable<TrackPoint> Pits { get; private set; }
         public IEnumerable<TrackPoint> Grid { get; private set; }
@@ -29,35 +34,62 @@ namespace SimTelemetry.Core.Aggregates
         public bool Equals(Track other) { return other.ID == ID; }
 
         /********* INITIAL DATA *********/
-        public Track(int id, string file, string name, string location, double length, float laprecordRace, float laprecordQualify)
+        public Track()
+        {
+            TrackCoordinateMinX = float.MaxValue;
+            TrackCoordinateMaxX = float.MinValue;
+            TrackCoordinateMinY = float.MaxValue;
+            TrackCoordinateMaxY = float.MinValue;
+        }
+
+        public Track(int id, string file, string name, string location, float laprecordRace, float laprecordQualify) : this()
         {
             ID = id;
             File = file;
             Name = name;
             Location = location;
-            Length = length;
             LaprecordRace = laprecordRace;
             LaprecordQualify = laprecordQualify;
         }
 
         /********* TRACK ROUTE *********/
+        private void UpdateTrackCoordinates(IEnumerable<TrackPoint> points)
+        {
+            TrackCoordinateMinX = Math.Max(points.Min(x => x.X), TrackCoordinateMinX);
+            TrackCoordinateMaxX = Math.Max(points.Max(x => x.X), TrackCoordinateMaxX);
+
+            TrackCoordinateMinY = Math.Max(points.Min(x => x.Y), TrackCoordinateMinY);
+            TrackCoordinateMaxY = Math.Max(points.Max(x => x.Y), TrackCoordinateMaxY);
+        }
+
         public void SetRoute(IList<TrackPoint> route)
         {
-            Route = route.OrderBy(x => x.Meter).Where(x => x.Type == TrackPointType.SECTOR1
-                                                           || x.Type == TrackPointType.SECTOR2
-                                                           || x.Type == TrackPointType.SECTOR3);
+            Route = route.Where(x => x.Type == TrackPointType.SECTOR1
+                                     || x.Type == TrackPointType.SECTOR2
+                                     || x.Type == TrackPointType.SECTOR3)
+                .OrderBy(x => x.Meter);
+
+            Length = route.Max(x => x.Meter) - route.Min(x => x.Meter);
+
+            UpdateTrackCoordinates(Route);
 
         }
 
         public void SetPits(IList<TrackPoint> route)
         {
-            Pits = route.OrderBy(x => x.Meter).Where(x => x.Type == TrackPointType.PITS);
+            Pits = route.Where(x => x.Type == TrackPointType.PITS)
+                .OrderBy(x => x.Meter);
+
+            UpdateTrackCoordinates(Pits);
 
         }
 
         public void SetGrid(IList<TrackPoint> route)
         {
-            Grid = route.OrderBy(x => x.Meter).Where(x => x.Type == TrackPointType.GRID);
+            Grid = route.Where(x => x.Type == TrackPointType.GRID)
+                .OrderBy(x => x.Meter);
+
+            // Grid is always located 'on' the route array.
 
         }
 

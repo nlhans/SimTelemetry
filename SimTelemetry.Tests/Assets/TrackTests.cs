@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using SimTelemetry.Core.Assets;
+using SimTelemetry.Core.Enumerations;
+using SimTelemetry.Core.ValueObjects;
 using SimTelemetry.Objects.Garage;
 
 namespace SimTelemetry.Tests.Assets
@@ -14,38 +16,29 @@ namespace SimTelemetry.Tests.Assets
     {
         private string Name = "Test Track";
         private ITrack GarageObject = (ITrack)null;
-        private List<TrackDataPoint> Route = new List<TrackDataPoint>();
+        private List<TrackPoint> Route = new List<TrackPoint>();
 
         private static TrackData track;
 
         [SetUp]
         public void CreateTrackData()
         {
-            Route = new List<TrackDataPoint>();
+            Route = new List<TrackPoint>(new []
+                                             {
+                                                 new TrackPoint(0.0f, TrackPointType.SECTOR1, -1.0f, -1.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(10.0f, TrackPointType.SECTOR1, 0.0f, -1.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(20.0f, TrackPointType.SECTOR1, 0.0f, 0.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(30.0f, TrackPointType.SECTOR2, 1.0f, 0.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(40.0f, TrackPointType.SECTOR2, 1.0f, 1.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(50.0f, TrackPointType.SECTOR3, 0.0f, 1.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(60.0f, TrackPointType.SECTOR3, -1.0f, 1.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(70.0f, TrackPointType.SECTOR3, -1.0f, 0.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(5.0f, TrackPointType.PITS, -1.5f, -1.0f, 0.0f, new double[0], new double[0]),
+                                                 new TrackPoint(15.0f, TrackPointType.PITS, -1.5f, -2.0f, 0.0f, new double[0], new double[0]),
+                                             });
 
-            var point1 = new TrackDataPoint { Meter = 0, X = -1, Y = -1, Width = 10, Sector = TrackSector.SECTOR1 };
-            var point2 = new TrackDataPoint { Meter = 10, X = 0, Y = -1, Width = 10, Sector = TrackSector.SECTOR1 };
-            var point3 = new TrackDataPoint { Meter = 20, X = 1, Y = -1, Width = 10, Sector = TrackSector.SECTOR1 };
-            var point4 = new TrackDataPoint { Meter = 30, X = 1, Y = 0, Width = 10, Sector = TrackSector.SECTOR2 };
-            var point5 = new TrackDataPoint { Meter = 40, X = 0, Y = 0, Width = 10, Sector = TrackSector.SECTOR2 };
-            var point6 = new TrackDataPoint { Meter = 50, X = 0, Y = 1, Width = 10, Sector = TrackSector.SECTOR2 };
-            var point7 = new TrackDataPoint { Meter = 60, X = -1, Y = 1, Width = 10, Sector = TrackSector.SECTOR3 };
-            var point8 = new TrackDataPoint { Meter = 70, X = -1, Y = 0, Width = 10, Sector = TrackSector.SECTOR3 };
-            var pits1 = new TrackDataPoint { Meter = -5, X = -1, Y = -1.5, Width = 10, Sector = TrackSector.PITS };
-            var pits2 = new TrackDataPoint { Meter = 75, X = 0, Y = -1.5, Width = 10, Sector = TrackSector.PITS };
 
-            Route.Add(point1);
-            Route.Add(point2);
-            Route.Add(point3);
-            Route.Add(point4);
-            Route.Add(point5);
-            Route.Add(point6);
-            Route.Add(point7);
-            Route.Add(point8);
-            Route.Add(pits1);
-            Route.Add(pits2);
-
-            track = new TrackData(Name, GarageObject, new List<TrackDataPoint>(Route));
+            track = new TrackData(Name, GarageObject, new List<TrackPoint>(Route));
 
             Assert.AreEqual(2, track.Pits.ToList().Count);
             Assert.AreEqual(8, track.Track.ToList().Count);

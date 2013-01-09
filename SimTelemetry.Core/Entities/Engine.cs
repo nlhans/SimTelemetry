@@ -18,9 +18,9 @@ namespace SimTelemetry.Core.Entities
         public IEnumerable<EngineMode> Modes { get; private set; }
         public IEnumerable<EngineTorque> TorqueCurve { get; private set; }
 
-        public EngineLifetime Lifetime;
+        public EngineLifetime Lifetime { get; private set; }
 
-        public Engine(EngineLifetime lifetime, string name, string manufacturer, int cilinders, int displacement, Range idleRpm, Range maximumRpm, IEnumerable<EngineMode> modes, IEnumerable<EngineTorque> torqueCurve)
+        public Engine(string name, string manufacturer, int cilinders, int displacement, Range idleRpm, Range maximumRpm, IEnumerable<EngineMode> modes, IEnumerable<EngineTorque> torqueCurve, EngineLifetime lifetime)
         {
             Lifetime = lifetime;
             Name = name;

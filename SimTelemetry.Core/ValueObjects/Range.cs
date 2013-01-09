@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SimTelemetry.Core.Common;
 
 namespace SimTelemetry.Core.ValueObjects
 {
-    public class Range
+    public class Range : IValueObject<Range>
     {
         public float Minimum { get; private set; }
         public float Optimum { get; private set; }
@@ -13,13 +10,51 @@ namespace SimTelemetry.Core.ValueObjects
         public float Step { get; private set; }
         public float Deviation { get; private set; }
 
-        public Range(float minimum, float optimum, float maximum, float step, float dev)
+        public Range()
+        {
+            Minimum = -1;
+            Maximum = -1;
+            Step = -1;
+            Optimum = -1;
+            Deviation = -1;
+        }
+
+        public Range(float minimum, float maximum) : this()
+        {
+            Minimum = minimum;
+            Maximum = maximum;
+
+        }
+
+        public Range(float minimum, float maximum, float optimum)
+            : this()
+        {
+            Minimum = minimum;
+            Maximum = maximum;
+            Optimum = optimum;
+        }
+
+        public Range(float minimum, float maximum, float optimum, float deviation)
+            : this()
+        {
+            Minimum = minimum;
+            Maximum = maximum;
+            Optimum = optimum;
+            Deviation = deviation;
+        }
+
+        public Range(float minimum, float maximum, float optimum, float dev, float step)
         {
             Minimum = minimum;
             Optimum = optimum;
             Maximum = maximum;
             Step = step;
             Deviation = dev;
+        }
+
+        public bool Equals(Range other)
+        {
+            return other.Minimum == Minimum && other.Maximum == Maximum && other.Optimum == Optimum;
         }
     }
 }

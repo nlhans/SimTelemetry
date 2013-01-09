@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using SimTelemetry.Core.Enumerations;
+using SimTelemetry.Core.ValueObjects;
 using SimTelemetry.Objects.Garage;
 
 namespace SimTelemetry.Core.Assets
@@ -11,27 +13,27 @@ namespace SimTelemetry.Core.Assets
         public double Length { get; set; }
 
         public ITrack GarageObject;
-        
-        public List<TrackDataPoint> Waypoints { get; set; }
+
+        public List<TrackPoint> Waypoints { get; set; }
         public RectangleF Bounds { get; set; }
 
-        public IEnumerable<TrackDataPoint> Track { get { return Waypoints.Where(x => x.Sector != TrackSector.PITS); } }
-        public IEnumerable<TrackDataPoint> Pits { get { return Waypoints.Where(x => x.Sector == TrackSector.PITS); } }
+        public IEnumerable<TrackPoint> Track { get { return Waypoints.Where(x => x.Type != TrackPointType.PITS); } }
+        public IEnumerable<TrackPoint> Pits { get { return Waypoints.Where(x => x.Type == TrackPointType.PITS); } }
 
-        public TrackData(string name, ITrack garageObject, List<TrackDataPoint> route)
+        public TrackData(string name, ITrack garageObject, List<TrackPoint> route)
         {
             Waypoints = route;
             Name = name;
             GarageObject = garageObject;
-            
+
             // Sort on meters:
             Waypoints.Sort((x1, x2) => x1.Meter.CompareTo(x2.Meter));
 
             // Get min/max X/Y
-            var minX = (float) Waypoints.Min(x => x.X);
-            var minY = (float) Waypoints.Min(x => x.Y);
-            var maxX = (float) Waypoints.Max(x => x.X);
-            var maxY = (float) Waypoints.Max(x => x.Y);
+            var minX = (float)Waypoints.Min(x => x.X);
+            var minY = (float)Waypoints.Min(x => x.Y);
+            var maxX = (float)Waypoints.Max(x => x.X);
+            var maxY = (float)Waypoints.Max(x => x.Y);
 
             // Track map bounds:
             Bounds = new RectangleF(minX, minY, maxX - minX, maxY - minY);
@@ -40,41 +42,6 @@ namespace SimTelemetry.Core.Assets
             Length = Track.Max(x => x.Meter) - Track.Min(x => x.Meter);
         }
     }
-
-    public class TrackDataPoint
-    {
-        public double Meter;
-        public double X;
-        public double Y;
-
-        public double Width;
-        public TrackSector Sector;
-    }
-
-    public enum TrackSector
-    {
-        PITS,
-        SECTOR1,
-        SECTOR2,
-        SECTOR3
-    }
-
-    public class ImageMargin
-    {
-        public int Left { get; set; }
-        public int Top { get; set; }
-        public int Right { get; set; }
-        public int Bottom { get; set; }
-
-        public ImageMargin(int l, int t, int r, int b)
-        {
-            Left = l;
-            Top = t;
-            Right = r;
-            Bottom = b;
-        }
-    }
-
     public class Track
     {
         public TrackData Loaded { get; protected set; }
@@ -125,6 +92,22 @@ namespace SimTelemetry.Core.Assets
 
             // Do track loading here.
             var bounds = new Rectangle();
+        }
+    }
+
+    public class ImageMargin
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+
+        public ImageMargin(int left, int top, int right, int bottom)
+        {
+            Left = left;
+            Top = top;
+            Right = right;
+            Bottom = bottom;
         }
     }
 }
