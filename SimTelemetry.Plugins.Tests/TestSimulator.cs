@@ -7,7 +7,7 @@ using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.Repositories;
 using SimTelemetry.Tests.Events;
 
-namespace SimTelemetry.Game.Tests
+namespace SimTelemetry.Plugins.Tests
 {
     [Export(typeof(IPluginSimulator))]
     public class TestSimulator : IPluginSimulator
@@ -21,6 +21,8 @@ namespace SimTelemetry.Game.Tests
 
         public string Description { get { return "Test simulator object"; } }
 
+        private Lazy<Simulator> Simulator = new Lazy<Simulator>(() => new rFactor());
+
         public TestSimulator()
         {
             GlobalEvents.Fire(new PluginTestSimulatorConstructor(), false);
@@ -28,7 +30,7 @@ namespace SimTelemetry.Game.Tests
 
         public Simulator GetSimulator()
         {
-            throw new NotImplementedException();
+            return Simulator.Value;
         }
 
         public Telemetry GetTelemetry()
