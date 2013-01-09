@@ -120,17 +120,20 @@ namespace SimTelemetry.Game.Rfactor
         {
             get { return rFactor.Game; }
         }
-        public bool Attached { get
+        public bool Attached
         {
-            if (UseMemoryReader)
+            get
             {
-                return Memory.Attached;
+                if (UseMemoryReader)
+                {
+                    return Memory.Attached;
+                }
+                else
+                {
+                    return rFactor.MMF.Hooked;
+                }
             }
-            else
-            {
-                return rFactor.MMF.Hooked;
-            }
-        } }
+        }
         public bool UseMemoryReader { get { return true; } }
 
         public ISetup Setup

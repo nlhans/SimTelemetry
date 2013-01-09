@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using SimTelemetry.Objects;
@@ -145,6 +146,7 @@ namespace SimTelemetry.Data.Logger
             bool data_read = false;
 
             // TODO: Put PropertyDescriptor, OnChange, Data, FrequencyCounter etc.. in a struct/class.
+
             for (int i = 0; i < PropertyDescriptors.Count; i++)
             {
                 PropertyDescriptor fi = PropertyDescriptors[i];

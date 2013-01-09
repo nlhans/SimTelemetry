@@ -1,26 +1,24 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using SimTelemetry.Core;
 using SimTelemetry.Core.Events;
-using SimTelemetry.Core.Plugins;
 using SimTelemetry.Tests.Events;
 
-namespace SimTelemetry.Tests
+namespace SimTelemetry.Tests.Core
 {
     [TestFixture]
     public class PluginTests
     {
-
-        const int  cfgSimulatorPlugins = 1;
+        const int cfgSimulatorPlugins = 1;
         const int cfgExtensionPlugins = 0;
-        const int cfgWidgetPlugins = 1;
+        const int cfgWidgetPlugins = 2;
 
         private const int cfgSimulatorPluginsInvalid = 0;
         private const int cfgExtensionPluginsInvalid = 0;
         private const int cfgWidgetPluginsInvalid = 1;
-
 
         [Test]
         public void PluginsFound()
@@ -44,15 +42,15 @@ namespace SimTelemetry.Tests
                 pluginsLoadedEventFire = true;
             }, true);
 
-            using (var pluginHost = new Plugins())
+            // Manually count the no of plugins in the bin directory.
+            var files = Directory.GetFiles(TestConstants.SimulatorsBinFolder);
+            var plugins = files.Where(x => x.Contains("SimTelemetry.Plugins."));
+
+            using (var pluginHost = new SimTelemetry.Core.Plugins.Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
                 pluginHost.Load();
-
-                // Manually count the no of plugins in the bin directory.
-                var files = Directory.GetFiles(TestConstants.SimulatorsBinFolder);
-                var plugins = files.Where(x => x.Contains("SimTelemetry.Plugins."));
 
                 // Resolve the no. of plugins there are available:
                 var iPluginsManualCount = plugins.ToList().Count;
@@ -95,17 +93,22 @@ namespace SimTelemetry.Tests
             GlobalEvents.Hook<PluginTestWidgetConstructor>((x) => constructorWidget++, false);
             GlobalEvents.Hook<PluginTestSimulatorConstructor>((x) => constructorSimulator++, false);
 
-            using (var pluginHost = new Plugins())
+            using (var pluginHost = new SimTelemetry.Core.Plugins.Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
-                pluginHost.Load();
-                pluginHost.Unload();
+                var rand = new Random().Next(2, 100);
+                Debug.WriteLine("Initializing " + rand + " times");
+                for (int i = 0; i < rand; i++)
+                {
+                    pluginHost.Load();
+                    pluginHost.Unload();
+                }
                 pluginHost.Load();
                 pluginHost.Unload();
             }
 
-            using (var pluginHost = new Plugins())
+            using (var pluginHost = new SimTelemetry.Core.Plugins.Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
@@ -118,7 +121,7 @@ namespace SimTelemetry.Tests
             Assert.AreEqual(constructorWidget, pluginLoadIterations * cfgWidgetPlugins);
 
             Assert.AreEqual(TestConstants.Warnings,
-                            pluginLoadIterations*
+                            pluginLoadIterations *
                             (cfgWidgetPluginsInvalid + cfgSimulatorPluginsInvalid + cfgExtensionPluginsInvalid));
 
         }

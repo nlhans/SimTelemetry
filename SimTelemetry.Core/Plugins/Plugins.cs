@@ -41,6 +41,9 @@ namespace SimTelemetry.Core.Plugins
         public IList<IExtension> Extensions { get; protected set; }
         #endregion
 
+        /// <summary>
+        /// Refresh the plugin catalog.
+        /// </summary>
         public void Load()
         {
             // Check if environmental settings are correct:
@@ -163,7 +166,10 @@ namespace SimTelemetry.Core.Plugins
             GlobalEvents.Fire(loadEvent, true);
         }
 
-
+        /// <summary>
+        /// Unload the plugin catalog.
+        /// Warning: all assemblies created at Load are not destroyed, so limit the usage of this function.
+        /// </summary>
         public void Unload()
         {
             if (Simulators == null)

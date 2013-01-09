@@ -23,7 +23,7 @@ namespace SimTelemetry.Tests
 
         private static void PrintWarning(DebugWarning w)
         {
-            Debug.WriteLine("[Warning] " + w.Message);
+            Debug.WriteLine("[Exception] " + w.Message);
             Debug.WriteLine(w.Exception.Message);
             Warnings++;
 

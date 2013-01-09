@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using SimTelemetry.Core;
@@ -11,11 +10,11 @@ using SimTelemetry.Tests.Events;
 namespace SimTelemetry.Game.Tests
 {
     [Export(typeof(IWidget))]
-    public class TestWidget : IWidget
+    public class TestWidgetFail : IWidget
     {
         public ITelemetry Host { get; set; }
 
-        public TestWidget()
+        public TestWidgetFail()
         {
             GlobalEvents.Fire(new PluginTestWidgetConstructor(), false);
         }
@@ -27,7 +26,7 @@ namespace SimTelemetry.Game.Tests
 
         public string Name
         {
-            get { return "Test Widget"; }
+            get { return "Test Widget Fail"; }
         }
 
         public string Version
@@ -47,12 +46,12 @@ namespace SimTelemetry.Game.Tests
 
         public void Initialize()
         {
-            Debug.WriteLine("TestWidget::Initialize()");
+            throw new NotImplementedException();
         }
 
         public void Deinitialize()
         {
-            Debug.WriteLine("TestWidget::Deinitialize()");
+            throw new NotImplementedException();
         }
 
         public Control Control

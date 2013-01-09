@@ -46,7 +46,7 @@ namespace SimTelemetry.Objects.Garage
         ICarEngine Engine { get; }
         ICarGearbox Gearbox { get; }
         ICarAerodynamics Aerodynamics { get; }
-        ICarWheels Wheels { get;}
+        ICarWheels Wheels { get; }
         string PhysicsFile { get; }
 
         void Scan();
