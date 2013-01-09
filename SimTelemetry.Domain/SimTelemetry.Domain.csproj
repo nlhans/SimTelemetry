@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SimTelemetry.Domain</RootNamespace>
+    <AssemblyName>SimTelemetry.Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Triton, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Binaries\Triton.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Aggregates\Car.cs" />
+    <Compile Include="Aggregates\RecordedLap.cs" />
+    <Compile Include="Aggregates\Simulator.cs" />
+    <Compile Include="Aggregates\Telemetry.cs" />
+    <Compile Include="Aggregates\Track.cs" />
+    <Compile Include="Common\IEntity.cs" />
+    <Compile Include="Common\InMemoryRepository.cs" />
+    <Compile Include="Common\IRepository.cs" />
+    <Compile Include="Common\IValueObject.cs" />
+    <Compile Include="Entities\Brake.cs" />
+    <Compile Include="Entities\Chassis.cs" />
+    <Compile Include="Entities\Drivetrain.cs" />
+    <Compile Include="Entities\Engine.cs" />
+    <Compile Include="Entities\ScoringDriver.cs" />
+    <Compile Include="Entities\Mod.cs" />
+    <Compile Include="Entities\Season.cs" />
+    <Compile Include="Entities\Team.cs" />
+    <Compile Include="Entities\Wheel.cs" />
+    <Compile Include="Events\CarAdded.cs" />
+    <Compile Include="Events\CarDeleted.cs" />
+    <Compile Include="Events\CarRepositoryCleared.cs" />
+    <Compile Include="Events\CarUpdated.cs" />
+    <Compile Include="Events\DrivingStarted.cs" />
+    <Compile Include="Events\DrivingStopped.cs" />
+    <Compile Include="Events\LapAdded.cs" />
+    <Compile Include="Events\ReferenceLapChanged.cs" />
+    <Compile Include="Events\SessionStarted.cs" />
+    <Compile Include="Events\SessionStopped.cs" />
+    <Compile Include="Events\SimulatorStarted.cs" />
+    <Compile Include="Events\SimulatorStopped.cs" />
+    <Compile Include="Events\TelemetryDriverAdded.cs" />
+    <Compile Include="Events\TelemetryDriverRemoved.cs" />
+    <Compile Include="Exceptions\CarAlreadyHasBrakeException.cs" />
+    <Compile Include="Exceptions\CarAlreadyHasChassisException.cs" />
+    <Compile Include="Exceptions\CarAlreadyHasDrivetrainException.cs" />
+    <Compile Include="Exceptions\CarAlreadyHasEngineException.cs" />
+    <Compile Include="Exceptions\CarAlreadyHasWheelException.cs" />
+    <Compile Include="Exceptions\DriverWasAlreadyAddedException.cs" />
+    <Compile Include="Exceptions\LapWasAlreadyAddedException.cs" />
+    <Compile Include="GlobalEventDelegate.cs" />
+    <Compile Include="Events\DebugWarning.cs" />
+    <Compile Include="Events\PluginsLoaded.cs" />
+    <Compile Include="Exceptions\PluginHostException.cs" />
+    <Compile Include="GlobalEvents.cs" />
+    <Compile Include="Plugins\IPluginBase.cs" />
+    <Compile Include="Plugins\IPluginSimulator.cs" />
+    <Compile Include="Plugins\Plugins.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\CarRepository.cs" />
+    <Compile Include="Repositories\ICarDataProvider.cs" />
+    <Compile Include="Repositories\ICarRepository.cs" />
+    <Compile Include="Common\IDataProvider.cs" />
+    <Compile Include="Repositories\ITrackDataProvider.cs" />
+    <Compile Include="Repositories\ITrackRepository.cs" />
+    <Compile Include="Repositories\TrackRepository.cs" />
+    <Compile Include="ValueObjects\EngineLifetime.cs" />
+    <Compile Include="ValueObjects\EngineMode.cs" />
+    <Compile Include="ValueObjects\Lap.cs" />
+    <Compile Include="ValueObjects\Polynomial.cs" />
+    <Compile Include="ValueObjects\Range.cs" />
+    <Compile Include="Enumerations\DriveTrainSetup.cs" />
+    <Compile Include="ValueObjects\EngineTorque.cs" />
+    <Compile Include="Enumerations\SessionType.cs" />
+    <Compile Include="ValueObjects\Time.cs" />
+    <Compile Include="ValueObjects\TrackPoint.cs" />
+    <Compile Include="Enumerations\TrackPointType.cs" />
+    <Compile Include="ValueObjects\Session.cs" />
+    <Compile Include="Enumerations\WheelLocation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
+      <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
+      <Name>SimTelemetry.Objects</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

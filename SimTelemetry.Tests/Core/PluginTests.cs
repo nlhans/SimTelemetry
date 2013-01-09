@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using SimTelemetry.Core;
-using SimTelemetry.Core.Events;
+using SimTelemetry.Domain;
+using SimTelemetry.Domain.Events;
 using SimTelemetry.Tests.Events;
 
 namespace SimTelemetry.Tests.Core
@@ -46,7 +46,7 @@ namespace SimTelemetry.Tests.Core
             var files = Directory.GetFiles(TestConstants.SimulatorsBinFolder);
             var plugins = files.Where(x => x.Contains("SimTelemetry.Plugins."));
 
-            using (var pluginHost = new SimTelemetry.Core.Plugins.Plugins())
+            using (var pluginHost = new SimTelemetry.Domain.Plugins.Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
@@ -93,7 +93,7 @@ namespace SimTelemetry.Tests.Core
             GlobalEvents.Hook<PluginTestWidgetConstructor>((x) => constructorWidget++, false);
             GlobalEvents.Hook<PluginTestSimulatorConstructor>((x) => constructorSimulator++, false);
 
-            using (var pluginHost = new SimTelemetry.Core.Plugins.Plugins())
+            using (var pluginHost = new SimTelemetry.Domain.Plugins.Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
@@ -108,7 +108,7 @@ namespace SimTelemetry.Tests.Core
                 pluginHost.Unload();
             }
 
-            using (var pluginHost = new SimTelemetry.Core.Plugins.Plugins())
+            using (var pluginHost = new SimTelemetry.Domain.Plugins.Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 

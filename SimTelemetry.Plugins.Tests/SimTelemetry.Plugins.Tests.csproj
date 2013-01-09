@@ -49,9 +49,9 @@
     <Compile Include="TestWidgetFail.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimTelemetry.Core\SimTelemetry.Core.csproj">
+    <ProjectReference Include="..\SimTelemetry.Domain\SimTelemetry.Domain.csproj">
       <Project>{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}</Project>
-      <Name>SimTelemetry.Core</Name>
+      <Name>SimTelemetry.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
       <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>

@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using SimTelemetry.Core;
+using SimTelemetry.Domain;
 
 namespace SimTelemetry.Tests.Core
 {

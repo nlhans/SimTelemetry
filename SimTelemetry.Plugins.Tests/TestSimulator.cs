@@ -1,48 +1,49 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using SimTelemetry.Core;
-using SimTelemetry.Objects;
-using SimTelemetry.Objects.Game;
-using SimTelemetry.Objects.Garage;
-using SimTelemetry.Objects.Plugins;
+using SimTelemetry.Domain;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Plugins;
+using SimTelemetry.Domain.Repositories;
 using SimTelemetry.Tests.Events;
 
 namespace SimTelemetry.Game.Tests
 {
-    [Export(typeof(ISimulator))]
-    public class TestSimulator : ISimulator
+    [Export(typeof(IPluginSimulator))]
+    public class TestSimulator : IPluginSimulator
     {
-        public ITelemetry Host { get; set; }
+        public int ID { get { return 0; } }
+        public string Name { get { return "Test simulator"; } }
+        public string Version { get { return "0.1 alpha"; } }
+        public string Author { get { return "SimTelemetry"; } }
 
-        public string PluginId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public DateTime CompilationTime { get { return DateTime.Now; } }
 
-        public string Name
-        {
-            get { return "Test simulator"; }
-        }
-
-        public string Version
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string Author
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string Description
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public string Description { get { return "Test simulator object"; } }
 
         public TestSimulator()
         {
             GlobalEvents.Fire(new PluginTestSimulatorConstructor(), false);
+        }
+
+        public Simulator GetSimulator()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Telemetry GetTelemetry()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ICarDataProvider GetCarDataProvider()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ITrackDataProvider GetTrackDataProvider()
+        {
+            throw new NotImplementedException();
         }
 
         public void Initialize()
@@ -55,55 +56,51 @@ namespace SimTelemetry.Game.Tests
             Debug.WriteLine("TestSimulator::Deinitialize()");
         }
 
-        public string ProcessName
+        public bool Equals(IPluginBase other)
         {
-            get { return "testsim.exe"; }
-        }
-
-        public SimulatorModules Modules
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public IDriverCollection Drivers
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public IDriverPlayer Player
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public ISession Session
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public IGarage Garage
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool Attached
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool UseMemoryReader
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public ISetup Setup
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public ICar Car
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            return other.ID == ID;
         }
     }
+
+    public class TelemetrySupport : ITelemetrySupport
+    {
+        public bool Timing { get; private set; }
+
+        // TODO: Add more support variables.
+    }
+
+    public class TelemetryAcquisition : ITelemetryAcquisition
+    {
+        public bool UseMemory { get; private set; }
+        public bool SupportMemory { get; private set; }
+
+        public bool UseDll { get; private set; }
+        public bool SupportDll { get; private set; }
+    }
+
+    public class TelemetryGame : ITelemetryGame
+    {
+    }
+
+    public class TelemetryTrack : ITelemetryTrack
+    {
+    }
+
+    public class TelemetrySession : ITelemetrySession
+    {
+    }
+
+    public class TelemetryDriver : ITelemetryDriver
+    {
+        public bool Equals(ITelemetryDriver other)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class TelemetryPlayer : ITelemetryPlayer
+    {
+
+    }
+
 }

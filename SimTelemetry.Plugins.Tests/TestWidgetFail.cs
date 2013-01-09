@@ -2,7 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Drawing;
 using System.Windows.Forms;
-using SimTelemetry.Core;
+using SimTelemetry.Domain;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Plugins;
 using SimTelemetry.Tests.Events;

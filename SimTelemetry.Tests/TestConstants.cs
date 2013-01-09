@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using SimTelemetry.Core;
-using SimTelemetry.Core.Events;
+using SimTelemetry.Domain;
+using SimTelemetry.Domain.Events;
 
 namespace SimTelemetry.Tests
 {
