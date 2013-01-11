@@ -16,10 +16,10 @@ namespace SimTelemetry.Plugins.Tests
         public string Name { get { return "Test simulator"; } }
         public string Version { get { return "0.1 alpha"; } }
         public string Author { get { return "SimTelemetry"; } }
+        public string Description { get { return "Test simulator object"; } }
 
         public DateTime CompilationTime { get { return DateTime.Now; } }
 
-        public string Description { get { return "Test simulator object"; } }
 
         private Lazy<Simulator> Simulator = new Lazy<Simulator>(() => new rFactor());
 

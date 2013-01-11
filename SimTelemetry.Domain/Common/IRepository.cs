@@ -2,13 +2,13 @@
 
 namespace SimTelemetry.Domain.Common
 {
-    public interface IRepository<T> where T : class
+    public interface IRepository<T> 
     {
-        void Add(T entity);
+        bool Add(T entity);
         void AddRange(IEnumerable<T> entities);
         void Clear();
         bool Contains(T entity);
-        void Remove(T entity);
+        bool Remove(T entity);
         IEnumerable<T> GetAll();
     }
 }

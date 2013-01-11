@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using SimTelemetry.Domain;
+using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Tests.Events;
 
 namespace SimTelemetry.Tests
 {
     [TestFixture]
-    public class Simulator
+    public class SimulatorTests
     {
         [Test]
         public void TestLazyScanning()
@@ -16,17 +17,17 @@ namespace SimTelemetry.Tests
             var trackScanCount = 0;
             var modScanCount = 0;
 
-            GlobalEvents.Hook<PluginTestSimulatorModScanner>((x) => {  modScanCount++;  },true);
-            GlobalEvents.Hook<PluginTestSimulatorTrackScanner>((x) => { trackScanCount++; },true);
+            GlobalEvents.Hook<PluginTestSimulatorModScanner>((x) => { modScanCount++; }, true);
+            GlobalEvents.Hook<PluginTestSimulatorTrackScanner>((x) => { trackScanCount++; }, true);
 
 
-            using (var pluginHost = new SimTelemetry.Domain.Plugins.Plugins())
+            using (var pluginHost = new Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
                 pluginHost.Load();
 
-                Assert.Greater(pluginHost.Simulators.Count,0);
+                Assert.Greater(pluginHost.Simulators.Count, 0);
 
                 var testSim = pluginHost.Simulators[0];
 
@@ -34,19 +35,18 @@ namespace SimTelemetry.Tests
                 Assert.AreEqual(0, trackScanCount);
                 Assert.AreEqual(0, modScanCount);
 
-                Assert.AreEqual(testSimulator.Name, "rFactor");
-                Assert.AreEqual(testSimulator.ProcessName, "rfactor");
-                Assert.AreEqual(testSimulator.Version, "1.255");
+                Assert.AreEqual("rFactor", testSimulator.Name);
+                Assert.AreEqual("rfactor", testSimulator.ProcessName);
+                Assert.AreEqual("1.255", testSimulator.Version);
 
-                // okay, get tracks & mod
                 var tracks = testSimulator.Tracks;
                 var mods = testSimulator.Mods;
 
-                Assert.AreEqual(modScanCount, 1);
-                Assert.AreEqual(trackScanCount, 1);
+                Assert.AreEqual(1, modScanCount);
+                Assert.AreEqual(1, trackScanCount);
 
-                Assert.AreEqual(tracks.Count(x => x.ID > 0), 1);
-                Assert.AreEqual(mods.Count(x => x.Name != ""), 1);
+                Assert.AreEqual(1, tracks.Count(x => x.ID != string.Empty));
+                Assert.AreEqual(1, mods.Count(x => x.Name != ""));
             }
         }
     }

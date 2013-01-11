@@ -6,11 +6,11 @@ using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Domain.Repositories
 {
-    public class CarRepository : InMemoryRepository<Car>, ICarRepository
+    public class CarRepository : LazyInMemoryRepository<Car, string>, ICarRepository
     {
-        public Car GetById(long id)
+        public CarRepository(ILazyRepositoryDataSource<Car, string> source) : base(source)
         {
-            return data.Where(x => x.ID == id).FirstOrDefault();
+
         }
 
         public Car GetByName(string name)
@@ -20,7 +20,7 @@ namespace SimTelemetry.Domain.Repositories
 
         public Car GetByFile(string file)
         {
-            return data.Where(x => x.File == file).FirstOrDefault();
+            return data.Where(x => x.ID == file).FirstOrDefault();
         }
 
         public IEnumerable<Car> GetByClass(string cls)
@@ -33,4 +33,5 @@ namespace SimTelemetry.Domain.Repositories
             return data.Where(x => x.BelongsTo(cls));
         }
     }
+
 }

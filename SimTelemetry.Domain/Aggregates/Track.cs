@@ -7,10 +7,9 @@ using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Aggregates
 {
-    public class Track : IEntity, IEquatable<Track>
+    public class Track : IEntity<string>, IEquatable<Track>
     {
-        public int ID { get; private set; }
-        public string File { get; private set; }
+        public string ID { get; private set; }
 
         public string Name { get; private set; }
         public string Location { get; private set; }
@@ -42,10 +41,9 @@ namespace SimTelemetry.Domain.Aggregates
             TrackCoordinateMaxY = float.MinValue;
         }
 
-        public Track(int id, string file, string name, string location, float laprecordRace, float laprecordQualify) : this()
+        public Track(string file, string name, string location, float laprecordRace, float laprecordQualify) : this()
         {
-            ID = id;
-            File = file;
+            ID = file;
             Name = name;
             Location = location;
             LaprecordRace = laprecordRace;

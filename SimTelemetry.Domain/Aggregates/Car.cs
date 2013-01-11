@@ -7,15 +7,13 @@ using SimTelemetry.Domain.Exceptions;
 
 namespace SimTelemetry.Domain.Aggregates
 {
-    public class Car : IEntity, IEquatable<Car>
+    public class Car : IEntity<string>, IEquatable<Car>
     {
         private IList<string> _carClass = new List<string>();
         private IList<Wheel> _wheels = new List<Wheel>();
         private IList<Brake> _brakes = new List<Brake>();
 
-        public int ID { get; private set; }
-
-        public string File { get; private set; }
+        public string ID { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
         public IEnumerable<string> CarClass { get { return _carClass; } }
@@ -34,10 +32,9 @@ namespace SimTelemetry.Domain.Aggregates
 
         public bool Equals(Car other) { return other.ID == ID; }
 
-        public Car(int id, string file, string name, string driver, string description, int startNumber)
+        public Car(string file, string name, string driver, string description, int startNumber)
         {
-            ID = id;
-            File = file;
+            ID = file;
             Name = name;
             Driver = driver;
             Description = description;

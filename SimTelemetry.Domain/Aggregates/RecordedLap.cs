@@ -4,7 +4,7 @@ using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Aggregates
 {
-    public class RecordedLap : IEntity, IEquatable<RecordedLap>
+    public class RecordedLap : IEntity<int>, IEquatable<RecordedLap>
     {
         public int ID { get; private set; }
         public string File { get; private set; }

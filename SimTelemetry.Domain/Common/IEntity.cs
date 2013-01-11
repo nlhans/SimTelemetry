@@ -1,7 +1,7 @@
 ﻿namespace SimTelemetry.Domain.Common
 {
-    public interface IEntity
+    public interface IEntity<T>
     {
-        int ID { get; }
+        T ID { get; }
     }
 }

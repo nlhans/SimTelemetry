@@ -52,9 +52,11 @@
     <Compile Include="Aggregates\Telemetry.cs" />
     <Compile Include="Aggregates\Track.cs" />
     <Compile Include="Common\IEntity.cs" />
+    <Compile Include="Common\ILazyRepositoryDataSource.cs" />
     <Compile Include="Common\InMemoryRepository.cs" />
     <Compile Include="Common\IRepository.cs" />
     <Compile Include="Common\IValueObject.cs" />
+    <Compile Include="Common\LazyInMemoryRepository.cs" />
     <Compile Include="Entities\Brake.cs" />
     <Compile Include="Entities\Chassis.cs" />
     <Compile Include="Entities\Drivetrain.cs" />

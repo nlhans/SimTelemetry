@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SimTelemetry.Domain.Entities;
+using SimTelemetry.Domain.Events;
 
 namespace SimTelemetry.Domain.Aggregates
 {
@@ -34,10 +35,14 @@ namespace SimTelemetry.Domain.Aggregates
 
         protected virtual IEnumerable<Mod> ModScanner()
         {
+            GlobalEvents.Fire(new DebugWarning("Each simulator plugin should implement it's own ModScanner() method.", new Exception("")),
+                              false);
             return new List<Mod>();
         }
         protected virtual IEnumerable<Track> TrackScanner()
         {
+            GlobalEvents.Fire(new DebugWarning("Each simulator plugin should implement it's own TrackScanner() method.", new Exception("")),
+                              false);
             return new List<Track>();
         }
 

@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\EventTests.cs" />
+    <Compile Include="Core\InMemoryRepositoryTests.cs" />
     <Compile Include="Events\PluginTestExtensionConstructor.cs" />
     <Compile Include="Events\PluginTestSimulatorConstructor.cs" />
     <Compile Include="Events\PluginTestSimulatorModScanner.cs" />
@@ -52,7 +53,7 @@
     <Compile Include="Events\PluginTestWidgetConstructor.cs" />
     <Compile Include="Core\PluginTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Simulator.cs" />
+    <Compile Include="SimulatorTests.cs" />
     <Compile Include="TestConstants.cs" />
   </ItemGroup>
   <ItemGroup>

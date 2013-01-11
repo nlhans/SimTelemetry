@@ -3,41 +3,52 @@ using System.Linq;
 
 namespace SimTelemetry.Domain.Common
 {
-    public class InMemoryRepository<T> : IRepository<T> where T : class
+    public class InMemoryRepository<T> : IRepository<T>
     {
         protected IList<T> data = new List<T>();
 
-        public void Add(T entity)
+        public virtual bool Add(T entity)
         {
-            if (!Contains(entity))
+            if (!this.Contains(entity))
             {
                 data.Add(entity);
+                return true;
+            }else
+            {
+                return false;
             }
         }
 
-        public void AddRange(IEnumerable<T> entities)
+        public virtual void AddRange(IEnumerable<T> entities)
         {
             foreach (var entity in entities)
                 Add(entity);
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             data.Clear();
         }
 
-        public bool Contains(T entity)
+        public virtual bool Contains(T entity)
         {
             return data.Any(x => x.Equals(entity));
         }
 
-        public void Remove(T entity)
+        public virtual bool Remove(T entity)
         {
             if (Contains(entity))
+            {
                 data.Remove(entity);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        public IEnumerable<T> GetAll()
+        public virtual IEnumerable<T> GetAll()
         {
             return data;
         }
