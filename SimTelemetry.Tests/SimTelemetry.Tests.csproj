@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aggregates\CarTests.cs" />
     <Compile Include="Core\EventTests.cs" />
     <Compile Include="Core\InMemoryRepositoryTests.cs" />
     <Compile Include="Events\PluginTestExtensionConstructor.cs" />

@@ -18,14 +18,12 @@ namespace SimTelemetry.Domain.Aggregates
 
         public Lap Lap { get; private set; }
 
+        public bool Equals(RecordedLap other) { return other.ID == ID; }
+        public bool Equals(int other) { return other == ID; }
 
         // etc.
 
 
 
-        public bool Equals(RecordedLap other)
-        {
-            return other.ID == ID;
-        }
     }
 }

@@ -16,7 +16,7 @@ namespace SimTelemetry.Tests.Core
             var obj1 = new InMemoryObject("1", "Test 1");
             var obj2 = new InMemoryObject("A", "Test 2");
             var obj3 = new InMemoryObject("!", "Test 3");
-            var rep = new InMemoryRepository<InMemoryObject>();
+            var rep = new InMemoryRepository<InMemoryObject, string>();
 
             Assert.AreEqual(rep.GetAll().Count(x => true), 0);
             Assert.AreEqual(rep.Contains(obj1), false);
@@ -54,6 +54,11 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(rep.Contains(obj1), true);
             Assert.AreEqual(rep.Contains(obj2), true);
             Assert.AreEqual(rep.Contains(obj3), true);
+
+            // Store
+            var obj1Get = rep.GetAll().Where(x => x.ID == "1").FirstOrDefault();
+            obj1Get.UpdateTest("Test 1a");
+            Assert.AreEqual(true, rep.Store(obj1Get));
 
             // Remove 2
             rep.Remove(obj2);
@@ -112,6 +117,7 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(0, myObjectCreator.AddObjectCalls);
             Assert.AreEqual(0, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(0, myObjectCreator.RemoveObjectCalls);
 
             // Now let's get an object:
@@ -122,6 +128,7 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(0, myObjectCreator.AddObjectCalls);
             Assert.AreEqual(1, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(0, myObjectCreator.RemoveObjectCalls);
 
             // Try to add an object.
@@ -130,6 +137,7 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
             Assert.AreEqual(1, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(0, myObjectCreator.RemoveObjectCalls);
 
             // Try to remove an object.
@@ -137,6 +145,7 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
             Assert.AreEqual(1, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(1, myObjectCreator.RemoveObjectCalls);
 
             // Try to remove an object (that doens't even exist).
@@ -144,6 +153,7 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
             Assert.AreEqual(1, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
 
             // After trying to remove it, try to get object B again:
@@ -152,26 +162,58 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
             Assert.AreEqual(1, myObjectCreator.GetObjectCalls); // we already had this object in data list.
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
-            Assert.AreEqual(1, lazyRepo.GetAll().ToList().Count );
+            Assert.AreEqual(1, lazyRepo.GetDataCount() );
 
-            // After trying to remove it, try to get object  again:
+            // Try to get object C (doesn't exist)
             var myObjectC = lazyRepo.GetById("C");
-            Assert.AreEqual(null, myObjectC.ID);
+            Assert.AreEqual(null, myObjectC);
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
-            Assert.AreEqual(2, myObjectCreator.GetObjectCalls); // tried to get C
+            Assert.AreEqual(1, myObjectCreator.GetObjectCalls); // tried to get C
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
-            Assert.AreEqual(1, lazyRepo.GetAll().ToList().Count);
+            Assert.AreEqual(1, lazyRepo.GetDataCount());
 
             // Have object '!' ready, and try to see if it contains it.
             var objectExclamationMark = new InMemoryObject("!", "Test 3");
             Assert.AreEqual(false, lazyRepo.Contains(objectExclamationMark)); // we haven't pulled the object out of the repo!
             Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
             Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
-            Assert.AreEqual(2, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(1, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
-            Assert.AreEqual(1, lazyRepo.GetAll().ToList().Count);
+            Assert.AreEqual(1, lazyRepo.GetDataCount());
+
+            // Try to store it:
+            var objectDollarSign = new InMemoryObject("$", "Money");
+            Assert.AreEqual(false, lazyRepo.Store(objectDollarSign));
+            Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
+            Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
+            Assert.AreEqual(1, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(0, myObjectCreator.StoreObjectCalls); // No DataSource::Store() is called because this object isn't in the ID list.
+            Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
+            Assert.AreEqual(1, lazyRepo.GetDataCount());
+
+            // Try to update/store existing object
+            var myOwnObjectA = new InMemoryObject("B", "Test B");
+            Assert.AreEqual(false, lazyRepo.Store(myOwnObjectA)); // read-only repo
+            Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
+            Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
+            Assert.AreEqual(1, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(1, myObjectCreator.StoreObjectCalls); // Now it does try to store it, because the ID exists.
+            Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
+            Assert.AreEqual(1, lazyRepo.GetDataCount());
+
+            // Get all:
+            Assert.AreEqual(3, lazyRepo.GetAll().ToList().Count);
+            Assert.AreEqual(1, myObjectCreator.GetIdsCalls);
+            Assert.AreEqual(1, myObjectCreator.AddObjectCalls);
+            Assert.AreEqual(3, myObjectCreator.GetObjectCalls);
+            Assert.AreEqual(1, myObjectCreator.StoreObjectCalls);
+            Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
+
         }
     }
 
@@ -181,6 +223,7 @@ namespace SimTelemetry.Tests.Core
         public int GetIdsCalls { get; private set; }
         public int AddObjectCalls { get; private set; }
         public int GetObjectCalls { get; private set; }
+        public int StoreObjectCalls { get; private set; }
         public int RemoveObjectCalls { get; private set; }
 
         public InMemoryObjectDataSource()
@@ -188,6 +231,7 @@ namespace SimTelemetry.Tests.Core
             GetIdsCalls = 0;
             AddObjectCalls = 0;
             GetObjectCalls = 0;
+            StoreObjectCalls = 0;
             RemoveObjectCalls = 0;
 
         }
@@ -206,6 +250,12 @@ namespace SimTelemetry.Tests.Core
             AddObjectCalls++;
 
             // It's get-only repo.
+            return false;
+        }
+
+        public bool Store(InMemoryObject obj)
+        {
+            StoreObjectCalls++;
             return false;
         }
 
@@ -258,9 +308,29 @@ namespace SimTelemetry.Tests.Core
             Test = test;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType().Equals(typeof(InMemoryObject)))
+                return Equals((InMemoryObject)obj);
+            else if (obj.GetType().Equals(typeof(string)))
+                return Equals((string) obj);
+            else
+                return false;
+        }
+
         public bool Equals(InMemoryObject other)
         {
-            return ID.Equals(other.ID) && Test.Equals(other.Test);
+            return ID.Equals(other.ID);
+        }
+
+        public bool Equals(string other)
+        {
+            return ID.Equals(other);
+        }
+
+        public void UpdateTest(string test)
+        {
+            Test = test;
         }
     }
 }

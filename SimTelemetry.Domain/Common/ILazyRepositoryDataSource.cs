@@ -6,6 +6,7 @@ namespace SimTelemetry.Domain.Common
     {
         IList<TId> GetIds();
         bool Add(TType obj);
+        bool Store(TType obj);
         TType Get(TId id);
         bool Remove(TId Id);
         bool Clear();

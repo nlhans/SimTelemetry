@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SimTelemetry.Domain.Common
 {
-    public class InMemoryRepository<T> : IRepository<T>
+    public class InMemoryRepository<TType, TId> : IRepository<TType> where TType : IEntity<TId>
     {
-        protected IList<T> data = new List<T>();
+        protected IList<TType> data = new List<TType>();
 
-        public virtual bool Add(T entity)
+        public virtual bool Add(TType entity)
         {
             if (!this.Contains(entity))
             {
@@ -19,7 +20,7 @@ namespace SimTelemetry.Domain.Common
             }
         }
 
-        public virtual void AddRange(IEnumerable<T> entities)
+        public virtual void AddRange(IEnumerable<TType> entities)
         {
             foreach (var entity in entities)
                 Add(entity);
@@ -30,12 +31,25 @@ namespace SimTelemetry.Domain.Common
             data.Clear();
         }
 
-        public virtual bool Contains(T entity)
+        public virtual bool Contains(TType entity)
         {
             return data.Any(x => x.Equals(entity));
         }
 
-        public virtual bool Remove(T entity)
+        public virtual bool Store(TType entity)
+        {
+            if (Contains(entity) == false)
+                return false;
+            else
+            {
+                var index = data.IndexOf(entity);
+                data[index] = entity;
+
+                return true;
+            }
+        }
+
+        public virtual bool Remove(TType entity)
         {
             if (Contains(entity))
             {
@@ -48,7 +62,7 @@ namespace SimTelemetry.Domain.Common
             }
         }
 
-        public virtual IEnumerable<T> GetAll()
+        public virtual IEnumerable<TType> GetAll()
         {
             return data;
         }

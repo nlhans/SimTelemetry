@@ -31,6 +31,7 @@ namespace SimTelemetry.Domain.Aggregates
         public IEnumerable<Session> Sessions { get { return _sessions; } }
 
         public bool Equals(Track other) { return other.ID == ID; }
+        public bool Equals(string other) { return other == ID; }
 
         /********* INITIAL DATA *********/
         public Track()

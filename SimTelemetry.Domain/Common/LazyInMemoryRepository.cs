@@ -4,20 +4,25 @@ using System.Linq;
 
 namespace SimTelemetry.Domain.Common
 {
-    public class LazyInMemoryRepository<TType, TId> : InMemoryRepository<TType> where TType : IEntity<TId>
+    public class LazyInMemoryRepository<TType, TId> : InMemoryRepository<TType, TId> where TType : class, IEntity<TId>
     {
-        protected Lazy<IList<TId>> idList;
-        protected ILazyRepositoryDataSource<TType, TId> dataSource;
+        protected Lazy<IList<TId>> IdList;
+        protected ILazyRepositoryDataSource<TType, TId> DataSource;
 
         public LazyInMemoryRepository(ILazyRepositoryDataSource<TType, TId> source)
         {
-            dataSource = source;
-            idList = new Lazy<IList<TId>>(dataSource.GetIds);
+            DataSource = source;
+            IdList = new Lazy<IList<TId>>(DataSource.GetIds);
         }
 
         public virtual bool Contains(TId id)
         {
-            return idList.Value.Contains(id);
+            return IdList.Value.Contains(id);
+        }
+
+        public override bool Contains(TType entity)
+        {
+            return Contains(entity.ID) && base.Contains(entity);
         }
 
         public virtual TType GetById(TId id)
@@ -26,7 +31,10 @@ namespace SimTelemetry.Domain.Common
                 return data.Where(x => x.ID.Equals(id)).FirstOrDefault();
             else
             {
-                var obj = dataSource.Get(id);
+                if (Contains(id) == false)
+                    return null;
+
+                var obj = DataSource.Get(id);
                 if (obj == null || obj.ID == null || !obj.ID.Equals(id))
                     return obj;
                 else
@@ -39,24 +47,23 @@ namespace SimTelemetry.Domain.Common
 
         public IEnumerable<TId> GetIds()
         {
-            return idList.Value;
+            return IdList.Value;
         }
 
-        public override bool Contains(TType entity)
+        public override IEnumerable<TType> GetAll()
         {
-            return Contains(entity.ID) && base.Contains(entity);
+            foreach (var id in GetIds())
+                GetById(id);
+            return data;
         }
 
         public override bool Add(TType entity)
         {
-
-            // Check if our ID list contains the object.
             if (!Contains(entity.ID))
             {
-                // Can our DataSource support Add operations?
-                if (dataSource.Add(entity))
+                if (DataSource.Add(entity))
                 {
-                    idList.Value.Add(entity.ID);
+                    IdList.Value.Add(entity.ID);
                 }
                 else
                 {
@@ -64,16 +71,24 @@ namespace SimTelemetry.Domain.Common
                 }
             }
             base.Add(entity);
-
             return true;
         }
 
+        public override bool Store(TType entity)
+        {
+            if (!Contains(entity.ID))
+                return false;
+            if (!DataSource.Store(entity))
+                return false;
+            base.Store(entity);
+            return true;
+        }
         public override bool Remove(TType entity)
         {
-            if (dataSource.Remove(entity.ID))
+            if (DataSource.Remove(entity.ID))
             {
                 base.Remove(entity);
-                idList.Value.Remove(entity.ID);
+                IdList.Value.Remove(entity.ID);
                 return true;
             }
             else
@@ -84,11 +99,26 @@ namespace SimTelemetry.Domain.Common
 
         public override void Clear()
         {
-            if (dataSource.Clear())
+            if (DataSource.Clear())
             {
                 base.Clear();
-                idList = new Lazy<IList<TId>>(dataSource.GetIds);                
+                IdList = new Lazy<IList<TId>>(DataSource.GetIds);                
             }
+        }
+
+#if DEBUG
+        public int GetDataCount()
+        {
+            return data.Count;
+        }
+        public int GetIdCount()
+        {
+            return IdList.Value.Count;
+        }
+#endif
+        public int GetCount()
+        {
+            return IdList.Value.Count;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Repositories;
 
 namespace SimTelemetry.Domain.Plugins
@@ -7,8 +8,9 @@ namespace SimTelemetry.Domain.Plugins
     {
         Simulator GetSimulator();
         Telemetry GetTelemetry();
-        ICarDataProvider GetCarDataProvider();
-        ITrackDataProvider GetTrackDataProvider();
+
+        ILazyRepositoryDataSource<Car, string> CarProvider { get; }
+        ILazyRepositoryDataSource<Track, string> TrackProvider { get; }
 
         void Initialize();
         void Deinitialize();

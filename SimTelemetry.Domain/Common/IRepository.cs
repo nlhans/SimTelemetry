@@ -8,6 +8,7 @@ namespace SimTelemetry.Domain.Common
         void AddRange(IEnumerable<T> entities);
         void Clear();
         bool Contains(T entity);
+        bool Store(T entity);
         bool Remove(T entity);
         IEnumerable<T> GetAll();
     }

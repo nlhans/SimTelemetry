@@ -31,6 +31,7 @@ namespace SimTelemetry.Domain.Aggregates
         public IEnumerable<Brake> Brakes { get { return _brakes; } }
 
         public bool Equals(Car other) { return other.ID == ID; }
+        public bool Equals(string other) { return other == ID; }
 
         public Car(string file, string name, string driver, string description, int startNumber)
         {
@@ -131,5 +132,6 @@ namespace SimTelemetry.Domain.Aggregates
         {
             return (CarClass.Intersect(cls).Count(x => true) > 0);
         }
+
     }
 }
