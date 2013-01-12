@@ -54,27 +54,31 @@ namespace SimTelemetry.Domain.Aggregates
         /********* TRACK ROUTE *********/
         private void UpdateTrackCoordinates(IEnumerable<TrackPoint> points)
         {
-            TrackCoordinateMinX = Math.Max(points.Min(x => x.X), TrackCoordinateMinX);
-            TrackCoordinateMaxX = Math.Max(points.Max(x => x.X), TrackCoordinateMaxX);
+            if (points.Count() > 0)
+            {
+                TrackCoordinateMinX = Math.Max(points.Min(x => x.X), TrackCoordinateMinX);
+                TrackCoordinateMaxX = Math.Max(points.Max(x => x.X), TrackCoordinateMaxX);
 
-            TrackCoordinateMinY = Math.Max(points.Min(x => x.Y), TrackCoordinateMinY);
-            TrackCoordinateMaxY = Math.Max(points.Max(x => x.Y), TrackCoordinateMaxY);
+                TrackCoordinateMinY = Math.Max(points.Min(x => x.Y), TrackCoordinateMinY);
+                TrackCoordinateMaxY = Math.Max(points.Max(x => x.Y), TrackCoordinateMaxY);
+            }
         }
 
-        public void SetRoute(IList<TrackPoint> route)
+        protected void SetRoute(IList<TrackPoint> route)
         {
             Route = route.Where(x => x.Type == TrackPointType.SECTOR1
                                      || x.Type == TrackPointType.SECTOR2
                                      || x.Type == TrackPointType.SECTOR3)
                 .OrderBy(x => x.Meter);
 
-            Length = route.Max(x => x.Meter) - route.Min(x => x.Meter);
+            if (Route.Count() > 0)
+                Length = Route.Max(x => x.Meter) - Route.Min(x => x.Meter);
 
             UpdateTrackCoordinates(Route);
 
         }
 
-        public void SetPits(IList<TrackPoint> route)
+        protected void SetPits(IList<TrackPoint> route)
         {
             Pits = route.Where(x => x.Type == TrackPointType.PITS)
                 .OrderBy(x => x.Meter);
@@ -83,7 +87,7 @@ namespace SimTelemetry.Domain.Aggregates
 
         }
 
-        public void SetGrid(IList<TrackPoint> route)
+        protected void SetGrid(IList<TrackPoint> route)
         {
             Grid = route.Where(x => x.Type == TrackPointType.GRID)
                 .OrderBy(x => x.Meter);
@@ -92,7 +96,7 @@ namespace SimTelemetry.Domain.Aggregates
 
         }
 
-        public void SetTrackPoints(IList<TrackPoint> points)
+        public void SetTrack(IList<TrackPoint> points)
         {
             SetRoute(points);
             SetPits(points);

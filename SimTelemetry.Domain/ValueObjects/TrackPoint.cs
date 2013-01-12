@@ -13,10 +13,10 @@ namespace SimTelemetry.Domain.ValueObjects
         public float Y { get; private set; }
         public float Z { get; private set; }
 
-        public double[] BoundsL { get; private set; }
-        public double[] BoundsR { get; private set; }
+        public float[] BoundsL { get; private set; }
+        public float[] BoundsR { get; private set; }
 
-        public TrackPoint(float meter, TrackPointType type, float x, float y, float z, double[] boundsL, double[] boundsR)
+        public TrackPoint(float meter, TrackPointType type, float x, float y, float z, float[] boundsL, float[] boundsR)
         {
             Meter = meter;
             Type = type;

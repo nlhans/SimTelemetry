@@ -28,7 +28,9 @@ namespace SimTelemetry.Domain.Common
         public virtual TType GetById(TId id)
         {
             if (data.Any(x => x.ID.Equals(id)))
+            {
                 return data.Where(x => x.ID.Equals(id)).FirstOrDefault();
+            }
             else
             {
                 if (Contains(id) == false)
@@ -36,7 +38,9 @@ namespace SimTelemetry.Domain.Common
 
                 var obj = DataSource.Get(id);
                 if (obj == null || obj.ID == null || !obj.ID.Equals(id))
+                {
                     return obj;
+                }
                 else
                 {
                     Add(obj);

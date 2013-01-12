@@ -26,7 +26,7 @@ namespace SimTelemetry.Tests.Aggregates
         }
 
         [Test]
-        public void CarConstruct()
+        public void Basic()
         {
             
 
@@ -47,7 +47,7 @@ namespace SimTelemetry.Tests.Aggregates
         }
 
         [Test]
-        public void CarClasses()
+        public void Classes()
         {
             Assert.AreNotEqual(null, car);
 

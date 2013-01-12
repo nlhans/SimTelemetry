@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Common;
 
@@ -12,12 +13,14 @@ namespace SimTelemetry.Domain.Repositories
 
         public Track GetByName(string name)
         {
-            return data.Where(x => x.Name == name).FirstOrDefault();
+            return GetIds().Select(GetById).Where(x => x.Name == name).FirstOrDefault();
         }
 
         public Track GetByFile(string file)
         {
-            return data.Where(x => x.ID == file).FirstOrDefault();
+            file = file.ToLower();
+            return GetById(GetIds().Where(x => Path.GetFileName(x) == file).FirstOrDefault());
+            //return data.Where(x => x.ID == file).FirstOrDefault();
         }
     }
 }
