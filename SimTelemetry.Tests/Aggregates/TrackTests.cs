@@ -52,14 +52,17 @@ namespace SimTelemetry.Tests.Aggregates
         [Test]
         public void Route()
         {
-            Assert.AreEqual(90.0f, track.Length); // 0-90 length
+            // track length
+            Assert.AreEqual(90.0f, track.Length); 
 
+            // Route list
             Assert.AreEqual(2, track.Pits.ToList().Count);
             Assert.AreEqual(1, track.Grid.ToList().Count);
             Assert.AreEqual(3, track.Route.Where(x => x.Type == TrackPointType.SECTOR1).ToList().Count);
             Assert.AreEqual(3, track.Route.Where(x => x.Type == TrackPointType.SECTOR2).ToList().Count);
             Assert.AreEqual(4, track.Route.Where(x => x.Type == TrackPointType.SECTOR3).ToList().Count);
 
+            // Route order point (asceding order of meters)
             var prevPoint = new TrackPoint(0, TrackPointType.GRID, 0,0,0, new float[1] { 0}, new float[0]);
             var prevPointInit = false;
             foreach(var point in track.Route)
@@ -71,6 +74,13 @@ namespace SimTelemetry.Tests.Aggregates
                 prevPointInit = true;
                 prevPoint = point;
             }
+
+            // Track bounds
+            Assert.AreEqual(-1.0f, track.TrackCoordinateMinX);
+            Assert.AreEqual(2.0f, track.TrackCoordinateMaxX);
+
+            Assert.AreEqual(-1.0f, track.TrackCoordinateMinY);
+            Assert.AreEqual(1.0f, track.TrackCoordinateMaxY);
         }
     }
 }

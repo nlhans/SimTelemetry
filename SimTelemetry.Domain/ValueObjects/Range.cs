@@ -1,22 +1,36 @@
-﻿using SimTelemetry.Domain.Common;
+﻿using System;
+using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Domain.ValueObjects
 {
+    public class NormalDistrbution : IValueObject<NormalDistrbution>
+    {
+        public float Optimum { get; private set; }
+        public float Deviation { get; private set; }
+
+        public NormalDistrbution(float step, float deviation)
+        {
+            Optimum = step;
+            Deviation = deviation;
+        }
+
+        public bool Equals(NormalDistrbution other)
+        {
+            return Optimum == other.Optimum && Deviation == other.Deviation;
+        }
+    }
+
     public class Range : IValueObject<Range>
     {
         public float Minimum { get; private set; }
         public float Optimum { get; private set; }
         public float Maximum { get; private set; }
-        public float Step { get; private set; }
-        public float Deviation { get; private set; }
 
         public Range()
         {
             Minimum = -1;
             Maximum = -1;
-            Step = -1;
             Optimum = -1;
-            Deviation = -1;
         }
 
         public Range(float minimum, float maximum) : this()
@@ -32,24 +46,6 @@ namespace SimTelemetry.Domain.ValueObjects
             Minimum = minimum;
             Maximum = maximum;
             Optimum = optimum;
-        }
-
-        public Range(float minimum, float maximum, float optimum, float deviation)
-            : this()
-        {
-            Minimum = minimum;
-            Maximum = maximum;
-            Optimum = optimum;
-            Deviation = deviation;
-        }
-
-        public Range(float minimum, float maximum, float optimum, float dev, float step)
-        {
-            Minimum = minimum;
-            Optimum = optimum;
-            Maximum = maximum;
-            Step = step;
-            Deviation = dev;
         }
 
         public bool Equals(Range other)

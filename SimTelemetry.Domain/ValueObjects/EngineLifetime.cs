@@ -7,11 +7,11 @@ namespace SimTelemetry.Domain.ValueObjects
     {
         public int Time { get; private set; }
 
-        public Range EngineRpm { get; private set; }
-        public Range OilTemperature { get; private set; }
-        public Range WaterTemperature { get; private set; }
+        public NormalDistrbution EngineRpm { get; private set; }
+        public NormalDistrbution OilTemperature { get; private set; }
+        public NormalDistrbution WaterTemperature { get; private set; }
 
-        public EngineLifetime(int time, Range engineRpm, Range oilTemperature, Range waterTemperature)
+        public EngineLifetime(int time, NormalDistrbution engineRpm, NormalDistrbution oilTemperature, NormalDistrbution waterTemperature)
         {
             Time = time;
             EngineRpm = engineRpm;

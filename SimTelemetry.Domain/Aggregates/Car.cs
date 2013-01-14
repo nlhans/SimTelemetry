@@ -67,6 +67,18 @@ namespace SimTelemetry.Domain.Aggregates
             }
         }
 
+        public void Assign(Drivetrain drivetrain)
+        {
+            if (Drivetrain == null)
+            {
+                Drivetrain = drivetrain;
+            }
+            else
+            {
+                throw new CarAlreadyHasDrivetrainException(this);
+            }
+        }
+
         public void Assign(Wheel wheel)
         {
             if (this.Wheels.Any(x => x.Location == wheel.Location) == false)

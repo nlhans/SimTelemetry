@@ -56,10 +56,10 @@ namespace SimTelemetry.Domain.Aggregates
         {
             if (points.Count() > 0)
             {
-                TrackCoordinateMinX = Math.Max(points.Min(x => x.X), TrackCoordinateMinX);
+                TrackCoordinateMinX = Math.Min(points.Min(x => x.X), TrackCoordinateMinX);
                 TrackCoordinateMaxX = Math.Max(points.Max(x => x.X), TrackCoordinateMaxX);
 
-                TrackCoordinateMinY = Math.Max(points.Min(x => x.Y), TrackCoordinateMinY);
+                TrackCoordinateMinY = Math.Min(points.Min(x => x.Y), TrackCoordinateMinY);
                 TrackCoordinateMaxY = Math.Max(points.Max(x => x.Y), TrackCoordinateMaxY);
             }
         }
