@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Tests.Events;
 
 namespace SimTelemetry.Tests.Core
@@ -46,7 +47,7 @@ namespace SimTelemetry.Tests.Core
             var files = Directory.GetFiles(TestConstants.SimulatorsBinFolder);
             var plugins = files.Where(x => x.Contains("SimTelemetry.Plugins."));
 
-            using (var pluginHost = new SimTelemetry.Domain.Plugins.Plugins())
+            using (var pluginHost = new Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
@@ -97,7 +98,7 @@ namespace SimTelemetry.Tests.Core
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
-                var rand = new Random().Next(2, 100);
+                var rand = new Random().Next(1, 5);
                 Debug.WriteLine("Initializing " + rand + " times");
                 for (int i = 0; i < rand; i++)
                 {

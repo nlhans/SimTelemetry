@@ -30,6 +30,8 @@ namespace SimTelemetry.Tests.Repositories
                 var carRepo = new CarRepository(testSim.CarProvider);
                 var cars = carRepo.GetIds().Count();
 
+                // I got over 1106 cars installed, so that's more than 1000.
+                Assert.Greater(cars,1000);
                 w.Stop();
                 Debug.WriteLine("[TIME] Retrieving ID list (" + cars + ") costs " + w.ElapsedMilliseconds + "ms");
                 w.Reset();
@@ -37,6 +39,7 @@ namespace SimTelemetry.Tests.Repositories
 
                 w.Start();
                 var f1Car = carRepo.GetByFile("JButton05.veh");
+                Assert.AreNotEqual(f1Car, null);
                 if (f1Car != null)
                     Debug.WriteLine("#" + f1Car.StartNumber + ". " + f1Car.Driver);
                 Debug.WriteLine("[TIME] Retrieving JButton05.veh car costs " + w.ElapsedMilliseconds + "ms");
@@ -44,6 +47,7 @@ namespace SimTelemetry.Tests.Repositories
                 w.Reset();
 
 
+                // This test is very very very slow:
                 /*w.Start();
                 cars = carRepo.GetAll().Count();
                 w.Stop();
@@ -53,10 +57,25 @@ namespace SimTelemetry.Tests.Repositories
 
                 w.Start();
                 f1Car = carRepo.GetByFile("TSATO05.veh");
+                Assert.AreNotEqual(f1Car, null);
                 if (f1Car != null)
                     Debug.WriteLine("#" + f1Car.StartNumber + ". " + f1Car.Driver);
                 Debug.WriteLine("[TIME] Retrieving TSATO05.veh car costs " + w.ElapsedMilliseconds + "ms");
                 w.Stop();
+
+                w.Reset();
+
+                // Verify that when cached, this is very quick:
+                w.Start();
+                f1Car = carRepo.GetByFile("JButton05.veh");
+                Assert.AreNotEqual(f1Car, null);
+                if (f1Car != null)
+                    Debug.WriteLine("#" + f1Car.StartNumber + ". " + f1Car.Driver);
+                Debug.WriteLine("[TIME] Retrieving JButton05.veh car costs " + w.ElapsedMilliseconds + "ms");
+
+                Assert.LessOrEqual(w.ElapsedMilliseconds, 1);
+                w.Stop();
+                w.Reset();
             }
         }
 

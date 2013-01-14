@@ -15,4 +15,20 @@ namespace SimTelemetry.Domain.Plugins
         void Initialize();
         void Deinitialize();
     }
+
+    public interface IPluginWidget : IPluginBase
+    {
+
+        void Initialize();
+        void Deinitialize();
+        
+    }
+    public interface IPluginExtension : IPluginBase
+    {
+        
+
+        void Initialize();
+        void Deinitialize();
+        
+    }
 }

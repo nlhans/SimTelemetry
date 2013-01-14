@@ -127,8 +127,8 @@ namespace LiveTelemetry.UI
                 else if (fi.PropertyType == typeof(float))
                 {
                     txt = string.Format("{0} = {1} ", pi.Name, Math.Round((float)value,3));
-                }
-                else
+                } 
+                else if (value != null)
                 {
                     txt = string.Format("{0} = {1} ", pi.Name, value.ToString());
                 }

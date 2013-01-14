@@ -6,9 +6,8 @@ using System.Linq;
 using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Utils;
 using SimTelemetry.Domain.ValueObjects;
-using SimTelemetry.Objects;
-using Triton;
 
 namespace SimTelemetry.Plugins.Tests
 {

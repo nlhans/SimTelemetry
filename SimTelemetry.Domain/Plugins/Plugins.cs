@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Exceptions;
-using SimTelemetry.Objects.Plugins;
 
 namespace SimTelemetry.Domain.Plugins
 {
@@ -31,14 +30,14 @@ namespace SimTelemetry.Domain.Plugins
         /// <summary>
         /// List of graphic interface plug-ins.
         /// </summary>
-        [ImportMany(typeof(IWidget))]
-        public IList<IWidget> Widgets { get; protected set; }
+        [ImportMany(typeof(IPluginWidget))]
+        public IList<IPluginWidget> Widgets { get; protected set; }
 
         /// <summary>
         /// List of 'extension' objects; these can access simulator data and handle it for e.g. hardware devices.
         /// </summary>
-        [ImportMany(typeof(IExtension))]
-        public IList<IExtension> Extensions { get; protected set; }
+        [ImportMany(typeof(IPluginExtension))]
+        public IList<IPluginExtension> Extensions { get; protected set; }
         #endregion
 
         /// <summary>
@@ -58,12 +57,12 @@ namespace SimTelemetry.Domain.Plugins
             }
 
             var simulatorsToDrop = new List<IPluginSimulator>();
-            var widgetsToDrop = new List<IWidget>();
-            var extensionsToDrop = new List<IExtension>();
+            var widgetsToDrop = new List<IPluginWidget>();
+            var extensionsToDrop = new List<IPluginExtension>();
 
             Simulators = new List<IPluginSimulator>();
-            Widgets = new List<IWidget>();
-            Extensions = new List<IExtension>();
+            Widgets = new List<IPluginWidget>();
+            Extensions = new List<IPluginExtension>();
 
             // Try to refresh DLL's from the plugin directory:
             try

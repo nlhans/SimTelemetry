@@ -7,6 +7,7 @@ using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Tests.Core
 {
+#if DEBUG
     [TestFixture]
     public class InMemoryRepositoryTests
     {
@@ -241,8 +242,8 @@ namespace SimTelemetry.Tests.Core
             GetIdsCalls++;
 
             // Do I/O, DB, stuff here
-            var ids = new List<string> {"1", "B", "!"};
-            return ids;
+            var ids2 = new List<string> {"1", "B", "!"};
+            return ids2;
         }
 
         public bool Add(InMemoryObject obj)
@@ -316,7 +317,8 @@ namespace SimTelemetry.Tests.Core
                 return Equals((string) obj);
             else
                 return false;
-        }
+        }
+
 
         public bool Equals(InMemoryObject other)
         {
@@ -333,4 +335,5 @@ namespace SimTelemetry.Tests.Core
             Test = test;
         }
     }
+#endif
 }

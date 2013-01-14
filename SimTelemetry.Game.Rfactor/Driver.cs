@@ -762,25 +762,36 @@ namespace SimTelemetry.Game.Rfactor
 
         public IWheel Wheel_LeftFront
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return null;  throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
 
         public IWheel Wheel_RightFront
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return null; throw new NotImplementedException();
+            }
             set { throw new NotImplementedException(); }
         }
 
         public IWheel Wheel_LeftRear
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return null; throw new NotImplementedException();
+            }
             set { throw new NotImplementedException(); }
         }
 
         public IWheel Wheel_RightRear
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return null; throw new NotImplementedException();
+            }
             set { throw new NotImplementedException(); }
         }
 

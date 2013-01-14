@@ -21,8 +21,10 @@ namespace SimTelemetry.Tests.Aggregates
         public void Dispose()
         {
             car = null;
+#if DEBUG
             GlobalEvents.Reset();
             Assert.AreEqual(0, GlobalEvents.Count);
+#endif
         }
 
         [Test]

@@ -4,23 +4,25 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using SimTelemetry.Domain;
-using SimTelemetry.Objects;
-using SimTelemetry.Objects.Plugins;
+using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Tests.Events;
 
 namespace SimTelemetry.Game.Tests
 {
-    [Export(typeof(IWidget))]
-    public class TestWidget : IWidget
+    [Export(typeof(IPluginWidget))]
+    public class TestWidget : IPluginWidget
     {
-        public ITelemetry Host { get; set; }
-
         public TestWidget()
         {
             GlobalEvents.Fire(new PluginTestWidgetConstructor(), false);
         }
 
         public string PluginId
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public int ID
         {
             get { throw new NotImplementedException(); }
         }
@@ -36,6 +38,11 @@ namespace SimTelemetry.Game.Tests
         }
 
         public string Author
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public DateTime CompilationTime
         {
             get { throw new NotImplementedException(); }
         }
@@ -73,6 +80,11 @@ namespace SimTelemetry.Game.Tests
         public bool Resizable
         {
             get { throw new NotImplementedException(); }
+        }
+
+        public bool Equals(IPluginBase other)
+        {
+            return other.ID == ID;
         }
     }
 }

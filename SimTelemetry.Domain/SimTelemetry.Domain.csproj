@@ -23,12 +23,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -103,6 +105,7 @@
     <Compile Include="Repositories\ITrackDataProvider.cs" />
     <Compile Include="Repositories\ITrackRepository.cs" />
     <Compile Include="Repositories\TrackRepository.cs" />
+    <Compile Include="Utils\IniScanner.cs" />
     <Compile Include="ValueObjects\EngineLifetime.cs" />
     <Compile Include="ValueObjects\EngineMode.cs" />
     <Compile Include="ValueObjects\Lap.cs" />
@@ -116,12 +119,6 @@
     <Compile Include="Enumerations\TrackPointType.cs" />
     <Compile Include="ValueObjects\Session.cs" />
     <Compile Include="Enumerations\WheelLocation.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
-      <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
-      <Name>SimTelemetry.Objects</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />

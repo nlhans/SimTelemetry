@@ -37,21 +37,32 @@ namespace SimTelemetry.Tests.Repositories
 
                 w.Start();
                 var Spa = trackRepo.GetByFile("67_SPA.GDB");
-
-                if (Spa != null)
-                    Debug.WriteLine(Spa.Name + " " + Spa.Length);
+                Assert.AreNotEqual(null, Spa);
+                Debug.WriteLine(Spa.Name + " " + Spa.Length);
 
                 w.Stop();
                 Debug.WriteLine("[TIME] Retrieving Spa 1967 costs " + w.ElapsedMilliseconds + "ms");
                 w.Reset();
 
+                // Building all tracks can take seconds.
                 /*w.Start();
                 foreach(var track in trackRepo.GetAll())
                     Debug.WriteLine(track.Name + "=" + track.Length);
                 w.Stop();
                 Debug.WriteLine("[TIME] Retrieving all tracks costs " + w.ElapsedMilliseconds + "ms");*/
-                GC.Collect();
-                System.Threading.Thread.Sleep(1000);
+
+
+                w.Start();
+                
+                Spa = trackRepo.GetByFile("67_SPA.GDB");
+                Assert.AreNotEqual(null, Spa);
+                Debug.WriteLine(Spa.Name + " " + Spa.Length);
+
+                w.Stop();
+                Debug.WriteLine("[TIME] Retrieving Spa 1967 costs " + w.ElapsedMilliseconds + "ms");
+                Assert.LessOrEqual(w.ElapsedMilliseconds, 1);
+                w.Reset();
+
                 var dmem = GC.GetTotalMemory(true) - mem;
                 Debug.WriteLine(dmem);
                 w.Reset();

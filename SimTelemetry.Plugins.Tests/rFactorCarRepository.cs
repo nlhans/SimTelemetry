@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Common;
-using SimTelemetry.Objects;
+using SimTelemetry.Domain.Utils;
 
 namespace SimTelemetry.Plugins.Tests
 {

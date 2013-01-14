@@ -4,6 +4,7 @@ using SimTelemetry.Domain;
 
 namespace SimTelemetry.Tests.Core
 {
+#if DEBUG
     public class TestEvent1Handler
     {
         public string Message1 { get; set; }
@@ -101,4 +102,5 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(2, _event2HandleCount);
         }
     }
+#endif
 }

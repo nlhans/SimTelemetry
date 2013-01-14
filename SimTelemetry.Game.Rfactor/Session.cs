@@ -30,7 +30,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                return rFactor.MMF.Hooked && rFactor.MMF.Telemetry.SessionRunning;
+                //return rFactor.MMF.Hooked && rFactor.MMF.Telemetry.SessionRunning;
 
                 // In addition to checking obvious Active Session remarks, check some game data
                 // to verify a session is actual running.
