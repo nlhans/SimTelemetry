@@ -9,7 +9,6 @@ namespace SimTelemetry.Tests.Repositories
     [TestFixture]
     class CarRepositoryTests
     {
-
         [Test]
         public void CarDataProviderTests()
         {
@@ -53,7 +52,6 @@ namespace SimTelemetry.Tests.Repositories
                 w.Stop();
                 Debug.WriteLine("[TIME] Retrieving all (other) cars costs " + w.ElapsedMilliseconds + "ms");
                 w.Reset();*/
-
 
                 w.Start();
                 f1Car = carRepo.GetByFile("TSATO05.veh");

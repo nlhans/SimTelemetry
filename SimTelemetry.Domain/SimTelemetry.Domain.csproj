@@ -105,7 +105,9 @@
     <Compile Include="Repositories\ITrackDataProvider.cs" />
     <Compile Include="Repositories\ITrackRepository.cs" />
     <Compile Include="Repositories\TrackRepository.cs" />
-    <Compile Include="Utils\IniScanner.cs" />
+    <Compile Include="Utils\IniReader.cs" />
+    <Compile Include="Utils\IniScannerOld.cs" />
+    <Compile Include="Utils\IniValueObject.cs" />
     <Compile Include="ValueObjects\EngineLifetime.cs" />
     <Compile Include="ValueObjects\EngineMode.cs" />
     <Compile Include="ValueObjects\Lap.cs" />

@@ -28,6 +28,7 @@ namespace SimTelemetry.Tests.Core
     {
         public void Initialize()
         {
+            GlobalEvents.Reset();
             //
             _event1HandleCount = 0;
             _event2HandleCount = 0;

@@ -7,7 +7,7 @@ using Triton;
 namespace SimTelemetry.Domain.Utils
 {
 
-    public class IniScanner
+    public class IniScannerOld
     {
         /// <summary>
         /// The data dictionary with groups, keys and then data (arrays).
@@ -128,7 +128,7 @@ namespace SimTelemetry.Domain.Utils
             return value;
         }
 
-        public IniScanner()
+        public IniScannerOld()
         {
             FireEventsForKeys = new List<string>();
             Group = "Main";

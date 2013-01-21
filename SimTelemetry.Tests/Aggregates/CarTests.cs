@@ -98,9 +98,9 @@ namespace SimTelemetry.Tests.Aggregates
             var hasException = false;
             var testEng = new CarTestEngine("V10 3.0L", "Cosworth", 10, 3000, new Range(3000, 4000),
                                             new Range(17500, 18500), new List<EngineMode>(), new List<EngineTorque>(),
-                                            new EngineLifetime(3600, new NormalDistrbution(15000, 100),
-                                                               new NormalDistrbution(100, 5),
-                                                               new NormalDistrbution(95, 5)));
+                                            new EngineLifetime(new NormalDistrbution(3600, 200),
+                                                               new NormalDistrbution(15000, 100),
+                                                               new NormalDistrbution(100, 5)));
 
             car.Assign(testEng);
 

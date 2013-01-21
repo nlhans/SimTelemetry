@@ -8,9 +8,9 @@ namespace SimTelemetry.Domain.ValueObjects
         public float Optimum { get; private set; }
         public float Deviation { get; private set; }
 
-        public NormalDistrbution(float step, float deviation)
+        public NormalDistrbution(float optimum, float deviation)
         {
-            Optimum = step;
+            Optimum = optimum;
             Deviation = deviation;
         }
 
@@ -25,12 +25,15 @@ namespace SimTelemetry.Domain.ValueObjects
         public float Minimum { get; private set; }
         public float Optimum { get; private set; }
         public float Maximum { get; private set; }
+        public float Step { get; private set; }
+        public float Span { get { return Maximum - Minimum; } }
 
         public Range()
         {
             Minimum = -1;
             Maximum = -1;
             Optimum = -1;
+            Step = -1;
         }
 
         public Range(float minimum, float maximum) : this()
@@ -48,9 +51,18 @@ namespace SimTelemetry.Domain.ValueObjects
             Optimum = optimum;
         }
 
+        public Range(float minimum, float maximum, float optimum, float step)
+            : this()
+        {
+            Minimum = minimum;
+            Maximum = maximum;
+            Optimum = optimum;
+            Step = step;
+        }
+
         public bool Equals(Range other)
         {
-            return other.Minimum == Minimum && other.Maximum == Maximum && other.Optimum == Optimum;
+            return other.Minimum == Minimum && other.Maximum == Maximum && other.Optimum == Optimum && Step == other.Step;
         }
     }
 }

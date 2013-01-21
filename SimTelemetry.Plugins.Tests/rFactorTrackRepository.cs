@@ -37,7 +37,7 @@ namespace SimTelemetry.Plugins.Tests
             System.Threading.Thread.Sleep(10);
             Debug.WriteLine("Track::Get(\"" + id + "\")");
             //
-            var scan = new IniScanner { IniFile = FilePath + id };
+            var scan = new IniScannerOld { IniFile = FilePath + id };
             scan.Read();
 
             // Read data:
@@ -58,7 +58,7 @@ namespace SimTelemetry.Plugins.Tests
             float[] boundsL = new float[0], boundsR = new float[0];
             var perpVector = new float[3] { 0.0f, 0.0f, 0.0f };
 
-            var track_aiw = new IniScanner { IniFile = FilePath + id.Replace("gdb", "aiw") };
+            var track_aiw = new IniScannerOld { IniFile = FilePath + id.Replace("gdb", "aiw") };
             track_aiw.HandleCustomKeys += (d) =>
                                               {
 

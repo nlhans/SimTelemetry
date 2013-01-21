@@ -1,14 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using NUnit.Framework;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Plugins;
-using SimTelemetry.Domain.Repositories;
 using SimTelemetry.Tests.Events;
 
-namespace SimTelemetry.Tests
+namespace SimTelemetry.Tests.Aggregates
 {
     [TestFixture]
     public class SimulatorTests
