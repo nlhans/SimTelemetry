@@ -23,8 +23,20 @@ namespace SimTelemetry.Objects.Peripherals
     public delegate void DevicePacketEvent(DevicePacket packet, object sender);
     public class DevicePacket
     {
-        public int ID { get; set; }
-        public int Length { get; set; }
-        public byte[] Data { get; set; }
+        public int ID { get; private set; }
+        public int Length { get; private set; }
+        public byte CRC { get; private set; }
+        public byte[] Data { get; private set; }
+
+        public DevicePacket(int id,byte[] data)
+        {
+            ID = id;
+            Length = data.Length;
+            Data = data;
+
+            CRC = 0xAA;
+            foreach (byte b in data)
+                CRC -= b;
+        }
     }
 }

@@ -21,19 +21,14 @@ namespace SimTelemetry.Tests.Utils
             {
                 ioException = true;
             }
-            catch (Exception ex)
+            catch
             {
-
+                Assert.Fail();
             }
             Assert.IsTrue(ioException);
 
-            var reader =
-                new IniReader(@"C:\Program Files (x86)\rFactor\rFm\BMWM3.rfm");
-            reader.AddHandler(x =>
-                                  {
-                                      if (x.NestedGroupName.Contains("SeasonScoringInfo"))
-                                           Debug.WriteLine(x.NestedGroupName + "." + x.Key + "=" + x.ReadAsString());
-                                  } );
+            var reader = new IniReader(@"C:\Program Files (x86)\rFactor\rFm\BMWM3.rfm");
+            reader.AddHandler(x => Debug.WriteLine(x.NestedGroupName + "." + x.Key + "=" + string.Join(",",x.ReadAsStringArray())));
             reader.Parse();
         }
     }

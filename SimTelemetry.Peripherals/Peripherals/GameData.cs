@@ -26,6 +26,7 @@ using System.Text;
 using System.Threading;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
+using SimTelemetry.Objects.Garage;
 using SimTelemetry.Objects.Peripherals;
 using SimTelemetry.Peripherals.Peripherals;
 
@@ -108,10 +109,11 @@ namespace SimTelemetry.Peripherals.Dashboard
         public static int GetGear()
         {
             return Telemetry.m.Sim.Player.Gear;
+            /*
             if (Telemetry.m.Sim.Drivers.Player.Gear == 0) return 0;
             double CurrentRatio = GetGearRatio_Pure(Telemetry.m.Sim.Drivers.Player.Gear);
 
-            for (int i = 0; i <= Telemetry.m.Sim.Drivers.Player.Gears + 3; i++)
+            for (int i = 0; i <= Telemetry.m.Sim.Drivers.Player.Gears; i++)
             {
                 double d = CurrentRatio / ShiftRpm.GetRatio(i);
                 if (d < 1.03 && d > 0.97)
@@ -120,6 +122,7 @@ namespace SimTelemetry.Peripherals.Dashboard
                     return Telemetry.m.Sim.Drivers.Player.Gears;
             }
             return 0;
+             */
         }
         #endregion
         #region Package
@@ -127,7 +130,7 @@ namespace SimTelemetry.Peripherals.Dashboard
         private Semaphore SerialPort_Lock = new Semaphore(1, 1);
         private void SendPackage(DashboardPackages package, byte[] data)
         {
-            DevicePacket pk = new DevicePacket { Data = data, ID = Convert.ToInt32(package), Length = data.Length };
+            DevicePacket pk = new DevicePacket((int)package, data);
             Telemetry.m.Peripherals.TX(pk, "");
             return;
             SerialPort_Lock.WaitOne();
@@ -234,11 +237,11 @@ namespace SimTelemetry.Peripherals.Dashboard
 
                 if (Telemetry.m.Active_Session)
                 {
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(Fire_HS), null);
+                    ThreadPool.QueueUserWorkItem(Fire_HS, null);
 
                     if (i > 2500)
                     {
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(Fire_LS), null);
+                        ThreadPool.QueueUserWorkItem(Fire_LS, null);
                         i = 0;
                     }
                 }
@@ -247,10 +250,14 @@ namespace SimTelemetry.Peripherals.Dashboard
 
         private void Fire_LS(object o)
         {
-            return;
-
             try
             {
+                ICar car = Telemetry.m.Sim.Garage.SearchCar(Telemetry.m.Sim.Drivers.Player.CarClass,
+                                                 Telemetry.m.Sim.Drivers.Player.CarModel);
+                car.Scan();
+                car.ScanGeneral();
+                car.ScanEngine();
+
             GameData_LS package = new GameData_LS();
 
             /** TYRE TEMPERATURES **/
@@ -267,8 +274,8 @@ namespace SimTelemetry.Peripherals.Dashboard
             catch (Exception ex)
             { }
             /** TYRE & BRAKE WEAR **/
-            package.TyreWear_F = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.Wheel_LeftFront.Wear + Telemetry.m.Sim.Drivers.Player.Wheel_RightFront.Wear, 0, 2) / 2.0);
-            package.TyreWear_R = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.Wheel_LeftRear.Wear + Telemetry.m.Sim.Drivers.Player.Wheel_RightRear.Wear, 0, 2) / 2.0);
+            // package.TyreWear_F = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.Wheel_LeftFront.Wear + Telemetry.m.Sim.Drivers.Player.Wheel_RightFront.Wear, 0, 2) / 2.0);
+            //package.TyreWear_R = Convert.ToByte(200 * Limits(Telemetry.m.Sim.Drivers.Player.Wheel_LeftRear.Wear + Telemetry.m.Sim.Drivers.Player.Wheel_RightRear.Wear, 0, 2) / 2.0);
             package.BrakeWear_F = 0;
             package.BrakeWear_R = 0;
 
@@ -303,13 +310,15 @@ namespace SimTelemetry.Peripherals.Dashboard
 
             /*** Temporarely do cardata here as well ***/
             CarData cardata = new CarData();
-            cardata.RPM_Max = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Max * rads_to_rpm,200,25000)-200);
-            cardata.RPM_Idle = Convert.ToUInt16(Limits(Telemetry.m.Sim.Car.Engine_RPM_Idle_Max * rads_to_rpm, 0, 7000));
+
+            cardata.RPM_Max = Convert.ToUInt16(Limits(Telemetry.m.Sim.Player.Engine_RPM_Max_Live ,200,25000)-200);
+            cardata.RPM_Idle = Convert.ToUInt16(Limits(car.Engine.IdleRPM * rads_to_rpm, 0, 7000));
+                cardata.RPM_Idle = 1000;
 
             //cardata.HP_Max = Convert.ToUInt16(EngineCurve.GetMaxHP());
-            cardata.Gears = (byte)Limits(Telemetry.m.Sim.Car.Gears,0, 10);
-            cardata.Fuel_Max = (byte)Limits(Telemetry.m.Sim.Car.Fuel_Max,0,100);
-
+            cardata.Gears = (byte)Limits(car.Gearbox.Gears,0, 10);
+            //cardata.Fuel_Max = (byte)Limits(car.General.Fueltank,0,100);
+                cardata.Fuel_Max = 100;
             cardata.GearRatio0 = Convert.ToSingle(Limits(GetGearRatio_Pure(0),0,20));
             cardata.GearRatio1 = Convert.ToSingle(Limits(GetGearRatio_Pure(1),0,20));
             cardata.GearRatio2 = Convert.ToSingle(Limits(GetGearRatio_Pure(2),0,20));
@@ -330,16 +339,16 @@ namespace SimTelemetry.Peripherals.Dashboard
                 cardata.GearRatio4 = cardata.GearRatio3 * 0.85f;
                 cardata.GearRatio5 = cardata.GearRatio4 * 0.85f;
                 cardata.GearRatio6 = cardata.GearRatio5 * 0.85f;
-            }
+            }*/
             ShiftRpm r = new ShiftRpm();
-             * cardata.RPM_Shift0 = cardata.RPM_Max;
+            cardata.RPM_Shift0 = cardata.RPM_Max;
             cardata.RPM_Shift1 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(1)));
             cardata.RPM_Shift2 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(2)));
             cardata.RPM_Shift3 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(3)));
             cardata.RPM_Shift4 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(4)));
             cardata.RPM_Shift5 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(5)));
-            cardata.RPM_Shift6 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(6)));*/
-            ShiftRpm r = new ShiftRpm();
+            cardata.RPM_Shift6 = Convert.ToUInt16(r.Get(1, r.GetRatioBetween(6)));
+            /*ShiftRpm r = new ShiftRpm();
             cardata.RPM_Shift0 = cardata.RPM_Max;
             cardata.RPM_Shift1 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
             cardata.RPM_Shift2 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
@@ -347,7 +356,7 @@ namespace SimTelemetry.Peripherals.Dashboard
             cardata.RPM_Shift4 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
             cardata.RPM_Shift5 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
             cardata.RPM_Shift6 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
-            cardata.RPM_Shift7 = (ushort)Limits(cardata.RPM_Max, 0, 25000);
+            cardata.RPM_Shift7 = (ushort)Limits(cardata.RPM_Max, 0, 25000);*/
 
             SendPackage(DashboardPackages.PACK_CARDATA, ByteMethods.ToBytes(cardata));
 
@@ -376,7 +385,9 @@ namespace SimTelemetry.Peripherals.Dashboard
                 i += 9;
                 k++;
             }
+                string t = BitConverter.ToString(bf);
             SendPackage(DashboardPackages.PACK_PREFS_SHIFTBAR, bf);
+                /*
             bf = new byte[leds.Length * 9 + 1];
             bf[0] = 1;
             i = 1;
@@ -400,6 +411,7 @@ namespace SimTelemetry.Peripherals.Dashboard
                 k++;
             }
             SendPackage(DashboardPackages.PACK_PREFS_SHIFTBAR, bf);
+                */
 
             }
             catch (Exception ex)
@@ -418,7 +430,6 @@ namespace SimTelemetry.Peripherals.Dashboard
         }
         private void Fire_HS(object o)
         {
-            return;
             try
             {
 
@@ -471,8 +482,8 @@ namespace SimTelemetry.Peripherals.Dashboard
 
 
                 /** MORE DRIVING **/
-                package.Speed = Convert.ToUInt16(Math.Round(Math.Abs(Limits(Telemetry.m.Sim.Player.Speed,0,125) * 3.6)));
-                package.RPM = Convert.ToUInt16(Math.Round(Limits(rads_to_rpm * Telemetry.m.Sim.Player.Engine_RPM, 0, 25000)));
+                package.Speed = Convert.ToUInt16(Math.Round(Math.Abs(Limits(Telemetry.m.Sim.Drivers.Player.Speed,0,125) * 3.6)));
+                package.RPM = Convert.ToUInt16(Math.Round(Limits(rads_to_rpm * Telemetry.m.Sim.Drivers.Player.RPM, 0, 25000)));
                 double torque = Limits(Telemetry.m.Sim.Player.Engine_Torque,-200,1000);
                 if (double.IsNaN(torque) == false && double.IsInfinity(torque) == false && torque > -10000 && torque <= 100000)
                 {

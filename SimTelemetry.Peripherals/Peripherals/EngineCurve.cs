@@ -20,8 +20,10 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using SimTelemetry.Data;
 using SimTelemetry.Objects;
+using Triton.Memory;
 
 namespace SimTelemetry.Peripherals.Dashboard
 {
@@ -29,13 +31,16 @@ namespace SimTelemetry.Peripherals.Dashboard
     {
         public static List<double> DoubleList = new List<double>();
 
+        private static MemoryReader rf = new MemoryReader();
+
         public static double GetTorque(double RPM, double throttle, double boost)
         {
+
             int BaseEngineCurve = 0x00ADD94C; // TODO: MAP TO SIMULATOR MAPPING
 
             // get engine torque figures (at this engine RPM)
             // this is directly from memory based engine curves.
-            double Rads = Rotations.RPM_Rads(RPM);
+            double Rads = (RPM);
             double Th_L = 0;
             double Th_H = 0;
             double Tl_L = 0;
@@ -47,36 +52,55 @@ namespace SimTelemetry.Peripherals.Dashboard
             double Th_Prev = 0;
             double Tl_Prev = 0;
             double R_Prev = 0;
-            bool Cached = ((DoubleList.Count == 0) ? false : true);
+            bool Cached = ((DoubleList.Count <= 25) ? false : true);
             if (!Cached)
             {
-                for (offset = 0; offset < 500; offset++)
+                lock (rf)
                 {
+                    if (DoubleList.Count > 25) return 0;
+                    bool rfOpen = false;
+                    try
+                    {
+                        rf.ReadProcess = Process.GetProcessesByName(Telemetry.m.Sim.ProcessName)[0];
+                        rf.OpenProcess();
+                        rfOpen = true;
+                        DoubleList.Clear();
+                        for (offset = 0; offset < 500; offset++)
+                        {
 
-                    double curve_rpm = 0, Tl_Now = 0, Th_Now = 0;
-                    // read rpm
-                    // TOOD: RFACTOR ONLY
-                    // TODO: these operations need to be moved to game DLL's!!!
-                    /*curve_rpm = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 3 * offset));
-                    Tl_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 1 + 0x8 * 3 * offset));
-                    Th_Now = Telemetry.m.Sim.Memory.ReadDouble(new IntPtr(BaseEngineCurve + 0x8 * 2 + 0x8 * 3 * offset));*/
+                            double curve_rpm = 0, Tl_Now = 0, Th_Now = 0;
+                            // read rpm
+                            // TOOD: RFACTOR ONLY
+                            // TODO: these operations need to be moved to game DLL's!!!
+                            curve_rpm = Rotations.Rads_RPM(rf.ReadDouble(new IntPtr(BaseEngineCurve + 0x8*3*offset)));
+                            Tl_Now = rf.ReadDouble(new IntPtr(BaseEngineCurve + 0x8*1 + 0x8*3*offset));
+                            Th_Now = rf.ReadDouble(new IntPtr(BaseEngineCurve + 0x8*2 + 0x8*3*offset));
 
-                    DoubleList.Add(curve_rpm);
-                    DoubleList.Add(Tl_Now);
-                    DoubleList.Add(Th_Now);
+                            DoubleList.Add(curve_rpm);
+                            DoubleList.Add(Tl_Now);
+                            DoubleList.Add(Th_Now);
 
+                        }
+                        Cached = true;
+                        offset = 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        Cached = false;
+                        DoubleList.Clear();
+                    }
+                    if (rfOpen)
+                        rf.CloseHandle();
                 }
-                Cached = true;
-                offset = 0;
-
             }
+
             while (Th_H == 0)
             {
 
                 double curve_rpm, Tl_Now, Th_Now;
-                curve_rpm = DoubleList[offset * 3];
-                Tl_Now = DoubleList[offset * 3 + 1];
-                Th_Now = DoubleList[offset * 3 + 2];
+                curve_rpm = DoubleList[offset*3];
+                Tl_Now = DoubleList[offset*3 + 1];
+                Th_Now = DoubleList[offset*3 + 2];
 
 
                 if (curve_rpm >= Rads)
@@ -99,13 +123,16 @@ namespace SimTelemetry.Peripherals.Dashboard
                 offset++;
 
             }
-
+            if (Th_H == 0)
+            {
+                
+            }
             // calculate duty cycle and determine torque.
-            double RPM_Part = (Rads - R_L) / (R_H - R_L); // factor in rpm curve.
-            double TorqueH = Th_L + RPM_Part * (Th_H - Th_L);
-            double TorqueL = Tl_L + RPM_Part * (Tl_H - Tl_L);
+            double RPM_Part = (Rads - R_L)/(R_H - R_L); // factor in rpm curve.
+            double TorqueH = Th_L + RPM_Part*(Th_H - Th_L);
+            double TorqueL = Tl_L + RPM_Part*(Tl_H - Tl_L);
             //return TorqueH * throttle * boost + TorqueL * boost;
-            return (TorqueH - TorqueL) * throttle * boost + TorqueL;
+            return (TorqueH - TorqueL)*throttle*boost + TorqueL;
         }
 
         public static double GetMaxHP_RPM()

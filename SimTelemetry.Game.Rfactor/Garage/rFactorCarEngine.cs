@@ -27,6 +27,23 @@ using Triton;
 
 namespace SimTelemetry.Game.Rfactor.Garage
 {
+    public class rFactorCarGearbox : ICarGearbox
+    {
+        public string File { get; private set; }
+        public double ShiftTime_Up { get; private set; }
+        public double ShiftTime_Down { get; private set; }
+        public int Gears { get; private set; }
+        public double[] Ratios { get; private set; }
+        public double[] Finals { get; private set; }
+        public double[] Ratio_Stock { get; private set; }
+        public double Final_Stock { get; private set; }
+
+        public rFactorCarGearbox(int gears)
+        {
+            Gears = gears;
+        }
+    }
+
     public class rFactorCarEngine : ICarEngine
     {
         private Dictionary<double, double> EngineTorque_Min;

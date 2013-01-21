@@ -20,7 +20,9 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
+using System.Linq;
 using System.Threading;
 using SimTelemetry.Objects.Peripherals;
 
@@ -54,10 +56,15 @@ namespace SimTelemetry.Objects
         {
             while (true)
             {
-                while (TX_Buffer.Count != 0)
+                try
                 {
-                    TX_Sync(TX_Buffer[0]);
-                    TX_Buffer.RemoveAt(0);
+                    while (TX_Buffer.Count != 0)
+                    {
+                        TX_Sync(TX_Buffer[0]);
+                        TX_Buffer.RemoveAt(0);
+                    }
+                }catch
+                {
                 }
                 Thread.Sleep(1);
             }
@@ -74,8 +81,8 @@ namespace SimTelemetry.Objects
                 packet.length = (UInt16)(devicePacket.Length);
                 packet.id = (byte)devicePacket.ID;
                 packet.crc = 0xAA;
-                for (int i = 0; i < devicePacket.Data.Length; i++)
-                    packet.crc += devicePacket.Data[i];
+                foreach (var t in devicePacket.Data)
+                    packet.crc += t;
 
                 // Write header
                 byte[] bPacket = ByteMethods.ToBytes(packet);
@@ -84,12 +91,12 @@ namespace SimTelemetry.Objects
                 // Write packet data
                 SP.Write(devicePacket.Data, 0, devicePacket.Length);
 
-                // Write junk incase bytes are missed on embedded system.
-                // This way there is a better chance the next package is received.
-                byte[] bf = new byte[2];
-                bf[0] = 0;
-                bf[1] = 0;
-                SP.Write(bf, 0, 2);
+                byte[] dump = new byte[64];
+                for (int lol = 0; lol < 64; lol++)
+                    dump[lol] = 64;
+
+                    SP.Write(dump, 0, 16);
+        
             }
             catch (Exception ex)
             { }
@@ -120,7 +127,7 @@ namespace SimTelemetry.Objects
 
                         ByteMethods.memcpy(data, RX_Buffer.ToArray(), length, 0, i + 5);
 
-                        DevicePacket packet = new DevicePacket{Data=data, ID=id, Length=length};
+                        DevicePacket packet = new DevicePacket(id, data);
                         if (RX != null) RX(packet, this);
 
                         // Done
@@ -140,6 +147,7 @@ namespace SimTelemetry.Objects
 
         public void TX(DevicePacket packet)
         {
+            if(!TX_Buffer.Any(x => x.ID == packet.ID))
                 TX_Buffer.Add(packet);
         }
 

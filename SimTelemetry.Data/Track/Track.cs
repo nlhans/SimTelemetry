@@ -105,6 +105,7 @@ namespace SimTelemetry.Data.Track
         private double PreviousTime;
         public void LapLogger_Elapsed(object sender, ElapsedEventArgs e)
         {
+            return;
             if (Telemetry.m.Active_Session && Telemetry.m.Sim.Modules.Time_Available )
             {
                 try

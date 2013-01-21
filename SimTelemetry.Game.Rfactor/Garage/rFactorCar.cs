@@ -254,6 +254,10 @@ namespace SimTelemetry.Game.Rfactor.Garage
                         _mHDV = new IniScanner {IniFile = _files["Vehicle"]};
                         _mHDV.IgnoreGroups = false;
                         _mHDV.Read();
+
+                        int gears = _mHDV.TryGetInt32("DRIVELINE","forwardgears");
+
+                        _gearbox = new rFactorCarGearbox(gears);
                     }
                     catch (Exception e)
                     {

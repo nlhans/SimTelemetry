@@ -36,7 +36,7 @@ namespace SimTelemetry.Peripherals.Dashboard
         public double TorqueInt(double low, double high, double throttle)
         {
             double i = 0;
-            double step = 75 / 4;
+            double step = 25;
             // Stepsize = 25rpm
 
             for (double rpm = low; rpm < high; rpm += step)
@@ -119,13 +119,13 @@ namespace SimTelemetry.Peripherals.Dashboard
 
         public double Get(double throttle, double ratio)
         {
-            double MaxRPM = Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live);
+            double MaxRPM = Telemetry.m.Sim.Player.Engine_RPM_Max_Live;
             double PF = double.MinValue;
             double PF2 = double.MinValue;
-            double low = MaxRPM * (0.1 + 0.9 * throttle) * 0.6;
-            double Step = 75;
+            double low = MaxRPM * (0.1 + 0.9 * throttle) * 0.5;
+            double Step = 25;
             if (GetTorque(Telemetry.m.Sim.Player.Engine_RPM, throttle) < 0)
-                return Rotations.Rads_RPM(Telemetry.m.Sim.Player.Engine_RPM_Max_Live);
+                return Telemetry.m.Sim.Player.Engine_RPM_Max_Live;
             // Search the point
             Dictionary<double, double> ShiftPoints = new Dictionary<double, double>();
             for (double rpm = low; rpm < MaxRPM; rpm += Step)

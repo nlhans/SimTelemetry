@@ -62,7 +62,7 @@
     <Compile Include="Repositories\TrackRepositoryTests.cs" />
     <Compile Include="Aggregates\SimulatorTests.cs" />
     <Compile Include="TestConstants.cs" />
-    <Compile Include="Utils\IniReaderTEsts.cs" />
+    <Compile Include="Utils\IniReaderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">

@@ -47,6 +47,7 @@ namespace SimTelemetry.Peripherals.Peripherals
 
         void Switchboard_PotTurn(int pot, int direction, int steps)
         {
+            return;
             // TODO: handle brake & throttle mapping
             int step = steps;
             switch(pot)
@@ -71,10 +72,7 @@ namespace SimTelemetry.Peripherals.Peripherals
                         Revs -= step;
 
                     
-                    DevicePacket MaximumRPM = new DevicePacket();
-                    MaximumRPM.ID = Convert.ToInt32(DashboardPackages.PACK_PREFS_ENGINEREVS);
-                    MaximumRPM.Length = 4;
-                    MaximumRPM.Data = BitConverter.GetBytes(Convert.ToInt32(Revs));
+                    DevicePacket MaximumRPM = new DevicePacket(Convert.ToInt32(DashboardPackages.PACK_PREFS_ENGINEREVS),BitConverter.GetBytes(Convert.ToInt32(Revs)));
 
                     Telemetry.m.Peripherals.TX(MaximumRPM, "Dashboard");
                     break;
@@ -101,10 +99,7 @@ namespace SimTelemetry.Peripherals.Peripherals
                     else
                         CruiseControl -= step;
                     
-                    DevicePacket Speed = new DevicePacket();
-                    Speed.ID = Convert.ToInt32(DashboardPackages.PACK_PREFS_CRUISECONTROL);
-                    Speed.Length = 4;
-                    Speed.Data = BitConverter.GetBytes(Convert.ToInt32(CruiseControl));
+                    DevicePacket Speed = new DevicePacket(Convert.ToInt32(DashboardPackages.PACK_PREFS_CRUISECONTROL), BitConverter.GetBytes(Convert.ToInt32(CruiseControl)));
 
                     Telemetry.m.Peripherals.TX(Speed, "Switchboard");
                     Telemetry.m.Peripherals.TX(Speed, "Dashboard");
