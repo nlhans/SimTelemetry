@@ -1117,6 +1117,7 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
+                return rFactor.Drivers.Player.Speed;
                 return 0;// return rFactor.MMF.Telemetry.Player.Speed; 
             }
         }

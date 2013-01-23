@@ -764,7 +764,8 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                return null;  throw new NotImplementedException(); }
+                return new DriverWheel(BaseAddress, 0); throw new NotImplementedException();
+            }
             set { throw new NotImplementedException(); }
         }
 
@@ -772,7 +773,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                return null; throw new NotImplementedException();
+                return new DriverWheel(BaseAddress, 1); throw new NotImplementedException();
             }
             set { throw new NotImplementedException(); }
         }
@@ -781,7 +782,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                return null; throw new NotImplementedException();
+                return new DriverWheel(BaseAddress, 2); throw new NotImplementedException();
             }
             set { throw new NotImplementedException(); }
         }
@@ -790,7 +791,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
-                return null; throw new NotImplementedException();
+                return new DriverWheel(BaseAddress, 3); throw new NotImplementedException();
             }
             set { throw new NotImplementedException(); }
         }
@@ -889,6 +890,54 @@ namespace SimTelemetry.Game.Rfactor
                 {
                 }
                 return new IntPtr(__LapsDataCached);
+            }
+        }
+    }
+
+    public class DriverWheel : IWheel
+    {
+        public double Wear { get; set; }
+        public double Temperature_Inside { get; set; }
+        public double Temperature_Middle { get; set; }
+        public double Temperature_Outside { get; set; }
+        public double Pressure { get; set; }
+        public double Rideheight { get; set; }
+        public double Radius { get; set; }
+        public bool Flat { get; set; }
+        public bool Detached { get; set; }
+
+        private int Addr;
+        private int Index;
+        public DriverWheel(int addr, int ind)
+        {
+            Index = ind;
+            Addr = addr;
+
+            Wear = rFactor.Game.ReadFloat(new IntPtr(addr + 0x2A34 + ind * 0x1E8));
+
+            if (addr == 0x7154C0) // = player
+            {
+                int ind2 = ind;
+                switch(ind)
+                {
+                    case 0:
+                        ind = 0;
+                        break;
+                    case 2:
+                        ind = 2;
+                        break;
+                    case 1:
+                        ind = 1;
+                        break;
+                    case 3:
+                        ind = 3;
+                        break;
+                }
+                Temperature_Inside = rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + + 0x006D9F44 + ind * 0x600));
+                 Temperature_Middle = rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + + 0x006D9F3C + ind * 0x600));
+                Temperature_Outside = rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + + 0x006D9F34 + ind * 0x600));
+                Pressure = rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006D9F5C + ind * 0x600));
+                Rideheight = rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + +0x006DB778 + ind2 * 0x10));
             }
         }
     }

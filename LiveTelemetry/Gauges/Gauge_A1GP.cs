@@ -147,7 +147,7 @@ namespace LiveTelemetry
 
         private void PaintBackground(object sender)
         {
-            System.Threading.Thread.Sleep(500);
+            //System.Threading.Thread.Sleep(500);
             // Fonts
             Font font_arial_10 = new Font("Arial", 10f, FontStyle.Bold);
 
@@ -407,7 +407,7 @@ namespace LiveTelemetry
                                Convert.ToSingle(rpm_gauge_xb), Convert.ToSingle(rpm_gauge_yb));
 
                     // ---------------------------------     Speed Needle    ---------------------------------
-                    double SpeedLive = Telemetry.m.Sim.Player.Speed*3.6;
+                    double SpeedLive = Telemetry.m.Sim.Drivers.Player.Speed*3.6;
 
                     double fAngle_Speed = 90 + (SpeedLive - Speed_Min)/(Speed_Max - Speed_Min)*225;
                     if (fAngle_Speed < 90) fAngle_Speed = 90;

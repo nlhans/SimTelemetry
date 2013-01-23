@@ -150,14 +150,9 @@ namespace SimTelemetry.Game.Rfactor
                     return null;
                 if (UseMemoryReader)
                 {
-                    return null;
-                    /*
                     ICar c = rFactor.Garage.SearchCar(rFactor.Drivers.Player.CarClass, rFactor.Drivers.Player.CarModel);
-                    if (c == null)
-                        // Try MMF.
-                        c = rFactor.Garage.SearchCar(rFactor.MMF.Telemetry.Player.VehicleName, "");
 
-                    return c;*/
+                    return c;
                 }else
                 {
                     //return rFactor.Garage.SearchCar(rFactor.MMF.Telemetry.Player.VehicleName, rFactor.Drivers.Player.CarModel);

@@ -3,6 +3,32 @@ using SimTelemetry.Objects.Game;
 
 namespace SimTelemetry.Game.Rfactor
 {
+    public class rFactorSetupWheel : ISetupWheel
+    {
+        public double Rideheight { get; set; }
+        public double Pressure { get; set; }
+        public double Temperature { get; set; }
+        public string Compound { get; set; }
+        public double BrakeThickness { get; set; }
+
+        public rFactorSetupWheel(double rideheight, double pressure, double temperature, string compound, double brakeThickness)
+        {
+            Rideheight = rideheight;
+            Pressure = pressure;
+            Temperature = temperature;
+            Compound = compound;
+            BrakeThickness = brakeThickness;
+        }
+        public rFactorSetupWheel()
+        {
+            Rideheight = 0.075;
+            Pressure = 165;
+            Temperature = 40;
+            Compound = "Rubber";
+            BrakeThickness = 3.5/100;
+        }
+    }
+
     public class rFactorSetup : ISetup
     {
         public int Aero_FrontWing
@@ -37,22 +63,22 @@ namespace SimTelemetry.Game.Rfactor
 
         public ISetupWheel Wheel_LeftFront
         {
-            get { throw new NotImplementedException(); }
+            get { return new rFactorSetupWheel(); }
         }
 
         public ISetupWheel Wheel_RightFront
         {
-            get { throw new NotImplementedException(); }
+            get { return new rFactorSetupWheel(); }
         }
 
         public ISetupWheel Wheel_LeftRear
         {
-            get { throw new NotImplementedException(); }
+            get { return new rFactorSetupWheel(); }
         }
 
         public ISetupWheel Wheel_RightRear
         {
-            get { throw new NotImplementedException(); }
+            get { return new rFactorSetupWheel(); }
         }
 
         public double Suspension_RideHeight_LF

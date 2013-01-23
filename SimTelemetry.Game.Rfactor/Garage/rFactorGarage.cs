@@ -76,7 +76,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
             {
                 // Index ALL files in GameDataDirectory:
                 Files = new FileList(GamedataDirectory,
-                    new string[6] { ".aiw", ".gdb", ".veh", ".rfm", ".ini", ".hdv" });
+                    new string[] { ".aiw", ".gdb", ".veh", ".rfm", ".ini", ".hdv" , ".tbc"});
 
                 Scanned = true;
 

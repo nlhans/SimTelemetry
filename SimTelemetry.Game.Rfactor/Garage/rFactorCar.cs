@@ -258,6 +258,7 @@ namespace SimTelemetry.Game.Rfactor.Garage
                         int gears = _mHDV.TryGetInt32("DRIVELINE","forwardgears");
 
                         _gearbox = new rFactorCarGearbox(gears);
+                        _wheels = new rFactorCarWheels(_mHDV);
                     }
                     catch (Exception e)
                     {
@@ -305,11 +306,102 @@ namespace SimTelemetry.Game.Rfactor.Garage
                 if (!eng.EndsWith(".ini"))
                     eng += ".ini";
 
+                if (_files.ContainsKey("Engine")==false)
                 _files.Add("Engine",
                            rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory, eng));
                 // Now we have read the HDV file, we can just as well initialize all sub classes:
                 _engine = new rFactorCarEngine(_files["Engine"], _mHDV);
             }
         }
+    }
+
+    public class rFactorCarWheel: ICarWheel
+    {
+        public double WheelRadius { get; set; }
+        public double BrakeTemperature_OptimalHigh { get; set; }
+        public double BrakeTemperature_OptimalLow { get; set; }
+        public double BrakeThickness_TypicalFailure { get; set; }
+        public double OptimalPressure { get; set; }
+
+        public rFactorCarWheel(double wheelRadius, double brakeTemperatureOptimalHigh, double brakeTemperatureOptimalLow, double brakeThicknessTypicalFailure, double optimalPressure)
+        {
+            WheelRadius = wheelRadius;
+            BrakeTemperature_OptimalHigh = brakeTemperatureOptimalHigh;
+            BrakeTemperature_OptimalLow = brakeTemperatureOptimalLow;
+            BrakeThickness_TypicalFailure = brakeThicknessTypicalFailure;
+            OptimalPressure = optimalPressure;
+        }
+        public rFactorCarWheel()
+        {
+            WheelRadius = 0.3;
+            BrakeTemperature_OptimalHigh = 700+273;
+            BrakeTemperature_OptimalLow = 300 + 273;
+            BrakeThickness_TypicalFailure = 0.2;
+            OptimalPressure = 170;
+        }
+    }
+
+    public class rFactorCarWheels : ICarWheels
+    {
+        public rFactorCarWheels(IniScanner mHdv)
+        {
+            try
+            {
+            File = mHdv.TryGetString("GENERAL", "TireBrand");
+            if (File.EndsWith(".tbc") == false)
+                File = File + ".tbc";
+            File = rFactor.Garage.Files.SearchFile(rFactor.Garage.GamedataDirectory, File);
+
+            var sides = new string[4] {"FRONTLEFT","FRONTRIGHT","REARLEFT","REARRIGHT"};
+                IniScanner mTyre = new IniScanner {IniFile = File};
+                mTyre.Read();
+
+                foreach (var side in sides)
+                {
+                    var brakeTempInfo = new string[4] {"40", "300", "500", "700"};
+                    if(mHdv.Data.ContainsKey(side) && mHdv.Data[side].ContainsKey("brakeresponsecurve"))
+                     brakeTempInfo = mHdv.TryGetData(side, "BrakeResponseCurve");
+
+                    var brakeTempLow = double.Parse(brakeTempInfo[1]) + 273;
+                    var brakeTempHigh = double.Parse(brakeTempInfo[3]) + 273;
+
+                    var brakeFailureMain = mHdv.TryGetString(side, "BrakeFailure").Split(',');
+                    var brakeFailure = double.Parse(brakeFailureMain[0]);
+
+                    var optimalPressure = 158.25; // TODO
+                    var radius = 0.3261; // TODO
+
+                    rFactorCarWheel rcw = new rFactorCarWheel(radius, brakeTempHigh, brakeTempLow, brakeFailure,
+                                                              optimalPressure);
+                    switch (side)
+                    {
+                        case "FRONTLEFT":
+                            LeftFront = rcw;
+                            break;
+                        case "FRONTRIGHT":
+                            RightFront = rcw;
+                            break;
+                        case "REARLEFT":
+                            LeftRear = rcw;
+                            break;
+                        case "REARRIGHT":
+                            RightRear = rcw;
+                            break;
+                    }
+                }
+            }catch(Exception e)
+            {
+                LeftFront = new rFactorCarWheel();
+                RightFront = new rFactorCarWheel();
+                LeftRear = new rFactorCarWheel();
+                RightRear = new rFactorCarWheel();
+            }
+        }
+
+        public string File { get; private set; }
+        public ICarWheel LeftFront { get; set; }
+        public ICarWheel RightFront { get; set; }
+        public ICarWheel LeftRear { get; set; }
+        public ICarWheel RightRear { get; set; }
     }
 }
