@@ -54,6 +54,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             new rFactor(this); // old v1.255 only, not v1.255 patch F!!!
             _Modules = new SimulatorModules();
+            _Modules.DistanceOnLap = true;
             _Modules.Time_Available = true;             // The plug-in knows the session time.
             _Modules.Track_Coordinates = true;
             _Modules.Track_MapFile = true;

@@ -30,21 +30,8 @@ namespace SimTelemetry.Objects.Utilities
     {
         public ISimulator sim;
 
-        public int Base
-        {
-            get
-            {
-                if (m_ReadProcess == null) return 0; try
-                {
-                    return (int) m_ReadProcess.MainModule.BaseAddress;
-                }catch(Exception ex)
-                {
-                    CloseHandle();
-
-                    return 0;
-                }
-            }
-        }
+        private int _Base;
+        public int Base  { get { return _Base; } }
 
         public bool Attached { get; internal set; }
         public string ProcessName { get; set; }
@@ -64,6 +51,18 @@ namespace SimTelemetry.Objects.Utilities
             Activate();
 
             Triton.TritonBase.PreExit += new Triton.AnonymousSignal(TritonBase_PreExit);
+        }
+
+        public void OpenProcess()
+        {
+            _Base = (int)m_ReadProcess.MainModule.BaseAddress;
+            base.OpenProcess();
+        }
+
+        public void CloseHandle()
+        {
+            _Base = 0;
+            base.CloseHandle();
         }
 
         void TritonBase_PreExit()

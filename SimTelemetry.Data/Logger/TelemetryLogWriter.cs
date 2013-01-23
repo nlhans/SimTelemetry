@@ -132,9 +132,9 @@ namespace SimTelemetry.Data.Logger
                         query =
                             "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath,distance,enginerevs,fuelused,gearchanges,samplelength,localtime,simulatortime) " +
                             "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
-                            Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
-                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
-                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
+                            Telemetry.m.Track.Name.Replace("'","") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "") + "'," +
                             LastLap.LapTime + "," + LastLap.Sector1 + "," +
                             LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
                             (LapNo).ToString() +
@@ -147,9 +147,9 @@ namespace SimTelemetry.Data.Logger
                         query =
                             "INSERT INTO laptimes (simulator,circuit,car,series,laptime,s1,s2,s3,driven,lapno,filepath) " +
                             "VALUES ('" + Telemetry.m.Sim.ProcessName + "','" +
-                            Telemetry.m.Track.Name.Replace("'", "\\'") + "','" +
-                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "\\'") + "','" +
-                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "\\'") + "'," +
+                            Telemetry.m.Track.Name.Replace("'", "") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarModel.Replace("'", "") + "','" +
+                            Telemetry.m.Sim.Drivers.Player.CarClass.Replace("'", "") + "'," +
                             LastLap.LapTime + "," + LastLap.Sector1 + "," +
                             LastLap.Sector2 + "," + LastLap.Sector3 + ",NOW(), " +
                             (LapNo).ToString() +
@@ -180,7 +180,6 @@ namespace SimTelemetry.Data.Logger
          */
         public void Annotate(string name, int lapno)
         {
-
             Telemetry.m.Stats.Reset();
             if (_mWrite != null)
             {

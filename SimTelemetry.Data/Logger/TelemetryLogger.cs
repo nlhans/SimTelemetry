@@ -83,6 +83,8 @@ namespace SimTelemetry.Data.Logger
                     attempt++;
 
                     AnnotationDirectory += "/";
+
+                    AnnotationDirectory = AnnotationDirectory.Replace("'", "");
                 } while (Directory.Exists(AnnotationDirectory));
                 Directory.CreateDirectory(AnnotationDirectory);
 

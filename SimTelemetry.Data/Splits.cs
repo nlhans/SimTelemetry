@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
+using System.Text;
 using SimTelemetry.Data.Logger;
 using SimTelemetry.Objects;
 using SimTelemetry.Objects.Plugins;
@@ -68,7 +69,7 @@ namespace SimTelemetry.Data
 
             // Trigger-once timer
             _mUpdateBestLap = new Timer {Interval = 2000};
-            _mUpdateBestLap.AutoReset = false;
+            _mUpdateBestLap.AutoReset = true;
 
             // TODO: This is some quality helloween code right here.
             _mUpdateBestLap.Elapsed += (s, e) =>
@@ -90,14 +91,14 @@ namespace SimTelemetry.Data
                                                                "SELECT Filepath, `ID` FROM Laptimes WHERE " +
                                                                "Car = '" +
                                                                Telemetry.m.Sim.Drivers.Player.CarModel.
-                                                                   Replace("'", "\\'") + "' AND " +
+                                                                   Replace("'", "") + "' AND " +
                                                                "Series = '" +
                                                                Telemetry.m.Sim.Drivers.Player.CarClass.
-                                                                   Replace("'", "\\'") + "' AND " +
+                                                                   Replace("'", "") + "' AND " +
                                                                "Circuit = '" +
-                                                               Telemetry.m.Track.Name.Replace("'", "\\'") +
-                                                               "' AND " +
-                                                               "Simulator = '" + Telemetry.m.Sim.Name + "'" +
+                                                               Telemetry.m.Track.Name.
+                                                                   Replace("'", "") + "' AND " +
+                                                               "Simulator = '" + Telemetry.m.Sim.Name + "' " +
                                                                "AND Laptime > 1 " +
                                                                "AND `InvalidLapData` = 0 " +
                                                                "ORDER BY Laptime ASC",
