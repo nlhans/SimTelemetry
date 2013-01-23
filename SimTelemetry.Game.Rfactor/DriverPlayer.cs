@@ -31,8 +31,9 @@ namespace SimTelemetry.Game.Rfactor
             set { }
             get
             {
+                return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC0AC));
                 if (rFactor.Simulator.UseMemoryReader) return 0;
-                //return rFactor.Game.ReadDouble(new IntPtr(rFactor.Game.Base + 0x006DC0AC));
+                
                 else return 0; // TODO: Make our own lifetime tracker or something?
             }
         }

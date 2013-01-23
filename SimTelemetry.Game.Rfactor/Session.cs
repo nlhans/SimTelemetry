@@ -148,7 +148,8 @@ namespace SimTelemetry.Game.Rfactor
                 SessionInfo i = new SessionInfo();
                 if (!rFactor.Simulator.UseMemoryReader)
                     return i;
-                int val = rFactor.Game.ReadInt32((IntPtr)(rFactor.Game.Base + 0x68696C));
+                //0x98696C
+                int val = rFactor.Game.ReadInt32((IntPtr)(rFactor.Game.Base + 0x58696C));
                 switch (val)
                 {
                     case 0x00:

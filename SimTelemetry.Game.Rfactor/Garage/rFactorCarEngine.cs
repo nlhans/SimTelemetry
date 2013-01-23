@@ -151,6 +151,8 @@ namespace SimTelemetry.Game.Rfactor.Garage
             }
 
             _lifetimeRpm = scanner.TryGetDouble("Main", "lifetimeenginerpm");
+            _lifetimeTemperatureOil = double.Parse(scanner.TryGetData("Main", "lifetimeoiltemp")[0]);
+            _lifetimeTemperatureWater = double.Parse(scanner.TryGetData("Main", "lifetimeoiltemp")[0]);
 
         }
 
