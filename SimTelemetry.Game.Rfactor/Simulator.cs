@@ -125,6 +125,7 @@ namespace SimTelemetry.Game.Rfactor
         {
             get
             {
+                if (Memory == null) return false;
                 if (UseMemoryReader)
                 {
                     return Memory.Attached;

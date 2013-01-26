@@ -194,7 +194,7 @@ namespace SimTelemetry.Game.Rfactor
 
                 }
 
-                i.Length = rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x6932EC));
+                i.Length = rFactor.Game.ReadFloat((IntPtr)(rFactor.Game.Base + 0x5932EC));
 
                 return i;
             }

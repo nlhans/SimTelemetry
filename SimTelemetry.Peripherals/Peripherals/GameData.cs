@@ -501,8 +501,8 @@ namespace SimTelemetry.Peripherals.Dashboard
                 package.Gap_Front = (float)Splits.Split;
                 if (float.IsNaN(package.Gap_Front) || float.IsInfinity(package.Gap_Front))
                     package.Gap_Front = 0;
-                if (package.Gap_Front >= 9.99)
-                    package.Gap_Front = 9.99;
+                if (package.Gap_Front >= 9.99f)
+                    package.Gap_Front = 9.99f;
                 package.Gap_Back = 0; // TODO
 
                 package.Wipers = 0;

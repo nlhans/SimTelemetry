@@ -56,13 +56,13 @@ namespace SimTelemetry.Objects.Utilities
         public void OpenProcess()
         {
             _Base = (int)m_ReadProcess.MainModule.BaseAddress;
-            base.OpenProcess();
+            base.Open();
         }
 
         public void CloseHandle()
         {
             _Base = 0;
-            base.CloseHandle();
+            base.Close();
         }
 
         void TritonBase_PreExit()

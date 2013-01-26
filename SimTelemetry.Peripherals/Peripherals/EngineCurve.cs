@@ -62,7 +62,7 @@ namespace SimTelemetry.Peripherals.Dashboard
                     try
                     {
                         rf.ReadProcess = Process.GetProcessesByName(Telemetry.m.Sim.ProcessName)[0];
-                        rf.OpenProcess();
+                        rf.Open();
                         rfOpen = true;
                         DoubleList.Clear();
                         for (offset = 0; offset < 500; offset++)
@@ -90,7 +90,7 @@ namespace SimTelemetry.Peripherals.Dashboard
                         DoubleList.Clear();
                     }
                     if (rfOpen)
-                        rf.CloseHandle();
+                        rf.Close();
                 }
             }
 

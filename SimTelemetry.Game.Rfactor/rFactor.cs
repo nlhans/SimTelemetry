@@ -18,6 +18,9 @@
  *                                                                       *
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
+using System;
+using System.Diagnostics;
+using System.Timers;
 using SimTelemetry.Game.Rfactor.MMF;
 using SimTelemetry.Objects.Plugins;
 using SimTelemetry.Objects.Utilities;
@@ -41,6 +44,7 @@ namespace SimTelemetry.Game.Rfactor
         
         public rFactor(ISimulator sim)
         {
+
             Simulator = sim;
             MMF = new rFactorMMF();
             
@@ -58,6 +62,17 @@ namespace SimTelemetry.Game.Rfactor
             Drivers = new Drivers();
 
             Player = new DriverPlayer();
+
+
+
+
+
+
+            Game.Diagnostic = true;
+            var t = new Timer(1000);
+            t.AutoReset = true;
+            t.Elapsed += (a, b) => Debug.WriteLine("RPM: " + Game.ReadCalls);
+            t.Start();
         }
 
         public static void Kill()
