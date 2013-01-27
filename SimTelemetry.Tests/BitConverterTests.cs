@@ -2,49 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using SimTelemetry.Objects;
 using Triton.Memory;
 
 namespace SimTelemetry.Tests
-{/*
-    public class Logger
-    {
-    }
-
-    public class LogDriver : ILogInstance
-    {
-        private readonly Dictionary<string, Delegate> _logs = new Dictionary<string, Delegate>();
-        private readonly string _name = "Driver";
-
-        public Dictionary<string, Delegate> Logs { get { return _logs; } }
-        public string Name { get { return _name;  } }
-
-        public LogDriver()
-        {
-            _logs.Add("RPM", getRpm);
-            _logs.Add("Speed", getSpeed);
-
-        }
-
-        public void getRpm()
-        {
-
-        }
-
-        public void getSpeed()
-        {
-
-        }
-    }
-
-    public interface ILogInstance
-    {
-        Dictionary<string, Delegate> Logs { get; }
-        string Name { get; }
-    }*/
-
+{
     [TestFixture]
     public class BitConverterTests
     {
@@ -232,7 +197,8 @@ namespace SimTelemetry.Tests
             Debug.WriteLine(drv1.ReadAs<int>("Gear"));
             Thread.Sleep(1000);
             Debug.WriteLine("ReadMemory calls: " + r.ReadCalls);
-            return;
+
+            // Speed comparisons.
             Stopwatch w = new Stopwatch();
             w.Reset();
             int[] data = new int[300000];
@@ -255,16 +221,6 @@ namespace SimTelemetry.Tests
             Thread.Sleep(1000);
             Debug.WriteLine("ReadMemory calls: " + r.ReadCalls + " / " + w.ElapsedMilliseconds + "ms");
 
-            int k = 0;
-            drv1 = provider.Pools.FirstOrDefault();
-            while (k < 50)
-            {
-                for (int l = 0; l < 50 * 80; l++)
-                    drv1.Refresh();
-                Debug.WriteLine(drv1.ReadAs<float>("Speed") + " @ " + drv1.ReadAs<float>("RPM") + " in " + drv1.ReadAs<int>("Gear"));
-                k++;
-                Thread.Sleep(1000);
-            }
         }
     }
 
@@ -291,42 +247,43 @@ namespace SimTelemetry.Tests
     public class MemoryDataConverterProvider<T>
     {
         public Type DataType { get { return typeof(T); } }
-        public Func<byte[], int, T> Converter { get; private set; }
+        public Func<byte[], int, T> Byte2Obj { get; private set; }
+        public Func<object, T> Obj2Obj { get; private set; }
 
-        public MemoryDataConverterProvider(Func<byte[], int, T> converter)
+        public MemoryDataConverterProvider(Func<byte[], int, T> byte2obj, Func<object, T> obj2obj)
         {
-            Converter = converter;
-        }
-    }
-    public class MemoryDataTypeProvider<T>
-    {
-        public Type DataType { get { return typeof(T); } }
-        public Func<object, T> Converter { get; private set; }
-
-        public MemoryDataTypeProvider(Func<object, T> converter)
-        {
-            Converter = converter;
+            Byte2Obj = byte2obj;
+            Obj2Obj = obj2obj;
         }
     }
 
     public class MemoryDataConverter
     {
-        private static readonly Dictionary<Type, object> ByteToObject;
-        private static readonly Dictionary<Type, object> ObjectToObject;
+        protected static readonly Dictionary<Type, object> Providers = new Dictionary<Type, object>();
 
         static MemoryDataConverter()
         {
-            ByteToObject = new Dictionary<Type, object>();
-            ByteToObject.Add(typeof(byte), new MemoryDataConverterProvider<byte>(MemoryDataConverter.ToByte));
-            ByteToObject.Add(typeof(int), new MemoryDataConverterProvider<int>(BitConverter.ToInt32));
-            ByteToObject.Add(typeof(double), new MemoryDataConverterProvider<double>(BitConverter.ToDouble));
-            ByteToObject.Add(typeof(float), new MemoryDataConverterProvider<float>(BitConverter.ToSingle));
+            Providers.Add(typeof(byte), new MemoryDataConverterProvider<byte>(ToByte, Convert.ToByte));
+            Providers.Add(typeof(char), new MemoryDataConverterProvider<char>(BitConverter.ToChar, Convert.ToChar));
 
-            ObjectToObject = new Dictionary<Type, object>();
-            ObjectToObject.Add(typeof(int), new MemoryDataTypeProvider<int>(Convert.ToInt32));
-            ObjectToObject.Add(typeof(long), new MemoryDataTypeProvider<long>(Convert.ToInt64));
-            ObjectToObject.Add(typeof(double), new MemoryDataTypeProvider<double>(Convert.ToDouble));
-            ObjectToObject.Add(typeof(float), new MemoryDataTypeProvider<float>(Convert.ToSingle));
+            Providers.Add(typeof(short), new MemoryDataConverterProvider<short>(BitConverter.ToInt16, Convert.ToInt16));
+            Providers.Add(typeof(ushort), new MemoryDataConverterProvider<ushort>(BitConverter.ToUInt16, Convert.ToUInt16));
+
+            Providers.Add(typeof(int), new MemoryDataConverterProvider<int>(BitConverter.ToInt32, Convert.ToInt32));
+            Providers.Add(typeof(uint), new MemoryDataConverterProvider<uint>(BitConverter.ToUInt32, Convert.ToUInt32));
+
+            Providers.Add(typeof(long), new MemoryDataConverterProvider<long>(BitConverter.ToInt64, Convert.ToInt64));
+            Providers.Add(typeof(ulong), new MemoryDataConverterProvider<ulong>(BitConverter.ToUInt64, Convert.ToUInt64));
+
+            Providers.Add(typeof(double), new MemoryDataConverterProvider<double>(BitConverter.ToDouble, Convert.ToDouble));
+            Providers.Add(typeof(float), new MemoryDataConverterProvider<float>(BitConverter.ToSingle, Convert.ToSingle));
+
+            Providers.Add(typeof(string), new MemoryDataConverterProvider<string>(BytesToString, Convert.ToString));
+        }
+
+        protected static string BytesToString(byte[] datainput, int index)
+        {
+            return Encoding.ASCII.GetString(datainput, index, datainput.Length - index);
         }
 
         protected static byte ToByte(byte[] datainput, int index)
@@ -337,13 +294,13 @@ namespace SimTelemetry.Tests
         public static T Read<T>(byte[] dataInput, int index)
         {
             Type inputType = typeof(T);
-            return ((MemoryDataConverterProvider<T>)ByteToObject[inputType]).Converter(dataInput, index);
+            return ((MemoryDataConverterProvider<T>)Providers[inputType]).Byte2Obj(dataInput, index);
         }
 
         public static TOutput Cast<TSource, TOutput>(TSource value)
         {
             Type outputType = typeof(TOutput);
-            return ((MemoryDataTypeProvider<TOutput>)ObjectToObject[outputType]).Converter(value);
+            return ((MemoryDataConverterProvider<TOutput>)Providers[outputType]).Obj2Obj(value);
             
         }
 
@@ -354,8 +311,8 @@ namespace SimTelemetry.Tests
             if (inputType.Equals(outputType))
                 return Read<TOutput>(dataInput, index);
             
-            TSource intermediate = Read<TSource>(dataInput, index);
-            return ((MemoryDataTypeProvider<TOutput>) ObjectToObject[outputType]).Converter(intermediate);
+            var intermediate = Read<TSource>(dataInput, index);
+            return ((MemoryDataConverterProvider<TOutput>)Providers[outputType]).Obj2Obj(intermediate);
         }
     }
 
@@ -375,8 +332,6 @@ namespace SimTelemetry.Tests
         public Type FieldType { get; protected set; }
 
         public Func<T, T> Conversion { get; protected set; }
-
-        //public virtual Lazy<T> Value { get; protected set; }
         public virtual T Value { get; protected set; }
 
         public virtual T ReadAs()
@@ -391,7 +346,6 @@ namespace SimTelemetry.Tests
 
         public virtual void Refresh()
         {
-            //Value = Pool != null ? new Lazy<T>(RefreshStatic) : new Lazy<T>(RefreshDynamic);
             Value = Pool != null ? RefreshStatic() : RefreshDynamic();
             if (Conversion != null)
                 Value = Conversion(Value);

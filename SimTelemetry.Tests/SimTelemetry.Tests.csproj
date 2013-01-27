@@ -65,7 +65,7 @@
     <Compile Include="Events\PluginTestSimulatorTrackScanner.cs" />
     <Compile Include="Events\PluginTestWidgetConstructor.cs" />
     <Compile Include="Core\PluginTests.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="BitConverterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\CarRepositoryTests.cs" />
     <Compile Include="Repositories\TrackRepositoryTests.cs" />
