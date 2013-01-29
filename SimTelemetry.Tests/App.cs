@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Triton.Debugging;
+﻿
+using System;
+using System.Diagnostics;
 
 namespace SimTelemetry.Tests
 {
@@ -11,10 +9,19 @@ namespace SimTelemetry.Tests
 
         static void Main(string[] args)
         {
-            BitConverterTests l = new BitConverterTests();
-            l.TestRfactor();
-            Console.WriteLine("ghello");
+            Stopwatch w = new Stopwatch();
+            w.Start();
+            MemoryTests l = new MemoryTests();
+            l.testPerformance();
+            w.Stop();
+            
+#if DEBUG
+            Debug.WriteLine("Time: " + w.ElapsedMilliseconds);
+#else
+            Console.WriteLine("Time : " +w.ElapsedMilliseconds );
             Console.ReadLine();
+#endif
+
         }
     }
 }
