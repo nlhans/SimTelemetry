@@ -10,11 +10,10 @@ namespace SimTelemetry.Domain.Memory
 
         public string Name { get; protected set; }
         public MemoryProvider Memory { get; set; }
-        public MemoryRefreshLevel Level { get; protected set; }
-        public MemoryAddressType AddressType { get; protected set; }
+        public MemoryAddress AddressType { get; protected set; }
 
-        public bool IsDynamic { get { return (AddressType == MemoryAddressType.DYNAMIC); } }
-        public bool IsStatic { get { return (AddressType == MemoryAddressType.STATIC || AddressType == MemoryAddressType.STATIC_ABSOLUTE); } }
+        public bool IsDynamic { get { return (AddressType == MemoryAddress.DYNAMIC); } }
+        public bool IsStatic { get { return (AddressType == MemoryAddress.STATIC || AddressType == MemoryAddress.STATIC_ABSOLUTE); } }
 
         public MemoryPool Pool { get; protected set; }
         public int Offset { get; protected set; }
@@ -51,40 +50,36 @@ namespace SimTelemetry.Domain.Memory
             else
                 throw new NotImplementedException();
         }
-        public void Refresh(MemoryRefreshLevel level)
+        public void Refresh()
         {
-            if (level >= this.Level)
+            var computedAddress = 0;
+            // Refresh this memory block.
+            if (IsStatic)
             {
-                var computedAddress = 0;
-                // Refresh this memory block.
-                if (IsStatic)
+                if (Address != 0 && Offset != 0)
                 {
-                    if (Address != 0 && Offset != 0)
-                    {
-                        computedAddress = Memory.Reader.ReadInt32(Memory.BaseAddress + Address) + Offset;
-                    }
-                    else
-                    {
-                        computedAddress = AddressType == MemoryAddressType.STATIC
-                                              ? Memory.BaseAddress + Address
-                                              : Address;
-                    }
+                    computedAddress = Memory.Reader.ReadInt32(Memory.BaseAddress + Address) + Offset;
                 }
                 else
                 {
-                    computedAddress = MemoryDataConverter.Read<int>(Pool.Value, Offset);
+                    computedAddress = AddressType == MemoryAddress.STATIC
+                                          ? Memory.BaseAddress + Address
+                                          : Address;
                 }
-
-                Value = Memory.Reader.ReadBytes(computedAddress, (uint)Size);
-
-                // Refresh underlying fields.
-                foreach (var field in Fields)
-                    if (field.Level <= level)
-                        field.Refresh(level);
-                foreach (var pool in Pools)//.Where(x => x.Level <= level))
-                    if (pool.Level <= level)
-                        pool.Refresh(level);
             }
+            else
+            {
+                computedAddress = MemoryDataConverter.Read<int>(Pool.Value, Offset);
+            }
+
+            Value = Memory.Reader.ReadBytes(computedAddress, (uint) Size);
+
+            // Refresh underlying fields.
+            foreach (var field in Fields)
+                field.Refresh();
+            foreach (var pool in Pools)
+                pool.Refresh();
+
         }
 
         public void SetProvider(MemoryProvider provider)
@@ -118,30 +113,27 @@ namespace SimTelemetry.Domain.Memory
             if (Memory != null) obj.SetProvider(Memory);
         }
 
-        public MemoryPool(string name, MemoryRefreshLevel level, MemoryAddressType type, int address, int size)
+        public MemoryPool(string name,  MemoryAddress type, int address, int size)
         {
             Name = name;
-            Level = level;
             Address = address;
             Offset = 0;
             Size = size;
             AddressType = type;
         }
 
-        public MemoryPool(string name, MemoryRefreshLevel level, MemoryAddressType type, int address, int offset, int size)
+        public MemoryPool(string name,  MemoryAddress type, int address, int offset, int size)
         {
             Name = name;
-            Level = level;
             Address = address;
             Offset = offset;
             Size = size;
             AddressType = type;
         }
 
-        public MemoryPool(string name, MemoryRefreshLevel level, MemoryAddressType type, MemoryPool pool, int offset, int size)
+        public MemoryPool(string name,  MemoryAddress type, MemoryPool pool, int offset, int size)
         {
             Name = name;
-            Level = level;
             Pool = pool;
             Offset = offset;
             Size = size;

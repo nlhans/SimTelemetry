@@ -6,11 +6,10 @@ namespace SimTelemetry.Domain.Memory
     {
         public string Name { get; protected set; }
         public MemoryProvider Memory { get; protected set; }
-        public MemoryRefreshLevel Level { get; protected set; }
-        public MemoryAddressType AddressType { get; protected set; }
+        public MemoryAddress AddressType { get; protected set; }
 
-        public bool IsDynamic { get { return (AddressType == MemoryAddressType.DYNAMIC); } }
-        public bool IsStatic { get { return (AddressType == MemoryAddressType.STATIC || AddressType == MemoryAddressType.STATIC_ABSOLUTE); } }
+        public bool IsDynamic { get { return (AddressType == MemoryAddress.DYNAMIC); } }
+        public bool IsStatic { get { return (AddressType == MemoryAddress.STATIC || AddressType == MemoryAddress.STATIC_ABSOLUTE); } }
 
         public MemoryPool Pool { get; protected set; }
         public int Offset { get; protected set; }
@@ -33,7 +32,7 @@ namespace SimTelemetry.Domain.Memory
             return MemoryDataConverter.Cast<T, TOut>(Value);
         }
 
-        public virtual void Refresh(MemoryRefreshLevel level)
+        public virtual void Refresh()
         {
             if (IsStatic)
                 RefreshStatic();
@@ -60,7 +59,7 @@ namespace SimTelemetry.Domain.Memory
                 computedAddress = Memory.Reader.ReadInt32(Memory.BaseAddress + Address) + Offset;
             else
             {
-                computedAddress = AddressType == MemoryAddressType.STATIC
+                computedAddress = AddressType == MemoryAddress.STATIC
                                       ? Memory.BaseAddress + Address
                                       : Address;
             }
@@ -81,10 +80,9 @@ namespace SimTelemetry.Domain.Memory
             Pool = pool;
         }
         #region Without conversion
-        public MemoryField(string name, MemoryRefreshLevel level, MemoryAddressType type, int address, int size)
+        public MemoryField(string name,  MemoryAddress type, int address, int size)
         {
             Name = name;
-            Level = level;
             FieldType = typeof(T);
             Address = address;
             Size = size;
@@ -92,10 +90,9 @@ namespace SimTelemetry.Domain.Memory
             AddressType = type;
         }
 
-        public MemoryField(string name, MemoryRefreshLevel level, MemoryAddressType type, int address, int offset, int size)
+        public MemoryField(string name,  MemoryAddress type, int address, int offset, int size)
         {
             Name = name;
-            Level = level;
             FieldType = typeof(T);
             Address = address;
             Size = size;
@@ -103,10 +100,9 @@ namespace SimTelemetry.Domain.Memory
             AddressType = type;
         }
 
-        public MemoryField(string name, MemoryRefreshLevel level, MemoryAddressType type, MemoryPool pool, int offset, int size)
+        public MemoryField(string name,  MemoryAddress type, MemoryPool pool, int offset, int size)
         {
             Name = name;
-            Level = level;
             FieldType = typeof(T);
             Size = size;
             Offset = offset;
@@ -116,10 +112,9 @@ namespace SimTelemetry.Domain.Memory
         #endregion
 
 
-        public MemoryField(string name, MemoryRefreshLevel level, MemoryAddressType type, int address, int size, Func<T,T> conversion)
+        public MemoryField(string name,  MemoryAddress type, int address, int size, Func<T,T> conversion)
         {
             Name = name;
-            Level = level;
             FieldType = typeof(T);
             Address = address;
             Size = size;
@@ -128,10 +123,9 @@ namespace SimTelemetry.Domain.Memory
             AddressType = type;
         }
 
-        public MemoryField(string name, MemoryRefreshLevel level, MemoryAddressType type, int address, int offset, int size, Func<T, T> conversion)
+        public MemoryField(string name,  MemoryAddress type, int address, int offset, int size, Func<T, T> conversion)
         {
             Name = name;
-            Level = level;
             FieldType = typeof(T);
             Address = address;
             Size = size;
@@ -140,10 +134,9 @@ namespace SimTelemetry.Domain.Memory
             AddressType = type;
         }
 
-        public MemoryField(string name, MemoryRefreshLevel level, MemoryAddressType type, MemoryPool pool, int offset, int size, Func<T, T> conversion)
+        public MemoryField(string name,  MemoryAddress type, MemoryPool pool, int offset, int size, Func<T, T> conversion)
         {
             Name = name;
-            Level = level;
             FieldType = typeof(T);
             Size = size;
             Offset = offset;

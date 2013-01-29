@@ -1,6 +1,6 @@
 ﻿namespace SimTelemetry.Domain.Memory
 {
-    public enum MemoryAddressType
+    public enum MemoryAddress
     {
         STATIC,
         STATIC_ABSOLUTE,

@@ -12,7 +12,7 @@ namespace SimTelemetry.Tests
             Stopwatch w = new Stopwatch();
             w.Start();
             MemoryTests l = new MemoryTests();
-            l.testPerformance();
+            l.TestRfactor();
             w.Stop();
             
 #if DEBUG

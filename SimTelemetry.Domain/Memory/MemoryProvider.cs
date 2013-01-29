@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Triton.Memory;
 
 namespace SimTelemetry.Domain.Memory
 {
@@ -7,7 +6,7 @@ namespace SimTelemetry.Domain.Memory
     {
         public MemoryProvider(MemoryReader reader)
         {
-            BaseAddress = reader.ReadProcess.MainModule.BaseAddress.ToInt32();
+            BaseAddress = reader.Process.MainModule.BaseAddress.ToInt32();
             Reader = reader;
         }
 
@@ -27,17 +26,9 @@ namespace SimTelemetry.Domain.Memory
             _pools.Remove(pool);
         }
 
-        public void Refresh(MemoryRefreshLevel level)
-        {
-            foreach (var pool in _pools)
-                //    .Where(x => x.Level <= level)) 
-                if (pool.Level <= level)
-                    pool.Refresh(level);
-
-        }
         public void Refresh()
         {
-            foreach (var pool in _pools) pool.Refresh(MemoryRefreshLevel.Always);
+            foreach (var pool in _pools) pool.Refresh();
         }
     }
 }

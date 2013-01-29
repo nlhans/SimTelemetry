@@ -95,14 +95,15 @@
     <Compile Include="Exceptions\PluginHostException.cs" />
     <Compile Include="GlobalEvents.cs" />
     <Compile Include="Memory\IMemoryObject.cs" />
-    <Compile Include="Memory\MemoryAddressType.cs" />
+    <Compile Include="Memory\MemoryAddress.cs" />
     <Compile Include="Memory\MemoryDataConverter.cs" />
     <Compile Include="Memory\MemoryDataConverterProvider.cs" />
     <Compile Include="Memory\MemoryField.cs" />
     <Compile Include="Memory\MemoryLazyField.cs" />
     <Compile Include="Memory\MemoryPool.cs" />
     <Compile Include="Memory\MemoryProvider.cs" />
-    <Compile Include="Memory\MemoryRefreshLevel.cs" />
+    <Compile Include="Memory\MemoryReader.cs" />
+    <Compile Include="Memory\MemoryReaderApi.cs" />
     <Compile Include="Plugins\IPluginBase.cs" />
     <Compile Include="Plugins\IPluginSimulator.cs" />
     <Compile Include="Plugins\Plugins.cs" />

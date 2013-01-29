@@ -4,8 +4,7 @@
     {
         string Name { get; }
         MemoryProvider Memory { get; }
-        MemoryRefreshLevel Level { get; }
-        MemoryAddressType AddressType { get; }
+        MemoryAddress AddressType { get; }
 
         bool IsDynamic { get; }
         bool IsStatic { get; }
@@ -17,7 +16,7 @@
 
         TOut ReadAs<TOut>();
 
-        void Refresh(MemoryRefreshLevel level);
+        void Refresh();
         void SetProvider(MemoryProvider provider);
         void SetPool(MemoryPool pool);
     }
