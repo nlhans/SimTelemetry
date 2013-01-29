@@ -31,7 +31,7 @@ namespace SimTelemetry.Domain.Memory
 
         public TOut ReadAs<TOut>()
         {
-            throw new NotImplementedException();
+            return MemoryDataConverter.Read<TOut>(new byte[32], 0);
         }
 
         public TOut ReadAs<TOut>(int offset)
@@ -49,7 +49,7 @@ namespace SimTelemetry.Domain.Memory
             if (Fields.Any(x => x.Name == field))
                 return Fields.Where(x => x.Name == field).FirstOrDefault().ReadAs<TOut>();
             else
-                throw new NotImplementedException();
+                return MemoryDataConverter.Read<TOut>(new byte[32], 0);
         }
         public void Refresh()
         {

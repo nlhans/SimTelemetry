@@ -19,7 +19,7 @@ namespace SimTelemetry.Tests
             //l.TestRfactor();
             test();
             w.Stop();
-            
+
 #if DEBUG
             Debug.WriteLine("Time: " + w.ElapsedMilliseconds);
 #else
@@ -32,7 +32,7 @@ namespace SimTelemetry.Tests
         static void RefreshDrivers(MemoryPool DriverPtrs)
         {
 
-
+            Console.WriteLine(("updating cars"));
             // Add found drivers.
             DriverPtrs.ClearPools();
 
@@ -60,47 +60,90 @@ namespace SimTelemetry.Tests
             r.Diagnostic = true;
             r.Open(Process.GetProcessesByName("rfactor")[0]);
 
+            MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<SessionType>
+                                                ((data, index) =>
+                                                {
+                                                    var iData = data[0];
+
+                                                    if (iData < 4 && iData != 0) return SessionType.PRACTICE;
+                                                    if (iData == 5) return SessionType.QUALIFY;
+                                                    if (iData == 6) return SessionType.WARMUP;
+                                                    if (iData == 7) return SessionType.RACE;
+                                                    return SessionType.TEST_DAY;
+                                                },
+                                                 (data) =>
+                                                 {
+                                                     var iData = data is int ? (int)data : 0;
+                                                     if (iData < 4 && iData != 0) return SessionType.PRACTICE;
+                                                     if (iData == 5) return SessionType.QUALIFY;
+                                                     if (iData == 6) return SessionType.WARMUP;
+                                                     if (iData == 7) return SessionType.RACE;
+                                                     return SessionType.TEST_DAY;
+                                                 }));
+
             // The MemoryProvider object is filled/generated inside a plugin.
             var provider = new MemoryProvider(r);
 
-            var DriverPtrs = new MemoryPool("Drivers", MemoryAddress.Static, 0x315284, 0x200);
-            DriverPtrs.Add(new MemoryField<int>("CarViewPort", MemoryAddress.Dynamic, 0, 0, 4));
-            DriverPtrs.Add(new MemoryField<int>("CarPlayer", MemoryAddress.Dynamic, 0, 0x8, 4));
-            DriverPtrs.Add(new MemoryField<int>("Cars", MemoryAddress.Dynamic, 0, 0xC, 4));
-            provider.Add(DriverPtrs);
+            // Driver pool
+            var driverPtrs = new MemoryPool("Drivers", MemoryAddress.Static, 0x315284, 0x200);
+            driverPtrs.Add(new MemoryField<int>("CarViewPort", MemoryAddress.Dynamic, 0, 0, 4));
+            driverPtrs.Add(new MemoryField<int>("CarPlayer", MemoryAddress.Dynamic, 0, 0x8, 4));
+            driverPtrs.Add(new MemoryField<int>("Cars", MemoryAddress.Dynamic, 0, 0xC, 4));
+            provider.Add(driverPtrs);
 
+            // Session data
             var session = new MemoryPool("Session", MemoryAddress.Static, 0x00309D24, 0x1000);
             session.Add(new MemoryFieldLazy<string>("Track", MemoryAddress.Dynamic, 0, 4, 128));
+            session.Add(new MemoryFieldLazy<float>("Time", MemoryAddress.Static, 0x60022C, 4));
+            session.Add(new MemoryFieldLazy<float>("Clock", MemoryAddress.Static, 0x6E2CD8, 4));
+
+            session.Add(new MemoryField<float>("TemperatureAmbient", MemoryAddress.Static, 0x006E2CD4, 4));
+            session.Add(new MemoryField<float>("TemperatureTrack", MemoryAddress.Static, 0x006E2CD4, 4));
+
+            session.Add(new MemoryFieldLazy<float>("SessionTime", MemoryAddress.Static, 0x5932EC, 4, (x) => Math.Min(48*3600, x)));
+            session.Add(new MemoryFieldLazy<int>("SessionType", MemoryAddress.Static, 0x58696C, 4));
+            session.Add(new MemoryFieldLazy<int>("SessionIndex", MemoryAddress.Static, 0x58696C, 4, (x) => ((x > 4) ? 1 : x)));
+            session.Add(new MemoryFieldLazy<int>("SessionLaps", MemoryAddress.Static, 0x00314654, 4));
+            session.Add(new MemoryFieldLazy<bool>("IsOffline", MemoryAddress.Static, 0x00315444, 1, (x) => !x));
+            session.Add(new MemoryFieldLazy<bool>("IsActive", MemoryAddress.Static, 0x30FEE4, 1));
+            
+            session.Add(new MemoryFieldLazy<bool>("IsReplay", MemoryAddress.Static, 0x315444, 1));
+
             provider.Add(session);
 
-            // From here 'application'.
             provider.Refresh();
 
             int a = 0;
             int lastCars = 0;
-            while(true)
+
+            while (true)
             {
                 provider.Refresh();
 
-                int cars = DriverPtrs.ReadAs<int>("Cars");
+                var sessionData = provider.Get("Session");
+                var driverPool = provider.Get("Drivers");
+                var cars = driverPool.ReadAs<int>("Cars");
                 if (cars != lastCars)
-                    RefreshDrivers(DriverPtrs);
+                    RefreshDrivers(driverPool);
                 lastCars = cars;
 
-                    /*Console.Clear();
-                    foreach (MemoryPool drv in provider.Get("Drivers").Pools.OrderBy(x => x.ReadAs<int>("Position")))
-                    {
-                        if (drv.ReadAs<int>("Index") == 0)
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                        var s = "#" + drv.ReadAs<int>("Index").ToString("000") + " -> P" + drv.ReadAs<int>("Position").ToString("000") + " | " +
-                                   drv.ReadAs<int>("Gear") + "|" + drv.ReadAs<int>("Speed").ToString("000") + "| " + drv.ReadAs<int>("RPM");
-                        Console.WriteLine(s);
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                        a += s.Length;
-                    }*/
+                bool sessionActive = session.ReadAs<bool>("IsActive");
+                bool sessionLoading = !sessionActive && cars > 0;
+                bool sessionReplay = session.ReadAs<bool>("IsReplay");
 
-                    Thread.Sleep(20);
-                }
+                string status = (session.ReadAs<bool>("IsOffline") ? "OFFLINE" : " ONLINE");
+                if (sessionReplay) status = "REPLAY";
+                if (sessionActive == false) status = "INACTIVE";
+                if (sessionLoading == true) status = "LOADING";
+
+                Console.Write(status);
+                Console.Write(" | Cars: " + driverPool.ReadAs<int>("Cars") + " | Time: " + sessionData.ReadAs<float>("Time"));
+                Console.Write(" | Length: " + sessionData.ReadAs<int>("SessionTime"));
+                Console.WriteLine(" | Type: " + sessionData.ReadAs<SessionType>("SessionType") + " " +sessionData.ReadAs<string>("SessionIndex") + " | " + r.ReadCalls);
+
+
+                Thread.Sleep(20);
             }
         }
     }
+}

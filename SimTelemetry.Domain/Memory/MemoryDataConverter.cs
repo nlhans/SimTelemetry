@@ -10,6 +10,8 @@ namespace SimTelemetry.Domain.Memory
 
         static MemoryDataConverter()
         {
+            Providers.Add(typeof(bool), new MemoryDataConverterProvider<bool>(BitConverter.ToBoolean, Convert.ToBoolean));
+
             Providers.Add(typeof(byte), new MemoryDataConverterProvider<byte>(ToByte, Convert.ToByte));
             Providers.Add(typeof(char), new MemoryDataConverterProvider<char>(BitConverter.ToChar, Convert.ToChar));
 
@@ -26,6 +28,21 @@ namespace SimTelemetry.Domain.Memory
             Providers.Add(typeof(float), new MemoryDataConverterProvider<float>(BitConverter.ToSingle, Convert.ToSingle));
 
             Providers.Add(typeof(string), new MemoryDataConverterProvider<string>(BytesToString, Convert.ToString));
+
+        }
+
+        public static void AddProvider<T>(MemoryDataConverterProvider<T> provider)
+        {
+            Type t = typeof (T);
+            if (!Providers.ContainsKey(t))
+                Providers.Add(t, provider);
+        }
+
+        public static void RemoveProvider<T>()
+        {
+            Type t = typeof (T);
+            if (Providers.ContainsKey(t))
+                Providers.Remove(t);
         }
 
         protected static string BytesToString(byte[] datainput, int index)
