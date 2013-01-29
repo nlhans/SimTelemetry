@@ -2,11 +2,18 @@
 
 namespace SimTelemetry.Domain.Memory
 {
-    public class MemoryLazyField<T> : MemoryField<T>
+    public class MemoryFieldLazy<T> : MemoryField<T>
     {
         #region Lazyness
         protected Lazy<T> _LazyValue;
-        public override T Value { get { return _LazyValue.Value; } }
+        public override T Value
+        {
+            get
+            {
+                if (_LazyValue == null) Refresh();
+                return _LazyValue.Value;
+            }
+        }
 
         public override void Refresh()
         {
@@ -28,32 +35,32 @@ namespace SimTelemetry.Domain.Memory
         #endregion
         #region Constructors
 
-        public MemoryLazyField(string name, MemoryAddress type, int address, int size)
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int size)
             : base(name, type, address, size)
         {
         }
 
-        public MemoryLazyField(string name, MemoryAddress type, int address, int offset, int size)
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int offset, int size)
             : base(name, type, address, offset, size)
         {
         }
 
-        public MemoryLazyField(string name, MemoryAddress type, MemoryPool pool, int offset, int size)
+        public MemoryFieldLazy(string name, MemoryAddress type, MemoryPool pool, int offset, int size)
             : base(name, type, pool, offset, size)
         {
         }
 
-        public MemoryLazyField(string name, MemoryAddress type, int address, int size, Func<T, T> conversion)
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int size, Func<T, T> conversion)
             : base(name, type, address, size, conversion)
         {
         }
 
-        public MemoryLazyField(string name, MemoryAddress type, int address, int offset, int size, Func<T, T> conversion)
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int offset, int size, Func<T, T> conversion)
             : base(name, type, address, offset, size, conversion)
         {
         }
 
-        public MemoryLazyField(string name, MemoryAddress type, MemoryPool pool, int offset, int size, Func<T, T> conversion)
+        public MemoryFieldLazy(string name, MemoryAddress type, MemoryPool pool, int offset, int size, Func<T, T> conversion)
             : base(name,  type, pool, offset, size, conversion)
         {
         }

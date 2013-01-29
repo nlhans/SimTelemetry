@@ -8,6 +8,7 @@
 
         bool IsDynamic { get; }
         bool IsStatic { get; }
+        bool IsConstant { get; }
 
         MemoryPool Pool { get; }
         int Offset { get; }

@@ -99,7 +99,8 @@
     <Compile Include="Memory\MemoryDataConverter.cs" />
     <Compile Include="Memory\MemoryDataConverterProvider.cs" />
     <Compile Include="Memory\MemoryField.cs" />
-    <Compile Include="Memory\MemoryLazyField.cs" />
+    <Compile Include="Memory\MemoryFieldConstant.cs" />
+    <Compile Include="Memory\MemoryFieldLazy.cs" />
     <Compile Include="Memory\MemoryPool.cs" />
     <Compile Include="Memory\MemoryProvider.cs" />
     <Compile Include="Memory\MemoryReader.cs" />

@@ -2,8 +2,9 @@
 {
     public enum MemoryAddress
     {
-        STATIC,
-        STATIC_ABSOLUTE,
-        DYNAMIC
+        Static,
+        StaticAbsolute,
+        Dynamic,
+        Constant
     }
 }

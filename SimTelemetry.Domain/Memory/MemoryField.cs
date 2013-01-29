@@ -8,8 +8,9 @@ namespace SimTelemetry.Domain.Memory
         public MemoryProvider Memory { get; protected set; }
         public MemoryAddress AddressType { get; protected set; }
 
-        public bool IsDynamic { get { return (AddressType == MemoryAddress.DYNAMIC); } }
-        public bool IsStatic { get { return (AddressType == MemoryAddress.STATIC || AddressType == MemoryAddress.STATIC_ABSOLUTE); } }
+        public bool IsDynamic { get { return (AddressType == MemoryAddress.Dynamic); } }
+        public bool IsStatic { get { return (AddressType == MemoryAddress.Static || AddressType == MemoryAddress.StaticAbsolute); } }
+        public bool IsConstant { get { return false; } }
 
         public MemoryPool Pool { get; protected set; }
         public int Offset { get; protected set; }
@@ -19,6 +20,7 @@ namespace SimTelemetry.Domain.Memory
         public Type FieldType { get; protected set; }
 
         public Func<T, T> Conversion { get; protected set; }
+
         public virtual T Value { get { return _Value; } }
         protected T _Value;
 
@@ -59,7 +61,7 @@ namespace SimTelemetry.Domain.Memory
                 computedAddress = Memory.Reader.ReadInt32(Memory.BaseAddress + Address) + Offset;
             else
             {
-                computedAddress = AddressType == MemoryAddress.STATIC
+                computedAddress = AddressType == MemoryAddress.Static
                                       ? Memory.BaseAddress + Address
                                       : Address;
             }

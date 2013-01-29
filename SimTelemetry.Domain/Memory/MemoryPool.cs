@@ -6,26 +6,27 @@ namespace SimTelemetry.Domain.Memory
 {
     public class MemoryPool : IMemoryObject
     {
-        public byte[] Value;
-
         public string Name { get; protected set; }
         public MemoryProvider Memory { get; set; }
         public MemoryAddress AddressType { get; protected set; }
 
-        public bool IsDynamic { get { return (AddressType == MemoryAddress.DYNAMIC); } }
-        public bool IsStatic { get { return (AddressType == MemoryAddress.STATIC || AddressType == MemoryAddress.STATIC_ABSOLUTE); } }
+        public bool IsDynamic { get { return (AddressType == MemoryAddress.Dynamic); } }
+        public bool IsStatic { get { return (AddressType == MemoryAddress.Static || AddressType == MemoryAddress.StaticAbsolute); } }
+        public bool IsConstant { get { return false; } }
 
         public MemoryPool Pool { get; protected set; }
         public int Offset { get; protected set; }
         public int Address { get; protected set; }
         public int Size { get; protected set; }
 
+        public byte[] Value { get; protected set; }
 
         public IEnumerable<IMemoryObject> Fields { get { return _fields; } }
         public IEnumerable<MemoryPool> Pools { get { return _pools; } }
 
         private readonly IList<IMemoryObject> _fields = new List<IMemoryObject>();
         private readonly IList<MemoryPool> _pools = new List<MemoryPool>();
+
 
 
         public TOut ReadAs<TOut>()
@@ -62,7 +63,7 @@ namespace SimTelemetry.Domain.Memory
                 }
                 else
                 {
-                    computedAddress = AddressType == MemoryAddress.STATIC
+                    computedAddress = AddressType == MemoryAddress.Static
                                           ? Memory.BaseAddress + Address
                                           : Address;
                 }
@@ -92,6 +93,7 @@ namespace SimTelemetry.Domain.Memory
 
         public void SetPool(MemoryPool pool)
         {
+            if (Pool == pool) return;
             if (Pool != null) throw new Exception("Can only set 1 pool");
             Pool = pool;
         }
@@ -111,6 +113,11 @@ namespace SimTelemetry.Domain.Memory
 
             obj.SetPool(this);
             if (Memory != null) obj.SetProvider(Memory);
+        }
+
+        public void ClearPools()
+        {
+            _pools.Clear();
         }
 
         public MemoryPool(string name,  MemoryAddress type, int address, int size)
@@ -138,13 +145,6 @@ namespace SimTelemetry.Domain.Memory
             Offset = offset;
             Size = size;
             AddressType = type;
-        }
-
-        protected byte[] ReadObject(byte[] dataIn, int index)
-        {
-            var dataOut = new byte[Size];
-            Array.Copy(dataIn, index, dataOut, 0, dataOut.Length);
-            return dataOut;
         }
 
     }
