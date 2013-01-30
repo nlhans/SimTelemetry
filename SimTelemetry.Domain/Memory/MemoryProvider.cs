@@ -8,7 +8,7 @@ namespace SimTelemetry.Domain.Memory
         public int BaseAddress { get; protected set; }
         public MemoryReader Reader { get; protected set; }
 
-        public IEnumerable<MemoryPool> Pools { get { return _pools; } }
+        public IList<MemoryPool> Pools { get { return _pools; } }
         private readonly IList<MemoryPool> _pools = new List<MemoryPool>();
 
         public MemoryProvider(MemoryReader reader)
@@ -41,7 +41,9 @@ namespace SimTelemetry.Domain.Memory
         public void Refresh()
         {
             foreach (var pool in _pools)
+            {
                 pool.Refresh();
+            }
         }
     }
 }

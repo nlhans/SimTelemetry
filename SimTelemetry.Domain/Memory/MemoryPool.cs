@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace SimTelemetry.Domain.Memory
@@ -21,11 +22,11 @@ namespace SimTelemetry.Domain.Memory
 
         public byte[] Value { get; protected set; }
 
-        public IEnumerable<IMemoryObject> Fields { get { return _fields; } }
-        public IEnumerable<MemoryPool> Pools { get { return _pools; } }
+        public Dictionary<string, IMemoryObject> Fields { get { return _fields; } }
+        public Dictionary<string, MemoryPool> Pools { get { return _pools; } }
 
-        private readonly IList<IMemoryObject> _fields = new List<IMemoryObject>();
-        private readonly IList<MemoryPool> _pools = new List<MemoryPool>();
+        private readonly Dictionary<string, IMemoryObject> _fields = new Dictionary<string, IMemoryObject>();
+        private readonly Dictionary<string, MemoryPool> _pools = new Dictionary<string, MemoryPool>();
 
 
 
@@ -46,8 +47,8 @@ namespace SimTelemetry.Domain.Memory
 
         public TOut ReadAs<TOut>(string field)
         {
-            if (Fields.Any(x => x.Name == field))
-                return Fields.Where(x => x.Name == field).FirstOrDefault().ReadAs<TOut>();
+            if (Fields.ContainsKey(field))
+                return Fields[field].ReadAs<TOut>();
             else
                 return MemoryDataConverter.Read<TOut>(new byte[32], 0);
         }
@@ -55,30 +56,35 @@ namespace SimTelemetry.Domain.Memory
         {
             var computedAddress = 0;
             // Refresh this memory block.
-            if (IsStatic)
+            if (Size > 0)
             {
-                if (Address != 0 && Offset != 0)
+                if (IsStatic)
                 {
-                    computedAddress = Memory.Reader.ReadInt32(Memory.BaseAddress + Address) + Offset;
+                    if (Address != 0 && Offset != 0)
+                    {
+                        computedAddress = Memory.Reader.ReadInt32(Memory.BaseAddress + Address) + Offset;
+                    }
+                    else
+                    {
+                        computedAddress = AddressType == MemoryAddress.Static
+                                              ? Memory.BaseAddress + Address
+                                              : Address;
+                    }
                 }
                 else
                 {
-                    computedAddress = AddressType == MemoryAddress.Static
-                                          ? Memory.BaseAddress + Address
-                                          : Address;
+                    computedAddress = MemoryDataConverter.Read<int>(Pool.Value, Offset);
                 }
-            }
-            else
-            {
-                computedAddress = MemoryDataConverter.Read<int>(Pool.Value, Offset);
-            }
 
-            Value = Memory.Reader.ReadBytes(computedAddress, (uint) Size);
+                // Read into this buffer.
+                Memory.Reader.Read(computedAddress, Value);
+            }
 
             // Refresh underlying fields.
             foreach (var field in Fields)
-                field.Refresh();
-            foreach (var pool in Pools)
+                field.Value.Refresh();
+
+            foreach (var pool in Pools.Values)
                 pool.Refresh();
 
         }
@@ -87,8 +93,8 @@ namespace SimTelemetry.Domain.Memory
         {
             if (Memory != null) throw new Exception("Can only set 1 memory provider");
             Memory = provider;
-            foreach (var field in _fields) field.SetProvider(provider);
-            foreach (var pool in _pools) pool.SetProvider(provider);
+            foreach (var field in _fields) field.Value.SetProvider(provider);
+            foreach (var pool in _pools) pool.Value.SetProvider(provider);
         }
 
         public void SetPool(MemoryPool pool)
@@ -100,19 +106,25 @@ namespace SimTelemetry.Domain.Memory
 
         public void Add<T>(T obj) where T : IMemoryObject
         {
-            if (typeof(T).Name == "MemoryPool") throw new Exception();
-            _fields.Add(obj);
+            if (typeof(T).Name.Contains("MemoryPool")) throw new Exception();
+            if (!_fields.ContainsKey(obj.Name))
+            {
+                _fields.Add(obj.Name, obj);
 
-            obj.SetPool(this);
-            if (Memory != null) obj.SetProvider(Memory);
+                obj.SetPool(this);
+                if (Memory != null) obj.SetProvider(Memory);
+            }
         }
 
         public void Add(MemoryPool obj)
         {
-            _pools.Add(obj);
+            if (!_pools.ContainsKey(obj.Name))
+            {
+                _pools.Add(obj.Name, obj);
 
-            obj.SetPool(this);
-            if (Memory != null) obj.SetProvider(Memory);
+                obj.SetPool(this);
+                if (Memory != null) obj.SetProvider(Memory);
+            }
         }
 
         public void ClearPools()
@@ -127,6 +139,8 @@ namespace SimTelemetry.Domain.Memory
             Offset = 0;
             Size = size;
             AddressType = type;
+
+            Value = new byte[Size];
         }
 
         public MemoryPool(string name,  MemoryAddress type, int address, int offset, int size)
@@ -136,6 +150,8 @@ namespace SimTelemetry.Domain.Memory
             Offset = offset;
             Size = size;
             AddressType = type;
+
+            Value = new byte[Size];
         }
 
         public MemoryPool(string name,  MemoryAddress type, MemoryPool pool, int offset, int size)
@@ -145,6 +161,8 @@ namespace SimTelemetry.Domain.Memory
             Offset = offset;
             Size = size;
             AddressType = type;
+
+            Value = new byte[Size];
         }
 
     }

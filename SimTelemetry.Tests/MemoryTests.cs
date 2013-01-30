@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using SimTelemetry.Domain.Memory;
-using SimTelemetry.Objects;
 
 namespace SimTelemetry.Tests
 {
@@ -33,7 +32,7 @@ namespace SimTelemetry.Tests
                 var driver = new MemoryPool("Driver", MemoryAddress.Dynamic, DriverPtrs, 0x14 + i * 4, 0x5F48); // base, 0x5F48 size
                 driver.Add(new MemoryFieldLazy<string>("Name", MemoryAddress.Dynamic, 0, 0x5B08, 32));
                 driver.Add(new MemoryFieldLazy<float>("Speed", MemoryAddress.Dynamic, 0, 0x57C0, 8, (x) => x * 3.6f));
-                driver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0xA4, 8, Rotations.Rads_RPM));
+                driver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0xA4, 8));
                 driver.Add(new MemoryFieldLazy<byte>("Gear", MemoryAddress.Dynamic, 0, 0x321C, 1));
                 provider.Add(driver);
             }
@@ -66,6 +65,33 @@ namespace SimTelemetry.Tests
         }
 
         [Test]
+        public void TestMemory()
+        {
+
+            MemoryReader r = new MemoryReader();
+            r.Diagnostic = true;
+            r.Open(Process.GetProcessesByName("rfactor")[0]);
+
+            var w = new Stopwatch();
+            w.Start();
+            for (int i = 0; i < 100000; i++)
+                r.ReadInt32(0x7154C0);
+            w.Stop();
+            Debug.WriteLine(w.ElapsedMilliseconds);
+            w.Reset();
+
+            byte[] data = new byte[0x6000];
+            w.Start();
+            for (int i = 0; i < 5000; i++)
+                r.Read(0x7154C0, data);
+
+            w.Stop();
+            Debug.WriteLine(w.ElapsedMilliseconds);
+            w.Reset();
+
+        }
+
+        [Test]
         public void TestRfactor()
         {
             MemoryReader r = new MemoryReader();
@@ -76,9 +102,9 @@ namespace SimTelemetry.Tests
             var provider = new MemoryProvider(r);
 
             var DriverPtrs = new MemoryPool("Drivers", MemoryAddress.Static, 0x315284, 0x200);
-            DriverPtrs.Add(new MemoryField<int>("CarViewPort", MemoryAddress.Dynamic, 0, 0, 4));
-            DriverPtrs.Add(new MemoryField<int>("CarPlayer", MemoryAddress.Dynamic, 0, 0x8, 4));
-            DriverPtrs.Add(new MemoryField<int>("Cars", MemoryAddress.Dynamic, 0, 0xC, 4));
+            DriverPtrs.Add(new MemoryFieldLazy<int>("CarViewPort", MemoryAddress.Dynamic, 0, 0, 4));
+            DriverPtrs.Add(new MemoryFieldLazy<int>("CarPlayer", MemoryAddress.Dynamic, 0, 0x8, 4));
+            DriverPtrs.Add(new MemoryFieldLazy<int>("Cars", MemoryAddress.Dynamic, 0, 0xC, 4));
 
             provider.Add(DriverPtrs);
             DriverPtrs.Refresh();
@@ -89,12 +115,67 @@ namespace SimTelemetry.Tests
             var drivers = DriverPtrs.ReadAs<int>("Cars");
             for (var i = 0; i < drivers; i++)
             {
-                var driver = new MemoryPool("Driver", MemoryAddress.Dynamic, DriverPtrs, 0x14 + i * 4, 0x5F48); // base, 0x5F48 size
+                var driver = new MemoryPool("Driver" + i, MemoryAddress.Dynamic, DriverPtrs, 0x14 + i * 4, 0x5F48);
+                // base, 0x5F48 size
                 driver.Add(new MemoryFieldConstant<int>("Index", i));
+                driver.Add(new MemoryFieldConstant<bool>("IsActive", true));
+
                 driver.Add(new MemoryFieldLazy<string>("Name", MemoryAddress.Dynamic, 0, 0x5B08, 32));
-                driver.Add(new MemoryFieldLazy<float>("Speed", MemoryAddress.Dynamic, 0, 0x57C0, 8, (x) => x * 3.6f));
-                driver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0xA4, 8, Rotations.Rads_RPM));
-                driver.Add(new MemoryFieldLazy<byte>("Gear", MemoryAddress.Dynamic, 0, 0x321C, 1));
+                driver.Add(new MemoryFieldLazy<string>("CarTeam", MemoryAddress.Dynamic, 0, 0x5C22, 64));
+                driver.Add(new MemoryFieldLazy<string>("CarModel", MemoryAddress.Dynamic, 0, 0x5C62, 64));
+                driver.Add(new MemoryFieldLazy<string>("CarClasses", MemoryAddress.Dynamic, 0, 0x39BC, 64));
+
+                driver.Add(new MemoryFieldLazy<float>("Meter", MemoryAddress.Dynamic, 0, 0x3D04, 4));
+                driver.Add(new MemoryFieldLazy<float>("Speed", MemoryAddress.Dynamic, 0, 0x57C0, 4));
+                driver.Add(new MemoryFieldLazy<float>("Mass", MemoryAddress.Dynamic, 0, 0x28DC, 4));
+                driver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0x317C, 4));
+                driver.Add(new MemoryFieldLazy<float>("RPMMax", MemoryAddress.Dynamic, 0, 0x3180, 4));
+
+                driver.Add(new MemoryFieldLazy<int>("Gear", MemoryAddress.Dynamic, 0, 0x321C, 1));
+
+                for (int j = 0; j < 7; j++)
+                    driver.Add(new MemoryFieldLazy<float>("GearRatio" + ((j == 0) ? "R" : i.ToString()),
+                                                          MemoryAddress.Dynamic, 0, 0x31F8 + j * 4, 4));
+
+
+                driver.Add(new MemoryFieldLazy<float>("TyreWearLF", MemoryAddress.Dynamic, 0, 0x2A34, 4));
+                driver.Add(new MemoryFieldLazy<float>("TyreWearRF", MemoryAddress.Dynamic, 0, 0x2C1C, 4));
+                driver.Add(new MemoryFieldLazy<float>("TyreWearLR", MemoryAddress.Dynamic, 0, 0x2E04, 4));
+                driver.Add(new MemoryFieldLazy<float>("TyreWearRR", MemoryAddress.Dynamic, 0, 0x2FEC, 4));
+
+                driver.Add(new MemoryFieldLazy<int>("Pitstops", MemoryAddress.Dynamic, 0, 0x3D2C, 4));
+                driver.Add(new MemoryFieldLazy<int>("Position", MemoryAddress.Dynamic, 0, 0x3D20, 4));
+                driver.Add(new MemoryFieldLazy<int>("Laps", MemoryAddress.Dynamic, 0, 0x3CF8, 1));
+
+                driver.Add(new MemoryFieldLazy<bool>("IsRetired", MemoryAddress.Dynamic, 0, 0x4160, 1));
+                driver.Add(new MemoryFieldLazy<bool>("IsLimiter", MemoryAddress.Dynamic, 0, 0x17B1, 1));
+                driver.Add(new MemoryFieldLazy<bool>("IsPits", MemoryAddress.Dynamic, 0, 0x27A8, 1));
+                driver.Add(new MemoryFieldLazy<bool>("IsDriving", MemoryAddress.Dynamic, 0, 0x3CBF, 1));
+                //driver.Add(new MemoryFieldFunc<bool>("IsActive", (x) => { return true; }));
+                /*(pool) =>
+                                                                 pool.ReadAs<float>("CoordinateX") != 0 &&
+                                                                 pool.ReadAs<float>("CoordinateY") != 0 &&
+                                                                 pool.ReadAs<float>("CoordinateZ") != 0 &&
+                                                                 pool.ReadAs<string>("Name").Length != 0     ));*/
+
+                driver.Add(new MemoryFieldLazy<bool>("FlagYellow", MemoryAddress.Dynamic, 0, 0x104, 1, (x) => !x));
+                driver.Add(new MemoryFieldLazy<bool>("FlagBlue", MemoryAddress.Dynamic, 0, 0x3E39, 1));
+                driver.Add(new MemoryFieldLazy<bool>("FlagBlack", MemoryAddress.Dynamic, 0, 0x3D24, 1));
+                driver.Add(new MemoryFieldLazy<bool>("Ignition", MemoryAddress.Dynamic, 0, 0xAA, 1));
+
+                driver.Add(new MemoryFieldLazy<float>("CoordinateX", MemoryAddress.Dynamic, 0, 0x10, 4));
+                driver.Add(new MemoryFieldLazy<float>("CoordinateY", MemoryAddress.Dynamic, 0, 0x18, 4));
+                driver.Add(new MemoryFieldLazy<float>("CoordinateZ", MemoryAddress.Dynamic, 0, 0x14, 4));
+                driver.Add(new MemoryFieldLazy<float>("Throttle", MemoryAddress.Dynamic, 0, 0x2938, 4));
+                driver.Add(new MemoryFieldLazy<float>("Brake", MemoryAddress.Dynamic, 0, 0x2940, 4));
+                driver.Add(new MemoryFieldLazy<float>("Fuel", MemoryAddress.Dynamic, 0, 0x315C, 4));
+                driver.Add(new MemoryFieldLazy<float>("FuelCapacity", MemoryAddress.Dynamic, 0, 0x3160, 4));
+
+                var laps = new MemoryPool("Laps", MemoryAddress.Dynamic, driver, 0x3D90, 6 * 4 * 200);
+                // 200 laps, 6 floats each.
+                driver.Add(laps);
+
+
                 DriverPtrs.Add(driver);
             }
             var session = new MemoryPool("Session", MemoryAddress.Static, 0x00309D24, 0x1000);
@@ -104,9 +185,9 @@ namespace SimTelemetry.Tests
             // From here 'application'.
             provider.Refresh();
 
-            MemoryPool drv1 = provider.Pools.Where(x => x.Name == "Drivers").FirstOrDefault().Pools.Where(x => x.Name=="Driver").FirstOrDefault();
-            foreach(MemoryPool drv in provider.Get("Drivers").Pools)
-                Debug.WriteLine("#" + drv.ReadAs<int>("Index") + " -> " + drv.ReadAs<string>("Name"));
+            MemoryPool drv1 = provider.Get("Drivers").Pools["Driver0"];
+            foreach(var drv in provider.Get("Drivers").Pools)
+                Debug.WriteLine("#" + drv.Value.ReadAs<int>("Index") + " -> " + drv.Value.ReadAs<string>("Name"));
 
             MemoryPool sess = provider.Pools.Where(x => x.Name == "Session").FirstOrDefault();
 
@@ -117,30 +198,30 @@ namespace SimTelemetry.Tests
             Debug.WriteLine(drv1.ReadAs<int>("Gear"));
             Thread.Sleep(1000);
             Console.WriteLine("ReadMemory calls: " + r.ReadCalls);
-
+            double tickLength = 0;
             // Speed comparisons.
             Stopwatch w = new Stopwatch();
             w.Reset();
-            int[] data = new int[3500 * (drivers + 2)];
+            int[] data = new int[40 * (drivers + 2)];
             w.Start();
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < 1000; j++) // 100Hz * 10 seconds
             {
                 for (int i = 0; i < data.Length; i++)
                 {
-                    data[i] = r.ReadInt32(0x7154C0 + i*4);
+                    r.ReadInt32(0x7154C0 + i*4);
                 }
             }
             w.Stop();
             Thread.Sleep(1000);
-            double tickLength = w.ElapsedMilliseconds/1000.0;
-            Console.WriteLine(@"{0}k  ReadInt32() -> ReadMemory calls: {1} / {2}ms -> {3}ms per tick", (data.Length / 1000), data.Length, w.ElapsedMilliseconds, tickLength);
-            Console.WriteLine(@"CPU time from memory reading @ 100Hz -> {0}%", Math.Round(tickLength * 100 / 10.0, 2));
+             tickLength = w.ElapsedMilliseconds/1000.0;
+            Console.WriteLine(@"{0}k  ReadInt32() -> ReadMemory calls: {1} / {2}ms -> {3}ms per tick", data.Length, 1000*data.Length, w.ElapsedMilliseconds, tickLength);
+            Console.WriteLine(@"CPU time from memory reading @ 100Hz -> {0}%", Math.Round(tickLength /1000.0 *10000, 2));
 
             w.Reset();
             w.Start();
-            for (int i = 0; i <1000; i++)
+            for (int i = 0; i < 1000; i++) // 100Hz * 10 seconds
             {
-                for (int j = 0; j < drivers+1; j++)
+                for (int j = 0; j < drivers+2; j++)
                     r.ReadBytes(0x7154C0, 0x5F48);
             }
             w.Stop();
@@ -152,13 +233,14 @@ namespace SimTelemetry.Tests
             w.Reset();
             w.Start();
             Console.WriteLine("Reading..");
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1000; i++) // 100Hz * 10 seconds
             {
                 provider.Refresh();
-               // Thread.Sleep(20);
+
+                // Thread.Sleep(20);
             }
             w.Stop();
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
             tickLength = w.ElapsedMilliseconds/1000.0;
             Console.WriteLine(@"1k * MemoryProvider.Refresh() -> ReadMemory calls: {0} / {1}ms -> {2}ms per tick", r.ReadCalls, w.ElapsedMilliseconds, tickLength);
             Console.WriteLine(@"CPU time from memory reading @ 100Hz -> {0}%", Math.Round(tickLength * 100 / 10.0, 2));

@@ -79,6 +79,27 @@ namespace SimTelemetry.Domain.Memory
             return buffer;
         }
 
+        public virtual bool Read(IntPtr memoryAddress, byte[] buffer)
+        {
+            if (Diagnostic)
+                _readCalls++;
+            IntPtr ptrBytesReaded;
+
+            MemoryReaderApi.ReadProcessMemory(m_hProcess, memoryAddress, buffer, (uint)buffer.Length, out ptrBytesReaded);
+            return ((int)ptrBytesReaded == buffer.Length);
+        }
+
+
+        public virtual bool Read(int memoryAddress, byte[] buffer)
+        {
+            if (Diagnostic)
+                _readCalls++;
+            IntPtr ptrBytesReaded;
+
+            MemoryReaderApi.ReadProcessMemory(m_hProcess, (IntPtr)memoryAddress, buffer, (uint)buffer.Length, out ptrBytesReaded);
+            return ((int)ptrBytesReaded == buffer.Length);
+        }
+
         #region Read<IntPtr>
         public T Read<T>(IntPtr address, uint size, Func<byte[], int, T> converter)
         {

@@ -21,6 +21,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -100,6 +103,7 @@
     <Compile Include="Memory\MemoryDataConverterProvider.cs" />
     <Compile Include="Memory\MemoryField.cs" />
     <Compile Include="Memory\MemoryFieldConstant.cs" />
+    <Compile Include="Memory\MemoryFieldFunc.cs" />
     <Compile Include="Memory\MemoryFieldLazy.cs" />
     <Compile Include="Memory\MemoryPool.cs" />
     <Compile Include="Memory\MemoryProvider.cs" />
@@ -118,7 +122,7 @@
     <Compile Include="Repositories\TrackRepository.cs" />
     <Compile Include="Utils\IniReader.cs" />
     <Compile Include="Utils\IniScannerOld.cs" />
-    <Compile Include="Utils\IniValueObject.cs" />
+    <Compile Include="ValueObjects\IniValueObject.cs" />
     <Compile Include="ValueObjects\EngineLifetime.cs" />
     <Compile Include="ValueObjects\EngineMode.cs" />
     <Compile Include="ValueObjects\Lap.cs" />
