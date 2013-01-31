@@ -259,11 +259,7 @@ namespace SimTelemetry.Tests
             //r.StartSigScanning();
 
             var regionCode = r.Regions.Where(x => x.BaseAddress == 0x401000).FirstOrDefault();
-            //byte[] data = File.ReadAllBytes(@"C:\Program Files (x86)\rFactor\Versie Beter\rfactor.exe");
-            byte[] data = File.ReadAllBytes(@"C:\Users\Hans\Documents\rfBeterDump.CEM");
-            //byte[] data = File.ReadAllBytes(@"C:\Program Files (x86)\Simraceway\SimracewayGame.exe");
-            //byte[] data = File.ReadAllBytes(@"C:\Program Files (x86)\rFactor2\Core\rfactor2.exe");
-            //byte[] data = File.ReadAllBytes(@"C:\GTR2\GTR2.exe");
+            byte[] data = File.ReadAllBytes(@"..\..\..\..\..\rf.exe");
             var myCustomRegion = new MemoryRegion(0x401000, data.Length, true);
             myCustomRegion.Data = data;
 
