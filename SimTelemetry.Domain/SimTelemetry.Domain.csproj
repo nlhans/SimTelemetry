@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -105,10 +105,13 @@
     <Compile Include="Memory\MemoryFieldConstant.cs" />
     <Compile Include="Memory\MemoryFieldFunc.cs" />
     <Compile Include="Memory\MemoryFieldLazy.cs" />
+    <Compile Include="Memory\MemoryFieldSignature.cs" />
+    <Compile Include="Memory\MemoryFieldSignaturePointer.cs" />
     <Compile Include="Memory\MemoryPool.cs" />
     <Compile Include="Memory\MemoryProvider.cs" />
     <Compile Include="Memory\MemoryReader.cs" />
     <Compile Include="Memory\MemoryReaderApi.cs" />
+    <Compile Include="Memory\MemorySignatureScanner.cs" />
     <Compile Include="Plugins\IPluginBase.cs" />
     <Compile Include="Plugins\IPluginSimulator.cs" />
     <Compile Include="Plugins\Plugins.cs" />

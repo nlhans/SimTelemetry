@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -244,6 +246,104 @@ namespace SimTelemetry.Tests
             tickLength = w.ElapsedMilliseconds/1000.0;
             Console.WriteLine(@"1k * MemoryProvider.Refresh() -> ReadMemory calls: {0} / {1}ms -> {2}ms per tick", r.ReadCalls, w.ElapsedMilliseconds, tickLength);
             Console.WriteLine(@"CPU time from memory reading @ 100Hz -> {0}%", Math.Round(tickLength * 100 / 10.0, 2));
+        }
+
+        [Test]
+        public void MemoryRegions()
+        {
+            MemoryReader r = new MemoryReader();
+            r.Diagnostic = true;
+            r.Open(Process.GetProcessesByName("rfactor")[0]);
+            Console.WriteLine(r.Regions.Count);
+
+            //r.StartSigScanning();
+
+            var regionCode = r.Regions.Where(x => x.BaseAddress == 0x401000).FirstOrDefault();
+            //byte[] data = File.ReadAllBytes(@"C:\Program Files (x86)\rFactor\Versie Beter\rfactor.exe");
+            byte[] data = File.ReadAllBytes(@"C:\Users\Hans\Documents\rfBeterDump.CEM");
+            //byte[] data = File.ReadAllBytes(@"C:\Program Files (x86)\Simraceway\SimracewayGame.exe");
+            //byte[] data = File.ReadAllBytes(@"C:\Program Files (x86)\rFactor2\Core\rfactor2.exe");
+            //byte[] data = File.ReadAllBytes(@"C:\GTR2\GTR2.exe");
+            var myCustomRegion = new MemoryRegion(0x401000, data.Length, true);
+            myCustomRegion.Data = data;
+
+            //DoAndPrintScan(r, myCustomRegion, "8BXX????????F6");
+
+            var sigs = new Dictionary<string, string>
+                                                  {
+                                                      {"TimePtr", "7DXXA1????????8305"},
+                                                      {"Clock", "D905????????56DD05"},
+                                                      {"SessionTime", "D81D????????DFE0F6C4017510"},
+                                                      {"Player Location", "A0XXXXXXXX8B0D????????F6D81BC0"},
+                                                      {"RPM", "7CD5D9XX????????518BCFD91C24E8"},
+                                                      {"MetersDriven", "D882XXXXXXXXD99E????????5E"},
+                                                      {"FlagYellow", "BC1F????????00"},
+                                                      {"LocationX", "8B4C242089XX??D9"},
+                                                      {"LocationY", "8945??8B44243089"},
+                                                      {"LocationZ", "894D??8D7DXX"},
+                                                      {"Laps", "3996????????7DXXDD"},
+                                                      {"Name", "8D8418????????8DB4"},
+                                                      {"Position", "8B8B????????5556"},
+                                                      {"GearR", "D983????????D9E1EB"}
+                                                  };
+            //string sigRPM = "E8????????";
+
+            Console.WriteLine(("rfactor.exe new"));
+            foreach (var sig in sigs)
+            {
+                Console.Write(sig.Key + ": ");
+                DoAndPrintScan(r, myCustomRegion, sig.Value);
+            }
+
+            Console.WriteLine("------------------------");
+            Stopwatch w = new Stopwatch();
+            w.Start();
+            Console.WriteLine(("rfactor.exe"));
+            foreach (var sig in sigs)
+            {
+                Console.Write(sig.Key + ": ");
+                DoAndPrintScan(r, regionCode, sig.Value);
+            }
+            w.Stop();
+            Console.WriteLine(w.ElapsedMilliseconds);
+        }
+
+        private void DoAndPrintScan(MemoryReader r, MemoryRegion regionCode, string sig)
+        {
+            /*var results = r.Scan(regionCode, sig).Distinct(new MyQualityComprarer((a, b) => a ==  b));
+            //Console.Write("Scanned "+sig + "=");
+            if (results.Count() == 0) Console.WriteLine("none!");
+            if (results.Count() == 1) Console.WriteLine("at 0x{0:X}", results.FirstOrDefault());
+            else if(results.Count() > 1)
+            {
+                if (results.Count() > 10) Console.WriteLine("[" + results.Count() + "]");
+                else
+                {
+                    Console.Write("[]");
+                    foreach (var result in results)
+                        Console.Write("0x{0:X}, ", result);
+                    Console.WriteLine();
+                }
+            }*/
+        }
+    }
+
+    public class MyQualityComprarer : IEqualityComparer<uint>
+    {
+        private Func<uint, uint, bool> func;
+        public MyQualityComprarer(Func<uint, uint, bool> equality)
+        {
+            func = equality;
+        }
+
+        public bool Equals(uint a, uint b)
+        {
+            return func(a, b);
+        }
+
+        public int GetHashCode(uint obj)
+        {
+            return (int) obj;
         }
     }
 }

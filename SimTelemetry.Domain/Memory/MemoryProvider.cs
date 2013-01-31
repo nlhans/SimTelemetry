@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SimTelemetry.Domain.Memory
@@ -8,6 +9,8 @@ namespace SimTelemetry.Domain.Memory
         public int BaseAddress { get; protected set; }
         public MemoryReader Reader { get; protected set; }
 
+        public MemorySignatureScanner Scanner { get; protected set; }
+
         public IList<MemoryPool> Pools { get { return _pools; } }
         private readonly IList<MemoryPool> _pools = new List<MemoryPool>();
 
@@ -15,6 +18,8 @@ namespace SimTelemetry.Domain.Memory
         {
             BaseAddress = reader.Process.MainModule.BaseAddress.ToInt32();
             Reader = reader;
+
+            Scanner = new MemorySignatureScanner(this);
         }
 
         public void Add(MemoryPool pool)

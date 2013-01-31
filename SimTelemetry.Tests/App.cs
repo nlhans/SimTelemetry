@@ -149,7 +149,8 @@ namespace SimTelemetry.Tests
             session.Add(new MemoryFieldLazy<bool>("IsActive", MemoryAddress.Static, 0x30FEE4, 1));
             session.Add(new MemoryFieldLazy<bool>("IsReplay", MemoryAddress.Static, 0x315444, 1));
 
-            session.Add(new MemoryFieldLazy<float>("Time", MemoryAddress.Static, 0x60022C, 4));
+            //session.Add(new MemoryFieldLazy<float>("Time", MemoryAddress.Static, 0x60022C, 4));
+            session.Add(new MemoryFieldSignature<float>("Time", MemoryAddress.StaticAbsolute, "7DXXA1????????8305", new[] { 0 }, 4));
             session.Add(new MemoryFieldLazy<float>("Clock", MemoryAddress.Static, 0x6E2CD8, 4));
 
             session.Add(new MemoryFieldLazy<float>("SessionTime", MemoryAddress.Static, 0x5932EC, 4, (x) => Math.Min(48 * 3600, x)));
@@ -165,8 +166,9 @@ namespace SimTelemetry.Tests
 
 
             provider.Add(session);
-
+            provider.Scanner.Enable();
             provider.Refresh();
+            provider.Scanner.Disable();
 
             int a = 0;
             int lastCars = 0;
