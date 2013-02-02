@@ -131,7 +131,7 @@ namespace SimTelemetry.Domain.Memory
 
             foreach(var region in Reader.Regions.Where(x => x.MatchesType(memoryRegionType)))
             {
-                for (int i = 0; i < 100; i++)
+                //for (int i = 0; i < 100; i++)
                     ScanRegion<T>(region, signatureObject, (value, address) =>
                                                                {
                                                                    if (results.ContainsKey(value))
@@ -169,11 +169,6 @@ namespace SimTelemetry.Domain.Memory
                         signatureCheckIndex++;
                         continue;
                     }
-                    /*if ((address + signatureCheckIndex) >= region.Data.Length)
-                    {
-                        matchFailed = true;
-                        break;
-                    }*/
                     var by = region.Data[address + signatureCheckIndex];
 
                     if (sigByte.target)
