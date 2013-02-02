@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -130,13 +131,14 @@ namespace SimTelemetry.Domain.Memory
 
             foreach(var region in Reader.Regions.Where(x => x.MatchesType(memoryRegionType)))
             {
-                ScanRegion<T>(region, signatureObject, (value, address) =>
-                                                           {
-                                                               if (results.ContainsKey(value))
-                                                                   results[value]++;
-                                                               else
-                                                                   results.Add(value, 1);
-                                                           });
+                for (int i = 0; i < 100; i++)
+                    ScanRegion<T>(region, signatureObject, (value, address) =>
+                                                               {
+                                                                   if (results.ContainsKey(value))
+                                                                       results[value]++;
+                                                                   else
+                                                                       results.Add(value, 1);
+                                                               });
             }
 
             return results;
@@ -148,14 +150,17 @@ namespace SimTelemetry.Domain.Memory
                 return;
 
             byte startByte = signature.FirstOrDefault().data;
-            var startHints = region.Data.IndexesOf(startByte, null);
+            var signatureLength = signature.Count();
 
-            foreach (var address in startHints)
+            var address = (uint) Array.IndexOf(region.Data, startByte, 0);
+
+            var signatureCheckIndex = 0;
+            var targetIndex = 0;
+            var target = new byte[32];
+            var matchFailed = false;
+
+            while (address < region.Data.Length-signatureLength)
             {
-                var signatureCheckIndex = 0;
-                var targetIndex = 0;
-                var target = new byte[32];
-                var matchFailed = false;
 
                 foreach (var sigByte in signature)
                 {
@@ -164,11 +169,11 @@ namespace SimTelemetry.Domain.Memory
                         signatureCheckIndex++;
                         continue;
                     }
-                    if ((address + signatureCheckIndex) >= region.Data.Length)
+                    /*if ((address + signatureCheckIndex) >= region.Data.Length)
                     {
                         matchFailed = true;
                         break;
-                    }
+                    }*/
                     var by = region.Data[address + signatureCheckIndex];
 
                     if (sigByte.target)
@@ -183,13 +188,20 @@ namespace SimTelemetry.Domain.Memory
 
                     signatureCheckIndex++;
                 }
-                if (matchFailed)
-                    continue;
-                else
-                    addAction(MemoryDataConverter.Read<T>(target, 0), address);
-                //Console.WriteLine("At byte 0x{0} I found the code sig! -> 0x{1:X} === 0x{2:X}", string.Format("{0:X}", b), BitConverter.ToString(target), d);
+                if (!matchFailed)
+                {
+                    addAction(MemoryDataConverter.Read<T>(target, 0), (int) address);
+                    //Debug.WriteLine("0x{0} -> 0x{2:X} [ 0x{1:X} ] ",string.Format("{0:X}", address), BitConverter.ToString(target), address);
 
+                    target = new byte[32];
+                }
+                signatureCheckIndex = 0;
+                targetIndex = 0;
+                matchFailed = false;
+
+                address = (uint)Array.IndexOf(region.Data, startByte, (int)address + 1);
             }
+
         }
     }
 }

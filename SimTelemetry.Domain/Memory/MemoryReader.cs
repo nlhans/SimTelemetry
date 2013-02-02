@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -71,12 +72,32 @@ namespace SimTelemetry.Domain.Memory
 
         protected void ScanRegions()
         {
+            ScanRegions(true);
+        }
+
+        protected void ScanRegions(bool onlyMe)
+        {
             var memRegionAddr = new IntPtr();
+            string targetExeName = Path.GetFileName(_Process.MainModule.FileName);
             while(true)
             {
                 var regionInfo = new MemoryReaderApi.MEMORY_BASIC_INFORMATION();
                 if (MemoryReaderApi.VirtualQueryEx(_Process.Handle, memRegionAddr, out regionInfo, (uint)Marshal.SizeOf(regionInfo)) != 0)
                 {
+                    memRegionAddr = new IntPtr(regionInfo.BaseAddress.ToInt32() + regionInfo.RegionSize);
+                    if ((regionInfo.State & 0x10000) != 0) // MemoryReaderApi.PageFlags.Free)
+                        continue;
+
+                    if (onlyMe)
+                    {
+                        StringBuilder processName = new StringBuilder(255);
+                        MemoryReaderApi.GetMappedFileName(_Process.Handle, memRegionAddr, processName,
+                                                            processName.Capacity);
+
+                        if (!processName.ToString().Contains(targetExeName))
+                            continue;
+                    }
+
                     if (true || (regionInfo.State & (uint)MemoryReaderApi.PageFlags.MEM_COMMIT) != 0
                         && (regionInfo.Protect & (uint)MemoryReaderApi.PageFlags.WRITABLE) != 0
                         && (regionInfo.Protect & (uint)MemoryReaderApi.PageFlags.PAGE_GUARD) == 0
@@ -90,7 +111,6 @@ namespace SimTelemetry.Domain.Memory
                         var region = new MemoryRegion(regionInfo.BaseAddress.ToInt32(), (int) regionInfo.RegionSize, execute);
                         _regions.Add(region);
                     }
-                    memRegionAddr = new IntPtr(regionInfo.BaseAddress.ToInt32() + regionInfo.RegionSize);
                 }
                 else
                 {
@@ -408,27 +428,6 @@ namespace SimTelemetry.Domain.Memory
             if (type == MemoryRegionType.EXECUTE && Execute == false) return false;
 
             return true;
-        }
-    }
-
-    public static class IEnumerableExtensions
-    {
-        public static int IndexOf<T>(this IEnumerable<T> obj, T value, IEqualityComparer<T> comparer)
-        {
-            comparer = comparer ?? EqualityComparer<T>.Default;
-            var found = obj
-                .Select((a, i) => new { a, i })
-                .FirstOrDefault(x => comparer.Equals(x.a, value));
-            return found == null ? -1 : found.i;
-        }
-        public static IEnumerable<int> IndexesOf<T>(this IEnumerable<T> obj, T value, IEqualityComparer<T> comparer)
-        {
-            comparer = comparer ?? EqualityComparer<T>.Default;
-            var found = obj
-                .Select((a, i) => new {a, i})
-                .Where(x => comparer.Equals(x.a, value))
-                .Select(x => x.i);
-            return found;
         }
     }
 }

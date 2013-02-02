@@ -251,54 +251,47 @@ namespace SimTelemetry.Tests
         [Test]
         public void MemoryRegions()
         {
+            Stopwatch w = new Stopwatch();
             MemoryReader r = new MemoryReader();
             r.Diagnostic = true;
             r.Open(Process.GetProcessesByName("rfactor")[0]);
+            var memory = new MemoryProvider(r);
+            memory.Scanner.Enable();
+
+            var pool = new MemoryPool("Test", MemoryAddress.Static, 0, 0);
             Console.WriteLine(r.Regions.Count);
-
-            //r.StartSigScanning();
-
-            var regionCode = r.Regions.Where(x => x.BaseAddress == 0x401000).FirstOrDefault();
-            byte[] data = File.ReadAllBytes(@"..\..\..\..\..\rf.exe");
-            var myCustomRegion = new MemoryRegion(0x401000, data.Length, true);
-            myCustomRegion.Data = data;
-
-            //DoAndPrintScan(r, myCustomRegion, "8BXX????????F6");
 
             var sigs = new Dictionary<string, string>
                                                   {
-                                                      {"TimePtr", "7DXXA1????????8305"},
-                                                      {"Clock", "D905????????56DD05"},
-                                                      {"SessionTime", "D81D????????DFE0F6C4017510"},
-                                                      {"Player Location", "A0XXXXXXXX8B0D????????F6D81BC0"},
-                                                      {"RPM", "7CD5D9XX????????518BCFD91C24E8"},
-                                                      {"MetersDriven", "D882XXXXXXXXD99E????????5E"},
-                                                      {"FlagYellow", "BC1F????????00"},
-                                                      {"LocationX", "8B4C242089XX??D9"},
-                                                      {"LocationY", "8945??8B44243089"},
-                                                      {"LocationZ", "894D??8D7DXX"},
-                                                      {"Laps", "3996????????7DXXDD"},
-                                                      {"Name", "8D8418????????8DB4"},
-                                                      {"Position", "8B8B????????5556"},
-                                                      {"GearR", "D983????????D9E1EB"}
+                                                      {"sTimePtr", "7DXXA1????????8305"},
+                                                      {"sClock", "D905????????56DD05"},
+                                                      {"sSessionTime", "D81D????????DFE0F6C4017510"},
+                                                      {"sPlayer Location", "A0XXXXXXXX8B0D????????F6D81BC0"},
+                                                      {"dRPM", "7CD5D9XX????????518BCFD91C24E8"},
+                                                      {"dMetersDriven", "D882XXXXXXXXD99E????????5E"},
+                                                      {"dFlagYellow", "BC1F????????00"},
+                                                      {"dLocationX", "8B4C242089XX??D9"},
+                                                      {"dLocationY", "8945??8B44243089"},
+                                                      {"dLocationZ", "894D??8D7DXX"},
+                                                      {"dLaps", "3996????????7DXXDD"},
+                                                      {"dName", "8D8418????????8DB4"},
+                                                      {"dPosition", "8B8B????????5556"},
+                                                      {"dGearR", "D983????????D9E1EB"}
                                                   };
-            //string sigRPM = "E8????????";
-
-            Console.WriteLine(("rfactor.exe new"));
-            foreach (var sig in sigs)
+            foreach(var sig in sigs)
             {
-                Console.Write(sig.Key + ": ");
-                DoAndPrintScan(r, myCustomRegion, sig.Value);
+                var type = ((sig.Key.StartsWith("d")) ? MemoryAddress.Dynamic : MemoryAddress.StaticAbsolute);
+                var ptr = ((sig.Key.EndsWith("Ptr")) ? new int[1] {0} : new int[0]);
+                var field = new MemoryFieldSignature<float>(sig.Key.Substring(1), type, sig.Value, ptr, 32);
+                pool.Add(field);
             }
-
-            Console.WriteLine("------------------------");
-            Stopwatch w = new Stopwatch();
+            memory.Add(pool);
             w.Start();
-            Console.WriteLine(("rfactor.exe"));
-            foreach (var sig in sigs)
+            memory.Refresh();
+
+            foreach(var field in memory.Get("Test").Fields)
             {
-                Console.Write(sig.Key + ": ");
-                DoAndPrintScan(r, regionCode, sig.Value);
+                Console.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<int>(), field.Value.Address, field.Value.Offset, field.Key);
             }
             w.Stop();
             Console.WriteLine(w.ElapsedMilliseconds);
