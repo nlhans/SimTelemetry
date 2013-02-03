@@ -76,7 +76,7 @@
     <Compile Include="Aggregates\CarTests.cs" />
     <Compile Include="Aggregates\TrackTests.cs" />
     <Compile Include="App.cs" />
-    <Compile Include="Core\EventTests.cs" />
+    <Compile Include="Core\GlobalEventsTests.cs" />
     <Compile Include="Core\InMemoryRepositoryTests.cs" />
     <Compile Include="Events\PluginTestExtensionConstructor.cs" />
     <Compile Include="Events\PluginTestSimulatorConstructor.cs" />
@@ -85,10 +85,12 @@
     <Compile Include="Events\PluginTestWidgetConstructor.cs" />
     <Compile Include="Core\PluginTests.cs" />
     <Compile Include="MemoryTests.cs" />
+    <Compile Include="Memory\MemoryPoolTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\CarRepositoryTests.cs" />
     <Compile Include="Repositories\TrackRepositoryTests.cs" />
     <Compile Include="Aggregates\SimulatorTests.cs" />
+    <Compile Include="Telemetry\TelemetryTests.cs" />
     <Compile Include="TestConstants.cs" />
     <Compile Include="Utils\IniReaderTests.cs" />
   </ItemGroup>

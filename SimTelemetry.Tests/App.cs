@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Tests.Telemetry;
 
 namespace SimTelemetry.Tests
 {
@@ -15,13 +16,9 @@ namespace SimTelemetry.Tests
         {
             Stopwatch w = new Stopwatch();
             w.Start();
-            MemoryTests l = new MemoryTests();
-            while(true)
-            {
-                //Console.Clear();
-                l.MemoryRegions();
-                Thread.Sleep(10);
-            }
+
+            TelemetryTests t = new TelemetryTests();
+            t.Continous();
             //l.TestRfactor();
             //l.TestRfactor();
             //test();

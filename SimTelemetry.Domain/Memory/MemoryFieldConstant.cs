@@ -1,4 +1,6 @@
-﻿namespace SimTelemetry.Domain.Memory
+﻿using System;
+
+namespace SimTelemetry.Domain.Memory
 {
     public class MemoryFieldConstant<T> : IMemoryObject
     {
@@ -43,6 +45,12 @@
         public void SetPool(MemoryPool pool)
         {
             Pool = pool; // don't care
+        }
+
+        public object Clone()
+        {
+            var newObj = new MemoryFieldConstant<T>(Name, StaticValue);
+            return newObj;
         }
     }
 }

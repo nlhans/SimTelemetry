@@ -261,9 +261,9 @@ namespace SimTelemetry.Tests
             Console.WriteLine(r.Regions.Count);
 
             var main = new MemoryPool("Environment", MemoryAddress.Static, 0, 0);
-            main.Add(new MemoryFieldSignature<int> ("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1] {0}, 4));
+            main.Add(new MemoryFieldSignature<int>("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1] { 0 }, 4));
             main.Add(new MemoryFieldSignature<float>("Time", MemoryAddress.StaticAbsolute, "7DXXA1????????8305", new int[1] { 0 }, 4));
-            main.Add(new MemoryFieldSignature<float>("Clock", MemoryAddress.StaticAbsolute, "D905????????56DD05", new int [0], 4, (x) => x*3600));
+            main.Add(new MemoryFieldSignature<float>("Clock", MemoryAddress.StaticAbsolute, "D905????????56DD05", new int[0], 4, (x) => x * 3600));
 
             var pool = new MemoryPool("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1]{ 0}, 0x6000);
             pool.Add(new MemoryFieldSignature<int>("Position", MemoryAddress.Dynamic, "8B8B????????5556", new int[0], 4));
@@ -322,23 +322,23 @@ namespace SimTelemetry.Tests
             memory.Add(main);
             w.Start();
             memory.Refresh();
-            Console.Clear();
+
             foreach(var field in memory.Get("Player").Fields)
             {
-                    Console.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
+                    Debug.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
             }
             foreach (var field in memory.Get("Environment").Fields)
             {
-                    Console.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
+                Debug.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
             }
             w.Stop();
-            Console.WriteLine(w.ElapsedMilliseconds);
+            Debug.WriteLine(w.ElapsedMilliseconds);
             w.Reset();
             w.Start();
             memory.Refresh();
             w.Stop();
             memory.Scanner.Disable();
-            Console.WriteLine(w.ElapsedMilliseconds);
+            Debug.WriteLine(w.ElapsedMilliseconds);
         }
 
         private void DoAndPrintScan(MemoryReader r, MemoryRegion regionCode, string sig)

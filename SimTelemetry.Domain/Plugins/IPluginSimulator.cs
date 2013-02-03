@@ -1,34 +1,22 @@
-﻿using SimTelemetry.Domain.Aggregates;
+﻿using System.Diagnostics;
+using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Common;
-using SimTelemetry.Domain.Repositories;
+using SimTelemetry.Domain.Memory;
 
 namespace SimTelemetry.Domain.Plugins
 {
     public interface IPluginSimulator : IPluginBase
     {
         Simulator GetSimulator();
-        Telemetry GetTelemetry();
+
+        IPluginTelemetryProvider TelemetryProvider { get; }
 
         ILazyRepositoryDataSource<Car, string> CarProvider { get; }
         ILazyRepositoryDataSource<Track, string> TrackProvider { get; }
 
-        void Initialize();
-        void Deinitialize();
-    }
-
-    public interface IPluginWidget : IPluginBase
-    {
-
-        void Initialize();
-        void Deinitialize();
-        
-    }
-    public interface IPluginExtension : IPluginBase
-    {
-        
-
-        void Initialize();
-        void Deinitialize();
-        
+        void Initialize(); // Initialize Car&Track providers
+        void SimulatorStart(Process p); // Initialize TelemetryProvider, based on exe-version.
+        void SimulatorStop(); // Deinitialize TelemetryProvider
+        void Deinitialize(); // Deinitialize Car&Track providers
     }
 }

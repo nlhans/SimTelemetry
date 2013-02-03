@@ -1,12 +1,13 @@
 ﻿using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Events
 {
     public class TelemetryDriverRemoved
     {
-        public ITelemetryDriver Driver { get; private set; }
+        public TelemetryDriver Driver { get; private set; }
 
-        public TelemetryDriverRemoved(ITelemetryDriver driver)
+        public TelemetryDriverRemoved(TelemetryDriver driver)
         {
             Driver = driver;
         }

@@ -147,5 +147,10 @@ namespace SimTelemetry.Domain.Memory
             AddressType = type;
         }
 
+        public object Clone()
+        {
+            var newObj = new MemoryField<T>(Name, AddressType, Address, Offset, Size, Conversion);
+            return newObj;
+        }
     }
 }

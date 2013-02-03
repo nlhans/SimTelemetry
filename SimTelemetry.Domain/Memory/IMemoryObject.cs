@@ -1,6 +1,8 @@
-﻿namespace SimTelemetry.Domain.Memory
+﻿using System;
+
+namespace SimTelemetry.Domain.Memory
 {
-    public interface IMemoryObject
+    public interface IMemoryObject : ICloneable
     {
         string Name { get; }
         MemoryProvider Memory { get; }

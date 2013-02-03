@@ -1,38 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using SimTelemetry.Domain.Entities;
+using System.Diagnostics;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Domain.Plugins;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Aggregates
 {
     public class Telemetry
     {
-        private IList<ITelemetryDriver> _drivers = new List<ITelemetryDriver>();
+        public bool ActiveGame { get; protected set; }
+        public bool ActiveSession { get; protected set; }
+        public bool ActiveDriving { get; protected set; }
 
-        public bool ActiveGame { get; private set; }
-        public bool ActiveSession { get; private set; }
-        public bool ActiveDriving { get; private set; }
+        public IEnumerable<TelemetryDriver> Drivers { get { return _drivers; } }
+        private IList<TelemetryDriver> _drivers = new List<TelemetryDriver>();
 
-        public IEnumerable<ITelemetryDriver> Drivers { get { return _drivers; } }
+        internal MemoryProvider Memory { get; set; }
 
-        public MemoryProvider Memory { get; private set; }
+        public IPluginTelemetryProvider Provider { get; protected set; }
 
-        public ITelemetrySession Session { get; private set; }
-        public ITelemetryTrack Track { get; private set; }
-        public ITelemetryGame Simulator { get; private set; }
+        public TelemetrySession Session { get; protected set; }
+        public TelemetryTrack Track { get; protected set; }
+        public TelemetryGame Simulator { get; protected set; }
 
-        public ITelemetryAcquisition Acquisition { get; private set; }
+        public TelemetryAcquisition Acquisition { get; protected set; }
 
-        public ITelemetrySupport Support;
+        public TelemetrySupport Support { get; protected set; }
 
-        public Telemetry(ITelemetrySupport support, ITelemetryPlayer player, ITelemetrySession session, ITelemetryTrack track, ITelemetryGame simulator, ITelemetryAcquisition acquisition)
+        public Telemetry(IPluginTelemetryProvider provider, Process simulatorProcess)
         {
-            Support = support;
-            Session = session;
-            Track = track;
-            Simulator = simulator;
-            Acquisition = acquisition;
+            Provider = provider;
+
+            // Initialize memory objects
+            var mem = new MemoryReader();
+            mem.Open(simulatorProcess);
+
+            Memory = new MemoryProvider(mem);
+
+            // Fill memory provider
+            Memory.Scanner.Enable();
+            Provider.Initialize(Memory);
+            Memory.Refresh();
+            Memory.Scanner.Disable();
+
+            // Start outside-world telemetry objects
+            Session = new TelemetrySession(this);
+            Track = new TelemetryTrack(this);
+            Simulator = new TelemetryGame(this);
+
+            Acquisition = new TelemetryAcquisition(this);
+            Support = new TelemetrySupport(this);
+        }
+
+         ~Telemetry()
+        {
+            Provider.Deinitialize();
+        }
+
+        public void Update()
+        {
+            // Updates memory pools and reads value to this class.
+            Memory.Refresh();
+
+            this.Support.Update();
+            this.Simulator.Update();
+            this.Session.Update();
+            this.Track.Update();
+
+            this.Acquisition.Update();
+
+            foreach(var driver in Drivers)
+                driver.Update();
+
         }
 
         public void SetGameStatus(bool active)
@@ -74,53 +115,21 @@ namespace SimTelemetry.Domain.Aggregates
             ActiveDriving = active;
         }
 
-        public void AddDriver(ITelemetryDriver driver)
+        public void AddDriver(TelemetryDriver driver)
         {
             if (!_drivers.Contains(driver))
                 _drivers.Add(driver);
             GlobalEvents.Fire(new TelemetryDriverAdded(driver), true);
         }
 
-        public void RemoveDriver(ITelemetryDriver driver)
+        public void RemoveDriver(TelemetryDriver driver)
         {
             if (_drivers.Contains(driver))
+
                 _drivers.Remove(driver);
 
             GlobalEvents.Fire(new TelemetryDriverRemoved(driver), true);
         }
     }
 
-    public interface ITelemetryPlugin
-    {
-        MemoryProvider InitPools();
-        MemoryPool CreateDriver(int reference);
-    }
-
-    public interface ITelemetrySupport
-    {
-    }
-
-    public interface ITelemetryAcquisition
-    {
-    }
-
-    public interface ITelemetryGame
-    {
-    }
-
-    public interface ITelemetrySession
-    {
-    }
-
-    public interface ITelemetryTrack
-    {
-    }
-
-    public interface ITelemetryPlayer
-    {
-    }
-
-    public interface ITelemetryDriver : IEquatable<ITelemetryDriver>
-    {
-    }
 }

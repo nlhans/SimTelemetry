@@ -5,6 +5,7 @@ using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Exceptions;
+using SimTelemetry.Domain.Telemetry;
 using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Entities
@@ -16,7 +17,7 @@ namespace SimTelemetry.Domain.Entities
         private IList<double> _trackSpeeds = new List<double>();
         private IList<double> _trackTimes = new List<double>();
 
-        public ITelemetryDriver Driver { get; private set; }
+        public TelemetryDriver Driver { get; private set; }
 
         public RecordedLap ReferenceLapSplit { get; private set; }
 
@@ -36,7 +37,7 @@ namespace SimTelemetry.Domain.Entities
         public IEnumerable<double> TrackSpeeds { get { return _trackSpeeds; } }
         public IEnumerable<double> TrackTimes { get { return _trackTimes; } }
 
-        public ScoringDriver(ITelemetryDriver driver)
+        public ScoringDriver(TelemetryDriver driver)
         {
             Driver = driver;
         }

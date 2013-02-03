@@ -24,7 +24,7 @@ namespace SimTelemetry.Tests.Core
     }
 
     [TestFixture]
-    class EventTests : IDisposable
+    class GlobalEventsTests : IDisposable
     {
         public void Initialize()
         {

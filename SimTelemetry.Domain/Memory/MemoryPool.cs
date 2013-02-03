@@ -5,11 +5,13 @@ using System.Linq;
 
 namespace SimTelemetry.Domain.Memory
 {
-    public class MemoryPool : IMemoryObject
+    public class MemoryPool : IMemoryObject, ICloneable
     {
         public string Name { get; protected set; }
         public MemoryProvider Memory { get; set; }
         public MemoryAddress AddressType { get; protected set; }
+
+        public bool IsTemplate { get; protected set; }
 
         public bool IsDynamic { get { return (AddressType == MemoryAddress.Dynamic); } }
         public bool IsStatic { get { return (AddressType == MemoryAddress.Static || AddressType == MemoryAddress.StaticAbsolute); } }
@@ -30,8 +32,6 @@ namespace SimTelemetry.Domain.Memory
         private readonly Dictionary<string, MemoryPool> _pools = new Dictionary<string, MemoryPool>();
 
         public IEnumerable<MemoryFieldSignaturePointer> Pointers { get; protected set; }
-
-
 
         public TOut ReadAs<TOut>()
         {
@@ -57,6 +57,8 @@ namespace SimTelemetry.Domain.Memory
         }
         public void Refresh()
         {
+            if (IsTemplate) return;
+
             var computedAddress = 0;
 
             if (Signature != string.Empty && Offset == 0 && Address == 0 && Memory.Scanner.Enabled)
@@ -245,5 +247,33 @@ namespace SimTelemetry.Domain.Memory
             Value = new byte[Size];
         }
 
+
+        public void SetTemplate(bool yes)
+        {
+            IsTemplate = yes;
+        }
+
+        public MemoryPool Clone(string newName, MemoryPool newPool, int offset, int size)
+        {
+            if (offset == -1) offset = Offset;
+            if (size == -1) size = Size;
+
+            var target = new MemoryPool(newName, AddressType, newPool, offset, size);
+
+            foreach (var pool in Pools)
+                target.Add(pool.Value.Clone(pool.Key, target, pool.Value.Offset, pool.Value.Size));
+
+            foreach (var field in Fields)
+                target.Add((IMemoryObject)field.Value.Clone());
+
+            return target;
+        }
+
+
+        public object Clone()
+        {
+            // cannot clone without arguments.
+            return null;
+        }
     }
 }

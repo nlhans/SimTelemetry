@@ -115,7 +115,10 @@
     <Compile Include="Memory\MemoryRegionType.cs" />
     <Compile Include="Memory\MemorySignatureScanner.cs" />
     <Compile Include="Plugins\IPluginBase.cs" />
+    <Compile Include="Plugins\IPluginExtension.cs" />
     <Compile Include="Plugins\IPluginSimulator.cs" />
+    <Compile Include="Plugins\IPluginTelemetryProvider.cs" />
+    <Compile Include="Plugins\IPluginWidget.cs" />
     <Compile Include="Plugins\Plugins.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\CarRepository.cs" />
@@ -125,6 +128,13 @@
     <Compile Include="Repositories\ITrackDataProvider.cs" />
     <Compile Include="Repositories\ITrackRepository.cs" />
     <Compile Include="Repositories\TrackRepository.cs" />
+    <Compile Include="Telemetry\ITelemetryObject.cs" />
+    <Compile Include="Telemetry\TelemetryAcquisition.cs" />
+    <Compile Include="Telemetry\TelemetryDriver.cs" />
+    <Compile Include="Telemetry\TelemetryGame.cs" />
+    <Compile Include="Telemetry\TelemetrySession.cs" />
+    <Compile Include="Telemetry\TelemetrySupport.cs" />
+    <Compile Include="Telemetry\TelemetryTrack.cs" />
     <Compile Include="Utils\IniReader.cs" />
     <Compile Include="Utils\IniScannerOld.cs" />
     <Compile Include="ValueObjects\IniValueObject.cs" />

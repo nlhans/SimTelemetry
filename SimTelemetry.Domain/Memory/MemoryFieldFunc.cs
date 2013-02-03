@@ -45,5 +45,11 @@ namespace SimTelemetry.Domain.Memory
         {
             Pool = pool; 
         }
+
+        public object Clone()
+        {
+            var newObj = new MemoryFieldFunc<T>(Name, ValidationFunc);
+            return newObj;
+        }
     }
 }

@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="rFactor.cs" />
     <Compile Include="rFactorCarRepository.cs" />
+    <Compile Include="rFactorSignaturizedTelemetry.cs" />
+    <Compile Include="rFactorStandardizedTelemetry.cs" />
     <Compile Include="rFactorTrackRepository.cs" />
     <Compile Include="TestSimulator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -56,6 +58,10 @@
     <ProjectReference Include="..\SimTelemetry.Domain\SimTelemetry.Domain.csproj">
       <Project>{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}</Project>
       <Name>SimTelemetry.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
+      <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
+      <Name>SimTelemetry.Objects</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Tests\SimTelemetry.Tests.csproj">
       <Project>{CFE14725-ECFB-4D8F-8167-E2D116BC6361}</Project>

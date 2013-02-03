@@ -1,15 +1,17 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Common;
+using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
-using SimTelemetry.Domain.Repositories;
 using SimTelemetry.Tests.Events;
 
 namespace SimTelemetry.Plugins.Tests
 {
+    
     [Export(typeof(IPluginSimulator))]
     public class TestSimulator : IPluginSimulator
     {
@@ -21,6 +23,8 @@ namespace SimTelemetry.Plugins.Tests
 
         public DateTime CompilationTime { get { return DateTime.Now; } }
 
+        public IPluginTelemetryProvider TelemetryProvider { get; protected set; }
+
         public ILazyRepositoryDataSource<Car, string> CarProvider { get; private set; }
         public ILazyRepositoryDataSource<Track, string> TrackProvider { get; private set; }
 
@@ -29,9 +33,6 @@ namespace SimTelemetry.Plugins.Tests
         public TestSimulator()
         {
             GlobalEvents.Fire(new PluginTestSimulatorConstructor(), false);
-
-            CarProvider = new rFactorCarRepository();
-            TrackProvider = new rFactorTrackRepository();
         }
 
         public Simulator GetSimulator()
@@ -39,66 +40,45 @@ namespace SimTelemetry.Plugins.Tests
             return Simulator.Value;
         }
 
-        public Telemetry GetTelemetry()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Initialize()
         {
             Debug.WriteLine("TestSimulator::Initialize()");
+
+            CarProvider = new rFactorCarRepository();
+            TrackProvider = new rFactorTrackRepository();
+
         }
 
         public void Deinitialize()
         {
             Debug.WriteLine("TestSimulator::Deinitialize()");
+
+            CarProvider.Clear();
+            TrackProvider.Clear();
+
+            CarProvider = null;
+            TrackProvider = null;
         }
+
+        public void SimulatorStart(Process p)
+        {
+            var rfactorExe = new FileInfo(p.MainModule.FileName);
+
+            if(rfactorExe.Length == 2210305)
+                TelemetryProvider = new rFactorSignaturizedTelemetry();
+            else
+                TelemetryProvider = new rFactorStandardizedTelemetry();
+        }
+
+        public void SimulatorStop()
+        {
+            TelemetryProvider = null;
+        }
+
 
         public bool Equals(IPluginBase other)
         {
             return other.ID == ID;
         }
     }
-
-    public class TelemetrySupport : ITelemetrySupport
-    {
-        public bool Timing { get; private set; }
-
-        // TODO: Add more support variables.
-    }
-
-    public class TelemetryAcquisition : ITelemetryAcquisition
-    {
-        public bool UseMemory { get; private set; }
-        public bool SupportMemory { get; private set; }
-
-        public bool UseDll { get; private set; }
-        public bool SupportDll { get; private set; }
-    }
-
-    public class TelemetryGame : ITelemetryGame
-    {
-    }
-
-    public class TelemetryTrack : ITelemetryTrack
-    {
-    }
-
-    public class TelemetrySession : ITelemetrySession
-    {
-    }
-
-    public class TelemetryDriver : ITelemetryDriver
-    {
-        public bool Equals(ITelemetryDriver other)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class TelemetryPlayer : ITelemetryPlayer
-    {
-
-    }
-
 }
