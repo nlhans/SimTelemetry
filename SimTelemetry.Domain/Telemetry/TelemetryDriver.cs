@@ -6,7 +6,7 @@ namespace SimTelemetry.Domain.Telemetry
     public class TelemetryDriver : ITelemetryObject
     {
         public Aggregates.Telemetry Telemetry { get; protected set; }
-        public int BaseAddress { get; protected set; }
+        public int BaseAddress { get { return Pool.Address; }}
 
         internal MemoryPool Pool { get; set; }
 

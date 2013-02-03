@@ -56,14 +56,13 @@ namespace SimTelemetry.Tests.Telemetry
                 while (true)
                 {
                     telemetryObject.Update();
-                    var playerDriver = telemetryObject.Drivers.FirstOrDefault();
-
-                    Console.Write(telemetryObject.Session.Time);
-                    if (playerDriver != null)
+                    //Console.Write(telemetryObject.Session.Time.ToString("0000") + " | " + telemetryObject.Session.Cars.ToString("000"));
+                    /*foreach(var driver in telemetryObject.Drivers)
                     {
-                        Console.Write(" | " + playerDriver.RPM);
+                        Console.Write(" | " + driver.RPM.ToString("00000"));
                     }
-                    Console.WriteLine();
+                    Console.WriteLine();*/
+                    Console.WriteLine(telemetryObject.Session.Cars.ToString("000"));
                     Thread.Sleep(20);
                 }
 

@@ -39,6 +39,9 @@ namespace SimTelemetry.Domain.Aggregates
             mem.Open(simulatorProcess);
 
             Memory = new MemoryProvider(mem);
+#if DEBUG
+            Memory.Reader.Diagnostic = true;
+#endif
 
             // Fill memory provider
             Memory.Scanner.Enable();
@@ -63,7 +66,6 @@ namespace SimTelemetry.Domain.Aggregates
         {
             // Updates memory pools and reads value to this class.
             Memory.Refresh();
-
             this.Support.Update();
             this.Simulator.Update();
             this.Session.Update();
@@ -74,20 +76,17 @@ namespace SimTelemetry.Domain.Aggregates
             UpdateDrivers();
             foreach(var driver in Drivers)
                 driver.Update();
-
+            Debug.WriteLine(Memory.Reader.ReadCalls);
         }
 
-        protected int _previousCars = 0;
         protected virtual void UpdateDrivers()
         {
-            if (this.Session.Cars != _previousCars)
-            {
-                _previousCars = this.Session.Cars;
+            if (this.Session.Cars != _drivers.Count){
 
                 // Get a new list of drivers
                 var driverList = Memory.Get("Simulator").ReadAs<int[]>("Drivers");
                 var validDriverList = driverList.Where(x => Provider.CheckDriverQuick(Memory, x)).ToArray();
-                var playerDriverPtr = Memory.Get("Simulator").ReadAs<int>("Player");
+                var playerDriverPtr = Memory.Get("Simulator").ReadAs<int>("CarPlayer");
                 // Update the drivers.))
                 foreach (var validDriverPtr in validDriverList)
                 {
@@ -103,13 +102,22 @@ namespace SimTelemetry.Domain.Aggregates
                     _drivers.Add(new TelemetryDriver(this, memPool));
                 }
 
-                return;
-                var deleteList = Drivers.Where(driver => !validDriverList.Any(x => x == driver.BaseAddress)).ToList();
+                var driverRemovalList = new List<TelemetryDriver>();
 
-                for (int i = 0; i < deleteList.Count; i++)
+                foreach (var driver in _drivers)
                 {
-                    Memory.Remove(deleteList[i].Pool);
-                    _drivers.Remove(deleteList[i]);
+                    if (!validDriverList.Any(x => x == driver.BaseAddress))
+                    {
+                        // This driver is now invalid
+                        driverRemovalList.Add(driver);
+                    }
+
+                }
+
+                for (int i = 0; i < driverRemovalList.Count; i++)
+                {
+                    Memory.Remove(driverRemovalList[i].Pool);
+                    _drivers.Remove(driverRemovalList[i]);
                 }
             }
         }
