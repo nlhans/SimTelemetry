@@ -175,7 +175,7 @@ namespace SimTelemetry.Plugins.Tests
         {
             var position = provider.Reader.ReadInt32(ptr + DriverPositionOffset);
             var name = provider.Reader.ReadString(ptr + NamePositionOffset, 8);
-            Debug.WriteLine(ptr +  " = P" +position.ToString("000"));
+            //Debug.WriteLine(ptr +  " = P" +position.ToString("000"));
             return position>0 && name != "";
         }
     }

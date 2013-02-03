@@ -76,7 +76,7 @@ namespace SimTelemetry.Domain.Aggregates
             UpdateDrivers();
             foreach(var driver in Drivers)
                 driver.Update();
-            Debug.WriteLine(Memory.Reader.ReadCalls);
+            //Debug.WriteLine(Memory.Reader.ReadCalls);
         }
 
         protected virtual void UpdateDrivers()
