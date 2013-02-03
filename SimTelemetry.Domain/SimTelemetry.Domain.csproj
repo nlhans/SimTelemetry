@@ -112,6 +112,7 @@
     <Compile Include="Memory\MemoryProvider.cs" />
     <Compile Include="Memory\MemoryReader.cs" />
     <Compile Include="Memory\MemoryReaderApi.cs" />
+    <Compile Include="Memory\MemoryRegionType.cs" />
     <Compile Include="Memory\MemorySignatureScanner.cs" />
     <Compile Include="Plugins\IPluginBase.cs" />
     <Compile Include="Plugins\IPluginSimulator.cs" />

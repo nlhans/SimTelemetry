@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Objects;
 
 namespace SimTelemetry.Tests
 {
@@ -257,43 +258,86 @@ namespace SimTelemetry.Tests
             r.Open(Process.GetProcessesByName("rfactor")[0]);
             var memory = new MemoryProvider(r);
             memory.Scanner.Enable();
-
-            var pool = new MemoryPool("Test", MemoryAddress.Static, 0, 0);
             Console.WriteLine(r.Regions.Count);
+
+            var main = new MemoryPool("Environment", MemoryAddress.Static, 0, 0);
+            main.Add(new MemoryFieldSignature<int> ("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1] {0}, 4));
+            main.Add(new MemoryFieldSignature<float>("Time", MemoryAddress.StaticAbsolute, "7DXXA1????????8305", new int[1] { 0 }, 4));
+            main.Add(new MemoryFieldSignature<float>("Clock", MemoryAddress.StaticAbsolute, "D905????????56DD05", new int [0], 4, (x) => x*3600));
+
+            var pool = new MemoryPool("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1]{ 0}, 0x6000);
+            pool.Add(new MemoryFieldSignature<int>("Position", MemoryAddress.Dynamic, "8B8B????????5556", new int[0], 4));
+            pool.Add(new MemoryFieldSignature<float>("RPM", MemoryAddress.Dynamic, "7CD5D9XX????????518BCFD91C24E8", new int[0], 4, Rotations.Rads_RPM));
+            pool.Add(new MemoryFieldSignature<float>("Speed", MemoryAddress.Dynamic, "D88EXXXXXXXXDEC1D99E????????0F85XXXXXXXX8B8E", new int[0], 4));
+
+            pool.Add(new MemoryFieldSignature<float>("GearBase", MemoryAddress.Dynamic, "D983????????D9E1EB", new int[0], 4));
+            pool.Add(new MemoryFieldFunc<float>("GearR", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 4)));
+            pool.Add(new MemoryFieldFunc<float>("Gear1", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 8)));
+            pool.Add(new MemoryFieldFunc<float>("Gear2", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 12)));
+            pool.Add(new MemoryFieldFunc<float>("Gear3", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 16)));
+            pool.Add(new MemoryFieldFunc<float>("Gear4", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 20)));
+            pool.Add(new MemoryFieldFunc<float>("Gear5", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 24)));
+            pool.Add(new MemoryFieldFunc<float>("Gear6", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 28)));
+            pool.Add(new MemoryFieldFunc<float>("Gear7", (p) => p.Memory.Reader.ReadFloat(pool.Address + pool.Fields["GearBase"].Offset + 32)));
+
+
 
             var sigs = new Dictionary<string, string>
                                                   {
-                                                      {"sTimePtr", "7DXXA1????????8305"},
-                                                      {"sClock", "D905????????56DD05"},
-                                                      {"sSessionTime", "D81D????????DFE0F6C4017510"},
-                                                      {"sPlayer Location", "A0XXXXXXXX8B0D????????F6D81BC0"},
-                                                      {"dRPM", "7CD5D9XX????????518BCFD91C24E8"},
-                                                      {"dMetersDriven", "D882XXXXXXXXD99E????????5E"},
-                                                      {"dFlagYellow", "BC1F????????00"},
-                                                      {"dLocationX", "8B4C242089XX??D9"},
-                                                      {"dLocationY", "8945??8B44243089"},
-                                                      {"dLocationZ", "894D??8D7DXX"},
-                                                      {"dLaps", "3996????????7DXXDD"},
-                                                      {"dName", "8D8418????????8DB4"},
-                                                      {"dPosition", "8B8B????????5556"},
-                                                      {"dGearR", "D983????????D9E1EB"}
+                                                      {"sSessionTimei", "D81D????????DFE0F6C4017510"},
+                                                      {"dMetersDrivenf", "D882XXXXXXXXD99E????????5E"},
+                                                      {"dFlagYellowf", "BC1F????????00"},
+                                                      {"dLocationXf", "8B4C242089XX??D9"},
+                                                      {"dLocationYf", "8945??8B44243089"},
+                                                      {"dLocationZf", "894D??8D7DXX"},
+                                                      {"dLapsi", "3996????????7DXXDD"},
+                                                      {"dNames", "8D8418????????8DB4"},
                                                   };
             foreach(var sig in sigs)
             {
                 var type = ((sig.Key.StartsWith("d")) ? MemoryAddress.Dynamic : MemoryAddress.StaticAbsolute);
-                var ptr = ((sig.Key.EndsWith("Ptr")) ? new int[1] {0} : new int[0]);
-                var field = new MemoryFieldSignature<float>(sig.Key.Substring(1), type, sig.Value, ptr, 32);
-                pool.Add(field);
+                var varType = sig.Key.Substring(sig.Key.Length - 1, 1);
+                var ptr = ((sig.Key.Substring(0, sig.Key.Length-1).EndsWith("Ptr")) ? new int[1] { 0 } : new int[0]);
+                switch(varType)
+                {
+                    case "i":
+                        var field1 = new MemoryFieldSignature<int>(sig.Key.Substring(1, sig.Key.Length - 2), type, sig.Value, ptr, 4);
+                        pool.Add(field1);
+                        break;
+                    case "f":
+                        var field2 = new MemoryFieldSignature<float>(sig.Key.Substring(1, sig.Key.Length - 2), type, sig.Value, ptr, 4);
+                        pool.Add(field2);
+                        break;
+                    case "s":
+                        var field3 = new MemoryFieldSignature<string>(sig.Key.Substring(1, sig.Key.Length - 2), type, sig.Value, ptr, 32);
+                        pool.Add(field3);
+                        break;
+                    case "b":
+                        var field4 = new MemoryFieldSignature<bool>(sig.Key.Substring(1, sig.Key.Length - 2), type, sig.Value, ptr, 1);
+                        pool.Add(field4);
+                        break;
+                }
             }
             memory.Add(pool);
+            memory.Add(main);
             w.Start();
             memory.Refresh();
-
-            foreach(var field in memory.Get("Test").Fields)
+            Console.Clear();
+            foreach(var field in memory.Get("Player").Fields)
             {
-                Console.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<int>(), field.Value.Address, field.Value.Offset, field.Key);
+                    Console.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
+            }
+            foreach (var field in memory.Get("Environment").Fields)
+            {
+                    Console.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
             }
             w.Stop();
+            Console.WriteLine(w.ElapsedMilliseconds);
+            w.Reset();
+            w.Start();
+            memory.Refresh();
+            w.Stop();
+            memory.Scanner.Disable();
             Console.WriteLine(w.ElapsedMilliseconds);
         }
 

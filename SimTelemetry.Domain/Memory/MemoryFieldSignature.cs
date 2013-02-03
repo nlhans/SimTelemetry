@@ -87,5 +87,22 @@ namespace SimTelemetry.Domain.Memory
             Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer)).ToList();
             Initialized = false;
         }
+
+        public MemoryFieldSignature(string name, MemoryAddress type, string signature, IEnumerable<MemoryFieldSignaturePointer> pointers, int size, Func<T,T> convert)
+            : base(name, type, 0, size)
+        {
+            Signature = signature;
+            Pointers = pointers;
+            Initialized = false;
+            Conversion = convert;
+        }
+        public MemoryFieldSignature(string name, MemoryAddress type, string signature, IEnumerable<int> pointers, int size, Func<T, T> convert)
+            : base(name, type, 0, size)
+        {
+            Signature = signature;
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer)).ToList();
+            Initialized = false;
+            Conversion = convert;
+        }
     }
 }

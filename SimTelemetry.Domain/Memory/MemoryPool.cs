@@ -19,6 +19,7 @@ namespace SimTelemetry.Domain.Memory
         public int Offset { get; protected set; }
         public int Address { get; protected set; }
         public int Size { get; protected set; }
+        public string Signature { get; protected set; }
 
         public byte[] Value { get; protected set; }
 
@@ -27,6 +28,8 @@ namespace SimTelemetry.Domain.Memory
 
         private readonly Dictionary<string, IMemoryObject> _fields = new Dictionary<string, IMemoryObject>();
         private readonly Dictionary<string, MemoryPool> _pools = new Dictionary<string, MemoryPool>();
+
+        public IEnumerable<MemoryFieldSignaturePointer> Pointers { get; protected set; }
 
 
 
@@ -55,6 +58,53 @@ namespace SimTelemetry.Domain.Memory
         public void Refresh()
         {
             var computedAddress = 0;
+
+            if (Signature != string.Empty && Offset == 0 && Address == 0 && Memory.Scanner.Enabled)
+            {
+                var result = Memory.Scanner.Scan<uint>(MemoryRegionType.EXECUTE, Signature);
+
+                // Search the address and offset.
+                switch (AddressType)
+                {
+                    case MemoryAddress.StaticAbsolute:
+                    case MemoryAddress.Static:
+                        if (result == 0) return;
+
+                        if (Pointers.Count() == 0)
+                        {
+                            // The result is directly our address
+                            Address = (int)result;
+                        }
+                        else
+                        {
+                            // We must follow one pointer.
+                            if (AddressType == MemoryAddress.Static)
+                            {
+                                computedAddress = Memory.BaseAddress + (int)result;
+                            }
+                            else
+                            {
+                                computedAddress = (int)result;
+                            }
+
+                            foreach (var ptr in Pointers)
+                            {
+                                computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
+                            }
+
+                            Address = computedAddress;
+                        }
+                        break;
+                    case MemoryAddress.Dynamic:
+                        Offset = (int)result;
+                        break;
+                    default:
+                        throw new Exception("AddressType for '" + Name + "' is not valid");
+                        break;
+                }
+
+            }
+
             // Refresh this memory block.
             if (Size > 0)
             {
@@ -132,6 +182,33 @@ namespace SimTelemetry.Domain.Memory
             _pools.Clear();
         }
 
+        public MemoryPool(string name, MemoryAddress type, string signature, int size)
+        {
+            Name = name;
+            Address = 0;
+            Offset = 0;
+            Size = size;
+            AddressType = type;
+            Signature = signature;
+            Pointers = new List<MemoryFieldSignaturePointer>();
+
+            Value = new byte[size];
+        }
+
+
+        public MemoryPool(string name, MemoryAddress type, string signature, IEnumerable<int> pointers, int size)
+        {
+            Name = name;
+            Address = 0;
+            Offset = 0;
+            Size = size;
+            AddressType = type;
+            Signature = signature;
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer)).ToList();
+
+            Value = new byte[size];
+        }
+
         public MemoryPool(string name,  MemoryAddress type, int address, int size)
         {
             Name = name;
@@ -139,6 +216,7 @@ namespace SimTelemetry.Domain.Memory
             Offset = 0;
             Size = size;
             AddressType = type;
+            Signature = string.Empty;
 
             Value = new byte[Size];
         }
@@ -150,6 +228,7 @@ namespace SimTelemetry.Domain.Memory
             Offset = offset;
             Size = size;
             AddressType = type;
+            Signature = string.Empty;
 
             Value = new byte[Size];
         }
@@ -161,6 +240,7 @@ namespace SimTelemetry.Domain.Memory
             Offset = offset;
             Size = size;
             AddressType = type;
+            Signature = string.Empty;
 
             Value = new byte[Size];
         }

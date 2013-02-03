@@ -16,7 +16,12 @@ namespace SimTelemetry.Tests
             Stopwatch w = new Stopwatch();
             w.Start();
             MemoryTests l = new MemoryTests();
-            l.MemoryRegions();
+            while(true)
+            {
+                //Console.Clear();
+                l.MemoryRegions();
+                Thread.Sleep(10);
+            }
             //l.TestRfactor();
             //l.TestRfactor();
             //test();

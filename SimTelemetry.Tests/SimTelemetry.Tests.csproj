@@ -97,6 +97,10 @@
       <Project>{25F653CD-5503-45B6-AD1B-C8F5C2034DA6}</Project>
       <Name>SimTelemetry.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
+      <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
+      <Name>SimTelemetry.Objects</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
