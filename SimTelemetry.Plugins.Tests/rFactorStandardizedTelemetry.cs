@@ -14,28 +14,62 @@ namespace SimTelemetry.Plugins.Tests
         public void Initialize(MemoryProvider provider)
         {
             MemoryPool simulator = new MemoryPool("Simulator", MemoryAddress.Static, 0, 0);
-            //simulator.Add(new MemoryFieldSignature<int>("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1] { 0 }, 4));
-            simulator.Add(new MemoryFieldLazy<int>("CarPlayer", MemoryAddress.StaticAbsolute, 0, 0x715328C, 4));
-            simulator.Add(new MemoryField<int[]>("Drivers", MemoryAddress.StaticAbsolute, 0x715298, 0x19C));
+            simulator.Add(new MemoryFieldLazy<int>("CarPlayer", MemoryAddress.Static, 0x31528c, 4));
+            simulator.Add(new MemoryField<int[]>("Drivers", MemoryAddress.Static, 0x315298, 0x19C));
 
             MemoryPool session = new MemoryPool("Session", MemoryAddress.Static, 0, 0);
-            session.Add(new MemoryField<int>("Cars", MemoryAddress.StaticAbsolute, 0x715290, 4));
+            session.Add(new MemoryField<int>("Cars", MemoryAddress.Static, 0x315290, 4));
             session.Add(new MemoryFieldLazy<float>("Time", MemoryAddress.Static, 0x60022C, 4));
             session.Add(new MemoryFieldLazy<float>("Clock", MemoryAddress.Static, 0x6E2CD8, 4));
-            //session.Add(new MemoryFieldSignature<float>("Time", MemoryAddress.StaticAbsolute, "7DXXA1????????8305", new int[1] { 0 }, 4));
-            //session.Add(new MemoryFieldSignature<float>("Clock", MemoryAddress.StaticAbsolute, "D905????????56DD05", new int[0], 4, (x) => x * 3600));
 
-            MemoryPool templateDriver = new MemoryPool("DriverTemplate", MemoryAddress.StaticAbsolute, 0, 0x5F48);
+            MemoryPool templateDriver = new MemoryPool("DriverTemplate", MemoryAddress.StaticAbsolute, 0, 0x5F48); // base, 0x5F48 size
+            templateDriver.Add(new MemoryFieldConstant<bool>("IsActive", true));
 
-            //templateDriver.Add(new MemoryFieldSignature<int>("Position", MemoryAddress.Dynamic, "8B8B????????5556", new int[0], 4));
-            //templateDriver.Add(new MemoryFieldSignature<float>("RPM", MemoryAddress.Dynamic, "7CD5D9XX????????518BCFD91C24E8", new int[0], 4, Rotations.Rads_RPM));
-            //templateDriver.Add(new MemoryFieldSignature<float>("Speed", MemoryAddress.Dynamic, "D88EXXXXXXXXDEC1D99E????????0F85XXXXXXXX8B8E", new int[0], 4));
-            templateDriver.Add(new MemoryFieldLazy<int>("Position", MemoryAddress.Dynamic, 0, 0x3D20, 4));
-            templateDriver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0x317C, 4));
+            templateDriver.Add(new MemoryFieldLazy<string>("Name", MemoryAddress.Dynamic, 0, 0x5B08, 32));
+            templateDriver.Add(new MemoryFieldLazy<string>("CarTeam", MemoryAddress.Dynamic, 0, 0x5C22, 64));
+            templateDriver.Add(new MemoryFieldLazy<string>("CarModel", MemoryAddress.Dynamic, 0, 0x5C62, 64));
+            templateDriver.Add(new MemoryFieldLazy<string>("CarClasses", MemoryAddress.Dynamic, 0, 0x39BC, 64));
+
             templateDriver.Add(new MemoryFieldLazy<float>("Meter", MemoryAddress.Dynamic, 0, 0x3D04, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("Speed", MemoryAddress.Dynamic, 0, 0x57C0, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0x317C, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("RPMMax", MemoryAddress.Dynamic, 0, 0x3180, 4));
             templateDriver.Add(new MemoryFieldLazy<int>("Gear", MemoryAddress.Dynamic, 0, 0x321C, 1));
-            templateDriver.Add(new MemoryFieldLazy<string>("Name", MemoryAddress.Dynamic, 0, 0x5B08, 32));
+
+            templateDriver.Add(new MemoryFieldLazy<float>("Mass", MemoryAddress.Dynamic, 0, 0x28DC, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("Fuel", MemoryAddress.Dynamic, 0, 0x315C, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("FuelCapacity", MemoryAddress.Dynamic, 0, 0x3160, 4));
+
+            templateDriver.Add(new MemoryFieldLazy<float>("TyreWearLF", MemoryAddress.Dynamic, 0, 0x2A34, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("TyreWearRF", MemoryAddress.Dynamic, 0, 0x2C1C, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("TyreWearLR", MemoryAddress.Dynamic, 0, 0x2E04, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("TyreWearRR", MemoryAddress.Dynamic, 0, 0x2FEC, 4));
+            
+            templateDriver.Add(new MemoryFieldLazy<float>("InputThrottle", MemoryAddress.Dynamic, 0, 0x2938, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("InputBrake", MemoryAddress.Dynamic, 0, 0x2940, 4));
+
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateX", MemoryAddress.Dynamic, 0, 0x10, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateY", MemoryAddress.Dynamic, 0, 0x18, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateZ", MemoryAddress.Dynamic, 0, 0x14, 4));
+           
+            templateDriver.Add(new MemoryFieldLazy<int>("Pitstops", MemoryAddress.Dynamic, 0, 0x3D2C, 4));
+            templateDriver.Add(new MemoryFieldLazy<int>("Position", MemoryAddress.Dynamic, 0, 0x3D20, 4));
+            templateDriver.Add(new MemoryFieldLazy<int>("Laps", MemoryAddress.Dynamic, 0, 0x3CF8, 1));
+
+            templateDriver.Add(new MemoryFieldLazy<bool>("IsRetired", MemoryAddress.Dynamic, 0, 0x4160, 1));
+            templateDriver.Add(new MemoryFieldLazy<bool>("IsLimiter", MemoryAddress.Dynamic, 0, 0x17B1, 1));
+            templateDriver.Add(new MemoryFieldLazy<bool>("IsPits", MemoryAddress.Dynamic, 0, 0x27A8, 1));
+            templateDriver.Add(new MemoryFieldLazy<bool>("IsDriving", MemoryAddress.Dynamic, 0, 0x3CBF, 1));
+
+            templateDriver.Add(new MemoryFieldLazy<bool>("FlagYellow", MemoryAddress.Dynamic, 0, 0x104, 1, (x) => !x));
+            templateDriver.Add(new MemoryFieldLazy<bool>("FlagBlue", MemoryAddress.Dynamic, 0, 0x3E39, 1));
+            templateDriver.Add(new MemoryFieldLazy<bool>("FlagBlack", MemoryAddress.Dynamic, 0, 0x3D24, 1));
+            templateDriver.Add(new MemoryFieldLazy<bool>("Ignition", MemoryAddress.Dynamic, 0, 0xAA, 1));
+
+            var laps = new MemoryPool("Laps", MemoryAddress.Dynamic, templateDriver, 0x3D90, 6 * 4 * 200);
+            // 200 laps, 6 floats each.
+            templateDriver.Add(laps);
+
 
             provider.Add(simulator);
             provider.Add(session);
@@ -52,8 +86,83 @@ namespace SimTelemetry.Plugins.Tests
         {
             if (isPlayer)
             {
+                //pool.Add(new MemoryFieldLazy<float>("", MemoryAddress.Static, 0, 4));
                 // I can now add tyre temperatures, pressure, brake info etc.
+                pool.Add(new MemoryFieldConstant<bool>("IsPlayer", true));
+                pool.Add(new MemoryFieldLazy<double>("EngineLifetime", MemoryAddress.Static, 0x006DC0AC, 8));
+                pool.Add(new MemoryFieldLazy<double>("EngineOil", MemoryAddress.Static, 0x006DC044, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("EngineWater", MemoryAddress.Static, 0x006DC084, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<byte>("EngineMode", MemoryAddress.Static, 0x006DBF70, 1));
+                pool.Add(new MemoryFieldLazy<byte>("EngineTorque", MemoryAddress.Static, 0x006DC224, 1));
+
+                pool.Add(new MemoryFieldLazy<int>("FuelStop1", MemoryAddress.Static, 0x006E1EAC, 4));
+                pool.Add(new MemoryFieldLazy<int>("FuelStop1", MemoryAddress.Static, 0x006E1EEC, 4));
+                pool.Add(new MemoryFieldLazy<int>("FuelStop1", MemoryAddress.Static, 0x006E1F2C, 4));
+
+                pool.Add(new MemoryFieldLazy<double>("RideheightLF", MemoryAddress.Static, 0x006DB778, 8));
+                pool.Add(new MemoryFieldLazy<double>("RideheightRF", MemoryAddress.Static, 0x006DB780, 8));
+                pool.Add(new MemoryFieldLazy<double>("RideheightLR", MemoryAddress.Static, 0x006DB788, 8));
+                pool.Add(new MemoryFieldLazy<double>("RideheightRR", MemoryAddress.Static, 0x006DB790, 8));
+
+                pool.Add(new MemoryFieldLazy<string>("TyreCompoundFront", MemoryAddress.Static, 0x006E1177, 16));
+                pool.Add(new MemoryFieldLazy<string>("TyreCompoundRear", MemoryAddress.Static, 0x006E11B7, 16));
+
+                pool.Add(new MemoryFieldLazy<double>("TyrePressureLF", MemoryAddress.Static, 0x006D9F5C, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyrePressureRF", MemoryAddress.Static, 0x006DA55C, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyrePressureLR", MemoryAddress.Static, 0x006DAB5C, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyrePressureRR", MemoryAddress.Static, 0x006DB15C, 8));
+
+                pool.Add(new MemoryFieldLazy<double>("TyreSpeedLF", MemoryAddress.Static, 0x006D9C04, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreSpeedRF", MemoryAddress.Static, 0x006DA204, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreSpeedLR", MemoryAddress.Static, 0x006DA804, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreSpeedRR", MemoryAddress.Static, 0x006DAE04, 8));
+
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideLF", MemoryAddress.Static, 0x006D9F44, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideRF", MemoryAddress.Static, 0x006DA534, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideLR", MemoryAddress.Static, 0x006DAB44, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideRR", MemoryAddress.Static, 0x006DB134, 8));
+
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleLF", MemoryAddress.Static, 0x006D9F3C, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleRF", MemoryAddress.Static, 0x006DA53C, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleLR", MemoryAddress.Static, 0x006DAB3C, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleRR", MemoryAddress.Static, 0x006DB13C, 8));
+
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideLF", MemoryAddress.Static, 0x006D9F34, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideRF", MemoryAddress.Static, 0x006DA544, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideLR", MemoryAddress.Static, 0x006DAB34, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideRR", MemoryAddress.Static, 0x006DB144, 8));
+
+                pool.Add(new MemoryFieldLazy<int>("AerodyanmicFrontwingSetting", MemoryAddress.Static, 0x006E182C, 4));
+                pool.Add(new MemoryFieldLazy<int>("AerodyanmicRearwingSetting", MemoryAddress.Static, 0x006E186C, 4));
+                pool.Add(new MemoryFieldLazy<int>("AerodyanmicRadiatorSetting", MemoryAddress.Static, 0x006E18AC, 4));
+                pool.Add(new MemoryFieldLazy<int>("AerodyanmicBrakeductSetting", MemoryAddress.Static, 0x006E18EC, 4));
+
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureLF", MemoryAddress.Static, 0x006DA0E0, 8));
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureRF", MemoryAddress.Static, 0x006DA6E0, 8));
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureLR", MemoryAddress.Static, 0x006DACE0, 8));
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureRR", MemoryAddress.Static, 0x006DB2E0, 8));
+
+                pool.Add(new MemoryFieldLazy<double>("BrakeThicknessLF", MemoryAddress.Static, 0x006DA110, 8));
+                pool.Add(new MemoryFieldLazy<double>("BrakeThicknessRF", MemoryAddress.Static, 0x006DA710, 8));
+                pool.Add(new MemoryFieldLazy<double>("BrakeThicknessLR", MemoryAddress.Static, 0x006DAD10, 8));
+                pool.Add(new MemoryFieldLazy<double>("BrakeThicknessRR", MemoryAddress.Static, 0x006DB310, 8));
+
+                pool.Add(new MemoryFieldLazy<double>("InputClutch", MemoryAddress.Static, 0x006D9744, 8));
+                pool.Add(new MemoryFieldLazy<double>("InputSteering", MemoryAddress.Static, 0x006D972C, 8));
+
+                pool.Add(new MemoryFieldLazy<byte>("HelpsABS", MemoryAddress.Static, 0x006D9786, 1));
+                pool.Add(new MemoryFieldLazy<byte>("HelpsTC", MemoryAddress.Static, 0x006D977E, 1));
+                pool.Add(new MemoryFieldLazy<byte>("HelpsSteer", MemoryAddress.Static, 0x006D9785, 1));
+
+                pool.Add(new MemoryFieldLazy<bool>("HelpsLock", MemoryAddress.Static, 0x006D9784, 1));
+                pool.Add(new MemoryFieldLazy<bool>("HelpsSpin", MemoryAddress.Static, 0x006D9787, 1));
+                pool.Add(new MemoryFieldLazy<bool>("HelpsStability", MemoryAddress.Static, 0x006D9780, 1));
+                pool.Add(new MemoryFieldLazy<bool>("HelpsClutch", MemoryAddress.Static, 0x006D9785, 1));
+                //pool.Add(new MemoryFieldLazy<byte>("HelpsShift", MemoryAddress.Static, 0x006D9782, 1));
+
             }
+            else
+                pool.Add(new MemoryFieldConstant<bool>("IsPlayer", false));
         }
 
         public void Deinitialize()
@@ -69,5 +178,11 @@ namespace SimTelemetry.Plugins.Tests
             Debug.WriteLine(ptr +  " = P" +position.ToString("000"));
             return position>0 && name != "";
         }
+    }
+
+    public static class Conversions
+    {
+        public static float Kelvin2Celsius(float data) { return data - 273.15f; }
+        public static double Kelvin2Celsius(double data) { return data - 273.15; }
     }
 }
