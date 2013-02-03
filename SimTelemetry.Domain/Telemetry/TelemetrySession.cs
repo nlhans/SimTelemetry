@@ -13,6 +13,7 @@ namespace SimTelemetry.Domain.Telemetry
         {
             var sessionPool = Telemetry.Memory.Get("Session");
 
+            Cars = sessionPool.ReadAs<int>("Cars");
             Time = sessionPool.ReadAs<float>("Time");
         }
         public TelemetrySession(Aggregates.Telemetry telemetry)

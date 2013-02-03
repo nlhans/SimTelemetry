@@ -72,13 +72,11 @@ namespace SimTelemetry.Domain.Memory
 
         public void SetProvider(MemoryProvider provider)
         {
-            if (Memory != null) throw new Exception("Can only set 1 memory provider");
             Memory = provider;
         }
 
         public void SetPool(MemoryPool pool)
         {
-            if (Pool != null) throw new Exception("Can only set 1 pool");
             Pool = pool;
         }
         #region Without conversion

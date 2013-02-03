@@ -143,7 +143,6 @@ namespace SimTelemetry.Domain.Memory
 
         public void SetProvider(MemoryProvider provider)
         {
-            if (Memory != null) throw new Exception("Can only set 1 memory provider");
             Memory = provider;
             foreach (var field in _fields) field.Value.SetProvider(provider);
             foreach (var pool in _pools) pool.Value.SetProvider(provider);
@@ -152,7 +151,6 @@ namespace SimTelemetry.Domain.Memory
         public void SetPool(MemoryPool pool)
         {
             if (Pool == pool) return;
-            if (Pool != null) throw new Exception("Can only set 1 pool");
             Pool = pool;
         }
 
@@ -253,27 +251,34 @@ namespace SimTelemetry.Domain.Memory
             IsTemplate = yes;
         }
 
-        public MemoryPool Clone(string newName, MemoryPool newPool, int offset, int size)
-        {
-            if (offset == -1) offset = Offset;
-            if (size == -1) size = Size;
-
-            var target = new MemoryPool(newName, AddressType, newPool, offset, size);
-
-            foreach (var pool in Pools)
-                target.Add(pool.Value.Clone(pool.Key, target, pool.Value.Offset, pool.Value.Size));
-
-            foreach (var field in Fields)
-                target.Add((IMemoryObject)field.Value.Clone());
-
-            return target;
-        }
-
-
         public object Clone()
         {
             // cannot clone without arguments.
             return null;
         }
+
+        public MemoryPool Clone(string newName, MemoryPool newPool, int offset, int size)
+        {
+            var target = new MemoryPool(newName, AddressType, newPool, offset, size);
+            CloneContents(target);
+            return target;
+        }
+
+
+        public MemoryPool Clone(string newName, int address)
+        {
+            var target = new MemoryPool(newName, AddressType, address, Size);
+            CloneContents(target);
+            return target;
+        }
+        protected void CloneContents(MemoryPool target)
+        {
+            foreach (var pool in Pools)
+                target.Add(pool.Value.Clone(pool.Key, target, pool.Value.Offset, pool.Value.Size));
+
+            foreach (var field in Fields)
+                target.Add((IMemoryObject)field.Value.Clone());
+        }
+
     }
 }

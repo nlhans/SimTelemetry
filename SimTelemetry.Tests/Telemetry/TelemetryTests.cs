@@ -23,19 +23,15 @@ namespace SimTelemetry.Tests.Telemetry
                 var testPlugin = pluginHost.Simulators[0];
 
                 testPlugin.Initialize();
-
                 Process rf = Process.GetProcessesByName("rfactor")[0];
-
                 testPlugin.SimulatorStart(rf);
-
-                Domain.Aggregates.Telemetry t = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
+                var telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
 
                 int i = 0;
                 while (i++ < 100)
                 {
-
-                    t.Update();
-                    Debug.WriteLine(t.Session.Time);
+                    telemetryObject.Update();
+                    Debug.WriteLine(telemetryObject.Session.Time);
 
                     Thread.Sleep(10);
                 }
@@ -53,20 +49,21 @@ namespace SimTelemetry.Tests.Telemetry
                 var testPlugin = pluginHost.Simulators[0];
 
                 testPlugin.Initialize();
-
                 Process rf = Process.GetProcessesByName("rfactor")[0];
-
                 testPlugin.SimulatorStart(rf);
+                var telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
 
-                Domain.Aggregates.Telemetry t = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
-
-                int i = 0;
                 while (true)
                 {
+                    telemetryObject.Update();
+                    var playerDriver = telemetryObject.Drivers.FirstOrDefault();
 
-                    t.Update();
-                   Console.WriteLine(t.Session.Time);
-
+                    Console.Write(telemetryObject.Session.Time);
+                    if (playerDriver != null)
+                    {
+                        Console.Write(" | " + playerDriver.RPM);
+                    }
+                    Console.WriteLine();
                     Thread.Sleep(20);
                 }
 

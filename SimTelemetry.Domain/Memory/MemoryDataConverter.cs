@@ -19,6 +19,7 @@ namespace SimTelemetry.Domain.Memory
             Providers.Add(typeof(ushort), new MemoryDataConverterProvider<ushort>(BitConverter.ToUInt16, Convert.ToUInt16));
 
             Providers.Add(typeof(int), new MemoryDataConverterProvider<int>(BitConverter.ToInt32, Convert.ToInt32));
+            Providers.Add(typeof(int[]), new MemoryDataConverterProvider<int[]>(ByteToIntArray, ObjToIntArray));
             Providers.Add(typeof(uint), new MemoryDataConverterProvider<uint>(BitConverter.ToUInt32, Convert.ToUInt32));
 
             Providers.Add(typeof(long), new MemoryDataConverterProvider<long>(BitConverter.ToInt64, Convert.ToInt64));
@@ -29,6 +30,23 @@ namespace SimTelemetry.Domain.Memory
 
             Providers.Add(typeof(string), new MemoryDataConverterProvider<string>(BytesToString, Convert.ToString));
 
+        }
+
+        private static int[] ObjToIntArray(object arg)
+        {
+            if (arg is int[]) return ((int[]) arg);
+            else return new int[0];
+        }
+
+        private static int[] ByteToIntArray(byte[] arg1, int arg2)
+        {
+            int inputLength = arg1.Length - arg2;
+            var intArray = new int[inputLength/4];
+
+            for (int i = 0; i < intArray.Length; i ++)
+                intArray[i] = BitConverter.ToInt32(arg1, arg2+ i*4);
+
+            return intArray;
         }
 
         public static void AddProvider<T>(MemoryDataConverterProvider<T> provider)

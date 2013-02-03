@@ -19,9 +19,11 @@ namespace SimTelemetry.Domain.Plugins
         void Initialize(MemoryProvider provider);
 
         // Create pool based on given template, and extra fields if necessary.
-        MemoryPool CreateDriver(MemoryPool template, bool isPlayer);
+        void CreateDriver(MemoryPool pool, bool isPlayer);
 
         // Clear all your helper objects beside memorypool
         void Deinitialize();
+
+        bool CheckDriverQuick(MemoryProvider provider, int ptr);
     }
 }

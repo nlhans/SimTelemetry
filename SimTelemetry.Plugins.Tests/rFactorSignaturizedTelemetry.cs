@@ -11,7 +11,7 @@ namespace SimTelemetry.Plugins.Tests
 
         }
 
-        public MemoryPool CreateDriver(MemoryPool template, bool isPlayer)
+        public void CreateDriver(MemoryPool pool, bool isPlayer)
         {
             throw new NotImplementedException();
         }
@@ -19,6 +19,11 @@ namespace SimTelemetry.Plugins.Tests
         public void Deinitialize()
         {
             throw new NotImplementedException();
+        }
+
+        public bool CheckDriverQuick(MemoryProvider provider, int ptr)
+        {
+            return false;
         }
     }
 }

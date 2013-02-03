@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
@@ -42,7 +43,6 @@ namespace SimTelemetry.Domain.Aggregates
             // Fill memory provider
             Memory.Scanner.Enable();
             Provider.Initialize(Memory);
-            Memory.Refresh();
             Memory.Scanner.Disable();
 
             // Start outside-world telemetry objects
@@ -71,9 +71,47 @@ namespace SimTelemetry.Domain.Aggregates
 
             this.Acquisition.Update();
 
+            UpdateDrivers();
             foreach(var driver in Drivers)
                 driver.Update();
 
+        }
+
+        protected int _previousCars = 0;
+        protected virtual void UpdateDrivers()
+        {
+            if (this.Session.Cars != _previousCars)
+            {
+                _previousCars = this.Session.Cars;
+
+                // Get a new list of drivers
+                var driverList = Memory.Get("Simulator").ReadAs<int[]>("Drivers");
+                var validDriverList = driverList.Where(x => Provider.CheckDriverQuick(Memory, x)).ToArray();
+                var playerDriverPtr = Memory.Get("Simulator").ReadAs<int>("Player");
+                // Update the drivers.))
+                foreach (var validDriverPtr in validDriverList)
+                {
+                    if (Drivers.Any(x => x.BaseAddress == validDriverPtr))
+                        continue;
+
+                    var isPlayer = validDriverPtr == playerDriverPtr;
+                    var memPool = Memory.Get("DriverTemplate").Clone("Driver " + validDriverPtr, validDriverPtr);
+                    Provider.CreateDriver(memPool, isPlayer);
+
+                    Memory.Add(memPool);
+
+                    _drivers.Add(new TelemetryDriver(this, memPool));
+                }
+
+                return;
+                var deleteList = Drivers.Where(driver => !validDriverList.Any(x => x == driver.BaseAddress)).ToList();
+
+                for (int i = 0; i < deleteList.Count; i++)
+                {
+                    Memory.Remove(deleteList[i].Pool);
+                    _drivers.Remove(deleteList[i]);
+                }
+            }
         }
 
         public void SetGameStatus(bool active)
