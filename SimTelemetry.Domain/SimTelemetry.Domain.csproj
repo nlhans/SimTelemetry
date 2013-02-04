@@ -137,6 +137,7 @@
     <Compile Include="Telemetry\TelemetryTrack.cs" />
     <Compile Include="Utils\IniReader.cs" />
     <Compile Include="Utils\IniScannerOld.cs" />
+    <Compile Include="Utils\MMTimer.cs" />
     <Compile Include="ValueObjects\IniValueObject.cs" />
     <Compile Include="ValueObjects\EngineLifetime.cs" />
     <Compile Include="ValueObjects\EngineMode.cs" />
