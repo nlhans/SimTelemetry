@@ -18,12 +18,24 @@ namespace SimTelemetry.Domain.Memory
         public int Offset { get { return 0; } }
         public int Size { get { return 0; } }
 
+        public Type ValueType { get { return typeof (T); } }
+
         public Func<MemoryPool, T> ValidationFunc { get; protected set; }
 
         public MemoryFieldFunc(string name, Func<MemoryPool, T> validationFunc)
         {
             Name = name;
             ValidationFunc = validationFunc;
+        }
+
+        public object Read()
+        {
+            return ValidationFunc(Pool);
+        }
+
+        public bool HasChanged()
+        {
+            return true;
         }
 
         public TOut ReadAs<TOut>()

@@ -15,12 +15,24 @@ namespace SimTelemetry.Domain.Memory
             }
         }
 
+        protected bool Refreshed = false;
+        public override bool HasChanged()
+        {
+            if (!Refreshed) return false;
+            if (_OldValue == null) return true;
+            bool what = _OldValue.Equals(_Value);
+            return !what;
+        }
+
         public override void Refresh()
         {
+            Refreshed = false;
             if (_LazyValue == null || _LazyValue.IsValueCreated)
             {
                 _LazyValue = new Lazy<T>(() =>
                                              {
+                                                 Refreshed = true;
+                                                 _OldValue = _Value;
                                                  if (IsStatic)
                                                      RefreshStatic();
                                                  else

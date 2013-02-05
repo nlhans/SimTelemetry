@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
+using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.Utils;
 
@@ -27,15 +28,8 @@ namespace SimTelemetry.Tests.Telemetry
                 Process rf = Process.GetProcessesByName("rfactor")[0];
                 testPlugin.SimulatorStart(rf);
                 var telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
-
-                int i = 0;
-                while (i++ < 100)
-                {
-                    telemetryObject.Update();
-                    Debug.WriteLine(telemetryObject.Session.Time);
-
-                    Thread.Sleep(10);
-                }
+                var telemetryLogger = new SimTelemetryLogWriter();
+                telemetryObject.SetLogger(telemetryLogger);
 
             }
         }
@@ -52,34 +46,13 @@ namespace SimTelemetry.Tests.Telemetry
                 pluginHost.Load();
                 var testPlugin = pluginHost.Simulators[0];
 
-                testPlugin.Initialize();
                 Process rf = Process.GetProcessesByName("rfactor")[0];
                 testPlugin.SimulatorStart(rf);
                 telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
-
-                MMTimer t = new MMTimer(1000);
-                t.Tick += (o, s) =>
-                                 {
-                                     Console.WriteLine(calls);
-                                     calls = 0;
-                                 };
-                t.Start();
-
-                Stopwatch w = new Stopwatch();
-                MMTimer mt = new MMTimer(20);
-                mt.Tick += (a, b) =>
-                               {
-                                   w.Stop();
-                                   long  time = w.ElapsedMilliseconds;
-                                   w.Restart();
-                                   Debug.WriteLine(time);
-                                   telemetryObject.Update();
-                                   calls++;
-                               };
-                mt.Start();
+                var telemetryLogger = new SimTelemetryLogWriter();
+                telemetryObject.SetLogger(telemetryLogger);
 
                 Console.ReadLine();
-                mt.Stop();
             }
         }
 

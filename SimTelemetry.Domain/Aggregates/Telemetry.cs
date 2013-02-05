@@ -1,34 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.Telemetry;
+using SimTelemetry.Domain.Utils;
 
 namespace SimTelemetry.Domain.Aggregates
 {
     public class Telemetry
     {
-        public bool ActiveGame { get; protected set; }
-        public bool ActiveSession { get; protected set; }
-        public bool ActiveDriving { get; protected set; }
+        public bool IsRunning { get; protected set; }
+        public bool IsDriving { get; protected set; }
+        public bool IsLoading { get; protected set; }
 
-        public IEnumerable<TelemetryDriver> Drivers { get { return _drivers; } }
-        private IList<TelemetryDriver> _drivers = new List<TelemetryDriver>();
+        private MMTimer Clock;
 
         internal MemoryProvider Memory { get; set; }
-
         public IPluginTelemetryProvider Provider { get; protected set; }
 
+        public ITelemetryLogger Logger { get; protected set; }
+
+        #region Telemetry data yard
         public TelemetrySession Session { get; protected set; }
-        public TelemetryTrack Track { get; protected set; }
         public TelemetryGame Simulator { get; protected set; }
 
         public TelemetryAcquisition Acquisition { get; protected set; }
 
         public TelemetrySupport Support { get; protected set; }
+
+        public IEnumerable<TelemetryDriver> Drivers { get { return _drivers; } }
+        protected readonly IList<TelemetryDriver> _drivers = new List<TelemetryDriver>();
+
+        public TelemetryDriver Player { get { return _player; } }
+        protected TelemetryDriver _player;
+        #endregion
 
         public Telemetry(IPluginTelemetryProvider provider, Process simulatorProcess)
         {
@@ -50,33 +58,84 @@ namespace SimTelemetry.Domain.Aggregates
 
             // Start outside-world telemetry objects
             Session = new TelemetrySession(this);
-            Track = new TelemetryTrack(this);
             Simulator = new TelemetryGame(this);
 
             Acquisition = new TelemetryAcquisition(this);
             Support = new TelemetrySupport(this);
+
+#if DEBUG
+            Clock = new MMTimer(25);
+#else
+            Clock = new MMTimer(20);
+#endif
+            Clock.Tick += (o, s) => GlobalEvents.Fire(new TelemetryRefresh(this), true);
+            Clock.Start();
+
+            GlobalEvents.Hook<TelemetryRefresh>(Update, true);
         }
 
-         ~Telemetry()
+        ~Telemetry()
         {
+            RemoveLogger();
             Provider.Deinitialize();
         }
 
-        public void Update()
+        public void SetLogger(ITelemetryLogger logger)
+        {
+            Logger = logger;
+            Logger.Initialize(this, Memory);
+        }
+
+        public void RemoveLogger()
+        {
+            Logger.Deinitialize();
+            Logger = null;
+        }
+
+        public void Update(TelemetryRefresh instance)
         {
             // Updates memory pools and reads value to this class.
             Memory.Refresh();
-            this.Support.Update();
-            this.Simulator.Update();
-            this.Session.Update();
-            this.Track.Update();
 
-            this.Acquisition.Update();
+            // Simulator environment etc.
+            Support.Update();
+            Simulator.Update();
+            Session.Update();
+            Acquisition.Update();
 
+            // Drivers
             UpdateDrivers();
             foreach(var driver in Drivers)
                 driver.Update();
-            //Debug.WriteLine(Memory.Reader.ReadCalls);
+
+            // Update game status reports.
+            var isSessionLoading = Session.IsLoading;
+            var sessionLoadingChanged = isSessionLoading != IsLoading;
+            if (sessionLoadingChanged)
+                SetLoadingStatus(isSessionLoading);
+
+            var isSessionActive = Session.IsActive;
+            var sessionActiveChanged = isSessionActive != IsRunning;
+            if (sessionActiveChanged)
+                SetSessionStatus(isSessionActive);
+
+            if (isSessionActive == false || Player == null)
+            {
+                if (IsDriving)
+                    SetDrivingStatus(false);
+            }
+            else
+            {
+                var isDriving = Player.IsDriving;
+                if (isDriving != IsDriving)
+                    SetDrivingStatus(isDriving);
+            }
+            if (Player != null)
+            foreach (var field in Player.Pool.Fields)
+                field.Value.Read();
+
+            if (Logger != null)
+                Logger.Update();
         }
 
         protected virtual void UpdateDrivers()
@@ -99,7 +158,11 @@ namespace SimTelemetry.Domain.Aggregates
 
                     Memory.Add(memPool);
 
-                    _drivers.Add(new TelemetryDriver(this, memPool));
+                    var td = new TelemetryDriver(this, memPool);
+                    _drivers.Add(td);
+
+                    if (isPlayer)
+                        _player = td;
                 }
 
                 var driverRemovalList = new List<TelemetryDriver>();
@@ -118,64 +181,50 @@ namespace SimTelemetry.Domain.Aggregates
                 {
                     Memory.Remove(driverRemovalList[i].Pool);
                     _drivers.Remove(driverRemovalList[i]);
+
+                    if (driverRemovalList[i] == _player)
+                        _player = null;
                 }
             }
-        }
-
-        public void SetGameStatus(bool active)
-        {
-            if (active)
-            {
-                GlobalEvents.Fire(new SimulatorStarted(), true);
-            }
-            else
-            {
-                GlobalEvents.Fire(new SimulatorStopped(), true);
-            }
-            ActiveGame = active;
         }
 
         public void SetSessionStatus(bool active)
         {
             if (active)
             {
-                GlobalEvents.Fire(new SessionStarted(), true);
+                GlobalEvents.Fire(new SessionStarted(), true, 500);
             }
             else
             {
-                GlobalEvents.Fire(new SessionStopped(), true);
+                GlobalEvents.Fire(new SessionStopped(), true, 500);
             }
-            ActiveSession = active;
+            IsRunning = active;
         }
 
         public void SetDrivingStatus(bool active)
         {
             if (active)
             {
-                GlobalEvents.Fire(new DrivingStarted(), true);
+                GlobalEvents.Fire(new DrivingStarted(), true, 500);
             }
             else
             {
-                GlobalEvents.Fire(new DrivingStopped(), true);
+                GlobalEvents.Fire(new DrivingStopped(), true, 500);
             }
-            ActiveDriving = active;
+            IsDriving = active;
         }
 
-        public void AddDriver(TelemetryDriver driver)
+        public void SetLoadingStatus(bool active)
         {
-            if (!_drivers.Contains(driver))
-                _drivers.Add(driver);
-            GlobalEvents.Fire(new TelemetryDriverAdded(driver), true);
-        }
-
-        public void RemoveDriver(TelemetryDriver driver)
-        {
-            if (_drivers.Contains(driver))
-
-                _drivers.Remove(driver);
-
-            GlobalEvents.Fire(new TelemetryDriverRemoved(driver), true);
+            if (active)
+            {
+                GlobalEvents.Fire(new LoadingStarted(), true, 500);
+            }
+            else
+            {
+                GlobalEvents.Fire(new LoadingFinished(), true, 500);
+            }
+            IsLoading = active;
         }
     }
-
 }

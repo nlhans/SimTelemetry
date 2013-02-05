@@ -17,16 +17,24 @@ namespace SimTelemetry.Domain.Memory
         public int Address { get; protected set; }
         public int Size { get; protected set; }
 
-        public Type FieldType { get; protected set; }
+        public Type ValueType { get; protected set; }
 
         public Func<T, T> Conversion { get; protected set; }
 
         public virtual T Value { get { return _Value; } }
         protected T _Value;
+        protected T _OldValue;
 
-        public virtual T ReadAs()
+        public virtual object Read()
         {
             return Value;
+        }
+
+        public virtual bool HasChanged()
+        {
+            if (_OldValue == null) return true;
+            if (_Value == null) return true;
+            return !_Value.Equals(_OldValue);
         }
 
         public virtual TOut ReadAs<TOut>()
@@ -36,6 +44,8 @@ namespace SimTelemetry.Domain.Memory
 
         public virtual void Refresh()
         {
+            _OldValue = _Value;
+
             if (IsStatic)
                 RefreshStatic();
             else
@@ -83,7 +93,7 @@ namespace SimTelemetry.Domain.Memory
         public MemoryField(string name,  MemoryAddress type, int address, int size)
         {
             Name = name;
-            FieldType = typeof(T);
+            ValueType = typeof(T);
             Address = address;
             Size = size;
             Offset = 0;
@@ -93,7 +103,7 @@ namespace SimTelemetry.Domain.Memory
         public MemoryField(string name,  MemoryAddress type, int address, int offset, int size)
         {
             Name = name;
-            FieldType = typeof(T);
+            ValueType = typeof(T);
             Address = address;
             Size = size;
             Offset = offset;
@@ -103,7 +113,7 @@ namespace SimTelemetry.Domain.Memory
         public MemoryField(string name,  MemoryAddress type, MemoryPool pool, int offset, int size)
         {
             Name = name;
-            FieldType = typeof(T);
+            ValueType = typeof(T);
             Size = size;
             Offset = offset;
             Pool = pool;
@@ -115,7 +125,7 @@ namespace SimTelemetry.Domain.Memory
         public MemoryField(string name,  MemoryAddress type, int address, int size, Func<T,T> conversion)
         {
             Name = name;
-            FieldType = typeof(T);
+            ValueType = typeof(T);
             Address = address;
             Size = size;
             Offset = 0;
@@ -126,7 +136,7 @@ namespace SimTelemetry.Domain.Memory
         public MemoryField(string name,  MemoryAddress type, int address, int offset, int size, Func<T, T> conversion)
         {
             Name = name;
-            FieldType = typeof(T);
+            ValueType = typeof(T);
             Address = address;
             Size = size;
             Offset = offset;
@@ -137,7 +147,7 @@ namespace SimTelemetry.Domain.Memory
         public MemoryField(string name,  MemoryAddress type, MemoryPool pool, int offset, int size, Func<T, T> conversion)
         {
             Name = name;
-            FieldType = typeof(T);
+            ValueType = typeof(T);
             Size = size;
             Offset = offset;
             Pool = pool;

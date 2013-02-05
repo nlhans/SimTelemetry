@@ -15,12 +15,21 @@ namespace SimTelemetry.Plugins.Tests
         {
             MemoryPool simulator = new MemoryPool("Simulator", MemoryAddress.Static, 0, 0);
             simulator.Add(new MemoryFieldLazy<int>("CarPlayer", MemoryAddress.Static, 0x31528c, 4));
-            simulator.Add(new MemoryField<int[]>("Drivers", MemoryAddress.Static, 0x315298, 0x19C));
+            simulator.Add(new MemoryFieldLazy<int[]>("Drivers", MemoryAddress.Static, 0x315298, 0x19C));
+
+            simulator.Add(new MemoryFieldLazy<string>("LocationGame", MemoryAddress.Static, 0x6EB320, 0, 256));
 
             MemoryPool session = new MemoryPool("Session", MemoryAddress.Static, 0, 0);
-            session.Add(new MemoryField<int>("Cars", MemoryAddress.Static, 0x315290, 4));
+            session.Add(new MemoryFieldLazy<int>("Cars", MemoryAddress.Static, 0x315290, 4));
             session.Add(new MemoryFieldLazy<float>("Time", MemoryAddress.Static, 0x60022C, 4));
             session.Add(new MemoryFieldLazy<float>("Clock", MemoryAddress.Static, 0x6E2CD8, 4));
+
+            session.Add(new MemoryFieldLazy<string>("LocationTrack", MemoryAddress.Static, 0x309D28, 0, 256));
+
+            session.Add(new MemoryFieldLazy<bool>("IsOffline", MemoryAddress.Static, 0x315444, 1, (x) => !x));
+            session.Add(new MemoryFieldLazy<bool>("IsActive", MemoryAddress.Static, 0x30FEE4, 1));
+            session.Add(new MemoryFieldLazy<bool>("IsReplay", MemoryAddress.Static, 0x315444, 1));
+            session.Add(new MemoryFieldFunc<bool>("IsLoading", (pool) => !pool.ReadAs<bool>("IsActive") && pool.ReadAs<int>("Cars") > 0 && pool.ReadAs<string>("LocationTrack").Length != 0 ));
 
             MemoryPool templateDriver = new MemoryPool("DriverTemplate", MemoryAddress.StaticAbsolute, 0, 0x5F48); // base, 0x5F48 size
             templateDriver.Add(new MemoryFieldConstant<bool>("IsActive", true));

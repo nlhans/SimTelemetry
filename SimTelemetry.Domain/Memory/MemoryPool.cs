@@ -24,6 +24,7 @@ namespace SimTelemetry.Domain.Memory
         public string Signature { get; protected set; }
 
         public byte[] Value { get; protected set; }
+        public Type ValueType { get { return typeof(MemoryPool); } }
 
         public Dictionary<string, IMemoryObject> Fields { get { return _fields; } }
         public Dictionary<string, MemoryPool> Pools { get { return _pools; } }
@@ -36,6 +37,16 @@ namespace SimTelemetry.Domain.Memory
         public TOut ReadAs<TOut>()
         {
             return MemoryDataConverter.Read<TOut>(new byte[32], 0);
+        }
+
+        public object Read()
+        {
+            return new byte[0];
+        }
+
+        public bool HasChanged()
+        {
+            return false;
         }
 
         public TOut ReadAs<TOut>(int offset)

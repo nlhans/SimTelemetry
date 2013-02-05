@@ -20,6 +20,17 @@ namespace SimTelemetry.Domain.Memory
         public int Size { get { return 0; } }
 
         public T StaticValue { get; protected set; }
+        public Type ValueType { get { return typeof(T); } }
+
+        public virtual object Read()
+        {
+            return StaticValue;
+        }
+
+        public bool HasChanged()
+        {
+            return false;
+        }
 
         public MemoryFieldConstant(string name, T staticValue)
         {

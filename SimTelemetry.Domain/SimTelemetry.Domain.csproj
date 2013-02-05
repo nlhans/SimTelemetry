@@ -72,6 +72,7 @@
     <Compile Include="Entities\Season.cs" />
     <Compile Include="Entities\Team.cs" />
     <Compile Include="Entities\Wheel.cs" />
+    <Compile Include="Enumerations\TelemetrySupportLevel.cs" />
     <Compile Include="Events\CarAdded.cs" />
     <Compile Include="Events\CarDeleted.cs" />
     <Compile Include="Events\CarRepositoryCleared.cs" />
@@ -79,6 +80,8 @@
     <Compile Include="Events\DrivingStarted.cs" />
     <Compile Include="Events\DrivingStopped.cs" />
     <Compile Include="Events\LapAdded.cs" />
+    <Compile Include="Events\LoadingFinished.cs" />
+    <Compile Include="Events\LoadingStarted.cs" />
     <Compile Include="Events\ReferenceLapChanged.cs" />
     <Compile Include="Events\SessionStarted.cs" />
     <Compile Include="Events\SessionStopped.cs" />
@@ -86,6 +89,7 @@
     <Compile Include="Events\SimulatorStopped.cs" />
     <Compile Include="Events\TelemetryDriverAdded.cs" />
     <Compile Include="Events\TelemetryDriverRemoved.cs" />
+    <Compile Include="Events\TelemetryRefresh.cs" />
     <Compile Include="Exceptions\CarAlreadyHasBrakeException.cs" />
     <Compile Include="Exceptions\CarAlreadyHasChassisException.cs" />
     <Compile Include="Exceptions\CarAlreadyHasDrivetrainException.cs" />
@@ -98,6 +102,13 @@
     <Compile Include="Events\PluginsLoaded.cs" />
     <Compile Include="Exceptions\PluginHostException.cs" />
     <Compile Include="GlobalEvents.cs" />
+    <Compile Include="Logger\ILogField.cs" />
+    <Compile Include="Logger\ITelemetryLogger.cs" />
+    <Compile Include="Logger\LogError.cs" />
+    <Compile Include="Logger\LogField.cs" />
+    <Compile Include="Logger\LogFile.cs" />
+    <Compile Include="Logger\LogGroup.cs" />
+    <Compile Include="Logger\SimTelemetryLogWriter.cs" />
     <Compile Include="Memory\IMemoryObject.cs" />
     <Compile Include="Memory\MemoryAddress.cs" />
     <Compile Include="Memory\MemoryDataConverter.cs" />
@@ -134,10 +145,10 @@
     <Compile Include="Telemetry\TelemetryGame.cs" />
     <Compile Include="Telemetry\TelemetrySession.cs" />
     <Compile Include="Telemetry\TelemetrySupport.cs" />
-    <Compile Include="Telemetry\TelemetryTrack.cs" />
     <Compile Include="Utils\IniReader.cs" />
     <Compile Include="Utils\IniScannerOld.cs" />
     <Compile Include="Utils\MMTimer.cs" />
+    <Compile Include="Utils\ZipStorer.cs" />
     <Compile Include="ValueObjects\IniValueObject.cs" />
     <Compile Include="ValueObjects\EngineLifetime.cs" />
     <Compile Include="ValueObjects\EngineMode.cs" />

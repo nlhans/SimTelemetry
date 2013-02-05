@@ -55,6 +55,8 @@ namespace SimTelemetry.Tests.Core
             _event2HandleCount++;
         }
         
+        // TODO: Write tests for periodic events.
+
         [Test]
         public void Events()
         {

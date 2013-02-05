@@ -13,6 +13,7 @@ namespace SimTelemetry.Domain.Memory
             Providers.Add(typeof(bool), new MemoryDataConverterProvider<bool>(BitConverter.ToBoolean, Convert.ToBoolean));
 
             Providers.Add(typeof(byte), new MemoryDataConverterProvider<byte>(ToByte, Convert.ToByte));
+
             Providers.Add(typeof(char), new MemoryDataConverterProvider<char>(BitConverter.ToChar, Convert.ToChar));
 
             Providers.Add(typeof(short), new MemoryDataConverterProvider<short>(BitConverter.ToInt16, Convert.ToInt16));
@@ -107,6 +108,34 @@ namespace SimTelemetry.Domain.Memory
 
             var intermediate = Read<TSource>(dataInput, index);
             return ((MemoryDataConverterProvider<TOutput>)Providers[outputType]).Obj2Obj(intermediate);
+        }
+
+        public static byte[] Rawify(Func<object> reader)
+        {
+            object data = reader();
+
+            if (data is double) return BitConverter.GetBytes((double)data);
+            if (data is float) return BitConverter.GetBytes((float)data);
+            if (data is bool) return BitConverter.GetBytes((bool)data);
+            if (data is int) return BitConverter.GetBytes((int)data);
+            if (data is short) return BitConverter.GetBytes((short)data);
+            if (data is long) return BitConverter.GetBytes((long) data);
+            if (data is string)
+            {
+                byte[] rawData = Encoding.ASCII.GetBytes((string)data);
+                byte[] outData = new byte[rawData.Length + 5];
+                Array.Copy(BitConverter.GetBytes(rawData.Length), 0, outData, 0, 4);
+                Array.Copy(rawData, 0, outData, 4, rawData.Length);
+                outData[outData.Length - 1] = 0;
+                return outData;
+
+            }
+            if (data is byte) return BitConverter.GetBytes((byte)data);
+            if (data is ushort) return BitConverter.GetBytes((ushort)data);
+            if (data is ulong) return BitConverter.GetBytes((ulong)data);
+            if (data is uint) return BitConverter.GetBytes((uint)data);
+
+            return new byte[0];
         }
     }
 }

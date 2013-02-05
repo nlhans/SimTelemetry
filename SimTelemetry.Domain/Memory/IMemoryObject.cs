@@ -16,8 +16,11 @@ namespace SimTelemetry.Domain.Memory
         int Offset { get; }
         int Address { get; }
         int Size { get; }
+        Type ValueType { get; }
 
         TOut ReadAs<TOut>();
+        object Read();
+        bool HasChanged();
 
         void Refresh();
         void SetProvider(MemoryProvider provider);
