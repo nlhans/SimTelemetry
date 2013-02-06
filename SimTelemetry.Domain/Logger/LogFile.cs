@@ -129,6 +129,11 @@ namespace SimTelemetry.Domain.Logger
 
         public void Finish()
         {
+            if (TimeMarkers.Select(x => x.Count).Sum() < 5)
+            {
+                ClearTemporaryFiles();
+                return;
+            }
             // Finish action does the following:
             // - Flush current data file
             // - Document about the log structure
@@ -183,6 +188,29 @@ namespace SimTelemetry.Domain.Logger
             zipFile.AddFile(ZipStorer.Compression.Deflate, "./LogTemp/Time.bin", "Time.bin", "");
             zipFile.AddFile(ZipStorer.Compression.Deflate, "./LogTemp/Structure.bin", "Structure.bin", "");
             zipFile.Close();
+
+            ClearTemporaryFiles();
+        }
+
+        private void ClearTemporaryFiles()
+        {
+            Data = null;
+            FrameData = null;
+            DataIndex = 0;
+            FrameDataIndex = 0;
+
+
+            for (int DataFile = 1; DataFile <= FileIndex; DataFile++)
+            {
+                if (File.Exists("./LogTemp/Data" + DataFile + ".bin"))
+                File.Delete("./LogTemp/Data" + DataFile + ".bin");
+            }
+            if (File.Exists("./LogTemp/Time.bin"))
+                File.Delete("./LogTemp/Time.bin");
+            if (File.Exists("./LogTemp/Structure.bin"))
+                File.Delete("./LogTemp/Structure.bin");
+
+            Directory.Delete("./LogTemp/");
         }
 
         protected void WriteLogStructure(ILogNode node, byte[] buffer, ref int bufferIndex)
