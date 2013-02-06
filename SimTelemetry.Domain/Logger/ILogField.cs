@@ -6,7 +6,7 @@ namespace SimTelemetry.Domain.Logger
     {
         uint ID { get; }
         string Name { get; }
-
+        LogGroup Group { get;  }
     }
     public interface ILogNode
     {

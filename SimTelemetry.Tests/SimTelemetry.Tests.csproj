@@ -57,9 +57,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zlib">
-      <HintPath>..\Binaries\Ionic.Zlib.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\Binaries\nunit.framework.dll</HintPath>
     </Reference>

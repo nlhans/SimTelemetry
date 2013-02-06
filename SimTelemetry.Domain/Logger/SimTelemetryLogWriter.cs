@@ -18,15 +18,23 @@ namespace SimTelemetry.Domain.Logger
         private int sizePerSec = 0;
         private float lt = 0.0f;
         private Filter averageTime = new Filter(100);
+        private float LastTime = 0;
         public void Update()
         {
             if (_log == null) return;
-            Samples++;
             // Log all interesting variables to disk.
             // Log the following instances:
             // Session, Simulator + All drivers
 
-            //Console.Clear();
+            // Get time first
+            var SampleTime = Memory.Get("Session").ReadAs<float>("Time");
+            if (SampleTime < LastTime) LastTime = 0;
+            if (SampleTime - LastTime < 1.0f / 50.0f)
+                return;
+            LastTime = SampleTime;
+            Samples++;
+
+            //Console.Clear();))
             foreach(var pool in Memory.Pools)
             {
                 if (pool.IsTemplate) continue;
@@ -47,6 +55,9 @@ namespace SimTelemetry.Domain.Logger
                 lastSize = _log.dataSize;
 
             }
+
+            _log.Flush(SampleTime);
+
             float ft = Memory.Get("Session").ReadAs<float>("Time");
             if(lt != 0.0 && ft-lt != 0.0)
             averageTime.Add(ft - lt);
@@ -62,9 +73,17 @@ namespace SimTelemetry.Domain.Logger
             GlobalEvents.Hook<DrivingStarted>(Handle_StartDriving, true);
             GlobalEvents.Hook<DrivingStopped>(Handle_StopDriving, true);
             GlobalEvents.Hook<SessionStarted>(Handle_StartLogfile, true);
-            GlobalEvents.Hook<SessionStopped>((x) => Console.WriteLine("session stopped ["+Samples+"]"), true);
+            GlobalEvents.Hook<SessionStopped>(Handle_StopLogfile, true);
             GlobalEvents.Hook<LoadingStarted>((x) => Console.WriteLine("loading started [" + Samples + "]"), true);
             GlobalEvents.Hook<LoadingFinished>((x) => Console.WriteLine("loading finished [" + Samples + "]"), true);
+        }
+
+        private void Handle_StopLogfile(SessionStopped obj)
+        {
+            Console.WriteLine("session stopped [" + Samples + "]");
+            _log.Finish();
+            _log = null;
+
         }
 
         protected void CreateLogStructure(IEnumerable<MemoryPool> pools, ILogNode node)
@@ -78,6 +97,8 @@ namespace SimTelemetry.Domain.Logger
                 {
                     group.CreateField(field.Value.Name, field.Value.ValueType);
                 }
+                if(pool.Pools.Count > 0)
+                    CreateLogStructure(pool.Pools.Values, group);
             }
         }
 

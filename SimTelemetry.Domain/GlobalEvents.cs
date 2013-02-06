@@ -2,17 +2,18 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 namespace SimTelemetry.Domain
 {
     public class GlobalEvents
     {
-        private static List<GlobalEventDelegate> _handlers = new List<GlobalEventDelegate>();
+        private static ConcurrentDictionary<object, GlobalEventDelegate> _handlers = new ConcurrentDictionary<object, GlobalEventDelegate>();
         private static ConcurrentDictionary<Type, DateTime> _lastFires = new ConcurrentDictionary<Type, DateTime>();
 
 #if DEBUG
         public static int Count { get { return _handlers.Count; } }
-        public static IEnumerable<GlobalEventDelegate> List { get { return _handlers; } }
+        public static IEnumerable<GlobalEventDelegate> List { get { return _handlers.Values; } }
         // For testing only:
         public static void Reset()
         {
@@ -34,8 +35,10 @@ namespace SimTelemetry.Domain
         public static void Hook<T>(Action<T> handler, bool includeNetwork)
         {
             // Allow multiple inclusion??
-            if (_handlers.Any(x => x.Action.Equals(handler)) == false)
-                _handlers.Add(new GlobalEventDelegate { Action = handler, Network = includeNetwork });
+            //if (_handlers.Any(x => x.Value.Action.Equals(handler)) == false)
+            if (!_handlers.ContainsKey(handler))
+                if (!_handlers.TryAdd(handler, new GlobalEventDelegate { Action = handler, Network = includeNetwork }))
+                    throw new Exception("Handler dictionary is currently locked");
         }
 
 
@@ -43,15 +46,17 @@ namespace SimTelemetry.Domain
         {
             var handlerHash = handler.GetHashCode();
 
-            while (_handlers.Count(x => x.Action.GetHashCode() == handlerHash) > 0)
-                _handlers.Remove(_handlers.Where(x => x.Action.GetHashCode() == handlerHash).First());
+            GlobalEventDelegate n;
+
+            while (_handlers.Count(x => x.Value.Action.GetHashCode() == handlerHash) > 0)
+                _handlers.TryRemove(_handlers.Where(x => x.Value.Action.GetHashCode() == handlerHash).First().Key, out n);
         }
 
         public static void Fire<T>(T Data, bool includeNetwork)
         {
             foreach (var handler in _handlers
-                .Where(x => includeNetwork || (includeNetwork == false && x.Network == false))
-                .Select(x => x.Action).OfType<Action<T>>())
+                .Where(x => includeNetwork || (includeNetwork == false && x.Value.Network == false))
+                .Select(x => x.Value.Action).OfType<Action<T>>())
                 handler(Data);
 
         }
@@ -76,8 +81,8 @@ namespace SimTelemetry.Domain
                 return;
 
             foreach (var handler in _handlers
-                .Where(x => includeNetwork || (includeNetwork == false && x.Network == false))
-                .Select(x => x.Action).OfType<Action<T>>())
+                .Where(x => includeNetwork || (includeNetwork == false && x.Value.Network == false))
+                .Select(x => x.Value.Action).OfType<Action<T>>())
                 handler(Data);
 
         }
