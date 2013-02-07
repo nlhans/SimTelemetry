@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Memory;
 using Triton.Maths;
@@ -19,6 +20,11 @@ namespace SimTelemetry.Domain.Logger
         private float lt = 0.0f;
         private Filter averageTime = new Filter(100);
         private float LastTime = 0;
+
+        public ITelemetryLogConfiguration Configuration { get; protected set; }
+
+        protected static readonly string[] TimepathFields = new[] {"Laps", "Meter", "Speed"};
+
         public void Update()
         {
             if (_log == null) return;
@@ -38,6 +44,50 @@ namespace SimTelemetry.Domain.Logger
             foreach(var pool in Memory.Pools)
             {
                 if (pool.IsTemplate) continue;
+
+                // Obey to configuration settings.
+                if (pool.Name.StartsWith("Driver"))
+                {
+                    bool isAI = pool.ReadAs<bool>("IsAI");
+                   
+                    bool recordTimePath = false;
+                    bool recordTelemetry = true;
+
+                    if (Configuration.RecordTimePathsAll)
+                        recordTimePath = true;
+
+                    // Turn off for AI:
+                    if (isAI)
+                    {
+                        if (!Configuration.RecordTimePathsAI)
+                            recordTimePath = false;
+
+                        if (!Configuration.DriversLogAI)
+                            recordTelemetry = false;
+                    }
+
+                    if (!Configuration.DriversLogAll)
+                    {
+                        // Check if this index is present in the selective array
+                        var index = pool.ReadAs<int>("Index");
+                        if (!Configuration.DriversLogSelective.Contains(index))
+                            recordTelemetry=false;
+                    }
+                    if(recordTimePath && !recordTelemetry)
+                    {
+                        // Time paths mean recording the meters, speed and lapnumber
+                        // This special routine only performs when the driver is skipped from logging complete telemetry.
+                        foreach (var timePathField in pool.Fields.Where(x => TimepathFields.Contains(x.Key)))
+                        {
+                            if (timePathField.Value.HasChanged())
+                                _log.Write(pool.Name, timePathField.Value.Name, MemoryDataConverter.Rawify(timePathField.Value.Read));
+                        }
+                    }
+
+                    if(!recordTelemetry)
+                        continue;
+                }
+
                 foreach(var fields in pool.Fields)
                 {
                     if (fields.Value.IsConstant) continue;
@@ -76,6 +126,16 @@ namespace SimTelemetry.Domain.Logger
             GlobalEvents.Hook<SessionStopped>(Handle_StopLogfile, true);
             GlobalEvents.Hook<LoadingStarted>((x) => Console.WriteLine("loading started [" + Samples + "]"), true);
             GlobalEvents.Hook<LoadingFinished>((x) => Console.WriteLine("loading finished [" + Samples + "]"), true);
+
+            // Log nothing
+            Configuration = new TelemetryLogConfiguration(false, false, false, false);
+        }
+
+        public void UpdateConfiguration(ITelemetryLogConfiguration configuration)
+        {
+            // 
+            this.Configuration = configuration;
+
         }
 
         private void Handle_StopLogfile(SessionStopped obj)
@@ -88,11 +148,64 @@ namespace SimTelemetry.Domain.Logger
 
         protected void CreateLogStructure(IEnumerable<MemoryPool> pools, ILogNode node)
         {
+            this.Memory.Refresh();
+
+            LogGroup group;
             foreach(var pool in pools)
             {
                 if (pool.IsTemplate) continue;
 
-                var group = node.CreateGroup(pool.Name);
+                // Obey to configuration settings.
+                if (pool.Name.StartsWith("Driver"))
+                {
+                    bool isAI = pool.ReadAs<bool>("IsAI");
+
+                    bool recordTimePath = false;
+                    bool recordTelemetry = true;
+
+                    if (Configuration.RecordTimePathsAll)
+                        recordTimePath = true;
+
+                    // Turn off for AI:
+                    if (isAI)
+                    {
+                        if (!Configuration.RecordTimePathsAI)
+                            recordTimePath = false;
+
+                        if (!Configuration.DriversLogAI)
+                            recordTelemetry = false;
+                    }
+
+                    if (!Configuration.DriversLogAll)
+                    {
+                        // Check if this index is present in the selective array
+                        var index = pool.ReadAs<int>("Index");
+                        if (!Configuration.DriversLogSelective.Contains(index))
+                            recordTelemetry = false;
+                    }
+                    if (recordTimePath && !recordTelemetry)
+                    {
+
+                        group = node.CreateGroup(pool.Name);
+
+                        // Time paths mean recording the meters, speed and lapnumber
+                        // This special routine only performs when the driver is skipped from logging complete telemetry.
+                        foreach (var timePathField in pool.Fields.Where(x => TimepathFields.Contains(x.Key)))
+                        {
+
+                            group.CreateField(timePathField.Value.Name, timePathField.Value.ValueType);
+                        }
+                    }
+
+                    if (!recordTelemetry)
+                        continue;
+                }
+
+
+
+
+
+                group = node.CreateGroup(pool.Name);
                 foreach (var field in pool.Fields)
                 {
                     group.CreateField(field.Value.Name, field.Value.ValueType);

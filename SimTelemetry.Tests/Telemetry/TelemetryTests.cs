@@ -51,7 +51,8 @@ namespace SimTelemetry.Tests.Telemetry
                 telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
                 var telemetryLogger = new SimTelemetryLogWriter();
                 telemetryObject.SetLogger(telemetryLogger);
-
+                telemetryLogger.UpdateConfiguration(new TelemetryLogConfiguration(true, false, true, true));
+                
                 Console.ReadLine();
             }
         }

@@ -95,6 +95,38 @@ namespace SimTelemetry.Tests
         }
 
         [Test]
+        public void CrossReferenceMemory()
+        {
+
+            MemoryReader r = new MemoryReader();
+            r.Diagnostic = true;
+            r.Open(Process.GetProcessesByName("rfactor")[0]);
+
+            byte[] me = r.ReadBytes(0x7154c0, 0x5F48);
+            var ais = new List<byte[]>();
+            for(int i = 0; i < 1 ;i++)
+            ais.Add(r.ReadBytes(r.ReadInt32(0x715298 + 4 + i * 4), 0x5F48));
+            
+            List<int> diff = new List<int>();
+            for(int i = 0; i < me.Length/4; i++)
+            {
+                int iMe = BitConverter.ToInt32(me, i*4);
+                int iAI = BitConverter.ToInt32(ais[0], i * 4);
+                bool fail = false;
+                for (int j = 0; j < ais.Count; j++)
+                    if (BitConverter.ToInt32(ais[j], i * 4) != iAI)
+                        fail = true;
+                    if (fail) continue;
+                if ((iMe == 0 && iAI == 1) || (iMe  == 1&& iAI == 0))
+                {
+                    Console.WriteLine("0x{0:X} -> {1:X} != {2:X}", (i*4), iMe, iAI);
+                }
+                //diff.Add(i);
+            }
+
+        }
+
+        [Test]
         public void TestRfactor()
         {
             MemoryReader r = new MemoryReader();

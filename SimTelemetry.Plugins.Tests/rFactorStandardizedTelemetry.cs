@@ -34,6 +34,8 @@ namespace SimTelemetry.Plugins.Tests
             MemoryPool templateDriver = new MemoryPool("DriverTemplate", MemoryAddress.StaticAbsolute, 0, 0x5F48); // base, 0x5F48 size
             templateDriver.Add(new MemoryFieldConstant<bool>("IsActive", true));
 
+            templateDriver.Add(new MemoryFieldLazy<int>("Index", MemoryAddress.Dynamic, 0, 0x8, 32));
+            
             templateDriver.Add(new MemoryFieldLazy<string>("Name", MemoryAddress.Dynamic, 0, 0x5B08, 32));
             templateDriver.Add(new MemoryFieldLazy<string>("CarTeam", MemoryAddress.Dynamic, 0, 0x5C22, 64));
             templateDriver.Add(new MemoryFieldLazy<string>("CarModel", MemoryAddress.Dynamic, 0, 0x5C62, 64));
@@ -57,14 +59,22 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<float>("InputThrottle", MemoryAddress.Dynamic, 0, 0x2938, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("InputBrake", MemoryAddress.Dynamic, 0, 0x2940, 4));
 
-            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateX", MemoryAddress.Dynamic, 0, 0x10, 4));
-            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateY", MemoryAddress.Dynamic, 0, 0x18, 4));
-            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateZ", MemoryAddress.Dynamic, 0, 0x14, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateX", MemoryAddress.Dynamic, 0, 0x289C, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateY", MemoryAddress.Dynamic, 0, 0x28A4, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateZ", MemoryAddress.Dynamic, 0, 0x28A0, 4));
+
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateX-Replay", MemoryAddress.Dynamic, 0, 0x10, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateY-Replay", MemoryAddress.Dynamic, 0, 0x18, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("CoordinateZ-Replay", MemoryAddress.Dynamic, 0, 0x14, 4));
+
+            templateDriver.Add(new MemoryFieldLazy<float>("Heading", MemoryAddress.Dynamic, 0, 0x40, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("AccelerationX", MemoryAddress.Dynamic, 0, 0x57C8, 4));
            
             templateDriver.Add(new MemoryFieldLazy<int>("Pitstops", MemoryAddress.Dynamic, 0, 0x3D2C, 4));
             templateDriver.Add(new MemoryFieldLazy<int>("Position", MemoryAddress.Dynamic, 0, 0x3D20, 4));
             templateDriver.Add(new MemoryFieldLazy<int>("Laps", MemoryAddress.Dynamic, 0, 0x3CF8, 1));
 
+            templateDriver.Add(new MemoryFieldLazy<bool>("IsAI", MemoryAddress.Dynamic, 0, 0x59C8, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("IsRetired", MemoryAddress.Dynamic, 0, 0x4160, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("IsLimiter", MemoryAddress.Dynamic, 0, 0x17B1, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("IsPits", MemoryAddress.Dynamic, 0, 0x27A8, 1));

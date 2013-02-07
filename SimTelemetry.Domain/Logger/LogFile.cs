@@ -200,7 +200,7 @@ namespace SimTelemetry.Domain.Logger
             FrameDataIndex = 0;
 
 
-            for (int DataFile = 1; DataFile <= FileIndex; DataFile++)
+            for (int DataFile = 0; DataFile <= 5+FileIndex; DataFile++)
             {
                 if (File.Exists("./LogTemp/Data" + DataFile + ".bin"))
                 File.Delete("./LogTemp/Data" + DataFile + ".bin");
