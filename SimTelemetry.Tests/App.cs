@@ -18,7 +18,8 @@ namespace SimTelemetry.Tests
             w.Start();
 
             TelemetryTests t = new TelemetryTests();
-            t.Continous();
+            t.ReadFile();
+            //t.Continous();
             //l.TestRfactor();
             //l.TestRfactor();
             //test();

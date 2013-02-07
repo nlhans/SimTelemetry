@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 
 namespace SimTelemetry.Domain.Utils
@@ -746,5 +747,19 @@ namespace SimTelemetry.Domain.Utils
             this.Close();
         }
         #endregion
+    }
+
+    public static class ZipStorerExtensions
+    {
+        public static byte[] ExtractFile(this ZipStorer me, string file)
+        {
+            var zfe = me.ReadCentralDir().Where(x => x.FilenameInZip == file).FirstOrDefault();
+            var data = new byte[zfe.FileSize];
+            var stream = new MemoryStream(data);
+            // Extract file using a stream.
+            me.ExtractFile(zfe, stream);
+
+            return data;
+        }
     }
 }

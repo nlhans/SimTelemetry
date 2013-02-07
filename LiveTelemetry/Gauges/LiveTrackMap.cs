@@ -77,8 +77,6 @@ namespace LiveTelemetry
                             float a1 = Convert.ToSingle(10 + ((driver.CoordinateX - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
                             float a2 = Convert.ToSingle(100 + (1 - (driver.CoordinateY - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
 
-                            a1 -= bubblesize / 2f;
-                            a2 -= bubblesize / 2f;
 
                             Brush c;
                             if (driver.Position == Telemetry.m.Sim.Drivers.Player.Position) // Player
@@ -94,8 +92,30 @@ namespace LiveTelemetry
                             else // Behind player, but not lapped.
                                 c = new SolidBrush(Color.FromArgb(90, 120, 120));
 
+                            double arrowSize = bubblesize/2;
+                            double arrowAngle = 50.0f / 180.0f * Math.PI;
+                            double heading_angle = 0;
+                            if (driver.Heading > 0)
+                                heading_angle = driver.Heading / 2 * Math.PI;
+                            else
+                                heading_angle = driver.Heading/2*Math.PI;
+
+                            heading_angle = Math.PI /-2 - driver.Heading*Math.PI/2;
+                            heading_angle += Math.PI;
+                            PointF[] arrow = new PointF[3];
+                            arrow[0] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle) * (arrowSize + 10)), Convert.ToSingle(a2 + Math.Cos(heading_angle) * (arrowSize + 10)));
+                            arrow[1] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle + arrowAngle) * arrowSize), Convert.ToSingle(a2 + Math.Cos(heading_angle + arrowAngle) * arrowSize));
+                            arrow[2] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle - arrowAngle) * arrowSize), Convert.ToSingle(a2 + Math.Cos(heading_angle - arrowAngle) * arrowSize));
+
+                            g.FillPolygon(Brushes.White, arrow, FillMode.Winding); ;
+
+
+                            a1 -= bubblesize / 2f;
+                            a2 -= bubblesize / 2f;
+
                             g.FillEllipse(c, a1, a2, bubblesize, bubblesize);
                             g.DrawEllipse(new Pen(Color.White, 1f), a1, a2, bubblesize, bubblesize);
+
                             g.DrawString(driver.Position.ToString(), f, Brushes.White, a1 + 5, a2 + 2);
 
                             g.DrawLine(pDarkRed, a1 + bubblesize / 2f - 10, a2 + 3 + bubblesize / 2f,

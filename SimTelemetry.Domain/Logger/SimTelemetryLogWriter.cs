@@ -49,7 +49,7 @@ namespace SimTelemetry.Domain.Logger
                 if (pool.Name.StartsWith("Driver"))
                 {
                     bool isAI = pool.ReadAs<bool>("IsAI");
-                   
+
                     bool recordTimePath = false;
                     bool recordTelemetry = true;
 
@@ -75,7 +75,10 @@ namespace SimTelemetry.Domain.Logger
                     }
                     if(recordTimePath && !recordTelemetry)
                     {
-                        // Time paths mean recording the meters, speed and lapnumber
+                        // Time paths mean recording the meters, speed and lap number
+                        // The time is already kept in the log file itself. (flush routine).
+                        // A time path can be handy for calculating sector times, differences, and 'overview' of corner speeds etc.
+                        // It may be useful to record only this for competitor cars instead of all (40+) telemetry fields.
                         // This special routine only performs when the driver is skipped from logging complete telemetry.
                         foreach (var timePathField in pool.Fields.Where(x => TimepathFields.Contains(x.Key)))
                         {
@@ -141,7 +144,7 @@ namespace SimTelemetry.Domain.Logger
         private void Handle_StopLogfile(SessionStopped obj)
         {
             Console.WriteLine("session stopped [" + Samples + "]");
-            _log.Finish();
+            _log.Finish("Telemetry.zip");
             _log = null;
 
         }

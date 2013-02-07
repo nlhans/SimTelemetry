@@ -1,4 +1,5 @@
 ﻿using System;
+using SimTelemetry.Domain.Memory;
 
 namespace SimTelemetry.Domain.Logger
 {
@@ -10,7 +11,11 @@ namespace SimTelemetry.Domain.Logger
         public LogGroup Group { get; protected set; }
         public LogFile File { get; protected set; }
 
-        public Type FieldType { get; protected set; }
+        public Type ValueType { get; protected set; }
+        public TOut ReadAs<TOut>(byte[] data, int index)
+        {
+            return MemoryDataConverter.Read<T, TOut>(data, index);
+        }
 
         public int SampleOffset;
         public T[] Data;
@@ -32,7 +37,7 @@ namespace SimTelemetry.Domain.Logger
             Name = name;
             Group = group;
             File = file;
-            FieldType = typeof(T);
+            ValueType = typeof(T);
         }
 
 

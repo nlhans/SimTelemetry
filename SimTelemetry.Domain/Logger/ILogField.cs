@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace SimTelemetry.Domain.Logger
 {
@@ -6,12 +6,8 @@ namespace SimTelemetry.Domain.Logger
     {
         uint ID { get; }
         string Name { get; }
-        LogGroup Group { get;  }
-    }
-    public interface ILogNode
-    {
-        IEnumerable<LogGroup> Groups { get; }
-        IEnumerable<ILogField> Fields { get; }
-        LogGroup CreateGroup(string name);
+        LogGroup Group { get; }
+        Type ValueType { get; }
+        TOut ReadAs<TOut>(byte[] data, int index);
     }
 }

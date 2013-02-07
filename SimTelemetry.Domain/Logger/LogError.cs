@@ -7,5 +7,6 @@
         FieldNotFound = 0xFFFFFFFE,
         GroupAlreadyExists = 0xFFFFFFFD,
         FieldAlreadyExists = 0xFFFFFFFC,
+        ReadOnly = 0xAAAAAAAA
     }
 }

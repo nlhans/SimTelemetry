@@ -34,7 +34,11 @@ namespace SimTelemetry.Tests.Telemetry
             }
         }
 
-
+        [Test]
+        public void ReadFile()
+        {
+            SimTelemetryLogReader reader = new SimTelemetryLogReader("Telemetry.zip");
+        }
         int calls = 0;
         private Domain.Aggregates.Telemetry telemetryObject;
         public void Continous()

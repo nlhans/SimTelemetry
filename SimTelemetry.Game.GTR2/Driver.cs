@@ -28,6 +28,7 @@ namespace SimTelemetry.Game.GTR2
     public class Driver : IDriverGeneral
     {
         private int Base = 0;
+        public double Heading { get; set; }
 
 
         public Driver(int i)

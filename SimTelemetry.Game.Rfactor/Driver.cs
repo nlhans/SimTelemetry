@@ -43,6 +43,12 @@ namespace SimTelemetry.Game.Rfactor
             _MMFData = mmf_instance;
         }
 
+        public double Heading
+        {
+            get { return rFactor.Game.ReadFloat(Base + 0x48); }
+            set { }
+        }
+
         public bool Driving
         { // 0x1794 seems to be set to 1 at start of each session
             // 0x314 seems to buggy with AI around.

@@ -33,6 +33,8 @@ namespace SimTelemetry.Objects
         //[Loggable(1)]
         //bool Retired { get; set; }
 
+        [Loggable(10)]
+        double Heading { get; set; }
         /// <summary>
         /// Denotes whether the driver is in garage or is 'on track' (at the controls).
         /// </summary>

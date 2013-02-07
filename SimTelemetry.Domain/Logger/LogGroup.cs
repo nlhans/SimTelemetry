@@ -23,7 +23,16 @@ namespace SimTelemetry.Domain.Logger
 
         public LogGroup CreateGroup(string name)
         {
+            if (File.ReadOnly) return null;
             var oGroup = new LogGroup(File.RequestNewGroupId(), name, this, File);
+            _groups.Add(oGroup);
+            return oGroup;
+        }
+
+        public LogGroup CreateGroup(string name, uint id)
+        {
+            if (!File.ReadOnly) return null;
+            var oGroup = new LogGroup(id, name, this, File);
             _groups.Add(oGroup);
             return oGroup;
         }
@@ -38,9 +47,21 @@ namespace SimTelemetry.Domain.Logger
 
         public ILogField CreateField(string name, Type valueType)
         {
-            var logFieldType = typeof (LogField<>).MakeGenericType(new[] {valueType});
-            var logFieldInstance = (ILogField) Activator.CreateInstance(logFieldType,
-                                                            new object[4] {File.RequestNewFieldId(), name, this, File});
+            if (valueType == null) return null;
+            var logFieldType = typeof(LogField<>).MakeGenericType(new[] { valueType });
+            var logFieldInstance = (ILogField)Activator.CreateInstance(logFieldType,
+                                                            new object[4] { File.RequestNewFieldId(), name, this, File });
+            _fields.Add(logFieldInstance);
+            return logFieldInstance;
+        }
+
+
+        public ILogField CreateField(string name, Type valueType, uint id)
+        {
+            if (valueType == null) return null;
+            var logFieldType = typeof(LogField<>).MakeGenericType(new[] { valueType });
+            var logFieldInstance = (ILogField)Activator.CreateInstance(logFieldType,
+                                                            new object[4] { id, name, this, File });
             _fields.Add(logFieldInstance);
             return logFieldInstance;
         }

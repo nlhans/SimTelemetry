@@ -232,7 +232,9 @@ namespace LiveTelemetry
                                             (RPM_Max - RPM_Min)*225;
                 if (double.IsInfinity(fAngle_RPM_RedLine) || double.IsNaN(fAngle_RPM_RedLine)) fAngle_RPM_RedLine = 200;
                 int Angle_RPM_RedLine = Convert.ToInt32(Math.Round(fAngle_RPM_RedLine));
-                
+                Telemetry.m.Sim.Car.Scan();
+                Telemetry.m.Sim.Car.ScanGeneral(); 
+                Telemetry.m.Sim.Car.ScanEngine();
 
                 double fAngle_RPM_WarningLine = (Telemetry.m.Sim.Car.Engine.Lifetime_RPM - RPM_Step / 2 -
                                                  RPM_Min)/(RPM_Max - RPM_Min)*225;

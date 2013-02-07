@@ -27,6 +27,7 @@ namespace SimTelemetry.Game.rFactor2.v1005b
 {
     public class Driver : IDriverGeneral
     {
+        public double Heading { get; set; }
         private int addr = 0;
         public Driver(int baseaddr)
         {

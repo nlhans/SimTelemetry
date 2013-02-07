@@ -54,6 +54,8 @@ namespace SimTelemetry.Data.Net.Objects
             throw new NotImplementedException();
         }
 
+        public double Heading { get; set; }
+
         public bool Driving { get; set; }
         public bool Ignition { get; set; }
         public int MemoryBlock { get; set; }
