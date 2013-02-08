@@ -45,7 +45,9 @@ namespace SimTelemetry.Game.Rfactor
 
         public double Heading
         {
-            get { return rFactor.Game.ReadFloat(Base + 0x48); }
+            get { var angle = Math.PI - Math.Atan2( rFactor.Game.ReadFloat(Base + 0x40), rFactor.Game.ReadFloat(Base + 0x48)); 
+            return Math.PI + angle;
+            }
             set { }
         }
 

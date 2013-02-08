@@ -94,14 +94,8 @@ namespace LiveTelemetry
 
                             double arrowSize = bubblesize/2;
                             double arrowAngle = 50.0f / 180.0f * Math.PI;
-                            double heading_angle = 0;
-                            if (driver.Heading > 0)
-                                heading_angle = driver.Heading / 2 * Math.PI;
-                            else
-                                heading_angle = driver.Heading/2*Math.PI;
-
-                            heading_angle = Math.PI /-2 - driver.Heading*Math.PI/2;
-                            heading_angle += Math.PI;
+                            double heading_angle = driver.Heading;
+                            //heading_angle =  driver.Heading*Math.PI/2;
                             PointF[] arrow = new PointF[3];
                             arrow[0] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle) * (arrowSize + 10)), Convert.ToSingle(a2 + Math.Cos(heading_angle) * (arrowSize + 10)));
                             arrow[1] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle + arrowAngle) * arrowSize), Convert.ToSingle(a2 + Math.Cos(heading_angle + arrowAngle) * arrowSize));

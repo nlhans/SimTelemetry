@@ -103,11 +103,13 @@
     <Compile Include="Exceptions\PluginHostException.cs" />
     <Compile Include="GlobalEvents.cs" />
     <Compile Include="Logger\ILogField.cs" />
+    <Compile Include="Logger\ILogNode.cs" />
     <Compile Include="Logger\ITelemetryLogger.cs" />
     <Compile Include="Logger\LogError.cs" />
     <Compile Include="Logger\LogField.cs" />
     <Compile Include="Logger\LogFile.cs" />
     <Compile Include="Logger\LogGroup.cs" />
+    <Compile Include="Logger\SimTelemetryLogReader.cs" />
     <Compile Include="Logger\SimTelemetryLogWriter.cs" />
     <Compile Include="Memory\IMemoryObject.cs" />
     <Compile Include="Memory\MemoryAddress.cs" />
