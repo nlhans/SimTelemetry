@@ -109,7 +109,7 @@ namespace SimTelemetry.Domain.Logger
 
             }
 
-            _log.Flush(SampleTime);
+            _log.Flush(Convert.ToInt32(SampleTime*1000));
 
             float ft = Memory.Get("Session").ReadAs<float>("Time");
             if(lt != 0.0 && ft-lt != 0.0)

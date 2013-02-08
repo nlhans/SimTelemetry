@@ -13,6 +13,7 @@ namespace SimTelemetry.Domain.Logger
     {
         private const int BufferSize = 16*1024*1024;
 
+        public uint ID { get { return 0; } }
 
         protected ZipStorer zipFile;
         public bool ReadOnly { get; protected set; }
@@ -24,7 +25,7 @@ namespace SimTelemetry.Domain.Logger
         public IEnumerable<LogGroup> Groups { get { return _groups; } }
         protected readonly IList<LogGroup> _groups = new List<LogGroup>();
 
-        protected List<Dictionary<float, int>> TimeMarkers = new List<Dictionary<float, int>>();
+        protected List<Dictionary<int, int>> TimeMarkers = new List<Dictionary<int, int>>();
         protected byte[] Data;
         protected byte[] FrameData = new byte[64 * 1024];
         protected int FrameDataIndex = 0;
@@ -45,7 +46,7 @@ namespace SimTelemetry.Domain.Logger
 
         public LogGroup CreateGroup(string name)
         {
-            var oGroup = new LogGroup(RequestNewGroupId(), name, this);
+            var oGroup = new LogGroup(RequestNewGroupId(), name, this, this);
             Add(oGroup);
             return oGroup;
         }
@@ -77,7 +78,7 @@ namespace SimTelemetry.Domain.Logger
             return search.FirstOrDefault();
         }
 
-        protected ILogField SearchField(int fieldId)
+        public ILogField SearchField(int fieldId)
         {
             if (fieldId == 0)
                 return null;
@@ -117,7 +118,7 @@ namespace SimTelemetry.Domain.Logger
             return LogError.OK;
         }
 
-        protected uint GetFieldId(int group, string name)
+        public uint GetFieldId(int group, string name)
         {
             var oGroup = Groups.Where(x => x.ID == group).FirstOrDefault();
 
@@ -133,7 +134,7 @@ namespace SimTelemetry.Domain.Logger
         }
 
         private Dictionary<string, uint> fieldIdCache = new Dictionary<string, uint>();
-        protected uint GetFieldId(string group, string name)
+        public uint GetFieldId(string group, string name)
         {
             if (fieldIdCache.ContainsKey(group + "." + name))
                 return fieldIdCache[group + "." + name];
@@ -153,7 +154,7 @@ namespace SimTelemetry.Domain.Logger
             }
         }
 
-        protected uint GetGroupId(string group)
+        public uint GetGroupId(string group)
         {
             var oGroup = Groups.Where(x => x.Name == group).FirstOrDefault();
             if (oGroup == null)
@@ -162,13 +163,13 @@ namespace SimTelemetry.Domain.Logger
                 return oGroup.ID;
         }
 
-        public uint RequestNewGroupId()
+        internal uint RequestNewGroupId()
         {
             if (ReadOnly) return 0;
             return _groupId++;
         }
 
-        public uint RequestNewFieldId()
+        internal uint RequestNewFieldId()
         {
             if (ReadOnly) return 0;
             return _fieldId++;
@@ -190,19 +191,18 @@ namespace SimTelemetry.Domain.Logger
             FileIndex = 0;
             for (int i = 0 ;i < times.Length/8; i++)
             {
-                var i1 = BitConverter.ToUInt32(times, i*8);
+                var i1 = BitConverter.ToInt32(times, i*8);
                 var index = BitConverter.ToInt32(times, i*8 + 4);
 
-                if(i1 == 0x80000000)
+                if(BitConverter.ToUInt32(times, i*8) == 0x80000000)
                 {
                     FileIndex = index-1;
-                    TimeMarkers.Add(new Dictionary<float, int>());
+                    TimeMarkers.Add(new Dictionary<int, int>());
                 }
                 else
                 {
-                    float time = i1/1000.0f;
-                    if(TimeMarkers[FileIndex].ContainsKey(time) == false)
-                    TimeMarkers[FileIndex].Add(time, index);
+                    if(TimeMarkers[FileIndex].ContainsKey(i1) == false)
+                    TimeMarkers[FileIndex].Add(i1, index);
                 }
             }
 
@@ -307,7 +307,7 @@ namespace SimTelemetry.Domain.Logger
         public LogFile()
         {
             // New start
-            TimeMarkers.Add(new Dictionary<float, int>());
+            TimeMarkers.Add(new Dictionary<int, int>());
             ReadOnly = false;
             Data = new byte[BufferSize];
         }
@@ -325,7 +325,6 @@ namespace SimTelemetry.Domain.Logger
             // - Document about the log structure
             // - Write time table to binary
             // - Compress data to ZIP archive
-
             // Flush current data to disk
             FileIndex++;
             WriteNewDataFile(Data);
@@ -343,7 +342,7 @@ namespace SimTelemetry.Domain.Logger
             File_WriteAllBytes("./LogTemp/Structure.bin", LogStructure, LogStructureSize);
 
             // Write time table
-            byte[] TimeTable = new byte[1024*1024*4];
+            byte[] TimeTable = new byte[1024*1024*16];
             int TimeTableIndex = 0;
             int TimeFileIndex = 1;
             foreach(var dataFileTimes in TimeMarkers)
@@ -356,7 +355,7 @@ namespace SimTelemetry.Domain.Logger
                 // Log all times
                 foreach(var timeKVP in dataFileTimes)
                 {
-                    int timeInt = (int)Math.Floor(timeKVP.Key*1000);
+                    int timeInt = timeKVP.Key;
 
                     Array.Copy(BitConverter.GetBytes(timeInt), 0, TimeTable, TimeTableIndex, 4);
                     TimeTableIndex += 4;
@@ -458,13 +457,13 @@ namespace SimTelemetry.Domain.Logger
 
         }
 
-        public void Flush(float timestamp)
+        public void Flush(int timestamp)
         {
             if (ReadOnly) return;
             if (FrameDataIndex + DataIndex > Data.Length)
             {
                 FileIndex++;
-                TimeMarkers.Add(new Dictionary<float, int>());
+                TimeMarkers.Add(new Dictionary<int, int>());
 
                 ThreadPool.QueueUserWorkItem(WriteNewDataFile, Data);
                 Data = new byte[BufferSize];

@@ -85,6 +85,8 @@
     <Compile Include="Events\PluginTestSimulatorTrackScanner.cs" />
     <Compile Include="Events\PluginTestWidgetConstructor.cs" />
     <Compile Include="Core\PluginTests.cs" />
+    <Compile Include="Logger\LogReaderTests.cs" />
+    <Compile Include="Logger\LogWriterTests.cs" />
     <Compile Include="MemoryTests.cs" />
     <Compile Include="Memory\MemoryPoolTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

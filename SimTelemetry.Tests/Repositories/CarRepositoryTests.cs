@@ -30,7 +30,7 @@ namespace SimTelemetry.Tests.Repositories
                 var cars = carRepo.GetIds().Count();
 
                 // I got over 1106 cars installed, so that's more than 1000.
-                Assert.Greater(cars,1000);
+                Assert.Greater(cars,100);
                 w.Stop();
                 Debug.WriteLine("[TIME] Retrieving ID list (" + cars + ") costs " + w.ElapsedMilliseconds + "ms");
                 w.Reset();

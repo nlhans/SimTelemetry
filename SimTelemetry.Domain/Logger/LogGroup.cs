@@ -7,13 +7,14 @@ namespace SimTelemetry.Domain.Logger
     {
         public uint ID { get; protected set; }
         public string Name { get; protected set; }
-        public LogGroup Master { get; protected set; }
+        public ILogNode Master { get; protected set; }
 
         public LogFile File { get; protected set; }
 
         public IEnumerable<ILogField> Fields { get { return _fields; } }
-        public IEnumerable<LogGroup> Groups { get { return _groups; } }
         protected IList<ILogField> _fields = new List<ILogField>();
+
+        public IEnumerable<LogGroup> Groups { get { return _groups; } }
         protected IList<LogGroup> _groups = new List<LogGroup>();
 
         public bool Equals(LogGroup other)
@@ -36,7 +37,6 @@ namespace SimTelemetry.Domain.Logger
             _groups.Add(oGroup);
             return oGroup;
         }
-
 
         public LogField<T> CreateField<T>(string name)
         {
@@ -73,7 +73,7 @@ namespace SimTelemetry.Domain.Logger
             File = file;
         }
 
-        public LogGroup(uint id, string name, LogGroup master, LogFile file)
+        public LogGroup(uint id, string name, ILogNode master, LogFile file)
         {
             ID = id;
             Name = name;

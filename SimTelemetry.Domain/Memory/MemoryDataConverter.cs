@@ -130,10 +130,9 @@ namespace SimTelemetry.Domain.Memory
             if (data is string)
             {
                 byte[] rawData = Encoding.ASCII.GetBytes((string)data);
-                byte[] outData = new byte[rawData.Length + 5];
+                byte[] outData = new byte[rawData.Length + 4];
                 Array.Copy(BitConverter.GetBytes(rawData.Length), 0, outData, 0, 4);
                 Array.Copy(rawData, 0, outData, 4, rawData.Length);
-                outData[outData.Length - 1] = 0;
                 return outData;
 
             }
