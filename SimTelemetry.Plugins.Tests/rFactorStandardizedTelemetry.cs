@@ -67,7 +67,10 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<float>("CoordinateY-Replay", MemoryAddress.Dynamic, 0, 0x18, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("CoordinateZ-Replay", MemoryAddress.Dynamic, 0, 0x14, 4));
 
-            templateDriver.Add(new MemoryFieldLazy<float>("Heading", MemoryAddress.Dynamic, 0, 0x40, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("RotationX", MemoryAddress.Dynamic, 0, 0x40, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("RotationY", MemoryAddress.Dynamic, 0, 0x48, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("RotationZ", MemoryAddress.Dynamic, 0, 0x44, 4));
+            templateDriver.Add(new MemoryFieldFunc<float>("Yaw", (pool) => (float)Math.Atan2(pool.ReadAs<float>("RotationX"), pool.ReadAs<float>("RotationY")), true));
             templateDriver.Add(new MemoryFieldLazy<float>("AccelerationX", MemoryAddress.Dynamic, 0, 0x57C8, 4));
            
             templateDriver.Add(new MemoryFieldLazy<int>("Pitstops", MemoryAddress.Dynamic, 0, 0x3D2C, 4));

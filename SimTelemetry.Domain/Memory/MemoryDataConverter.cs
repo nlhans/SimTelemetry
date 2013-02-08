@@ -101,13 +101,20 @@ namespace SimTelemetry.Domain.Memory
 
         public static TOutput Read<TSource, TOutput>(byte[] dataInput, int index)
         {
-            Type inputType = typeof(TSource);
-            Type outputType = typeof(TOutput);
+            Type inputType = typeof (TSource);
+            Type outputType = typeof (TOutput);
             if (inputType.Equals(outputType))
                 return Read<TOutput>(dataInput, index);
 
             var intermediate = Read<TSource>(dataInput, index);
-            return ((MemoryDataConverterProvider<TOutput>)Providers[outputType]).Obj2Obj(intermediate);
+            try
+            {
+                return ((MemoryDataConverterProvider<TOutput>) Providers[outputType]).Obj2Obj(intermediate);
+            }
+            catch(Exception)
+            {
+                return (TOutput) Convert.ChangeType(0, typeof(TOutput));
+            }
         }
 
         public static byte[] Rawify(Func<object> reader)

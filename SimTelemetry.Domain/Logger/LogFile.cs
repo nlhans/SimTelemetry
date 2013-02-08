@@ -19,6 +19,7 @@ namespace SimTelemetry.Domain.Logger
 
         //
         public IEnumerable<ILogField> Fields { get { return new List<ILogField>(); } }
+        protected Dictionary<int, ILogField> _fieldsCache = new Dictionary<int, ILogField>();
 
         public IEnumerable<LogGroup> Groups { get { return _groups; } }
         protected readonly IList<LogGroup> _groups = new List<LogGroup>();
@@ -80,11 +81,23 @@ namespace SimTelemetry.Domain.Logger
         {
             if (fieldId == 0)
                 return null;
+            if (_fieldsCache.ContainsKey(fieldId))
+                return _fieldsCache[fieldId];
 
-            var allFields =
-                _groups.SelectMany(x => x.Fields).Concat(_groups.SelectMany(x => x.Groups).SelectMany(x => x.Fields));
-            var cntFields = allFields.Count();
-            return allFields.Where(x => x.ID == fieldId).FirstOrDefault();
+            var lvl1 = _groups.SelectMany(x => x.Fields).Where(x => x.ID == fieldId);
+            var lvl1f = lvl1.FirstOrDefault();
+            if (lvl1f != null)
+            {
+                _fieldsCache.Add(fieldId, lvl1f);
+                return lvl1f;
+            }
+
+            var fieldFromAll =_groups.SelectMany(x => x.Groups).SelectMany(x => x.Fields).Where(x => x.ID == fieldId).FirstOrDefault();
+           if(fieldFromAll==null)
+               return null;
+
+            _fieldsCache.Add(fieldId, fieldFromAll);
+            return fieldFromAll;
         }
 
         public LogError Remove(LogGroup group)
@@ -196,6 +209,7 @@ namespace SimTelemetry.Domain.Logger
             uint tempSpeedfieldId = 0;
             uint tempRpmfieldId = 0;
             uint tempTimeFieldId = 0;
+            uint tempYawFieldId = 0;
 
             // read channel structure
             int structureIndex = 0;
@@ -235,10 +249,16 @@ namespace SimTelemetry.Domain.Logger
                     tempRpmfieldId = id;
                 if (name == "Time")
                     tempTimeFieldId = id;
+                if (name == "Yaw")
+                    tempYawFieldId = id;
                 structureIndex += blockSize;
             }
 
-            float testtime = 0, rpm = 0, speed = 0;
+
+
+            var f = SearchField(104);
+
+            float yaw=0,testtime = 0, rpm = 0, speed = 0;
             StringBuilder csvout = new StringBuilder();
             // read all data..
             byte[] data = zipFile.ExtractFile("Data1.bin");
@@ -253,10 +273,12 @@ namespace SimTelemetry.Domain.Logger
                     if(field != null)
                     {
                         var fieldData =field.ReadAs<float>(data, dataIndex + 6);
+                        if(fieldID==tempYawFieldId)
+                            yaw = fieldData;
                         if (fieldID == tempSpeedfieldId)
                         {
                             speed = fieldData;
-                            csvout.AppendLine(testtime + "," + speed + "," + rpm);
+                            csvout.AppendLine(testtime + "," + speed + "," + rpm+","+yaw);
                         }
                         if(fieldID == tempRpmfieldId)
                             rpm = fieldData;

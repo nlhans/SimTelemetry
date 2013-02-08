@@ -26,6 +26,14 @@ namespace SimTelemetry.Domain.Memory
         {
             Name = name;
             ValidationFunc = validationFunc;
+            IsChanging = true;
+        }
+
+        public MemoryFieldFunc(string name, Func<MemoryPool, T> validationFunc, bool isChanging)
+        {
+            Name = name;
+            ValidationFunc = validationFunc;
+            IsChanging = isChanging;
         }
 
         public object Read()
@@ -33,9 +41,10 @@ namespace SimTelemetry.Domain.Memory
             return ValidationFunc(Pool);
         }
 
+        protected bool IsChanging = false;
         public bool HasChanged()
         {
-            return true;
+            return IsChanging;
         }
 
         public TOut ReadAs<TOut>()
