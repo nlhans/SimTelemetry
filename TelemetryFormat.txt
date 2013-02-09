@@ -3,7 +3,7 @@ Time annotation: [BEL] [INT TIME [BEL]
 
 Channel-index file
 [GS] [USHORT groupID] [USHORT parentID] [SHORT strLength] [Char[StrLength] Name]
-[RS] [USHORT channelID] [USHORT groupID] [SHORT variableType] [SHORT strLength] [Char[StrLength] Name]
+[RS] [USHORT channelID] [USHORT groupID] [SHORT strLength] [Char[StrLength] Name] [SHORT variableTypeLength] [Char[typeLength] Type] 
 
 Time-index file:
 [INT TIME] [INT offset] 

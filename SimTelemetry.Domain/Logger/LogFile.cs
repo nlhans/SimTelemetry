@@ -138,20 +138,22 @@ namespace SimTelemetry.Domain.Logger
         {
             if (fieldIdCache.ContainsKey(group + "." + name))
                 return fieldIdCache[group + "." + name];
-            var oGroup = Groups.Where(x => x.Name == group).FirstOrDefault();
 
+            var oGroup = Groups.Where(x => x.Name == group).FirstOrDefault();
+            
             if (oGroup == null)
-                return (uint)LogError.GroupNotFound;
+            {
+                var subGroup = Groups.SelectMany(x => x.Groups).Where(x => x.Name == group).FirstOrDefault();
+                if (subGroup == null)
+                    return (uint)LogError.GroupNotFound;
+                oGroup = subGroup;
+            }
 
             var oField = oGroup.Fields.Where(x => x.Name == name).FirstOrDefault();
             if (oField == null)
                 return (uint)LogError.FieldNotFound;
-            else
-            {
-                
-                fieldIdCache.Add(group+"."+name, oField.ID);
-                return oField.ID;
-            }
+            fieldIdCache.Add(group+"."+name, oField.ID);
+            return oField.ID;
         }
 
         public uint GetGroupId(string group)
@@ -494,7 +496,11 @@ namespace SimTelemetry.Domain.Logger
             if (FrameDataIndex + PacketLength > FrameData.Length)
                 return; // TODO: Handle error
 
-            byte[] byteFieldId = BitConverter.GetBytes((int)GetFieldId(group, field));
+            var fieldID = (int) GetFieldId(group, field);
+            if (fieldID == -1)
+                return;
+
+            byte[] byteFieldId = BitConverter.GetBytes(fieldID);
             FrameData[FrameDataIndex] = 0x1F;
             FrameData[FrameDataIndex + 1] = 0x1F;
 

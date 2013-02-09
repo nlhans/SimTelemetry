@@ -12,8 +12,11 @@ namespace SimTelemetry.Tests.Logger
     class LogWriterTests
     {
         private LogFile logFile;
+        private Domain.Utils.ZipStorer zipFile;
+        private int testDataFrames = 1200000; // Enough data for 2 log files
+        private int switchPoint = 0;
         [Test]
-        public void Structure()
+        public void HouseKeeping()
         {
              logFile = new LogFile();
             Assert.AreEqual(false, logFile.ReadOnly);
@@ -65,7 +68,31 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(2, logFile.GetFieldId("My Group", "myString"));
             Assert.AreEqual(2, logFile.GetFieldId(1, "myString"));
 
-            
+            // Subgroup
+            var subGroup = myGroup.CreateGroup("My Subgroup");
+            Assert.AreEqual(logFile.Groups.Count(), 1);
+            Assert.AreEqual(myGroup.Groups.Count(), 1);
+            Assert.AreEqual(2, subGroup.ID);
+            Assert.AreEqual("My Subgroup", subGroup.Name);
+
+            Assert.AreEqual(0, subGroup.Fields.Count());
+            Assert.AreEqual(0, subGroup.Groups.Count());
+            Assert.AreEqual(myGroup, subGroup.Master);
+            Assert.AreEqual(logFile, subGroup.File);
+
+            Assert.AreEqual(subGroup, logFile.SearchGroup(2));
+            Assert.AreEqual(null, logFile.Groups.Where(x => x.ID == 2).FirstOrDefault());
+
+            // Add test field
+            var myDouble = subGroup.CreateField("myDouble", typeof (double));
+
+            Assert.AreEqual(3, myDouble.ID);
+            Assert.AreEqual("myDouble", myDouble.Name);
+            Assert.AreEqual(typeof(double), myDouble.ValueType);
+            Assert.AreEqual(subGroup, myDouble.Group);
+            Assert.AreEqual(typeof(LogField<double>), myDouble.GetType());
+            Assert.AreEqual(logFile, ((LogField<double>)myDouble).File);
+
         }
 
         [Test]
@@ -79,12 +106,12 @@ namespace SimTelemetry.Tests.Logger
             }
 
             var sourceStream = new MemoryStream(sourceData);
-            var zipWriter = Domain.Utils.ZipStorer.Create("temp.zip", "");
+            var zipWriter = Domain.Utils.ZipStorer.Create("zipzipzip.zip", "");
             zipWriter.AddStream(Domain.Utils.ZipStorer.Compression.Deflate, "Test.txt", sourceStream, DateTime.Now, "");
             zipWriter.Close();
 
             // Read it
-            var zipReader = Domain.Utils.ZipStorer.Open("temp.zip", FileAccess.Read);
+            var zipReader = Domain.Utils.ZipStorer.Open("zipzipzip.zip", FileAccess.Read);
             var zipFiles = zipReader.ReadCentralDir();
             
             Assert.AreEqual(1, zipFiles.Count);
@@ -105,41 +132,31 @@ namespace SimTelemetry.Tests.Logger
 
             zipReader.Close();
 
-            File.Delete("temp.zip");
+            File.Delete("zipzipzip.zip");
         }
 
         [Test]
         public void BinaryTests()
         {
-            int frames = 1500000;
+            int i = 0;
 
             // Init structure:
-            Structure();
-            int i = 0;
-            // Write 100 floats
-            float[] floatData = new float[frames];
-            while (i < frames)
-            {
-                floatData[i] = i*(i + 10.0f)%550.0f + 5.1234f;
-                i++;
-            }
-            string[] testData = new string[frames/10];
-            i=0;
-            while (i < testData.Length)
-            {
-                testData[i] = string.Format("{0:X}", i);
-                i++;
-            }
+            HouseKeeping();
+            float[] floatData = GetFloatData();
+            string[] stringData = GetStringData();
+            double[] doubleData = GetDoubleData();
 
             Func<object> readFloat = () => floatData[i];
-            Func<object> readString = () => testData[i / 10];
+            Func<object> readDouble = () => doubleData[i];
+            Func<object> readString = () => stringData[i/10];
 
             i = 0;
-            while (i < frames)
+            while (i < testDataFrames)
             {
-                logFile.Write("My Group", "myFloat", MemoryDataConverter.Rawify(readFloat));
-                if (i % 10 == 0)
+                logFile.Write("My Subgroup","myDouble", MemoryDataConverter.Rawify(readDouble));
+                if (i%10 == 0)
                     logFile.Write("My Group", "myString", MemoryDataConverter.Rawify(readString));
+                logFile.Write("My Group", "myFloat", MemoryDataConverter.Rawify(readFloat));
 
                 logFile.Flush(i*40); // simulate every 40ms, 25Hz
                 i++;
@@ -148,43 +165,54 @@ namespace SimTelemetry.Tests.Logger
             // This stores it into a zip
             logFile.Finish("temp.zip");
 
-
             // Use ZipStorer to extract the data again and byte-by-byte analyze the format.
-            var zip = Domain.Utils.ZipStorer.Open("temp.zip", FileAccess.Read);
+            zipFile = Domain.Utils.ZipStorer.Open("temp.zip", FileAccess.Read);
 
-            var files = zip.ReadCentralDir();
-            Assert.AreEqual(4, files.Count); // Data1.bin, Structure.bin, Time.bin
+            var files = zipFile.ReadCentralDir();
+            Assert.AreEqual(4, files.Count); // Data1.bin, Data2.bin, Structure.bin, Time.bin
             Assert.True(files.Any(x => x.FilenameInZip == "Data1.bin"));
             Assert.True(files.Any(x => x.FilenameInZip == "Data2.bin"));
             Assert.True(files.Any(x => x.FilenameInZip == "Structure.bin"));
             Assert.True(files.Any(x => x.FilenameInZip == "Time.bin"));
             // TODO: Add Laptimes index
 
-            // read the source data 1
-            var dataFile1 = files.Where(x => x.FilenameInZip == "Data1.bin").FirstOrDefault();
-            Assert.AreEqual(1024 * 1024 * 16, dataFile1.FileSize);
-            var sourceData1 = new byte[dataFile1.FileSize];
-            var sourceStream1 = new MemoryStream(sourceData1, true);
-            zip.ExtractFile(dataFile1, sourceStream1);
+        }
 
-            var dataFile2 = files.Where(x => x.FilenameInZip == "Data2.bin").FirstOrDefault();
-            Assert.AreEqual(1024 * 1024 * 16, dataFile2.FileSize);
-            var sourceData2 = new byte[dataFile2.FileSize];
-            var sourceStream2 = new MemoryStream(sourceData2, true);
-            zip.ExtractFile(dataFile2, sourceStream2);
-
-            byte[] sourceData = sourceData1;
+        [Test]
+        public void TestData()
+        {
             int timeout = 0;
             int sourceDataIndex = 0;
-            i = 0;
 
-            int switchPoint = 0;
+            var files = zipFile.ReadCentralDir();
+            int i = 0;
 
-            while (i < frames)
+            var floatData = GetFloatData();
+            var stringData = GetStringData();
+            var doubleData = GetDoubleData();
+
+            // read the source data 1
+            var dataFile1 = files.Where(x => x.FilenameInZip == "Data1.bin").FirstOrDefault();
+            Assert.AreEqual(1024*1024*16, dataFile1.FileSize);
+            var sourceData1 = new byte[dataFile1.FileSize];
+            var sourceStream1 = new MemoryStream(sourceData1, true);
+            zipFile.ExtractFile(dataFile1, sourceStream1);
+
+            // read the source data 2
+            var dataFile2 = files.Where(x => x.FilenameInZip == "Data2.bin").FirstOrDefault();
+            Assert.AreEqual(1024*1024*16, dataFile2.FileSize);
+            var sourceData2 = new byte[dataFile2.FileSize];
+            var sourceStream2 = new MemoryStream(sourceData2, true);
+            zipFile.ExtractFile(dataFile2, sourceStream2);
+
+            byte[] sourceData = sourceData1;
+
+
+            while (i < testDataFrames)
             {
-                if(sourceDataIndex == 0xFFFFFB)
+                if (sourceDataIndex == 0x00ffffdd)
                 {
-                    switchPoint = i * 40; // each float occurs on 40ms (25Hz) timebase
+                    switchPoint = i*40; // each float occurs on 40ms (25Hz) timebase
                     sourceData = sourceData2;
                     sourceDataIndex = 0;
                 }
@@ -196,10 +224,10 @@ namespace SimTelemetry.Tests.Logger
                 // Get the field ID
                 var fieldID = BitConverter.ToUInt32(sourceData, sourceDataIndex + 2);
 
-                if (fieldID > 2 || fieldID == 0)
-                    Assert.Fail();
+                if (fieldID > 3 || fieldID == 0)
+                    Assert.Fail("Invalid field ID at " + sourceDataIndex);
 
-                if(fieldID == 1)
+                if (fieldID == 1)
                 {
                     var myFloat = BitConverter.ToSingle(sourceData, sourceDataIndex + 6);
                     Assert.AreEqual(myFloat, floatData[i]);
@@ -207,30 +235,53 @@ namespace SimTelemetry.Tests.Logger
 
                     sourceDataIndex += 10;
                 }
-                else
+                else if(fieldID == 2)
                 {
                     var stringLength = BitConverter.ToInt32(sourceData, sourceDataIndex + 6);
-                    var myString= ASCIIEncoding.ASCII.GetString(sourceData, sourceDataIndex + 10, stringLength);
-                    Assert.AreEqual(myString, testData[i/10]);
+                    var myString = Encoding.ASCII.GetString(sourceData, sourceDataIndex + 10, stringLength);
+                    Assert.AreEqual(myString, stringData[i/10]);
 
                     sourceDataIndex += 10 + stringLength;
+                } else if(fieldID == 3)
+                {
+                    var myDouble = BitConverter.ToDouble(sourceData, sourceDataIndex + 6);
+                    Assert.AreEqual(doubleData[i], myDouble);
+
+                    sourceDataIndex += 14;
                 }
                 timeout++;
-                if(timeout> sourceData.Length*2)
+                if (timeout > sourceData.Length*2)
                     Assert.Fail();
             }
+        }
+
+        private double[] GetDoubleData()
+        {
+            var data = new double[testDataFrames];
+           
+            for(int i = 0 ; i < data.Length; i++)
+                data[i] = 12345.6789/i;
+
+            return data;
+        }
+
+        [Test]
+        public void TestTimetable()
+        {
+            var files = zipFile.ReadCentralDir();
+            int i = 0;
+
+            int timeDataIndex = 0;
+            uint lastTime = 0;
+            uint lastTimeOffset = 0;
+            bool justSwitched = false;
 
             // time table
             var timeFile = files.Where(x => x.FilenameInZip == "Time.bin").FirstOrDefault();
             var timeData = new byte[timeFile.FileSize];
             var timeStream = new MemoryStream(timeData, true);
-            zip.ExtractFile(timeFile, timeStream);
+            zipFile.ExtractFile(timeFile, timeStream);
 
-            int timeDataIndex = 0;
-            uint timeFileNumber = 0;
-            uint lastTime = 0;
-            uint lastTimeOffset = 0;
-            bool justSwitched = false;
             while(timeDataIndex < timeData.Length)
             {
                 uint i1 = BitConverter.ToUInt32(timeData, timeDataIndex);
@@ -238,7 +289,6 @@ namespace SimTelemetry.Tests.Logger
 
                 if (i1 == 0x80000000)
                 {
-                    timeFileNumber = i2;
                     justSwitched = true;
                     if (i2 == 2)
                     {
@@ -261,6 +311,130 @@ namespace SimTelemetry.Tests.Logger
                 timeDataIndex += 8;
             }
 
+        }
+
+        [Test]
+        public void TestStructure()
+        {
+
+            var files = zipFile.ReadCentralDir();
+            int i = 0;
+            var structureFileIndex = 0;
+
+            // test structure
+            var structureFile = files.Where(x => x.FilenameInZip == "Structure.bin").FirstOrDefault();
+            var structureData = new byte[structureFile.FileSize];
+            var structureStream = new MemoryStream(structureData, true);
+            zipFile.ExtractFile(structureFile, structureStream);
+             
+            while(structureFileIndex < structureData.Length)
+            {
+                if (structureData[structureFileIndex] == 0x1E)
+                {
+                    // Field data
+                    Assert.AreEqual(0x1E, structureData[structureFileIndex]);
+                    var fieldID = BitConverter.ToInt32(structureData, structureFileIndex + 1);
+                    var groupID = BitConverter.ToInt32(structureData, structureFileIndex + 5);
+                    var nameLength = BitConverter.ToInt32(structureData, structureFileIndex + 9);
+                    var name = Encoding.ASCII.GetString(structureData, structureFileIndex + 13, nameLength);
+                    var typeLength = BitConverter.ToInt32(structureData, structureFileIndex + 13+nameLength);
+                    var type = Encoding.ASCII.GetString(structureData, structureFileIndex + 17 + nameLength, typeLength);
+
+                    if (fieldID != 1 && fieldID != 2 && fieldID != 3)
+                        Assert.Fail("Invalid field at index " + structureFileIndex);
+                    if(groupID != 1 && groupID!= 2)
+                    Assert.Fail("Invalid group at index " +structureFileIndex);
+                    if (fieldID == 1)
+                    {
+                        Assert.AreEqual("myFloat", name);
+                        Assert.AreEqual(typeof (float).FullName, type);
+                    }
+                    if (fieldID == 2)
+                    {
+                        Assert.AreEqual("myString", name);
+                        Assert.AreEqual(typeof(string).FullName, type);
+                    }
+                    if (fieldID == 3)
+                    {
+                        Assert.AreEqual("myDouble", name);
+                        Assert.AreEqual(typeof(double).FullName, type);
+                    }
+
+
+                    structureFileIndex += 17 + nameLength + typeLength;
+                }
+                else if (structureData[structureFileIndex] == 0x1D)
+                {
+                    Assert.AreEqual(0x1D, structureData[structureFileIndex]);
+
+                    var groupID = BitConverter.ToInt32(structureData, structureFileIndex + 1);
+                    var masterID = BitConverter.ToInt32(structureData, structureFileIndex + 5);
+                    var nameLength = BitConverter.ToInt32(structureData, structureFileIndex + 9);
+                    var name = Encoding.ASCII.GetString(structureData, structureFileIndex + 13, nameLength);
+
+                    if (groupID == 1)
+                    {
+                        Assert.AreEqual(0, masterID);
+                        Assert.AreEqual("My Group", name);
+                    }
+                    else if (groupID == 2)
+                    {
+                        Assert.AreEqual(1, masterID);
+                        Assert.AreEqual("My Subgroup", name);
+                    }
+                    else
+                    {
+                        Assert.Fail("Invalid group");
+                    }
+
+                    structureFileIndex += 13 + nameLength;
+
+                }
+                else
+                {
+                    Assert.Fail("Invalid data at index " +structureFileIndex);
+                }
+            }
+        }
+
+        public string[] GetStringData()
+        {
+            int i = 0;
+            string[] stringData = new string[testDataFrames/10];
+            while (i < stringData.Length)
+            {
+                stringData[i] = string.Format("{0:X}", i);
+                i++;
+            }
+            return stringData;
+        }
+
+        public float[] GetFloatData()
+        {
+            int i = 0;
+            // Write 100 floats
+            float[] floatData = new float[testDataFrames];
+            while (i < floatData.Length)
+            {
+                floatData[i] = i*(i + 10.0f)%550.0f + 5.1234f;
+                i++;
+            }
+            return floatData;
+        }
+
+        [TestFixtureTearDown]
+        public void Dispose()
+        {
+            if (zipFile != null)
+            {
+                zipFile.Close();
+                zipFile = null;
+            }
+
+            if (File.Exists("temp.zip"))
+                File.Delete("temp.zip");
+            if (File.Exists("zipzipzip.zip"))
+                File.Delete("zipzipzip.zip");
         }
     }
 }
