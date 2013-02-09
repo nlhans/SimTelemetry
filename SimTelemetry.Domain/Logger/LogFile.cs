@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Utils;
 
 namespace SimTelemetry.Domain.Logger
@@ -25,7 +26,11 @@ namespace SimTelemetry.Domain.Logger
         public IEnumerable<LogGroup> Groups { get { return _groups; } }
         protected readonly IList<LogGroup> _groups = new List<LogGroup>();
 
-        protected List<Dictionary<int, int>> TimeMarkers = new List<Dictionary<int, int>>();
+        public IEnumerable<int> Timeline { get; private set; }
+        public List<Dictionary<int, int>> Time { get { return _time; } }
+        protected List<Dictionary<int, int>> _time = new List<Dictionary<int, int>>();
+
+        #region Data Writer fields
         protected byte[] Data;
         protected byte[] FrameData = new byte[64 * 1024];
         protected int FrameDataIndex = 0;
@@ -34,7 +39,10 @@ namespace SimTelemetry.Domain.Logger
 
         private uint _groupId = 1;
         private uint _fieldId = 1;
-
+        #endregion
+        #region Data Reader Fields
+        protected Dictionary<int, byte[]> DataFiles = new Dictionary<int, byte[]>();
+        #endregion
         #region House keeping methods
         public LogError Add(LogGroup group)
         {
@@ -53,7 +61,7 @@ namespace SimTelemetry.Domain.Logger
 
         public LogGroup CreateGroup(string name, uint id)
         {
-            var oGroup = new LogGroup(id, name, this);
+            var oGroup = new LogGroup(id, name, this, this);
             Add(oGroup);
             return oGroup;
         }
@@ -160,7 +168,13 @@ namespace SimTelemetry.Domain.Logger
         {
             var oGroup = Groups.Where(x => x.Name == group).FirstOrDefault();
             if (oGroup == null)
-                return (uint) LogError.GroupNotFound;
+            {
+                
+                var subGroup = Groups.SelectMany(x => x.Groups).Where(x => x.Name == group).FirstOrDefault();
+                if (subGroup == null)
+                    return (uint)LogError.GroupNotFound;
+                return subGroup.ID;
+            }
             else
                 return oGroup.ID;
         }
@@ -199,19 +213,15 @@ namespace SimTelemetry.Domain.Logger
                 if(BitConverter.ToUInt32(times, i*8) == 0x80000000)
                 {
                     FileIndex = index-1;
-                    TimeMarkers.Add(new Dictionary<int, int>());
+                    _time.Add(new Dictionary<int, int>());
                 }
                 else
                 {
-                    if(TimeMarkers[FileIndex].ContainsKey(i1) == false)
-                    TimeMarkers[FileIndex].Add(i1, index);
+                    if(_time[FileIndex].ContainsKey(i1) == false)
+                    _time[FileIndex].Add(i1, index);
                 }
             }
-
-            uint tempSpeedfieldId = 0;
-            uint tempRpmfieldId = 0;
-            uint tempTimeFieldId = 0;
-            uint tempYawFieldId = 0;
+            Timeline = Time.SelectMany(x => x.Keys).ToList();
 
             // read channel structure
             int structureIndex = 0;
@@ -243,73 +253,16 @@ namespace SimTelemetry.Domain.Logger
 
                     group.CreateField(name, valueTypeObject, id);
                 }
-                if(name=="Speed")
-                {
-                    tempSpeedfieldId = id;
-                }
-                if (name == "RPM")
-                    tempRpmfieldId = id;
-                if (name == "Time")
-                    tempTimeFieldId = id;
-                if (name == "Yaw")
-                    tempYawFieldId = id;
+
                 structureIndex += blockSize;
             }
 
-
-
-            var f = SearchField(104);
-
-            float yaw=0,testtime = 0, rpm = 0, speed = 0;
-            StringBuilder csvout = new StringBuilder();
-            // read all data..
-            byte[] data = zipFile.ExtractFile("Data1.bin");
-            int dataIndex = 0;
-            while (data.Length >  dataIndex)
-            {
-                var isData = data[dataIndex+1] == 0x1F && data[dataIndex] == 0x1F;
-                if(isData)
-                {
-                    var fieldID = BitConverter.ToInt32(data, dataIndex + 2);
-                    var field = this.SearchField(fieldID);
-                    if(field != null)
-                    {
-                        var fieldData =field.ReadAs<float>(data, dataIndex + 6);
-                        if(fieldID==tempYawFieldId)
-                            yaw = fieldData;
-                        if (fieldID == tempSpeedfieldId)
-                        {
-                            speed = fieldData;
-                            csvout.AppendLine(testtime + "," + speed + "," + rpm+","+yaw);
-                        }
-                        if(fieldID == tempRpmfieldId)
-                            rpm = fieldData;
-                        if (fieldID == tempTimeFieldId)
-                            testtime = fieldData;
-                    }
-
-                    int j = dataIndex+6;
-                    while( j < data.Length)
-                    {
-                        if (data[j] == 0x1F && data[j + 1] == 0x1F) 
-                            break;
-                        j++;
-                    }
-
-                    dataIndex = j;
-                }else
-                {
-                    dataIndex++;
-                }
-            }
-
-            File.WriteAllText("test.csv", csvout.ToString());
         }
 
         public LogFile()
         {
             // New start
-            TimeMarkers.Add(new Dictionary<int, int>());
+            _time.Add(new Dictionary<int, int>());
             ReadOnly = false;
             Data = new byte[BufferSize];
         }
@@ -317,7 +270,7 @@ namespace SimTelemetry.Domain.Logger
         public void Finish(string file)
         {
             if (ReadOnly) return;
-            if (TimeMarkers.Select(x => x.Count).Sum() < 5)
+            if (_time.Select(x => x.Count).Sum() < 5)
             {
                 ClearTemporaryFiles();
                 return;
@@ -347,7 +300,7 @@ namespace SimTelemetry.Domain.Logger
             byte[] TimeTable = new byte[1024*1024*16];
             int TimeTableIndex = 0;
             int TimeFileIndex = 1;
-            foreach(var dataFileTimes in TimeMarkers)
+            foreach(var dataFileTimes in _time)
             {
                 Array.Copy(BitConverter.GetBytes(0x80000000), 0, TimeTable, TimeTableIndex, 4);
                 TimeTableIndex += 4;
@@ -465,7 +418,7 @@ namespace SimTelemetry.Domain.Logger
             if (FrameDataIndex + DataIndex > Data.Length)
             {
                 FileIndex++;
-                TimeMarkers.Add(new Dictionary<int, int>());
+                _time.Add(new Dictionary<int, int>());
 
                 ThreadPool.QueueUserWorkItem(WriteNewDataFile, Data);
                 Data = new byte[BufferSize];
@@ -475,9 +428,9 @@ namespace SimTelemetry.Domain.Logger
 
 
             // Copy data & mark it in time table
-            if (!TimeMarkers[FileIndex].ContainsKey(timestamp))
+            if (!_time[FileIndex].ContainsKey(timestamp))
             {
-                TimeMarkers[FileIndex].Add(timestamp, DataIndex);
+                _time[FileIndex].Add(timestamp, DataIndex);
                 Array.Copy(FrameData, 0, Data, DataIndex, FrameDataIndex);
 
                 // Increase the indexes.
@@ -516,6 +469,74 @@ namespace SimTelemetry.Domain.Logger
             var stream = File.OpenWrite(file);
             stream.Write(data, 0, length);
             stream.Close();
+        }
+
+        public T ReadAs<T>(string group, string field, int time)
+        {
+            T errObj =  (T)Convert.ChangeType(0, typeof(T));
+            byte[] databuffer = null;
+            int dataFileIndex = 1;
+            int dataOffset = 0;
+            foreach(var dataTimeline in Time)
+            {
+                if (dataTimeline.ContainsKey(time))
+                {
+                    databuffer = GetDataBuffer(dataFileIndex);
+                    dataOffset = dataTimeline[time];
+                    break;
+                }
+                dataFileIndex++;
+            }
+
+            if (databuffer == null) return errObj;
+
+            var fieldId = GetFieldId(group, field);
+            if (fieldId == (uint)LogError.FieldNotFound) return errObj;
+            if (fieldId == (uint)LogError.GroupNotFound) return errObj;
+            var fieldObj = SearchField((int)fieldId);
+
+            int fieldOffset = 0;
+
+            // Search inside the buffer.
+            int ind = dataOffset;
+            while (ind < databuffer.Length)
+            {
+                var isData = databuffer[ind + 1] == 0x1F && databuffer[ind] == 0x1F;
+                if (isData)
+                {
+                    var blockFieldID = BitConverter.ToUInt32(databuffer, ind + 2);
+                    if (blockFieldID == fieldId)
+                    {
+                        fieldOffset = ind+2+4;
+                        break;
+                    }
+                    else
+                        ind += 4;
+                }
+                else
+                ind++;
+            }
+
+            return fieldObj.ReadAs<T>(databuffer, fieldOffset);
+
+        }
+
+        private byte[] GetDataBuffer(int dataFileIndex)
+        {
+            if (DataFiles.ContainsKey(dataFileIndex))
+                return DataFiles[dataFileIndex];
+            
+            var dataFileSearch = zipFile.ReadCentralDir().Where(x => x.FilenameInZip == "Data" + dataFileIndex + ".bin");
+            if(dataFileSearch.Count() == 0)
+                return new byte[0];
+
+            var dataFile = dataFileSearch.FirstOrDefault();
+
+            var data = new byte[dataFile.FileSize];
+            var dataStream = new MemoryStream(data);
+            zipFile.ExtractFile(dataFile, dataStream);
+            DataFiles.Add(dataFileIndex, data);
+            return data;
         }
     }
 

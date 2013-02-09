@@ -11,10 +11,10 @@ namespace SimTelemetry.Tests.Logger
     [TestFixture]
     class LogWriterTests
     {
-        private LogFile logFile;
-        private Domain.Utils.ZipStorer zipFile;
-        private int testDataFrames = 1200000; // Enough data for 2 log files
-        private int switchPoint = 0;
+        public LogFile logFile;
+        public Domain.Utils.ZipStorer zipFile;
+        public int testDataFrames = 400000; // Enough data for 2 log files
+        public int switchPoint = 0;
         [Test]
         public void HouseKeeping()
         {
@@ -159,6 +159,8 @@ namespace SimTelemetry.Tests.Logger
                 logFile.Write("My Group", "myFloat", MemoryDataConverter.Rawify(readFloat));
 
                 logFile.Flush(i*40); // simulate every 40ms, 25Hz
+                if (logFile.Time.Count == 2 && switchPoint == 0)
+                    switchPoint = i*40;
                 i++;
             }
 
@@ -207,10 +209,9 @@ namespace SimTelemetry.Tests.Logger
 
             byte[] sourceData = sourceData1;
 
-
             while (i < testDataFrames)
             {
-                if (sourceDataIndex == 0x00ffffdd)
+                if (sourceDataIndex == 0x00fffefa)
                 {
                     switchPoint = i*40; // each float occurs on 40ms (25Hz) timebase
                     sourceData = sourceData2;
@@ -223,9 +224,6 @@ namespace SimTelemetry.Tests.Logger
 
                 // Get the field ID
                 var fieldID = BitConverter.ToUInt32(sourceData, sourceDataIndex + 2);
-
-                if (fieldID > 3 || fieldID == 0)
-                    Assert.Fail("Invalid field ID at " + sourceDataIndex);
 
                 if (fieldID == 1)
                 {
@@ -242,12 +240,17 @@ namespace SimTelemetry.Tests.Logger
                     Assert.AreEqual(myString, stringData[i/10]);
 
                     sourceDataIndex += 10 + stringLength;
-                } else if(fieldID == 3)
+                }
+                else if(fieldID == 3)
                 {
                     var myDouble = BitConverter.ToDouble(sourceData, sourceDataIndex + 6);
                     Assert.AreEqual(doubleData[i], myDouble);
 
                     sourceDataIndex += 14;
+                }
+                else
+                {
+                    Assert.Fail("Invalid field ID at " + sourceDataIndex);
                 }
                 timeout++;
                 if (timeout > sourceData.Length*2)
@@ -255,7 +258,7 @@ namespace SimTelemetry.Tests.Logger
             }
         }
 
-        private double[] GetDoubleData()
+        public double[] GetDoubleData()
         {
             var data = new double[testDataFrames];
            
@@ -403,7 +406,7 @@ namespace SimTelemetry.Tests.Logger
             string[] stringData = new string[testDataFrames/10];
             while (i < stringData.Length)
             {
-                stringData[i] = string.Format("{0:X}", i);
+                stringData[i] = new string((char) (0x41+ i%26), 512);
                 i++;
             }
             return stringData;

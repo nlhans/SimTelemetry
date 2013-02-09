@@ -82,6 +82,8 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<bool>("IsLimiter", MemoryAddress.Dynamic, 0, 0x17B1, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("IsPits", MemoryAddress.Dynamic, 0, 0x27A8, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("IsDriving", MemoryAddress.Dynamic, 0, 0x3CBF, 1));
+            templateDriver.Add(new MemoryFieldLazy<byte>("IsDisqualified", MemoryAddress.Dynamic, 0x3D24, 1,
+                                                         (v) => (byte)((v == 3) ? 1 : 0)));
 
             templateDriver.Add(new MemoryFieldLazy<bool>("FlagYellow", MemoryAddress.Dynamic, 0, 0x104, 1, (x) => !x));
             templateDriver.Add(new MemoryFieldLazy<bool>("FlagBlue", MemoryAddress.Dynamic, 0, 0x3E39, 1));
