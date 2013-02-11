@@ -1,12 +1,12 @@
 ﻿namespace SimTelemetry.Domain.Logger
 {
-    public enum LogError : uint
+    public enum LogError : int
     {
         OK = 0,
-        GroupNotFound = 0xFFFFFFFF,
-        FieldNotFound = 0xFFFFFFFE,
-        GroupAlreadyExists = 0xFFFFFFFD,
-        FieldAlreadyExists = 0xFFFFFFFC,
-        ReadOnly = 0xAAAAAAAA
+        GroupNotFound = -1,
+        FieldNotFound = -2,
+        GroupAlreadyExists = -3,
+        FieldAlreadyExists = -4,
+        ReadOnly = -5
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimTelemetry.Domain.Logger
 {
     public class LogGroup : ILogNode, IEquatable<LogGroup>
     {
-        public uint ID { get; protected set; }
+        public int ID { get; protected set; }
         public string Name { get; protected set; }
         public ILogNode Master { get; protected set; }
 
@@ -22,6 +23,34 @@ namespace SimTelemetry.Domain.Logger
             return other.ID == ID;
         }
 
+        public ILogNode FindGroup(int id)
+        {
+            return Groups.Where(x => x.ID == id).FirstOrDefault();
+        }
+
+        public ILogNode FindGroup(string name)
+        {
+            return Groups.Where(x => x.Name == name).FirstOrDefault();
+        }
+
+        public bool ContainsGroup(string name)
+        {
+            return Groups.Any(x => x.Name == name);
+        }
+        public bool ContainsGroup(int id)
+        {
+            return Groups.Any(x => x.ID == id);
+        }
+
+        public bool ContainsField(string name)
+        {
+            return Fields.Any(x => x.Name == name);
+        }
+        public bool ContainsField(int id)
+        {
+            return Fields.Any(x => x.ID == id);
+        }
+
         public LogGroup CreateGroup(string name)
         {
             if (File.ReadOnly) return null;
@@ -30,7 +59,7 @@ namespace SimTelemetry.Domain.Logger
             return oGroup;
         }
 
-        public LogGroup CreateGroup(string name, uint id)
+        public LogGroup CreateGroup(string name, int id)
         {
             if (!File.ReadOnly) return null;
             var oGroup = new LogGroup(id, name, this, File);
@@ -56,7 +85,7 @@ namespace SimTelemetry.Domain.Logger
         }
 
 
-        public ILogField CreateField(string name, Type valueType, uint id)
+        public ILogField CreateField(string name, Type valueType, int id)
         {
             if (valueType == null) return null;
             var logFieldType = typeof(LogField<>).MakeGenericType(new[] { valueType });
@@ -66,19 +95,20 @@ namespace SimTelemetry.Domain.Logger
             return logFieldInstance;
         }
 
-        public LogGroup(uint id, string name, LogFile file)
+        public LogGroup(int id, string name, LogFile file)
         {
             ID = id;
             Name = name;
             File = file;
         }
 
-        public LogGroup(uint id, string name, ILogNode master, LogFile file)
+        public LogGroup(int id, string name, ILogNode master, LogFile file)
         {
             ID = id;
             Name = name;
             Master = master;
             File = file;
         }
+
     }
 }

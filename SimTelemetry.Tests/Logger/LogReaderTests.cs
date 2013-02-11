@@ -33,7 +33,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(0, logFile.Fields.Count());
 
             var myGroup = logFile.Groups.FirstOrDefault();
-            var myGroupById = logFile.SearchGroup(1);
+            var myGroupById = logFile.FindGroup(1);
             var myGroupId = logFile.GetGroupId("My Group");
             Assert.AreEqual(myGroupId, myGroupById.ID);
             Assert.AreEqual(myGroupById, myGroup);
@@ -46,7 +46,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(1, myGroup.Groups.Count());
 
             // myFloat
-            var myFloatFieldById = logFile.SearchField(1);
+            var myFloatFieldById = logFile.FindField(1);
             var floatFieldId = logFile.GetFieldId("My Group", "myFloat");
             var myFloatField = myGroup.Fields.Where(x => x.ID == 1).FirstOrDefault();
 
@@ -59,7 +59,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual("myFloat", myFloatField.Name);
 
             // myString
-            var myStringFieldById = logFile.SearchField(2);
+            var myStringFieldById = logFile.FindField(2);
             var stringFieldId = logFile.GetFieldId("My Group", "myString");
             var myStringField = myGroup.Fields.Where(x => x.ID == 2).FirstOrDefault();
 
@@ -72,7 +72,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual("myString", myStringField.Name);
 
             // subGroup
-            var mySubGroupById = logFile.SearchGroup(2);
+            var mySubGroupById = logFile.FindGroup(2);
             var mySubGroupId = logFile.GetGroupId("My Subgroup");
             var mySubGroup = myGroup.Groups.Where(x => x.ID == 2).FirstOrDefault();
 
@@ -87,7 +87,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual("My Subgroup", mySubGroup.Name);
 
             // myDouble
-            var myDoubleFieldById = logFile.SearchField(3);
+            var myDoubleFieldById = logFile.FindField(3);
             var doubleFieldId = logFile.GetFieldId("My Subgroup", "myDouble");
             var myDoubleField = mySubGroup.Fields.Where(x => x.ID == 3).FirstOrDefault();
 

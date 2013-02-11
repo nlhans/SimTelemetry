@@ -4,7 +4,7 @@ namespace SimTelemetry.Domain.Logger
 {
     public interface ILogField
     {
-        uint ID { get; }
+        int ID { get; }
         string Name { get; }
         LogGroup Group { get; }
         Type ValueType { get; }

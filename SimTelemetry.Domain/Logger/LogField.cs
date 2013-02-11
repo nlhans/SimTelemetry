@@ -5,7 +5,7 @@ namespace SimTelemetry.Domain.Logger
 {
     public class LogField<T> : ILogField
     {
-        public uint ID { get; protected set; }
+        public int ID { get; protected set; }
         public string Name { get; protected set; }
 
         public LogGroup Group { get; protected set; }
@@ -31,7 +31,7 @@ namespace SimTelemetry.Domain.Logger
             return (T)new object();
         }
 
-        public LogField(uint id, string name, LogGroup @group, LogFile file)
+        public LogField(int id, string name, LogGroup @group, LogFile file)
         {
             ID = id;
             Name = name;

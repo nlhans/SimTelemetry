@@ -14,7 +14,7 @@ namespace SimTelemetry.Domain.Logger
     {
         private const int BufferSize = 16*1024*1024;
 
-        public uint ID { get { return 0; } }
+        public int ID { get { return 0; } }
 
         protected ZipStorer zipFile;
         public bool ReadOnly { get; protected set; }
@@ -37,8 +37,8 @@ namespace SimTelemetry.Domain.Logger
         protected int DataIndex = 0;
         protected int FileIndex = 0;
 
-        private uint _groupId = 1;
-        private uint _fieldId = 1;
+        private int _groupId = 1;
+        private int _fieldId = 1;
         #endregion
         #region Data Reader Fields
         protected Dictionary<int, byte[]> DataFiles = new Dictionary<int, byte[]>();
@@ -59,19 +59,26 @@ namespace SimTelemetry.Domain.Logger
             return oGroup;
         }
 
-        public LogGroup CreateGroup(string name, uint id)
+        public LogGroup CreateGroup(string name, int id)
         {
             var oGroup = new LogGroup(id, name, this, this);
             Add(oGroup);
             return oGroup;
         }
 
-        public ILogField CreateField(string name, Type valueType, uint id)
+        public ILogField CreateField(string name, Type valueType, int id)
         {
             return null;
         }
 
-        public ILogNode SearchGroup(uint id)
+        public ILogNode FindGroup(string name)
+        {
+            var search = _groups.Where(x => x.Name == name);
+            // TODO: Add sub-groups?
+            return search.FirstOrDefault();
+        }
+
+        public ILogNode FindGroup(int id)
         {
             if (id == 0)
                 return this;
@@ -86,7 +93,25 @@ namespace SimTelemetry.Domain.Logger
             return search.FirstOrDefault();
         }
 
-        public ILogField SearchField(int fieldId)
+        public bool ContainsGroup(string name)
+        {
+            return Groups.Any(x => x.Name == name);
+        }
+        public bool ContainsGroup(int id)
+        {
+            return Groups.Any(x => x.ID == id);
+        }
+
+        public bool ContainsField(string name)
+        {
+            return Fields.Any(x => x.Name == name);
+        }
+        public bool ContainsField(int id)
+        {
+            return Fields.Any(x => x.ID == id);
+        }
+
+        public ILogField FindField(int fieldId)
         {
             if (fieldId == 0)
                 return null;
@@ -126,23 +151,23 @@ namespace SimTelemetry.Domain.Logger
             return LogError.OK;
         }
 
-        public uint GetFieldId(int group, string name)
+        public int GetFieldId(int group, string name)
         {
             var oGroup = Groups.Where(x => x.ID == group).FirstOrDefault();
 
             if (oGroup == null)
-                return (uint)LogError.GroupNotFound;
+                return (int)LogError.GroupNotFound;
 
             var oField = oGroup.Fields.Where(x => x.Name == name).FirstOrDefault();
             if (oField == null)
-                return (uint)LogError.FieldNotFound;
+                return (int)LogError.FieldNotFound;
             else
                 return oField.ID;
 
         }
 
-        private Dictionary<string, uint> fieldIdCache = new Dictionary<string, uint>();
-        public uint GetFieldId(string group, string name)
+        private Dictionary<string, int> fieldIdCache = new Dictionary<string, int>();
+        public int GetFieldId(string group, string name)
         {
             if (fieldIdCache.ContainsKey(group + "." + name))
                 return fieldIdCache[group + "." + name];
@@ -153,18 +178,18 @@ namespace SimTelemetry.Domain.Logger
             {
                 var subGroup = Groups.SelectMany(x => x.Groups).Where(x => x.Name == group).FirstOrDefault();
                 if (subGroup == null)
-                    return (uint)LogError.GroupNotFound;
+                    return (int)LogError.GroupNotFound;
                 oGroup = subGroup;
             }
 
             var oField = oGroup.Fields.Where(x => x.Name == name).FirstOrDefault();
             if (oField == null)
-                return (uint)LogError.FieldNotFound;
+                return (int)LogError.FieldNotFound;
             fieldIdCache.Add(group+"."+name, oField.ID);
             return oField.ID;
         }
 
-        public uint GetGroupId(string group)
+        public int GetGroupId(string group)
         {
             var oGroup = Groups.Where(x => x.Name == group).FirstOrDefault();
             if (oGroup == null)
@@ -172,20 +197,20 @@ namespace SimTelemetry.Domain.Logger
                 
                 var subGroup = Groups.SelectMany(x => x.Groups).Where(x => x.Name == group).FirstOrDefault();
                 if (subGroup == null)
-                    return (uint)LogError.GroupNotFound;
+                    return (int)LogError.GroupNotFound;
                 return subGroup.ID;
             }
             else
                 return oGroup.ID;
         }
 
-        internal uint RequestNewGroupId()
+        internal int RequestNewGroupId()
         {
             if (ReadOnly) return 0;
             return _groupId++;
         }
 
-        internal uint RequestNewFieldId()
+        internal int RequestNewFieldId()
         {
             if (ReadOnly) return 0;
             return _fieldId++;
@@ -230,15 +255,15 @@ namespace SimTelemetry.Domain.Logger
                 var isGroup = structure[structureIndex] == 0x1D;
                 var isField = structure[structureIndex] == 0x1E;
 
-                var id = BitConverter.ToUInt32(structure, structureIndex + 1);
-                var parent = BitConverter.ToUInt32(structure, structureIndex + 5);
+                var id = BitConverter.ToInt32(structure, structureIndex + 1);
+                var parent = BitConverter.ToInt32(structure, structureIndex + 5);
                 var nameLength = BitConverter.ToInt32(structure, structureIndex + 9);
                 var name = Encoding.ASCII.GetString(structure, structureIndex + 13, nameLength);
 
                 var blockSize = 13 + nameLength;
                 if(isGroup)
                 {
-                    var master = SearchGroup(parent);
+                    var master = FindGroup(parent);
                     master.CreateGroup(name, id);
                 }
                 else
@@ -249,7 +274,7 @@ namespace SimTelemetry.Domain.Logger
                     blockSize += 4 + typeLength;
 
                     Type valueTypeObject = Type.GetType(type);
-                    var group = SearchGroup(parent);
+                    var group = FindGroup(parent);
 
                     group.CreateField(name, valueTypeObject, id);
                 }
@@ -491,9 +516,9 @@ namespace SimTelemetry.Domain.Logger
             if (databuffer == null) return errObj;
 
             var fieldId = GetFieldId(group, field);
-            if (fieldId == (uint)LogError.FieldNotFound) return errObj;
-            if (fieldId == (uint)LogError.GroupNotFound) return errObj;
-            var fieldObj = SearchField((int)fieldId);
+            if (fieldId == (int)LogError.FieldNotFound) return errObj;
+            if (fieldId == (int)LogError.GroupNotFound) return errObj;
+            var fieldObj = FindField((int)fieldId);
 
             int fieldOffset = 0;
 

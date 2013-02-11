@@ -36,7 +36,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(0, myGroup.Groups.Count());
             Assert.AreEqual(logFile, myGroup.Master);
             Assert.AreEqual(logFile, myGroup.File);
-            Assert.AreEqual(myGroup, logFile.SearchGroup(1));
+            Assert.AreEqual(myGroup, logFile.FindGroup(1));
             Assert.AreEqual(myGroup, logFile.Groups.Where(x => x.ID == 1).FirstOrDefault());
 
             // Add a field to a group
@@ -61,8 +61,8 @@ namespace SimTelemetry.Tests.Logger
 
             Assert.AreEqual(2, myGroup.Fields.Count());
 
-            Assert.AreEqual(myFloat, logFile.SearchField(1));
-            Assert.AreEqual(myString, logFile.SearchField(2));
+            Assert.AreEqual(myFloat, logFile.FindField(1));
+            Assert.AreEqual(myString, logFile.FindField(2));
             Assert.AreEqual(1, logFile.GetFieldId("My Group", "myFloat"));
             Assert.AreEqual(1, logFile.GetFieldId(1, "myFloat"));
             Assert.AreEqual(2, logFile.GetFieldId("My Group", "myString"));
@@ -80,7 +80,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(myGroup, subGroup.Master);
             Assert.AreEqual(logFile, subGroup.File);
 
-            Assert.AreEqual(subGroup, logFile.SearchGroup(2));
+            Assert.AreEqual(subGroup, logFile.FindGroup(2));
             Assert.AreEqual(null, logFile.Groups.Where(x => x.ID == 2).FirstOrDefault());
 
             // Add test field
