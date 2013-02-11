@@ -8,7 +8,7 @@ namespace SimTelemetry.Domain.Logger
     {
         ITelemetryLogConfiguration Configuration { get; }
 
-        void Update();
+        void UpdateData();
         void Initialize(Aggregates.Telemetry telemetry, MemoryProvider memory);
         void UpdateConfiguration(ITelemetryLogConfiguration configuration);
         void Deinitialize();

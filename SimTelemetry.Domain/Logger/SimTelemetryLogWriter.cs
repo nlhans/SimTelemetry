@@ -59,7 +59,7 @@ namespace SimTelemetry.Domain.Logger
             this.Configuration = configuration;
         }
 
-        public void Update()
+        public void UpdateData()
         {
             if (_log == null) return;
             // Log all interesting variables to disk.
@@ -145,7 +145,7 @@ namespace SimTelemetry.Domain.Logger
             }
 
             _log.Flush(Convert.ToInt32(SampleTime*1000));
-
+            /*
 #if DEBUG
             var ft = Memory.Get("Session").ReadAs<float>("Time");
             if (lt != 0.0 && ft - lt != 0.0)
@@ -155,6 +155,7 @@ namespace SimTelemetry.Domain.Logger
                             "kB/s - " + Math.Round(sizePerSec*3600/1024.0/1024, 3) + "MB 1 hour)");
             lt = ft;
 #endif
+             */
         }
 
         #region Global events

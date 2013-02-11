@@ -136,7 +136,7 @@ namespace SimTelemetry.Domain.Aggregates
                 field.Value.Read();
 
             if (Logger != null)
-                Logger.Update();
+                Logger.UpdateData();
         }
 
         protected virtual void UpdateDrivers()

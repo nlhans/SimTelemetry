@@ -18,6 +18,7 @@ namespace SimTelemetry.Tests.Logger
         private MemoryProvider _virtualMemory;
 
         private float _time;
+        private float _lifetime = 0;
 
         public void CreatePool()
         {
@@ -31,11 +32,11 @@ namespace SimTelemetry.Tests.Logger
 
             var templateDriver = new MemoryPool("TemplateDriver", MemoryAddress.Static, 0, 0, 0);
 
-            templateDriver.Add(new MemoryFieldConstant<float>("Speed", 7));
-            templateDriver.Add(new MemoryFieldConstant<float>("Meter", 1337.0f));
-            templateDriver.Add(new MemoryFieldConstant<float>("RPM", 5000));
-            templateDriver.Add(new MemoryFieldConstant<int>("Gear", 6));
-            templateDriver.Add(new MemoryFieldConstant<int>("Laps", 5));
+            templateDriver.Add(new MemoryFieldFunc<float>("Speed", (pool) => 7));
+            templateDriver.Add(new MemoryFieldFunc<float>("Meter", (pool) => 1337.0f));
+            templateDriver.Add(new MemoryFieldFunc<float>("RPM", (pool) => 5000));
+            templateDriver.Add(new MemoryFieldFunc<int>("Gear", (pool) => 6));
+            templateDriver.Add(new MemoryFieldFunc<int>("Laps", (pool) => 5));
             
             templateDriver.SetTemplate(true);
 
@@ -51,13 +52,12 @@ namespace SimTelemetry.Tests.Logger
 
             bool firstDriver = (_virtualMemory.Pools.Count(x => x.Name.StartsWith("Driver")) == 0) ? true : false;
 
-            myDriver.Add(new MemoryFieldConstant<int>("Index", _virtualMemory.Pools.Count(x => x.Name.StartsWith("Driver"))));
-            myDriver.Add(new MemoryFieldConstant<bool>("IsAI", AI));
-            myDriver.Add(new MemoryFieldConstant<bool>("IsPlayer", firstDriver));
+            myDriver.Add(new MemoryFieldFunc<int>("Index", (pool) => _virtualMemory.Pools.Count(x => x.Name.StartsWith("Driver"))));
+            myDriver.Add(new MemoryFieldFunc<bool>("IsAI", (pool) => AI));
+            myDriver.Add(new MemoryFieldFunc<bool>("IsPlayer", (pool) => firstDriver));
             if (firstDriver)
-                myDriver.Add(new MemoryFieldConstant<float>("EngineLifetime", 123456));
+                myDriver.Add(new MemoryFieldFunc<float>("EngineLifetime", (pool) => _lifetime));
             _virtualMemory.Add(myDriver);
-
             GlobalEvents.Fire(new DriversAdded(null, new List<TelemetryDriver> {new TelemetryDriver(null, myDriver)}), true);
         }
 
@@ -439,6 +439,43 @@ namespace SimTelemetry.Tests.Logger
             Assert.False(writer.Log.ContainsGroup("Driver John")); // Player is not on selective list, no timepaths, no telemetry&timepath logging
 
             // NOTES: Telemetry + TimePath 'All' is turned off. Telemetry + TimePath AI is optional out, not optional in.
+        }
+
+        [Test]
+        public void TestDataAndTime()
+        {
+            //
+            CreatePool();
+            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            writer.Initialize(null, _virtualMemory);
+            writer.UpdateConfiguration(new TelemetryLogConfiguration(true, true, true, true));
+
+            GlobalEvents.Fire(new SessionStarted(), true);
+
+            CreateDriver("Henk", false);
+            CreateDriver("Frits", true);
+
+            int packetSize = 4*7 + 10*14; // 4 bool packets (7bytes), 14 float packets (10bytes)
+            int switchpoint = 16*1024*1024/packetSize;
+
+            for (int i = 0; i < 40*3600; i++)
+            {
+                if (i > switchpoint)
+                    Assert.AreEqual(i - switchpoint, writer.Log.Time[1].Count);
+                else
+                    Assert.AreEqual(i, writer.Log.Time[0].Count);
+
+                _time += 0.04f;
+
+                int dataSizeBefore = writer.Log.dataSize;
+                writer.UpdateData();
+                int dataSizeAfter = writer.Log.dataSize;
+
+                Assert.AreEqual(168, dataSizeAfter-dataSizeBefore);
+
+            }
+            Debug.WriteLine(writer.Log.dataSize);
+
         }
     }
 }
