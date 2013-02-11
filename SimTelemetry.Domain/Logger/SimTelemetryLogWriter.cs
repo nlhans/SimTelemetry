@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Memory;
@@ -12,7 +13,8 @@ namespace SimTelemetry.Domain.Logger
         public Aggregates.Telemetry Telemetry { get; protected set; }
         protected MemoryProvider Memory;
 
-        private LogFile _log;
+        public LogFile Log { get { return _log; } }
+        protected LogFile _log;
 
         private int Samples = 0;
         private int lastSize = 0;
@@ -23,7 +25,39 @@ namespace SimTelemetry.Domain.Logger
 
         public ITelemetryLogConfiguration Configuration { get; protected set; }
 
-        protected static readonly string[] TimepathFields = new[] {"Laps", "Meter", "Speed"};
+        protected static readonly string[] TimepathFields = new[] { "Index", "IsAI", "IsPlayer", "Laps", "Meter", "Speed" };
+
+        public void Initialize(Aggregates.Telemetry telemetry, MemoryProvider memory)
+        {
+            Telemetry = telemetry;
+            Memory = memory;
+
+            GlobalEvents.Hook<DrivingStarted>(Handle_StartDriving, true);
+            GlobalEvents.Hook<DrivingStopped>(Handle_StopDriving, true);
+            GlobalEvents.Hook<SessionStarted>(Handle_StartLogfile, true);
+            GlobalEvents.Hook<SessionStopped>(Handle_StopLogfile, true);
+            GlobalEvents.Hook<DriversAdded>(Handle_DriverAdd, true);
+            GlobalEvents.Hook<LoadingStarted>((x) => Console.WriteLine("loading started [" + Samples + "]"), true);
+            GlobalEvents.Hook<LoadingFinished>((x) => Console.WriteLine("loading finished [" + Samples + "]"), true);
+
+            // Log nothing
+            Configuration = new TelemetryLogConfiguration(false, false, false, false);
+        }
+
+        public void Deinitialize()
+        {
+            GlobalEvents.Unhook<DrivingStarted>(Handle_StartDriving);
+            GlobalEvents.Unhook<DrivingStopped>(Handle_StopDriving);
+            GlobalEvents.Unhook<SessionStarted>(Handle_StartLogfile);
+            GlobalEvents.Unhook<SessionStopped>(Handle_StopLogfile);
+            GlobalEvents.Unhook<DriversAdded>(Handle_DriverAdd);
+        }
+
+        public void UpdateConfiguration(ITelemetryLogConfiguration configuration)
+        {
+            // 
+            this.Configuration = configuration;
+        }
 
         public void Update()
         {
@@ -35,13 +69,13 @@ namespace SimTelemetry.Domain.Logger
             // Get time first
             var SampleTime = Memory.Get("Session").ReadAs<float>("Time");
             if (SampleTime < LastTime) LastTime = 0;
-            if (SampleTime - LastTime < 1.0f / 50.0f)
+            if (SampleTime - LastTime < 1.0f/50.0f)
                 return;
             LastTime = SampleTime;
             Samples++;
 
             //Console.Clear();))
-            foreach(var pool in Memory.Pools)
+            foreach (var pool in Memory.Pools)
             {
                 if (pool.IsTemplate) continue;
 
@@ -71,9 +105,9 @@ namespace SimTelemetry.Domain.Logger
                         // Check if this index is present in the selective array
                         var index = pool.ReadAs<int>("Index");
                         if (!Configuration.DriversLogSelective.Contains(index))
-                            recordTelemetry=false;
+                            recordTelemetry = false;
                     }
-                    if(recordTimePath && !recordTelemetry)
+                    if (recordTimePath && !recordTelemetry)
                     {
                         // Time paths mean recording the meters, speed and lap number
                         // The time is already kept in the log file itself. (flush routine).
@@ -83,15 +117,16 @@ namespace SimTelemetry.Domain.Logger
                         foreach (var timePathField in pool.Fields.Where(x => TimepathFields.Contains(x.Key)))
                         {
                             if (timePathField.Value.HasChanged())
-                                _log.Write(pool.Name, timePathField.Value.Name, MemoryDataConverter.Rawify(timePathField.Value.Read));
+                                _log.Write(pool.Name, timePathField.Value.Name,
+                                           MemoryDataConverter.Rawify(timePathField.Value.Read));
                         }
                     }
 
-                    if(!recordTelemetry)
+                    if (!recordTelemetry)
                         continue;
                 }
 
-                foreach(var fields in pool.Fields)
+                foreach (var fields in pool.Fields)
                 {
                     if (fields.Value.IsConstant) continue;
                     if (fields.Value.HasChanged())
@@ -102,43 +137,32 @@ namespace SimTelemetry.Domain.Logger
                 }
 
             }
-            if (Samples % 50 == 0)
+            if (Samples%50 == 0)
             {
-                 sizePerSec = _log.dataSize - lastSize;
+                sizePerSec = _log.dataSize - lastSize;
                 lastSize = _log.dataSize;
 
             }
 
             _log.Flush(Convert.ToInt32(SampleTime*1000));
 
-            float ft = Memory.Get("Session").ReadAs<float>("Time");
-            if(lt != 0.0 && ft-lt != 0.0)
-            averageTime.Add(ft - lt);
-            Console.WriteLine((ft-lt).ToString("00.000") + ","+ averageTime.Average.ToString("0.00000") + " - " + Math.Round(_log.dataSize/1024.0/1024.0,3)+"MB (" + Math.Round(sizePerSec/1024.0,3)+"kB/s - " + Math.Round(sizePerSec*3600/1024.0/1024,3)+"MB 1 hour)");
+#if DEBUG
+            var ft = Memory.Get("Session").ReadAs<float>("Time");
+            if (lt != 0.0 && ft - lt != 0.0)
+                averageTime.Add(ft - lt);
+            Debug.WriteLine((ft - lt).ToString("00.000") + "," + averageTime.Average.ToString("0.00000") + " - " +
+                            Math.Round(_log.dataSize/1024.0/1024.0, 3) + "MB (" + Math.Round(sizePerSec/1024.0, 3) +
+                            "kB/s - " + Math.Round(sizePerSec*3600/1024.0/1024, 3) + "MB 1 hour)");
             lt = ft;
+#endif
         }
 
-        public void Initialize(Aggregates.Telemetry telemetry, MemoryProvider memory)
+        #region Global events
+        private void Handle_DriverAdd(DriversAdded obj)
         {
-            Telemetry = telemetry;
-            Memory = memory;
-
-            GlobalEvents.Hook<DrivingStarted>(Handle_StartDriving, true);
-            GlobalEvents.Hook<DrivingStopped>(Handle_StopDriving, true);
-            GlobalEvents.Hook<SessionStarted>(Handle_StartLogfile, true);
-            GlobalEvents.Hook<SessionStopped>(Handle_StopLogfile, true);
-            GlobalEvents.Hook<LoadingStarted>((x) => Console.WriteLine("loading started [" + Samples + "]"), true);
-            GlobalEvents.Hook<LoadingFinished>((x) => Console.WriteLine("loading finished [" + Samples + "]"), true);
-
-            // Log nothing
-            Configuration = new TelemetryLogConfiguration(false, false, false, false);
-        }
-
-        public void UpdateConfiguration(ITelemetryLogConfiguration configuration)
-        {
-            // 
-            this.Configuration = configuration;
-
+            if (obj.Telemetry == Telemetry)
+                // update log from top ..
+                UpdateLogStructure(Memory.Pools, _log);
         }
 
         private void Handle_StopLogfile(SessionStopped obj)
@@ -149,9 +173,32 @@ namespace SimTelemetry.Domain.Logger
 
         }
 
-        protected void CreateLogStructure(IEnumerable<MemoryPool> pools, ILogNode node)
+        protected void Handle_StartLogfile(SessionStarted e)
         {
-            this.Memory.Refresh();
+            Console.WriteLine("session started [" + Samples + "]");
+            _log = new LogFile();
+            UpdateLogStructure(Memory.Pools, _log);
+        }
+
+        protected void Handle_StartDriving(DrivingStarted e)
+        {
+            Console.WriteLine("Starting log [" + Samples + "]");
+        }
+
+        protected void Handle_StopDriving(DrivingStopped e)
+        {
+
+            Console.WriteLine("Stopping log [" + Samples + "]");
+        }
+        #endregion
+        #region Log file structure
+
+        protected void UpdateLogStructure(IEnumerable<MemoryPool> pools, ILogNode node)
+        {
+            if (node == null)
+                return;
+
+            Memory.Refresh();
 
             LogGroup group;
             foreach(var pool in pools)
@@ -205,41 +252,22 @@ namespace SimTelemetry.Domain.Logger
                 }
 
 
+                // Does this top-level group already exist?
+                if (node.ContainsGroup(pool.Name))
+                    group = (LogGroup) node.FindGroup(pool.Name);
+                else
+                    group = node.CreateGroup(pool.Name);
 
-
-
-                group = node.CreateGroup(pool.Name);
                 foreach (var field in pool.Fields)
                 {
-                    group.CreateField(field.Value.Name, field.Value.ValueType);
+                    if (!group.ContainsField(field.Value.Name))
+                        group.CreateField(field.Value.Name, field.Value.ValueType);
                 }
                 if(pool.Pools.Count > 0)
-                    CreateLogStructure(pool.Pools.Values, group);
+                    UpdateLogStructure(pool.Pools.Values, group);
             }
         }
-
-        protected void Handle_StartLogfile(SessionStarted e)
-        {
-            Console.WriteLine("session started [" + Samples + "]");
-            _log = new LogFile();
-            CreateLogStructure(Memory.Pools, _log);
-        }
-
-        protected void Handle_StartDriving(DrivingStarted e)
-        {
-            Console.WriteLine("Starting log [" + Samples + "]");
-        }
-
-        protected void Handle_StopDriving(DrivingStopped e)
-        {
-
-            Console.WriteLine("Stopping log [" + Samples + "]");
-        }
-
-        public void Deinitialize()
-        {
-
-        }
+        #endregion
     }
 }
 

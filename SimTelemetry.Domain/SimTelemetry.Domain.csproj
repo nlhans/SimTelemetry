@@ -77,6 +77,8 @@
     <Compile Include="Events\CarDeleted.cs" />
     <Compile Include="Events\CarRepositoryCleared.cs" />
     <Compile Include="Events\CarUpdated.cs" />
+    <Compile Include="Events\DriversAdded.cs" />
+    <Compile Include="Events\DriversRemoved.cs" />
     <Compile Include="Events\DrivingStarted.cs" />
     <Compile Include="Events\DrivingStopped.cs" />
     <Compile Include="Events\LapAdded.cs" />

@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using NUnit.Framework;
 using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Plugins;
-using SimTelemetry.Domain.Utils;
 
 namespace SimTelemetry.Tests.Telemetry
 {
@@ -35,10 +30,11 @@ namespace SimTelemetry.Tests.Telemetry
         }
 
         [Test]
-        public void ReadFile()
+        public void ReadFile() 
         {
             SimTelemetryLogReader reader = new SimTelemetryLogReader("Telemetry.zip");
         }
+
         int calls = 0;
         private Domain.Aggregates.Telemetry telemetryObject;
         public void Continous()

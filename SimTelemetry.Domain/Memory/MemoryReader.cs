@@ -64,6 +64,17 @@ namespace SimTelemetry.Domain.Memory
             return result;
         }
 
+        public virtual bool Open(Process p, bool scanRegions)
+        {
+            m_hProcess = MemoryReaderApi.OpenProcess((uint)MemoryReaderApi.AccessType.PROCESS_VM_READ, 0, (uint)p.Id);
+
+            var result = ((m_hProcess == IntPtr.Zero) ? false : true);
+            if (result) _Process = p;
+            if (result && scanRegions) ScanRegions();
+
+            return result;
+        }
+
         protected void ScanRegions()
         {
             ScanRegions(true);

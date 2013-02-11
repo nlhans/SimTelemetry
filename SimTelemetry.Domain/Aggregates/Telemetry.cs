@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SimTelemetry.Domain.Events;
@@ -140,7 +141,11 @@ namespace SimTelemetry.Domain.Aggregates
 
         protected virtual void UpdateDrivers()
         {
-            if (this.Session.Cars != _drivers.Count){
+            if (Session.Cars != _drivers.Count)
+            {
+                
+                var driversAdded = new List<TelemetryDriver>();
+                var driversRemoved = new List<TelemetryDriver>();
 
                 // Get a new list of drivers
                 var driverList = Memory.Get("Simulator").ReadAs<int[]>("Drivers");
@@ -160,31 +165,37 @@ namespace SimTelemetry.Domain.Aggregates
 
                     var td = new TelemetryDriver(this, memPool);
                     _drivers.Add(td);
+                    driversAdded.Add(td);
 
                     if (isPlayer)
                         _player = td;
                 }
 
-                var driverRemovalList = new List<TelemetryDriver>();
 
                 foreach (var driver in _drivers)
                 {
                     if (!validDriverList.Any(x => x == driver.BaseAddress))
                     {
                         // This driver is now invalid
-                        driverRemovalList.Add(driver);
+                        driversRemoved.Add(driver);
                     }
 
                 }
 
-                for (int i = 0; i < driverRemovalList.Count; i++)
+                for (int i = 0; i < driversRemoved.Count; i++)
                 {
-                    Memory.Remove(driverRemovalList[i].Pool);
-                    _drivers.Remove(driverRemovalList[i]);
+                    Memory.Remove(driversRemoved[i].Pool);
+                    _drivers.Remove(driversRemoved[i]);
 
-                    if (driverRemovalList[i] == _player)
+                    if (driversRemoved[i] == _player)
                         _player = null;
                 }
+                
+                if (driversAdded.Count > 0)
+                    GlobalEvents.Fire(new DriversAdded(this, driversAdded), true);
+                if (driversRemoved.Count > 0)
+                    GlobalEvents.Fire(new DriversRemoved(this, driversAdded), true);
+
             }
         }
 
