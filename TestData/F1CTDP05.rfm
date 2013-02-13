@@ -1,0 +1,197 @@
+// Game/Season Info:
+Mod Name = CTDP F1 2005
+Track Filter = *
+Vehicle Filter = CTDPF1_2005
+SafetyCar = AMG_SLK55.veh
+
+Matchmaker = match.rfactor.net
+Matchmaker TCP Port = 39001
+Matchmaker UDP Port = 39002
+Loading Bar Color = 16750848
+RaceCast Location = racecast.rfactor.net
+
+Max Opponents = 19   // maximum opponents in practice/quick race/grand prix/championship
+Min Championship Opponents = 3 // minimum opponents in championship only
+
+ConfigOverrides
+{
+MusicDir=Music\CTDP\
+VehiclesDir=GAMEDATA\VEHICLES\CTDP\
+DriversDir=GAMEDATA\TALENT\CTDP\
+OSCFile=CTDPUI05.OSC
+
+}
+
+
+Season = CTDP F1 2005
+{
+  FullSeasonName = CTDP Formula One Season 2005
+  BaseCreditMult = 1000.0
+  MinExperience = 5000
+  EntryFee = 25000
+  Vehicle Filter = CTDPF1_2005
+  Min Championship Opponents = 19
+
+  SceneOrder
+  {
+Toban_Short
+Mills_Long
+Birmingham_MP_Club
+Toban_Long
+Mills_Short
+S_Heights_short
+Toban_Long_Rev
+Birmingham_MP_Short
+Mills_Long_Rev
+Birmingham_MP_Long
+Toban_Short_Rev
+Orchard_Lake_RC
+Shakir
+Monza
+  }
+}
+
+
+DefaultScoring
+{
+  RacePitKPH = 100
+  NormalPitKPH = 80
+  Practice1Day = Friday
+  Practice1Start = 11:00
+  Practice1Duration = 60
+  Practice2Day = Friday
+  Practice2Start = 13:00
+  Practice2Duration = 60
+  Practice3Day = Saturday
+  Practice3Start = 10:00
+  Practice3Duration = 45
+  Practice4Day = Saturday
+  Practice4Start = 11:15
+  Practice4Duration = 45
+  QualifyDay = Saturday
+  QualifyStart = 13:00
+  QualifyDuration = 60
+  QualifyLaps = 3
+  WarmupDay = Sunday
+  WarmupStart = 9:30
+  WarmupDuration = 30
+  RaceDay = Sunday
+  RaceStart = 14:00
+  RaceLaps = 50
+  RaceTime = 120
+}
+
+// Money and experience accumulation (mostly multipliers for hard-coded values
+// which have various factors taken into account like number of competitors)
+StartingMoney = 30000000        // always start with zero experience, but you need some money
+StartingExperience = 1       // start with no experience
+StartingVehicle = Christijan Albers, Patrick Friesacher.veh
+DriveAnyUnlocked = true     // whether player can drive any unlocked vehicle, or if player has to own it
+BaseCreditMult = 1.0         // base which is multiplied by all the other multipliers
+LapMoneyMult = 1.0           // laps completed (based roughly on expected lap times)
+LapExpMult = 1.0
+FineMoneyMult = 1.0          // fines
+FineExpMult = 0.0
+PoleSingleMoneyMult = 1.0    // pole positions in single player
+PoleSingleExpMult = 1.0
+PoleCareerMoneyMult = 1.0    // pole positions in career mode
+PoleCareerExpMult = 1.0
+PoleMultiMoneyMult = 1.0     // pole positions in multiplayer
+PoleMultiExpMult = 1.0
+WinSingleMoneyMult = 1.0     // wins in single player
+WinSingleExpMult = 1.0
+WinCareerMoneyMult = 1.0     // wins in career mode
+WinCareerExpMult = 1.0
+WinMultiMoneyMult = 1.0      // wins in multiplayer
+WinMultiExpMult = 1.0
+PointsSingleMoneyMult = 1.0  // points in single player
+PointsSingleExpMult = 1.0
+PointsCareerMoneyMult = 1.0  // points in career mode
+PointsCareerExpMult = 1.0
+PointsMultiMoneyMult = 1.0   // points in multiplayer
+PointsMultiExpMult = 1.0
+
+// CTDP and www.Onlineracer.de Rules
+
+ParcFerme = 2
+FormationSpeedKPH = 265
+MinimumYellowLaps = 1
+RandomYellowLaps = 2
+ClosePits = 0
+AdditivePenalties = 0
+LapsToServePenalty = 4
+ParcFermeFuel = 1.0
+ParcFermeTires = 300
+ParcFermeSetup = 1
+BlueFlags = 1
+FreeSettings = 234
+SafetyCarRoadMult=0.98
+SafetyCarOvalMult=0.98
+SpinRoadSeverity=0.04
+SpinOvalSeverity=0.04
+PitSpeedingAllowance = 0.5
+PrivateQualifying = 0
+FreezeOrder = 1
+FinishUnderCaution = 0
+
+
+
+// Season scoring info
+SeasonScoringInfo
+{
+  FirstPlace = 10
+  SecondPlace = 8
+  ThirdPlace = 6
+  FourthPlace = 5
+  FifthPlace = 4
+  SixthPlace = 3
+  SeventhPlace = 2
+  EighthPlace = 1
+}
+
+SceneOrder // first one in the list will be the default track when loading up the first time
+{
+  Toban_Short
+  Mills_Long
+  Birmingham_MP_Club
+  Toban_Long
+  Mills_Short
+  S_Heights_short
+  Toban_Long_Rev
+  Birmingham_MP_Short
+  Mills_Long_Rev
+  Birmingham_MP_Long	
+  Toban_Short_Rev
+  Orchard_Lake_RC
+}
+
+// Pitstop locations in order from front to back, with the number
+// of vehicles sharing each pit ... if the order needs to be
+// reversed on an individual track, set "ReversePitOrder=1" in
+// the track-specific GDB file.
+// These are now "pit group" names, not necessarily team names.
+// In the VEH file, the pit group defaults to the team name but
+// can be overridden by defining "PitGroup=<name>".
+PitGroupOrder
+{
+  // format is: PitGroup = <# of vehicles sharing pit>, <groupname>
+  PitGroup = 2, Group1
+  PitGroup = 2, Group2
+  PitGroup = 2, Group3
+  PitGroup = 2, Group4
+  PitGroup = 2, Group5
+  PitGroup = 2, Group6
+  PitGroup = 2, Group7
+  PitGroup = 2, Group8
+  PitGroup = 2, Group9
+  PitGroup = 2, Group10
+  PitGroup = 2, Group11
+  PitGroup = 2, Group12
+  PitGroup = 2, Group13
+  PitGroup = 2, Group14
+  PitGroup = 2, Group15
+  PitGroup = 2, Group16
+  PitGroup = 2, Group17
+}
+
+

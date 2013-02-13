@@ -6,6 +6,8 @@ namespace SimTelemetry.Tests
 {
     public class TestConstants
     {
+        public const string TestFolder = @"C:\Users\Hans\Documents\GitHub\SimTelemetry\TestData\";
+
         public const string TelemetryFolder =
             @"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\";
 
