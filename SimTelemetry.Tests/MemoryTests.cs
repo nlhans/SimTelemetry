@@ -17,6 +17,9 @@ namespace SimTelemetry.Tests
         [Test]
         public void testPerformance()
         {
+            if (Process.GetProcessesByName("rfactor").Length == 0)
+                Assert.Ignore();
+
             var r = new MemoryReader();
             r.Diagnostic = true;
             r.Open( Process.GetProcessesByName("rfactor")[0]);
@@ -70,6 +73,8 @@ namespace SimTelemetry.Tests
         [Test]
         public void TestMemory()
         {
+            if (Process.GetProcessesByName("rfactor").Length == 0)
+                Assert.Ignore();
 
             MemoryReader r = new MemoryReader();
             r.Diagnostic = true;
@@ -97,6 +102,8 @@ namespace SimTelemetry.Tests
         [Test]
         public void CrossReferenceMemory()
         {
+            if (Process.GetProcessesByName("rfactor").Length == 0)
+                Assert.Ignore();
 
             MemoryReader r = new MemoryReader();
             r.Diagnostic = true;
@@ -129,6 +136,9 @@ namespace SimTelemetry.Tests
         [Test]
         public void TestRfactor()
         {
+            if (Process.GetProcessesByName("rfactor").Length == 0)
+                Assert.Ignore();
+
             MemoryReader r = new MemoryReader();
             r.Diagnostic = true;
             r.Open(Process.GetProcessesByName("rfactor")[0]);
@@ -284,6 +294,9 @@ namespace SimTelemetry.Tests
         [Test]
         public void MemoryRegions()
         {
+            if (Process.GetProcessesByName("rfactor").Length == 0)
+                Assert.Ignore();
+
             Stopwatch w = new Stopwatch();
             MemoryReader r = new MemoryReader();
             r.Diagnostic = true;
@@ -293,11 +306,11 @@ namespace SimTelemetry.Tests
             Console.WriteLine(r.Regions.Count);
 
             var main = new MemoryPool("Environment", MemoryAddress.Static, 0, 0);
-            main.Add(new MemoryFieldSignature<int>("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1] { 0 }, 4));
-            main.Add(new MemoryFieldSignature<float>("Time", MemoryAddress.StaticAbsolute, "7DXXA1????????8305", new int[1] { 0 }, 4));
+            main.Add(new MemoryFieldSignature<int>("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new[] { 0 }, 4));
+            main.Add(new MemoryFieldSignature<float>("Time", MemoryAddress.StaticAbsolute, "7DXXA1????????8305", new[] { 0 }, 4));
             main.Add(new MemoryFieldSignature<float>("Clock", MemoryAddress.StaticAbsolute, "D905????????56DD05", new int[0], 4, (x) => x * 3600));
 
-            var pool = new MemoryPool("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new int[1]{ 0}, 0x6000);
+            var pool = new MemoryPool("Player", MemoryAddress.StaticAbsolute, "A0XXXXXXXX8B0D????????F6D81BC0", new[]{ 0}, 0x6000);
             pool.Add(new MemoryFieldSignature<int>("Position", MemoryAddress.Dynamic, "8B8B????????5556", new int[0], 4));
             pool.Add(new MemoryFieldSignature<float>("RPM", MemoryAddress.Dynamic, "7CD5D9XX????????518BCFD91C24E8", new int[0], 4, Rotations.Rads_RPM));
             pool.Add(new MemoryFieldSignature<float>("Speed", MemoryAddress.Dynamic, "D88EXXXXXXXXDEC1D99E????????0F85XXXXXXXX8B8E", new int[0], 4));

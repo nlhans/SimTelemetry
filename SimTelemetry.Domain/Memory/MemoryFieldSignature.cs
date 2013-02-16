@@ -84,7 +84,7 @@ namespace SimTelemetry.Domain.Memory
             : base(name, type, 0, size)
         {
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, true)).ToList();
             Initialized = false;
         }
 
@@ -100,7 +100,7 @@ namespace SimTelemetry.Domain.Memory
             : base(name, type, 0, size)
         {
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, true)).ToList();
             Initialized = false;
             Conversion = convert;
         }

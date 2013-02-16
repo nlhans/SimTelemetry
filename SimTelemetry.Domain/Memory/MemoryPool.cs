@@ -13,6 +13,7 @@ namespace SimTelemetry.Domain.Memory
 
         public bool IsTemplate { get; protected set; }
 
+        public bool IsSignature { get { return Signature != string.Empty; } }
         public bool IsDynamic { get { return (AddressType == MemoryAddress.Dynamic); } }
         public bool IsStatic { get { return (AddressType == MemoryAddress.Static || AddressType == MemoryAddress.StaticAbsolute); } }
         public bool IsConstant { get { return false; } }
@@ -20,6 +21,7 @@ namespace SimTelemetry.Domain.Memory
         public MemoryPool Pool { get; protected set; }
         public int Offset { get; protected set; }
         public int Address { get; protected set; }
+        public int[] AddressTree { get; protected set; }
         public int Size { get; protected set; }
         public string Signature { get; protected set; }
 
@@ -66,13 +68,14 @@ namespace SimTelemetry.Domain.Memory
             else
                 return MemoryDataConverter.Read<TOut>(new byte[32], 0);
         }
+
         public void Refresh()
         {
             if (IsTemplate) return;
 
             var computedAddress = 0;
 
-            if (Signature != string.Empty && Offset == 0 && Address == 0 && Memory.Scanner.Enabled)
+            if (IsSignature && Offset == 0 && Address == 0 && Memory.Scanner.Enabled)
             {
                 var result = Memory.Scanner.Scan<uint>(MemoryRegionType.EXECUTE, Signature);
 
@@ -100,11 +103,6 @@ namespace SimTelemetry.Domain.Memory
                                 computedAddress = (int)result;
                             }
 
-                            foreach (var ptr in Pointers)
-                            {
-                                computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
-                            }
-
                             Address = computedAddress;
                         }
                         break;
@@ -115,12 +113,16 @@ namespace SimTelemetry.Domain.Memory
                         throw new Exception("AddressType for '" + Name + "' is not valid");
                         break;
                 }
-
             }
+
+            // Refresh pointers too
+            foreach (var ptr in Pointers)
+                ptr.Refresh(Memory);
 
             // Refresh this memory block.
             if (Size > 0)
             {
+                AddressTree = new int[1+Pointers.Count()];
                 if (IsStatic)
                 {
                     if (Address != 0 && Offset != 0)
@@ -136,8 +138,18 @@ namespace SimTelemetry.Domain.Memory
                 }
                 else
                 {
-                    computedAddress = MemoryDataConverter.Read<int>(Pool.Value, Offset);
+                    computedAddress = Pool == null ? 0 : MemoryDataConverter.Read<int>(Pool.Value, Offset);
                 }
+                int treeInd = 0;
+                foreach (var ptr in Pointers)
+                {
+                    AddressTree[treeInd++] = computedAddress;
+                    if (ptr.Additive)
+                        computedAddress += ptr.Offset;
+                    else
+                        computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
+                }
+                AddressTree[treeInd] = computedAddress;
 
                 // Read into this buffer.
                 Memory.Reader.Read(computedAddress, Value);
@@ -215,12 +227,25 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
 
             Value = new byte[size];
         }
 
-        public MemoryPool(string name,  MemoryAddress type, int address, int size)
+        public MemoryPool(string name, MemoryAddress type, string signature, IEnumerable<MemoryFieldSignaturePointer> pointers, int size)
+        {
+            Name = name;
+            Address = 0;
+            Offset = 0;
+            Size = size;
+            AddressType = type;
+            Signature = signature;
+            Pointers = pointers;
+
+            Value = new byte[size];
+        }
+
+        public MemoryPool(string name, MemoryAddress type, int address, IEnumerable<int> pointers, int size)
         {
             Name = name;
             Address = address;
@@ -228,6 +253,33 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = string.Empty;
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
+
+            Value = new byte[Size];
+        }
+
+        public MemoryPool(string name, MemoryAddress type, int address, IEnumerable<MemoryFieldSignaturePointer> pointers, int size)
+        {
+            Name = name;
+            Address = address;
+            Offset = 0;
+            Size = size;
+            AddressType = type;
+            Signature = string.Empty;
+            Pointers = pointers;
+
+            Value = new byte[Size];
+        }
+
+        public MemoryPool(string name, MemoryAddress type, int address, int size)
+        {
+            Name = name;
+            Address = address;
+            Offset = 0;
+            Size = size;
+            AddressType = type;
+            Signature = string.Empty;
+            Pointers = new List<MemoryFieldSignaturePointer>();
 
             Value = new byte[Size];
         }
@@ -240,6 +292,7 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = string.Empty;
+            Pointers = new List<MemoryFieldSignaturePointer>();
 
             Value = new byte[Size];
         }
@@ -252,6 +305,7 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = string.Empty;
+            Pointers = new List<MemoryFieldSignaturePointer>();
 
             Value = new byte[Size];
         }
