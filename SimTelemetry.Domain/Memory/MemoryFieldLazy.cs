@@ -19,6 +19,7 @@ namespace SimTelemetry.Domain.Memory
         public override bool HasChanged()
         {
             if (!Refreshed) return false;
+            if (readCounter < 2) return true;
             if (_OldValue == null) return true;
             bool what = _OldValue.Equals(_Value);
             return !what;

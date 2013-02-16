@@ -31,6 +31,167 @@ namespace SimTelemetry.Tests.Memory
         }
 
         [Test]
+        public void PoolTemplate()
+        {
+            InitTest();
+
+            var driversPool = new MemoryPool("Drivers", MemoryAddress.Static, 0x315298, 0x200);
+            driversPool.SetTemplate(true);
+
+            var provider = new MemoryProvider(reader);
+            provider.Add(driversPool);
+            provider.Refresh();
+
+            Assert.AreEqual("Drivers", driversPool.Name);
+            Assert.AreEqual(MemoryAddress.Static, driversPool.AddressType);
+            Assert.AreEqual(0x315298, driversPool.Address);
+            Assert.AreEqual(0x200, driversPool.Size);
+            Assert.AreEqual(0, driversPool.Offset);
+            Assert.False(driversPool.IsDynamic);
+            Assert.False(driversPool.IsConstant);
+            Assert.True(driversPool.IsStatic);
+            Assert.False(driversPool.IsSignature);
+            Assert.True(driversPool.IsTemplate);
+
+            Assert.AreEqual(0, actionLogbook.Count);
+
+            for (int i = 0; i < 100; i++)
+                provider.Refresh();
+            Assert.AreEqual(0, actionLogbook.Count);
+
+            driversPool.SetTemplate(false);
+
+            provider.Refresh();
+
+            Assert.AreEqual(0x715298, actionLogbook[0].Address);
+            Assert.AreEqual(0x200, actionLogbook[0].Size);
+        }
+
+        [Test]
+        public void PoolDynamic()
+        {
+            InitTest();
+
+            var driversPool = new MemoryPool("Drivers", MemoryAddress.Static, 0x315298, 0x200);
+
+            var provider = new MemoryProvider(reader);
+            provider.Add(driversPool);
+            provider.Refresh();
+
+            Assert.AreEqual("Drivers", driversPool.Name);
+            Assert.AreEqual(MemoryAddress.Static, driversPool.AddressType);
+            Assert.AreEqual(0x315298, driversPool.Address);
+            Assert.AreEqual(0x200, driversPool.Size);
+            Assert.AreEqual(0, driversPool.Offset);
+            Assert.False(driversPool.IsDynamic);
+            Assert.False(driversPool.IsConstant);
+            Assert.True(driversPool.IsStatic);
+            Assert.False(driversPool.IsSignature);
+            Assert.False(driversPool.IsTemplate);
+
+            Assert.AreEqual(1, actionLogbook.Count);
+
+            Assert.AreEqual(0x715298, actionLogbook[0].Address);
+            Assert.AreEqual(0x200, actionLogbook[0].Size);
+
+            var driver1 = new MemoryPool("Driver1", MemoryAddress.Dynamic, driversPool, 0x0, 0x6000);
+            var driver2 = new MemoryPool("Driver2", MemoryAddress.Dynamic, driversPool, 0x4, 0x6000);
+
+            provider.Add(driver1);
+            provider.Add(driver2);
+            provider.Refresh();
+
+            Assert.AreEqual("Driver1", driver1.Name);
+            Assert.AreEqual(MemoryAddress.Dynamic, driver1.AddressType);
+            Assert.AreEqual(0, driver1.Address);
+            Assert.AreEqual(0x6000, driver1.Size);
+            Assert.AreEqual(0, driver1.Offset);
+            Assert.AreEqual(driversPool, driver1.Pool);
+            Assert.True(driver1.IsDynamic);
+            Assert.False(driver1.IsConstant);
+            Assert.False(driver1.IsStatic);
+            Assert.False(driver1.IsSignature);
+            Assert.False(driver1.IsTemplate);
+
+            Assert.AreEqual("Driver2", driver2.Name);
+            Assert.AreEqual(MemoryAddress.Dynamic, driver2.AddressType);
+            Assert.AreEqual(0, driver2.Address);
+            Assert.AreEqual(0x6000, driver2.Size);
+            Assert.AreEqual(4, driver2.Offset);
+            Assert.AreEqual(driversPool, driver2.Pool);
+            Assert.True(driver2.IsDynamic);
+            Assert.False(driver2.IsConstant);
+            Assert.False(driver2.IsStatic);
+            Assert.False(driver2.IsSignature);
+            Assert.False(driver2.IsTemplate);
+
+            Assert.AreEqual(4, actionLogbook.Count);
+
+            Assert.AreEqual(0x715298, actionLogbook[0].Address);
+            Assert.AreEqual(0x200, actionLogbook[0].Size);
+            Assert.AreEqual(0x715298, actionLogbook[1].Address);
+            Assert.AreEqual(0x200, actionLogbook[1].Size);
+            Assert.AreEqual(0x7154c0, actionLogbook[2].Address);
+            Assert.AreEqual(0x6000, actionLogbook[2].Size);
+            Assert.AreEqual(0x71b408, actionLogbook[3].Address);
+            Assert.AreEqual(0x6000, actionLogbook[3].Size);
+
+        }
+
+        [Test]
+        public void PoolContainer()
+        {
+            InitTest();
+
+            var p = new MemoryPool("MyPool", MemoryAddress.StaticAbsolute, 0, 0, 0);
+
+            var provider = new MemoryProvider(reader);
+            provider.Add(p);
+            provider.Refresh();
+
+            Assert.AreEqual("MyPool", p.Name);
+            Assert.AreEqual(MemoryAddress.StaticAbsolute, p.AddressType);
+            Assert.AreEqual(0, p.Address);
+            Assert.AreEqual(0, p.Size);
+            Assert.AreEqual(0, p.Offset);
+            Assert.False(p.IsDynamic);
+            Assert.False(p.IsConstant);
+            Assert.True(p.IsStatic);
+            Assert.False(p.IsSignature);
+            Assert.False(p.IsTemplate);
+
+            Assert.AreEqual(0, actionLogbook.Count);
+        }
+
+        [Test]
+        public void PoolContainerNonZeroSize()
+        {
+            InitTest();
+
+            var p = new MemoryPool("MyPool", MemoryAddress.StaticAbsolute, 0, 0, 4);
+
+            var provider = new MemoryProvider(reader);
+            provider.Add(p);
+            provider.Refresh();
+
+            Assert.AreEqual("MyPool", p.Name);
+            Assert.AreEqual(MemoryAddress.StaticAbsolute, p.AddressType);
+            Assert.AreEqual(0, p.Address);
+            Assert.AreEqual(4, p.Size);
+            Assert.AreEqual(0, p.Offset);
+            Assert.False(p.IsDynamic);
+            Assert.False(p.IsConstant);
+            Assert.True(p.IsStatic);
+            Assert.False(p.IsSignature);
+            Assert.False(p.IsTemplate);
+
+            Assert.AreEqual(1, actionLogbook.Count);
+
+            Assert.AreEqual(0, actionLogbook[0].Address);
+            Assert.AreEqual(4, actionLogbook[0].Size);
+        }
+
+        [Test]
         public void PoolStaticAbsolute()
         {
             InitTest();
@@ -284,8 +445,6 @@ namespace SimTelemetry.Tests.Memory
 
             var provider = new MemoryProvider(reader);
             provider.Add(p);
-
-            // Enable sig scanner this time
             provider.Scanner.Enable();
             provider.Refresh();
             provider.Scanner.Disable();
@@ -334,8 +493,6 @@ namespace SimTelemetry.Tests.Memory
 
             var provider = new MemoryProvider(reader);
             provider.Add(p);
-
-            // Enable sig scanner this time
             provider.Scanner.Enable();
             provider.Refresh();
             provider.Scanner.Disable();
@@ -399,8 +556,6 @@ namespace SimTelemetry.Tests.Memory
 
             var provider = new MemoryProvider(reader);
             provider.Add(p);
-
-            // Enable sig scanner this time
             provider.Scanner.Enable();
             provider.Refresh();
             provider.Scanner.Disable();
@@ -452,5 +607,4 @@ namespace SimTelemetry.Tests.Memory
         }
 
     }
-
 }

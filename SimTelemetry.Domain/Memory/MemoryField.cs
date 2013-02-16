@@ -24,6 +24,7 @@ namespace SimTelemetry.Domain.Memory
         public virtual T Value { get { return _Value; } }
         protected T _Value;
         protected T _OldValue;
+        protected int readCounter = 0;
 
         public virtual object Read()
         {
@@ -32,6 +33,7 @@ namespace SimTelemetry.Domain.Memory
 
         public virtual bool HasChanged()
         {
+            if (readCounter < 2) return true;
             if (_OldValue == null) return true;
             if (_Value == null) return true;
             return !_Value.Equals(_OldValue);
@@ -44,6 +46,7 @@ namespace SimTelemetry.Domain.Memory
 
         public virtual void Refresh()
         {
+            readCounter++;
             _OldValue = _Value;
 
             if (IsStatic)

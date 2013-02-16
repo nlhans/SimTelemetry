@@ -22,6 +22,8 @@ namespace SimTelemetry.Domain.Memory
         public T StaticValue { get; protected set; }
         public Type ValueType { get { return typeof(T); } }
 
+        private bool firstCall = true;
+
         public virtual object Read()
         {
             return StaticValue;
@@ -29,6 +31,11 @@ namespace SimTelemetry.Domain.Memory
 
         public bool HasChanged()
         {
+            if (firstCall)
+            {
+                firstCall = false;
+                return true;
+            }
             return false;
         }
 

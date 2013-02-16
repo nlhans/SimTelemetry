@@ -6,6 +6,8 @@ namespace SimTelemetry.Domain.Memory
 {
     public class MemoryFieldSignature<T> : MemoryField<T>
     {
+        public int[] AddressTree { get; protected set; }
+
         public IEnumerable<MemoryFieldSignaturePointer> Pointers { get; protected set; }
         public string Signature { get; protected set; }
 
@@ -29,17 +31,22 @@ namespace SimTelemetry.Domain.Memory
 
             var result = Memory.Scanner.Scan<uint>(MemoryRegionType.EXECUTE, Signature);
 
-            // Search the address and offset.
+            foreach (var ptr in Pointers)
+                ptr.Refresh(Memory);
+
+            // Search the address and offset.);
             switch (AddressType)
             {
                 case MemoryAddress.StaticAbsolute:
                 case MemoryAddress.Static:
                     if (result == 0) return;
+                    AddressTree = new int[1 + Pointers.Count()];
 
                     if (Pointers.Count() == 0)
                     {
                         // The result is directly our address
                         Address = (int) result;
+                        AddressTree[0] = (int)result;
                     }
                     else
                     {
@@ -54,16 +61,29 @@ namespace SimTelemetry.Domain.Memory
                             computedAddress = (int) result;
                         }
 
+                        int treeInd = 0;
+
                         foreach(var ptr in Pointers)
                         {
-                            computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
+                            AddressTree[treeInd++] = computedAddress;
+                            if (ptr.Additive)
+                                computedAddress += ptr.Offset;
+                            else
+                                computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
                         }
+                        AddressTree[treeInd] = computedAddress;
 
                         Address = computedAddress;
                     }
                     break;
                 case MemoryAddress.Dynamic:
-                    Offset = (int) result;
+                    Offset = (int)result;
+
+                    foreach (var ptr in Pointers)
+                    {
+                        if (ptr.Additive)
+                            Offset += ptr.Offset;
+                    }
                     break;
                 default:
                     throw new Exception("AddressType for '" + Name + "' is not valid");
@@ -84,7 +104,7 @@ namespace SimTelemetry.Domain.Memory
             : base(name, type, 0, size)
         {
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, true)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
             Initialized = false;
         }
 
@@ -100,7 +120,7 @@ namespace SimTelemetry.Domain.Memory
             : base(name, type, 0, size)
         {
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, true)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
             Initialized = false;
             Conversion = convert;
         }
