@@ -52,7 +52,7 @@ namespace SimTelemetry.Tests.Logger
 
             bool firstDriver = (_virtualMemory.Pools.Count(x => x.Name.StartsWith("Driver")) == 0) ? true : false;
 
-            myDriver.Add(new MemoryFieldFunc<int>("Index", (pool) => _virtualMemory.Pools.Count(x => x.Name.StartsWith("Driver"))));
+            myDriver.Add(new MemoryFieldConstant<int>("Index", _virtualMemory.Pools.Count(x => x.Name.StartsWith("Driver"))));
             myDriver.Add(new MemoryFieldFunc<bool>("IsAI", (pool) => AI));
             myDriver.Add(new MemoryFieldFunc<bool>("IsPlayer", (pool) => firstDriver));
             if (firstDriver)
@@ -455,7 +455,7 @@ namespace SimTelemetry.Tests.Logger
             CreateDriver("Henk", false);
             CreateDriver("Frits", true);
 
-            int packetSize = 4*7 + 10*14; // 4 bool packets (7bytes), 14 float packets (10bytes)
+            int packetSize = 4*7 + 10*12; // 4 bool packets (7bytes), 1 float packets (10bytes)
             int switchpoint = 16*1024*1024/packetSize;
 
             for (int i = 0; i < 40*3600; i++)
@@ -471,7 +471,7 @@ namespace SimTelemetry.Tests.Logger
                 writer.UpdateData();
                 int dataSizeAfter = writer.Log.dataSize;
 
-                Assert.AreEqual(168, dataSizeAfter-dataSizeBefore);
+                Assert.AreEqual(packetSize, dataSizeAfter - dataSizeBefore);
 
             }
             Debug.WriteLine(writer.Log.dataSize);

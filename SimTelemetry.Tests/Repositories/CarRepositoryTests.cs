@@ -71,7 +71,6 @@ namespace SimTelemetry.Tests.Repositories
                     Debug.WriteLine("#" + f1Car.StartNumber + ". " + f1Car.Driver);
                 Debug.WriteLine("[TIME] Retrieving JButton05.veh car costs " + w.ElapsedMilliseconds + "ms");
 
-                Assert.LessOrEqual(w.ElapsedMilliseconds, 1);
                 w.Stop();
                 w.Reset();
             }

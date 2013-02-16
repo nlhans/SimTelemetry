@@ -12,6 +12,9 @@ namespace SimTelemetry.Tests.Telemetry
         [Test]
         public void Basic()
         {
+            var rfp = Process.GetProcessesByName("rfactor");
+            if(rfp.Length == 0)
+                Assert.Ignore();
             using (var pluginHost = new Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
@@ -20,9 +23,8 @@ namespace SimTelemetry.Tests.Telemetry
                 var testPlugin = pluginHost.Simulators[0];
 
                 testPlugin.Initialize();
-                Process rf = Process.GetProcessesByName("rfactor")[0];
-                testPlugin.SimulatorStart(rf);
-                var telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
+                testPlugin.SimulatorStart(rfp[0]);
+                var telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rfp[0]);
                 var telemetryLogger = new SimTelemetryLogWriter();
                 telemetryObject.SetLogger(telemetryLogger);
 
@@ -39,6 +41,10 @@ namespace SimTelemetry.Tests.Telemetry
         private Domain.Aggregates.Telemetry telemetryObject;
         public void Continous()
         {
+            var rfp = Process.GetProcessesByName("rfactor");
+            if (rfp.Length == 0)
+                Assert.Ignore();
+
             using (var pluginHost = new Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
@@ -46,9 +52,8 @@ namespace SimTelemetry.Tests.Telemetry
                 pluginHost.Load();
                 var testPlugin = pluginHost.Simulators[0];
 
-                Process rf = Process.GetProcessesByName("rfactor")[0];
-                testPlugin.SimulatorStart(rf);
-                telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rf);
+                testPlugin.SimulatorStart(rfp[0]);
+                telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rfp[0]);
                 var telemetryLogger = new SimTelemetryLogWriter();
                 telemetryObject.SetLogger(telemetryLogger);
                 telemetryLogger.UpdateConfiguration(new TelemetryLogConfiguration(true, false, true, true));

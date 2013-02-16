@@ -79,6 +79,7 @@
     <Compile Include="App.cs" />
     <Compile Include="Core\GlobalEventsTests.cs" />
     <Compile Include="Core\InMemoryRepositoryTests.cs" />
+    <Compile Include="Events\MemoryReadAction.cs" />
     <Compile Include="Events\PluginTestExtensionConstructor.cs" />
     <Compile Include="Events\PluginTestSimulatorConstructor.cs" />
     <Compile Include="Events\PluginTestSimulatorModScanner.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Logger\LogWriterTests.cs" />
     <Compile Include="Logger\SimTelemetryLogWriterTests.cs" />
     <Compile Include="MemoryTests.cs" />
+    <Compile Include="Memory\DiagnosticMemoryReader.cs" />
     <Compile Include="Memory\MemoryPoolTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\CarRepositoryTests.cs" />
