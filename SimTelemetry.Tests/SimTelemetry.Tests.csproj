@@ -98,6 +98,7 @@
     <Compile Include="Memory\MemoryFieldSignatureTests.cs" />
     <Compile Include="Memory\MemoryFieldTests.cs" />
     <Compile Include="Memory\MemoryPoolTests.cs" />
+    <Compile Include="Memory\MemorySignatureScannerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\CarRepositoryTests.cs" />
     <Compile Include="Repositories\TrackRepositoryTests.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using NUnit.Framework;
 using SimTelemetry.Domain.Memory;
 
@@ -19,9 +20,71 @@ namespace SimTelemetry.Tests.Memory
     public class MemoryDataConverterTests
     {
         [Test]
+        public void CustomProviders()
+        {
+            int stockProviders = MemoryDataConverter.Providers.Count;
+
+            var testConv = new MemoryDataConverterProvider<TestCustomConverter>(
+                (arr, ind) => (TestCustomConverter)arr[ind],
+                (obj) => obj is byte
+                             ? (TestCustomConverter)obj
+                             : TestCustomConverter.Error);
+
+            MemoryDataConverter.AddProvider(testConv);
+
+            Assert.AreEqual(1, MemoryDataConverter.Providers.Count - stockProviders);
+
+            MemoryDataConverter.AddProvider(testConv);
+
+            Assert.AreEqual(1, MemoryDataConverter.Providers.Count - stockProviders);
+
+            MemoryDataConverter.RemoveProvider<TestCustomConverter>();
+
+            Assert.AreEqual(0, MemoryDataConverter.Providers.Count - stockProviders);
+
+            MemoryDataConverter.RemoveProvider<TestCustomConverter>();
+
+            Assert.AreEqual(0, MemoryDataConverter.Providers.Count - stockProviders);
+
+        }
+
+        [Test]
+        public void CastFloat()
+        {
+            var f = 13.37f;
+            var d = Math.PI;
+
+            var f_in_d = MemoryDataConverter.Cast<float, double>(f);
+            var d_in_f = MemoryDataConverter.Cast<double, float>(d);
+            var f_in_f = MemoryDataConverter.Cast<float, float>(f);
+            var d_in_d = MemoryDataConverter.Cast<double, double>(d);
+
+            Assert.AreEqual(13.37, f_in_d, 0.0001);
+            Assert.AreEqual((float)d, d_in_f, 0.0001);
+            Assert.AreEqual(f_in_f, f);
+            Assert.AreEqual(d_in_d, d);
+        }
+
+        [Test]
         public void ConvertCustom()
         {
             var data = new byte[20];
+            var myConv = new MemoryDataConverterProvider<TestCustomConverter>(
+                (arr, ind) =>
+                    {
+                        int intermediate = BitConverter.ToInt32(arr, ind);
+                        return (TestCustomConverter) (intermediate/2);
+                    }
+                , (obj) =>
+                      {
+                          if (obj is int)
+                              return (TestCustomConverter) ((int) obj/2);
+                          else
+                          {
+                              return TestCustomConverter.Error;
+                          }
+                      });
+
 
             // integer code *2 is our 'conversion'
             Array.Copy(BitConverter.GetBytes((int)(TestCustomConverter.All)*2), 0, data, 0, 4);
@@ -30,21 +93,7 @@ namespace SimTelemetry.Tests.Memory
             Array.Copy(BitConverter.GetBytes((int)(TestCustomConverter.Test3)*2), 0, data, 12, 4);
             Array.Copy(BitConverter.GetBytes((int)(TestCustomConverter.Test4)*2), 0, data, 16, 4);
 
-            MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<TestCustomConverter>(
-                                                (arr, ind) =>
-                                                    {
-                                                        int intermediate = BitConverter.ToInt32(arr, ind);
-                                                        return (TestCustomConverter) (intermediate/2);
-                                                    }
-                                                , (obj) =>
-                                                      {
-                                                          if (obj is int)
-                                                              return (TestCustomConverter) ((int) obj/2);
-                                                          else
-                                                          {
-                                                              return TestCustomConverter.Error;
-                                                          }
-                                                      }));
+            MemoryDataConverter.AddProvider(myConv);
 
             Assert.AreEqual(TestCustomConverter.All, MemoryDataConverter.Read<TestCustomConverter>(data, 0));
             Assert.AreEqual(TestCustomConverter.Test1, MemoryDataConverter.Read<TestCustomConverter>(data, 4));
@@ -61,6 +110,8 @@ namespace SimTelemetry.Tests.Memory
 
             // Short != type of int, so the conversion function returns 'error'
             Assert.AreEqual(TestCustomConverter.Error, MemoryDataConverter.Read<short, TestCustomConverter>(data, 16));
+
+            MemoryDataConverter.RemoveProvider<TestCustomConverter>();
         }
 
         [Test]
@@ -76,10 +127,7 @@ namespace SimTelemetry.Tests.Memory
         [Test]
         public void ConvertIntegers()
         {
-            var data = new byte[8]
-                           {
-                               0xFF,4,6,8, 10,12,14,16
-                           };
+            var data = new byte[8] { 0xFF,4,6,8, 10,12,14,16 };
 
             byte controlU8 = (byte)data[0];
             char controlS8 = Encoding.ASCII.GetChars(data, 0, 1)[0];
@@ -165,5 +213,7 @@ namespace SimTelemetry.Tests.Memory
 
             Assert.AreEqual(realData, MemoryDataConverter.Rawify(testString));
         }
+
+
     }
 }

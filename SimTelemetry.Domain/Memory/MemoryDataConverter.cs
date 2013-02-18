@@ -6,84 +6,49 @@ namespace SimTelemetry.Domain.Memory
 {
     public class MemoryDataConverter
     {
-        protected static readonly Dictionary<Type, object> Providers = new Dictionary<Type, object>();
+        public static Dictionary<Type, object> Providers { get { return _providers; } }
+        protected static readonly Dictionary<Type, object> _providers = new Dictionary<Type, object>();
 
         static MemoryDataConverter()
         {
-            Providers.Add(typeof(bool), new MemoryDataConverterProvider<bool>(BitConverter.ToBoolean, Convert.ToBoolean));
+            _providers.Add(typeof(bool), new MemoryDataConverterProvider<bool>(BitConverter.ToBoolean, Convert.ToBoolean));
 
-            Providers.Add(typeof(byte), new MemoryDataConverterProvider<byte>(ToByte, Convert.ToByte));
+            _providers.Add(typeof(byte), new MemoryDataConverterProvider<byte>(ToByte, Convert.ToByte));
 
-            Providers.Add(typeof(char), new MemoryDataConverterProvider<char>(ToChar, Convert.ToChar));
+            _providers.Add(typeof(char), new MemoryDataConverterProvider<char>(ToChar, Convert.ToChar));
 
-            Providers.Add(typeof(short), new MemoryDataConverterProvider<short>(BitConverter.ToInt16, Convert.ToInt16));
-            Providers.Add(typeof(ushort), new MemoryDataConverterProvider<ushort>(BitConverter.ToUInt16, Convert.ToUInt16));
+            _providers.Add(typeof(short), new MemoryDataConverterProvider<short>(BitConverter.ToInt16, Convert.ToInt16));
+            _providers.Add(typeof(ushort), new MemoryDataConverterProvider<ushort>(BitConverter.ToUInt16, Convert.ToUInt16));
 
-            Providers.Add(typeof(int), new MemoryDataConverterProvider<int>(BitConverter.ToInt32, Convert.ToInt32));
-            Providers.Add(typeof(int[]), new MemoryDataConverterProvider<int[]>(ByteToIntArray, ObjToIntArray));
-            Providers.Add(typeof(uint), new MemoryDataConverterProvider<uint>(BitConverter.ToUInt32, Convert.ToUInt32));
+            _providers.Add(typeof(int), new MemoryDataConverterProvider<int>(BitConverter.ToInt32, Convert.ToInt32));
+            _providers.Add(typeof(int[]), new MemoryDataConverterProvider<int[]>(ByteToIntArray, ObjToIntArray));
+            _providers.Add(typeof(uint), new MemoryDataConverterProvider<uint>(BitConverter.ToUInt32, Convert.ToUInt32));
 
-            Providers.Add(typeof(long), new MemoryDataConverterProvider<long>(BitConverter.ToInt64, Convert.ToInt64));
-            Providers.Add(typeof(ulong), new MemoryDataConverterProvider<ulong>(BitConverter.ToUInt64, Convert.ToUInt64));
+            _providers.Add(typeof(long), new MemoryDataConverterProvider<long>(BitConverter.ToInt64, Convert.ToInt64));
+            _providers.Add(typeof(ulong), new MemoryDataConverterProvider<ulong>(BitConverter.ToUInt64, Convert.ToUInt64));
 
-            Providers.Add(typeof(double), new MemoryDataConverterProvider<double>(BitConverter.ToDouble, Convert.ToDouble));
-            Providers.Add(typeof(float), new MemoryDataConverterProvider<float>(BitConverter.ToSingle, Convert.ToSingle));
+            _providers.Add(typeof(double), new MemoryDataConverterProvider<double>(BitConverter.ToDouble, Convert.ToDouble));
+            _providers.Add(typeof(float), new MemoryDataConverterProvider<float>(BitConverter.ToSingle, Convert.ToSingle));
 
-            Providers.Add(typeof(string), new MemoryDataConverterProvider<string>(BytesToString, Convert.ToString));
+            _providers.Add(typeof(string), new MemoryDataConverterProvider<string>(BytesToString, Convert.ToString));
 
         }
 
-        private static int[] ObjToIntArray(object arg)
-        {
-            if (arg is int[]) return ((int[]) arg);
-            else return new int[0];
-        }
-
-        private static int[] ByteToIntArray(byte[] arg1, int arg2)
-        {
-            int inputLength = arg1.Length - arg2;
-            var intArray = new int[inputLength/4];
-
-            for (int i = 0; i < intArray.Length; i ++)
-                intArray[i] = BitConverter.ToInt32(arg1, arg2+ i*4);
-
-            return intArray;
-        }
 
         public static void AddProvider<T>(MemoryDataConverterProvider<T> provider)
         {
-            Type t = typeof (T);
-            if (!Providers.ContainsKey(t))
-                Providers.Add(t, provider);
+            Type t = typeof(T);
+            if (!_providers.ContainsKey(t))
+                _providers.Add(t, provider);
         }
 
         public static void RemoveProvider<T>()
         {
-            Type t = typeof (T);
-            if (Providers.ContainsKey(t))
-                Providers.Remove(t);
+            Type t = typeof(T);
+            if (_providers.ContainsKey(t))
+                _providers.Remove(t);
         }
 
-        protected static string BytesToString(byte[] datainput, int index)
-        {
-            int end_index = index;
-            while (end_index < datainput.Length)
-            {
-                if (datainput[end_index] == 0) break;
-                end_index++;
-            }
-            if (end_index == index) return "";
-            return Encoding.ASCII.GetString(datainput, index, end_index - index);
-        }
-
-        protected static byte ToByte(byte[] datainput, int index)
-        {
-            return datainput[index];
-        }
-        protected static char ToChar(byte[] datainput, int index)
-        {
-            return Encoding.ASCII.GetChars(datainput, index, 1)[0];
-        }
 
         public static T Read<T>(byte[] dataInput, int index)
         {
@@ -93,31 +58,31 @@ namespace SimTelemetry.Domain.Memory
                 dataInput = new byte[128];
             }
             Type inputType = typeof(T);
-            return ((MemoryDataConverterProvider<T>)Providers[inputType]).Byte2Obj(dataInput, index);
+            return ((MemoryDataConverterProvider<T>)_providers[inputType]).Byte2Obj(dataInput, index);
         }
 
         public static TOutput Cast<TSource, TOutput>(TSource value)
         {
             Type outputType = typeof(TOutput);
-            return ((MemoryDataConverterProvider<TOutput>)Providers[outputType]).Obj2Obj(value);
+            return ((MemoryDataConverterProvider<TOutput>)_providers[outputType]).Obj2Obj(value);
 
         }
 
         public static TOutput Read<TSource, TOutput>(byte[] dataInput, int index)
         {
-            Type inputType = typeof (TSource);
-            Type outputType = typeof (TOutput);
+            Type inputType = typeof(TSource);
+            Type outputType = typeof(TOutput);
             if (inputType.Equals(outputType))
                 return Read<TOutput>(dataInput, index);
 
             var intermediate = Read<TSource>(dataInput, index);
             try
             {
-                return ((MemoryDataConverterProvider<TOutput>) Providers[outputType]).Obj2Obj(intermediate);
+                return ((MemoryDataConverterProvider<TOutput>)_providers[outputType]).Obj2Obj(intermediate);
             }
-            catch(Exception)
+            catch (Exception)
             {
-                return (TOutput) Convert.ChangeType(0, typeof(TOutput));
+                return (TOutput)Convert.ChangeType(0, typeof(TOutput));
             }
         }
 
@@ -155,7 +120,7 @@ namespace SimTelemetry.Domain.Memory
             if (data is bool) return BitConverter.GetBytes((bool)data);
             if (data is int) return BitConverter.GetBytes((int)data);
             if (data is short) return BitConverter.GetBytes((short)data);
-            if (data is long) return BitConverter.GetBytes((long) data);
+            if (data is long) return BitConverter.GetBytes((long)data);
             if (data is string)
             {
                 byte[] rawData = Encoding.ASCII.GetBytes((string)data);
@@ -171,6 +136,49 @@ namespace SimTelemetry.Domain.Memory
             if (data is uint) return BitConverter.GetBytes((uint)data);
 
             return new byte[0];
+        }
+
+
+
+
+
+
+        private static int[] ObjToIntArray(object arg)
+        {
+            if (arg is int[]) return ((int[]) arg);
+            else return new int[0];
+        }
+
+        private static int[] ByteToIntArray(byte[] arg1, int arg2)
+        {
+            int inputLength = arg1.Length - arg2;
+            var intArray = new int[inputLength/4];
+
+            for (int i = 0; i < intArray.Length; i ++)
+                intArray[i] = BitConverter.ToInt32(arg1, arg2+ i*4);
+
+            return intArray;
+        }
+
+        protected static string BytesToString(byte[] datainput, int index)
+        {
+            int end_index = index;
+            while (end_index < datainput.Length)
+            {
+                if (datainput[end_index] == 0) break;
+                end_index++;
+            }
+            if (end_index == index) return "";
+            return Encoding.ASCII.GetString(datainput, index, end_index - index);
+        }
+
+        protected static byte ToByte(byte[] datainput, int index)
+        {
+            return datainput[index];
+        }
+        protected static char ToChar(byte[] datainput, int index)
+        {
+            return Encoding.ASCII.GetChars(datainput, index, 1)[0];
         }
     }
 }

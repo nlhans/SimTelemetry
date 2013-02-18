@@ -118,6 +118,15 @@ namespace SimTelemetry.Domain.Memory
                 return results.Keys;
         }
 
+        public Dictionary<T, int> ScanAllFrequencies<T>(MemoryRegionType memoryRegionType, string signature)
+        {
+            var results = ScanMemory<T>(memoryRegionType, signature);
+            if (results == null)
+                return new Dictionary<T, int>();
+            else
+                return results;
+        }
+
         protected Dictionary<T, int> ScanMemory<T>(MemoryRegionType memoryRegionType, string signature)
         {
             if (!Enabled)
