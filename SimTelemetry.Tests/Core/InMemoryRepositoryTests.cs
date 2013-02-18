@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using SimTelemetry.Domain.Common;
 
@@ -215,6 +218,104 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(1, myObjectCreator.StoreObjectCalls);
             Assert.AreEqual(2, myObjectCreator.RemoveObjectCalls);
 
+        }
+
+        [Test]
+        public void ThreadingTests()
+        {
+
+            var myObjectCreator = new InMemoryObjectDataRepository();
+            var lazyRepo = new LazyInMemoryRepository<InMemoryObject, string>(myObjectCreator);
+
+            Task slowIterator = new Task(() =>
+                                    {
+                                        foreach (var item in lazyRepo.GetAll())
+                                        {
+                                            // Let's iterate very slowly :)
+                                            Thread.Sleep(100);
+                                        }
+                                    });
+            Task slowAdded = new Task(() =>
+                                          {
+                                              Thread.Sleep(50);
+                                              lazyRepo.Add(new InMemoryObject("T", "Mwhuahua"));
+                                          });
+            slowIterator.Start();
+            slowAdded.Start();
+
+            slowIterator.Wait();
+
+        }
+
+    }
+
+    public class InMemoryObjectDataRepository : ILazyRepositoryDataSource<InMemoryObject, string>
+    {
+        // Specific to testing:
+        public int GetIdsCalls { get; private set; }
+        public int AddObjectCalls { get; private set; }
+        public int GetObjectCalls { get; private set; }
+        public int StoreObjectCalls { get; private set; }
+        public int RemoveObjectCalls { get; private set; }
+
+        private ConcurrentDictionary<string, InMemoryObject> ids = new ConcurrentDictionary<string, InMemoryObject>();
+
+        public InMemoryObjectDataRepository()
+        {
+            GetIdsCalls = 0;
+            AddObjectCalls = 0;
+            GetObjectCalls = 0;
+            StoreObjectCalls = 0;
+            RemoveObjectCalls = 0;
+
+            ids = new ConcurrentDictionary<string, InMemoryObject>();
+            ids.TryAdd("1", new InMemoryObject("1", "Test 1"));
+            ids.TryAdd("B", new InMemoryObject("B", "Test 2"));
+            ids.TryAdd("!", new InMemoryObject("!", "Test 3"));
+        }
+
+        public IList<string> GetIds()
+        {
+            GetIdsCalls++;
+
+            // Do I/O, DB, stuff here
+            return ids.Keys.ToList();
+        }
+
+        public bool Add(InMemoryObject obj)
+        {
+            AddObjectCalls++;
+            
+            return ids.TryAdd(obj.ID, obj);
+        }
+
+        public bool Store(InMemoryObject obj)
+        {
+            StoreObjectCalls++;
+            return ids.TryUpdate(obj.ID, obj, Get(obj.ID));
+        }
+
+        public InMemoryObject Get(string id)
+        {
+            GetObjectCalls++;
+
+            return ids.ContainsKey(id) ? ids[id] : new InMemoryObject();
+        }
+
+        public bool Remove(string Id)
+        {
+            RemoveObjectCalls++;
+
+            // It's get only repo (in this test)
+            // It will however, remove the ID.
+            InMemoryObject tmp;
+            return ids.TryRemove(Id, out tmp);
+        }
+
+        public bool Clear()
+        {
+            ids.Clear();
+            return true; // read-only
         }
     }
 

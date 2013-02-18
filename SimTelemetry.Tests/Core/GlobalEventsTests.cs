@@ -57,7 +57,7 @@ namespace SimTelemetry.Tests.Core
             Assert.AreEqual(data.Message2, "Hello event 2");
             _event2HandleCount++;
         }
-        
+
         // TODO: Write tests for periodic events.
 
         [Test]
@@ -130,7 +130,7 @@ namespace SimTelemetry.Tests.Core
             var task2 = new Task(() =>
             {
                 Thread.Sleep(50);
-                    GlobalEvents.Hook<TestEvent1Handler>(handleEvent1, true);
+                GlobalEvents.Hook<TestEvent1Handler>(handleEvent1, true);
             });
             task1.Start();
             task2.Start();

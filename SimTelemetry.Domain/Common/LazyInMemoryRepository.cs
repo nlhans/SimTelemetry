@@ -51,14 +51,12 @@ namespace SimTelemetry.Domain.Common
 
         public IEnumerable<TId> GetIds()
         {
-            return IdList.Value;
+            return IdList.Value.ToList();
         }
 
         public override IEnumerable<TType> GetAll()
         {
-            foreach (var id in GetIds())
-                GetById(id);
-            return data;
+            return GetIds().Select(GetById);
         }
 
         public override bool Add(TType entity)
