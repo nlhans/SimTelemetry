@@ -106,6 +106,7 @@
     <Compile Include="Telemetry\TelemetryTests.cs" />
     <Compile Include="TestConstants.cs" />
     <Compile Include="Utils\IniReaderTests.cs" />
+    <Compile Include="Utils\ZipStorerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimTelemetry.Domain\SimTelemetry.Domain.csproj">

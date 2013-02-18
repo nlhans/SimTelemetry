@@ -78,7 +78,7 @@ namespace SimTelemetry.Domain.Utils
         // Stream object of storage file
         private Stream ZipFileStream;
         // General comment
-        private string Comment = "";
+        public string Comment { get; private set; } // mod
         // Central dir image
         private byte[] CentralDirImage = null;
         // Existing files in zip
@@ -716,7 +716,12 @@ namespace SimTelemetry.Domain.Utils
                         UInt32 centralDirOffset = br.ReadUInt32();
                         UInt16 commentSize = br.ReadUInt16();
 
-                        // check if comment field is the very last data in file
+                        byte[] commentBytes = br.ReadBytes(commentSize);
+                        this.Comment = Encoding.ASCII.GetString(commentBytes);
+
+                        this.ZipFileStream.Seek(0 - commentSize, SeekOrigin.Current);
+
+                        // check if comment field is the very last data in file)))
                         if (this.ZipFileStream.Position + commentSize != this.ZipFileStream.Length)
                             return false;
 
