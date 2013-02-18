@@ -109,36 +109,70 @@ namespace SimTelemetry.Tests.Core
         }
 
         [Test]
-        public void MultithreadingTests()
+        public void MultithreadingTests_Hook()
         {
             Initialize();
 
-            Action <TestEvent1Handler> slowHandler = (x) =>
-                                                         {
-                                                             Debug.WriteLine("Handling event 1");
-                                                             Thread.Sleep(100);
-                                                             Debug.WriteLine("Done event 1 : " + x.Message1);
-                                                         };
-            GlobalEvents.Hook<TestEvent1Handler>(slowHandler,true);
+            Action<TestEvent1Handler> slowHandler
+                = (x) =>
+                {
+                    Debug.WriteLine("Handling event 1");
+                    Thread.Sleep(100);
+                    Debug.WriteLine("Done event 1 : " + x.Message1);
+                };
+
+            GlobalEvents.Hook(slowHandler, true);
             var task1 = new Task(() =>
-                                     {
-                                         for (int i = 0; i < 5; i++)
-                                             GlobalEvents.Fire(new TestEvent1Handler("Hello event 1"), true);
-                                     });
+            {
+                for (int i = 0; i < 5; i++)
+                    GlobalEvents.Fire(new TestEvent1Handler("Hello event 1"), true);
+            });
             var task2 = new Task(() =>
             {
                 Thread.Sleep(50);
-                                          for(int i = 0; i < 50; i++)
-                                          {
-                                              GlobalEvents.Hook<TestEvent1Handler>(handleEvent1, true);
-                                          }
-                                      });
+                    GlobalEvents.Hook<TestEvent1Handler>(handleEvent1, true);
+            });
             task1.Start();
             task2.Start();
 
             task1.Wait();
             task2.Wait();
             Assert.AreEqual(4, _event1HandleCount);
+
+        }
+
+
+        [Test]
+        public void MultithreadingTests_Unhook()
+        {
+            Initialize();
+
+            Action<TestEvent1Handler> slowHandler
+                = (x) =>
+                {
+                    Debug.WriteLine("Handling event 1");
+                    Thread.Sleep(100);
+                    Debug.WriteLine("Done event 1 : " + x.Message1);
+                };
+
+            GlobalEvents.Hook(slowHandler, true);
+            GlobalEvents.Hook<TestEvent1Handler>(handleEvent1, true);
+            var task1 = new Task(() =>
+            {
+                for (int i = 0; i < 5; i++)
+                    GlobalEvents.Fire(new TestEvent1Handler("Hello event 1"), true);
+            });
+            var task2 = new Task(() =>
+            {
+                Thread.Sleep(50);
+                GlobalEvents.Unhook<TestEvent1Handler>(handleEvent1);
+            });
+            task1.Start();
+            task2.Start();
+
+            task1.Wait();
+            task2.Wait();
+            Assert.AreEqual(1, _event1HandleCount);
 
         }
     }
