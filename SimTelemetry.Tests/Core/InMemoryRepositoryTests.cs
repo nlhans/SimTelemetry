@@ -239,6 +239,10 @@ namespace SimTelemetry.Tests.Core
                                           {
                                               Thread.Sleep(50);
                                               lazyRepo.Add(new InMemoryObject("T", "Mwhuahua"));
+                                              Thread.Sleep(100);
+                                              lazyRepo.Store(new InMemoryObject("T", "Mwhuahua2"));
+                                              Thread.Sleep(100);
+                                              lazyRepo.Remove(new InMemoryObject("T", "Mwhuahua"));
                                           });
             slowIterator.Start();
             slowAdded.Start();

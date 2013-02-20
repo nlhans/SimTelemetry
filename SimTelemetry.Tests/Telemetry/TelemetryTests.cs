@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
+using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Plugins;
 
@@ -25,7 +26,7 @@ namespace SimTelemetry.Tests.Telemetry
                 testPlugin.Initialize();
                 testPlugin.SimulatorStart(rfp[0]);
                 var telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rfp[0]);
-                var telemetryLogger = new SimTelemetryLogWriter();
+                var telemetryLogger = new TelemetryLogWriter();
                 telemetryObject.SetLogger(telemetryLogger);
 
             }
@@ -34,7 +35,7 @@ namespace SimTelemetry.Tests.Telemetry
         [Test]
         public void ReadFile() 
         {
-            SimTelemetryLogReader reader = new SimTelemetryLogReader("Telemetry.zip");
+            TelemetryLog reader = new TelemetryLog("Telemetry.zip");
         }
 
         int calls = 0;
@@ -54,7 +55,7 @@ namespace SimTelemetry.Tests.Telemetry
 
                 testPlugin.SimulatorStart(rfp[0]);
                 telemetryObject = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rfp[0]);
-                var telemetryLogger = new SimTelemetryLogWriter();
+                var telemetryLogger = new TelemetryLogWriter();
                 telemetryObject.SetLogger(telemetryLogger);
                 telemetryLogger.UpdateConfiguration(new TelemetryLogConfiguration(true, false, true, true));
                 

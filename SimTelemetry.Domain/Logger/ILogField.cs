@@ -8,6 +8,8 @@ namespace SimTelemetry.Domain.Logger
         string Name { get; }
         LogGroup Group { get; }
         Type ValueType { get; }
-        TOut ReadAs<TOut>(byte[] data, int index);
+        bool IsConstant { get;  }
+        //TOut ReadAs<TOut>(byte[] data, int index);
+        T ReadAs<T>(byte[] databuffer, int index);
     }
 }

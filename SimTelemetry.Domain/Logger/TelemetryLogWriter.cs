@@ -8,7 +8,7 @@ using Triton.Maths;
 
 namespace SimTelemetry.Domain.Logger
 {
-    public class SimTelemetryLogWriter : ITelemetryLogger
+    public class TelemetryLogWriter : ITelemetryLogger
     {
         public Aggregates.Telemetry Telemetry { get; protected set; }
         protected MemoryProvider Memory;
@@ -244,7 +244,7 @@ namespace SimTelemetry.Domain.Logger
                         foreach (var timePathField in pool.Fields.Where(x => TimepathFields.Contains(x.Key)))
                         {
 
-                            group.CreateField(timePathField.Value.Name, timePathField.Value.ValueType);
+                            group.CreateField(timePathField.Value.Name, timePathField.Value.ValueType, pool.IsConstant);
                         }
                     }
 
@@ -262,7 +262,7 @@ namespace SimTelemetry.Domain.Logger
                 foreach (var field in pool.Fields)
                 {
                     if (!group.ContainsField(field.Value.Name))
-                        group.CreateField(field.Value.Name, field.Value.ValueType);
+                        group.CreateField(field.Value.Name, field.Value.ValueType, field.Value.IsConstant);
                 }
                 if(pool.Pools.Count > 0)
                     UpdateLogStructure(pool.Pools.Values, group);

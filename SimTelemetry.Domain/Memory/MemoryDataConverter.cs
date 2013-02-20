@@ -138,8 +138,27 @@ namespace SimTelemetry.Domain.Memory
             return new byte[0];
         }
 
-
-
+        public static T Unrawify<T>(byte[] data, int index)
+        {
+            if (typeof(T).Equals(typeof(string)))
+            {
+                int size = BitConverter.ToInt32(data, index);
+                string str = Encoding.ASCII.GetString(data, index + 4, size);
+                return (T)((object) str);
+            }
+            else
+            {
+                return Read<T>(data, index);
+            }
+        }
+        
+        public static TOutput Unrawify<TSource, TOutput>(byte[] data , int index)
+        {
+            if(typeof(TSource).Equals(typeof(TOutput)))
+                return Unrawify<TOutput>(data, index);
+            else
+                return Cast<TSource, TOutput>(Unrawify<TSource>(data, index));
+        }
 
 
 

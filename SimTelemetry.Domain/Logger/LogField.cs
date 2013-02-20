@@ -8,14 +8,16 @@ namespace SimTelemetry.Domain.Logger
         public int ID { get; protected set; }
         public string Name { get; protected set; }
 
+        public bool IsConstant { get; protected set; }
+        public TOutput ReadAs<TOutput>(byte[] databuffer, int index)
+        {
+            return MemoryDataConverter.Unrawify<T, TOutput>(databuffer, index);
+        }
+
         public LogGroup Group { get; protected set; }
         public LogFile File { get; protected set; }
 
         public Type ValueType { get; protected set; }
-        public TOut ReadAs<TOut>(byte[] data, int index)
-        {
-            return MemoryDataConverter.Read<T, TOut>(data, index);
-        }
 
         public int SampleOffset;
         public T[] Data;
@@ -31,13 +33,14 @@ namespace SimTelemetry.Domain.Logger
             return (T)new object();
         }
 
-        public LogField(int id, string name, LogGroup @group, LogFile file)
+        public LogField(int id, string name, LogGroup @group, LogFile file, bool isConstant)
         {
             ID = id;
             Name = name;
             Group = group;
             File = file;
             ValueType = typeof(T);
+            IsConstant = isConstant;
         }
 
 

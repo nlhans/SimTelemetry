@@ -57,6 +57,7 @@
     <Compile Include="Aggregates\Simulator.cs" />
     <Compile Include="Aggregates\Telemetry.cs" />
     <Compile Include="Aggregates\Track.cs" />
+    <Compile Include="Common\IDataNode.cs" />
     <Compile Include="Common\IEntity.cs" />
     <Compile Include="Common\ILazyRepositoryDataSource.cs" />
     <Compile Include="Common\InMemoryRepository.cs" />
@@ -111,8 +112,8 @@
     <Compile Include="Logger\LogField.cs" />
     <Compile Include="Logger\LogFile.cs" />
     <Compile Include="Logger\LogGroup.cs" />
-    <Compile Include="Logger\SimTelemetryLogReader.cs" />
-    <Compile Include="Logger\SimTelemetryLogWriter.cs" />
+    <Compile Include="Aggregates\TelemetryLog.cs" />
+    <Compile Include="Logger\TelemetryLogWriter.cs" />
     <Compile Include="Memory\IMemoryObject.cs" />
     <Compile Include="Memory\MemoryAddress.cs" />
     <Compile Include="Memory\MemoryDataConverter.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="ValueObjects\EngineLifetime.cs" />
     <Compile Include="ValueObjects\EngineMode.cs" />
     <Compile Include="ValueObjects\Lap.cs" />
+    <Compile Include="ValueObjects\LogSample.cs" />
     <Compile Include="ValueObjects\Polynomial.cs" />
     <Compile Include="ValueObjects\Range.cs" />
     <Compile Include="Enumerations\DriveTrainSetup.cs" />

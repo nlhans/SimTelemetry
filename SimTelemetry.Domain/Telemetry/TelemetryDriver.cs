@@ -1,11 +1,11 @@
 ﻿using System;
+using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Memory;
 
 namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetryDriver : ITelemetryObject
     {
-        public Aggregates.Telemetry Telemetry { get; protected set; }
         public int BaseAddress { get { return Pool.Address; }}
 
         internal MemoryPool Pool { get; set; }
@@ -54,7 +54,7 @@ namespace SimTelemetry.Domain.Telemetry
 
         private bool _initial = true;
 
-        public void Update()
+        public void Update(Aggregates.Telemetry telemetry)
         {
             if(_initial)
             {
@@ -110,10 +110,23 @@ namespace SimTelemetry.Domain.Telemetry
             }
         }
 
-        public TelemetryDriver(Aggregates.Telemetry telemetry, MemoryPool pool)
+        public void Update(LogFile logFile)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TelemetryDriver(MemoryPool pool)
         {
             Pool = pool;
-            Telemetry = telemetry;
+        }
+
+        public TelemetryDriver(ILogNode f)
+        {
+        }
+
+        public TelemetryDriver Clone()
+        {
+            return (TelemetryDriver)MemberwiseClone();
         }
     }
 }

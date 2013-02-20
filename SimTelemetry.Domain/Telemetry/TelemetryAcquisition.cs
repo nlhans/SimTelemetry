@@ -1,4 +1,5 @@
 ﻿using System;
+using SimTelemetry.Domain.Logger;
 
 namespace SimTelemetry.Domain.Telemetry
 {
@@ -6,13 +7,14 @@ namespace SimTelemetry.Domain.Telemetry
     {
         public Aggregates.Telemetry Telemetry { get; protected set; }
 
-        public void Update()
+        public void Update(Aggregates.Telemetry telemetry)
         {
 
         }
-        public TelemetryAcquisition(Aggregates.Telemetry telemetry)
+
+        public void Update(LogFile logFile)
         {
-            Telemetry = telemetry;
+            throw new NotImplementedException();
         }
     }
 }

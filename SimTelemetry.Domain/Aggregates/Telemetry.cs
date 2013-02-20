@@ -58,11 +58,11 @@ namespace SimTelemetry.Domain.Aggregates
             Memory.Scanner.Disable();
 
             // Start outside-world telemetry objects
-            Session = new TelemetrySession(this);
-            Simulator = new TelemetryGame(this);
+            Session = new TelemetrySession();
+            Simulator = new TelemetryGame();
 
-            Acquisition = new TelemetryAcquisition(this);
-            Support = new TelemetrySupport(this);
+            Acquisition = new TelemetryAcquisition();
+            Support = new TelemetrySupport();
 
 #if DEBUG
             Clock = new MMTimer(25);
@@ -99,15 +99,15 @@ namespace SimTelemetry.Domain.Aggregates
             Memory.Refresh();
 
             // Simulator environment etc.
-            Support.Update();
-            Simulator.Update();
-            Session.Update();
-            Acquisition.Update();
+            Support.Update(this);
+            Simulator.Update(this);
+            Session.Update(this);
+            Acquisition.Update(this);
 
             // Drivers
             UpdateDrivers();
             foreach(var driver in Drivers)
-                driver.Update();
+                driver.Update(this);
 
             // Update game status reports.
             var isSessionLoading = Session.IsLoading;
@@ -163,7 +163,7 @@ namespace SimTelemetry.Domain.Aggregates
 
                     Memory.Add(memPool);
 
-                    var td = new TelemetryDriver(this, memPool);
+                    var td = new TelemetryDriver(memPool);
                     _drivers.Add(td);
                     driversAdded.Add(td);
 

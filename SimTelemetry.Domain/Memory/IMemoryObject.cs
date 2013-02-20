@@ -18,7 +18,7 @@ namespace SimTelemetry.Domain.Memory
         int Size { get; }
         Type ValueType { get; }
 
-        TOut ReadAs<TOut>();
+        T ReadAs<T>();
         object Read();
         bool HasChanged();
 

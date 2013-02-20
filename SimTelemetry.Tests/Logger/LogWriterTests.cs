@@ -25,7 +25,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(0, logFile.Fields.Count());
 
             // Our logger doesn't support top-entry level fields
-            logFile.CreateField("Test", typeof(string), 1);
+            logFile.CreateField("Test", typeof(string), 1, false);
             Assert.AreEqual(0, logFile.Fields.Count());
 
             LogGroup myGroup = logFile.CreateGroup("My Group");
@@ -40,8 +40,8 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(myGroup, logFile.Groups.Where(x => x.ID == 1).FirstOrDefault());
 
             // Add a field to a group
-            var myFloat = myGroup.CreateField<float>("myFloat");
-            var myString = (LogField<string>) myGroup.CreateField("myString", typeof(string));
+            var myFloat = myGroup.CreateField<float>("myFloat",false);
+            var myString = (LogField<string>) myGroup.CreateField("myString", typeof(string),false);
 
             // ID
             Assert.AreEqual(1, myFloat.ID);
@@ -84,7 +84,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(null, logFile.Groups.Where(x => x.ID == 2).FirstOrDefault());
 
             // Add test field
-            var myDouble = subGroup.CreateField("myDouble", typeof (double));
+            var myDouble = subGroup.CreateField("myDouble", typeof(double), false);
 
             Assert.AreEqual(3, myDouble.ID);
             Assert.AreEqual("myDouble", myDouble.Name);
@@ -434,10 +434,10 @@ namespace SimTelemetry.Tests.Logger
                 zipFile = null;
             }
 
-            if (File.Exists("temp.zip"))
+            /*if (File.Exists("temp.zip"))
                 File.Delete("temp.zip");
             if (File.Exists("zipzipzip.zip"))
-                File.Delete("zipzipzip.zip");
+                File.Delete("zipzipzip.zip");*/
         }
     }
 }

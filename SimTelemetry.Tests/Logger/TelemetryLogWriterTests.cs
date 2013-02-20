@@ -13,7 +13,7 @@ using SimTelemetry.Domain.Telemetry;
 namespace SimTelemetry.Tests.Logger
 {
     [TestFixture]
-    public class SimTelemetryLogWriterTests
+    public class TelemetryLogWriterTests
     {
         private MemoryProvider _virtualMemory;
 
@@ -57,15 +57,16 @@ namespace SimTelemetry.Tests.Logger
             myDriver.Add(new MemoryFieldFunc<bool>("IsPlayer", (pool) => firstDriver));
             if (firstDriver)
                 myDriver.Add(new MemoryFieldFunc<float>("EngineLifetime", (pool) => _lifetime));
+            myDriver.Add(new MemoryFieldFunc<float>("EngineRpm", (pool) => (float) (100+ 50*Math.Sin(_time/100.0 * Math.PI*2))));
             _virtualMemory.Add(myDriver);
-            GlobalEvents.Fire(new DriversAdded(null, new List<TelemetryDriver> {new TelemetryDriver(null, myDriver)}), true);
+            GlobalEvents.Fire(new DriversAdded(null, new List<TelemetryDriver> {new TelemetryDriver(myDriver)}), true);
         }
 
         private void RemoveDriver(string driver)
         {
             var myDriver = _virtualMemory.Get("Driver " + driver);
             _virtualMemory.Remove(myDriver);
-            GlobalEvents.Fire(new DriversRemoved(null, new List<TelemetryDriver> { new TelemetryDriver(null, myDriver) }), true);
+            GlobalEvents.Fire(new DriversRemoved(null, new List<TelemetryDriver> { new TelemetryDriver(myDriver) }), true);
         }
 
         [Test]
@@ -73,7 +74,7 @@ namespace SimTelemetry.Tests.Logger
         {
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(new TelemetryLogConfiguration(true, true, true, true));
 
@@ -123,7 +124,7 @@ namespace SimTelemetry.Tests.Logger
         {
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(new TelemetryLogConfiguration(true, false, true, true));
 
@@ -173,7 +174,7 @@ namespace SimTelemetry.Tests.Logger
         {
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(new TelemetryLogConfiguration(true, false, true, false));
 
@@ -218,7 +219,7 @@ namespace SimTelemetry.Tests.Logger
             cfg.Add(0);
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(cfg);
 
@@ -263,7 +264,7 @@ namespace SimTelemetry.Tests.Logger
             cfg.Add(0);
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(cfg);
 
@@ -315,7 +316,7 @@ namespace SimTelemetry.Tests.Logger
             cfg.Add(0);
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(cfg);
 
@@ -358,7 +359,7 @@ namespace SimTelemetry.Tests.Logger
             cfg.Add(0);
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(cfg);
 
@@ -403,7 +404,7 @@ namespace SimTelemetry.Tests.Logger
             cfg.Add(0);
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(cfg);
 
@@ -446,7 +447,7 @@ namespace SimTelemetry.Tests.Logger
         {
             //
             CreatePool();
-            SimTelemetryLogWriter writer = new SimTelemetryLogWriter();
+            TelemetryLogWriter writer = new TelemetryLogWriter();
             writer.Initialize(null, _virtualMemory);
             writer.UpdateConfiguration(new TelemetryLogConfiguration(true, true, true, true));
 
@@ -455,7 +456,7 @@ namespace SimTelemetry.Tests.Logger
             CreateDriver("Henk", false);
             CreateDriver("Frits", true);
 
-            int packetSize = 4*7 + 10*12; // 4 bool packets (7bytes), 1 float packets (10bytes)
+            int packetSize = 4*7 + 10*14; // 4 bool packets (7bytes), 1 float packets (10bytes)
             int switchpoint = 16*1024*1024/packetSize;
 
             for (int i = 0; i < 40*3600; i++)
@@ -476,6 +477,7 @@ namespace SimTelemetry.Tests.Logger
             }
             Debug.WriteLine(writer.Log.dataSize);
 
+            GlobalEvents.Fire(new SessionStopped(), true);
         }
     }
 }

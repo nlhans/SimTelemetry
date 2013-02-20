@@ -2,8 +2,7 @@
 {
     public interface ITelemetryObject
     {
-        Aggregates.Telemetry Telemetry { get; }
-
-        void Update();
+        void Update(Aggregates.Telemetry telemInstance);
+        void Update(Logger.LogFile logFile);
     }
 }

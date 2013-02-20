@@ -1,21 +1,26 @@
 ﻿using System;
+using SimTelemetry.Domain.Logger;
 
 namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetryGame : ITelemetryObject
     {
-        public Aggregates.Telemetry Telemetry { get; protected set; }
-
         public string Version;
 
-        public void Update()
+        public void Update(Aggregates.Telemetry telemetry)
         {
 
         }
 
-        public TelemetryGame(Aggregates.Telemetry telemetry)
+        public void Update(LogFile logFile)
         {
-            Telemetry = telemetry;
+            throw new NotImplementedException();
+        }
+
+
+        public TelemetryGame Clone()
+        {
+            return (TelemetryGame)MemberwiseClone();
         }
     }
 }

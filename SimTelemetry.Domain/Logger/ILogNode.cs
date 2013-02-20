@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Domain.Logger
 {
-    public interface ILogNode
+    public interface ILogNode : IDataNode
     {
         int ID { get; }
         IEnumerable<LogGroup> Groups { get; }
         IEnumerable<ILogField> Fields { get; }
         LogGroup CreateGroup(string name);
         LogGroup CreateGroup(string name, int id);
-        ILogField CreateField(string name, Type valueType, int id);
+        ILogField CreateField(string name, Type valueType, int id, bool isConstant);
         ILogNode FindGroup(string name);
         ILogNode FindGroup(int id);
 
@@ -19,5 +20,7 @@ namespace SimTelemetry.Domain.Logger
 
         bool ContainsField(string name);
         bool ContainsField(int id);
+
+        T ReadAs<T>(string field);
     }
 }

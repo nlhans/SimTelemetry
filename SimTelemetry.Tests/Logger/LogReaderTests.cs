@@ -136,17 +136,25 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(timeline.Count, _logWriter.testDataFrames);
             var floatData = _logWriter.GetFloatData();
             var doubleData = _logWriter.GetDoubleData();
+            var stringData = _logWriter.GetStringData();
 
             var myFloat1 = logFile.ReadAs<float>("My Group", "myFloat", timeline.FirstOrDefault());
             Assert.AreEqual(myFloat1, floatData[0]);
 
             Stopwatch w = new Stopwatch();
             w.Start();
-            for(int i = 0; i < floatData.Length; i++)
+            for (int i = 0; i < floatData.Length; i++)
             {
                 Assert.AreEqual(logFile.ReadAs<float>("My Group", "myFloat", timeline[i]), floatData[i]);
                 //Assert.AreEqual(logFile.ReadAs<double>("My Group", "myFloat", timeline[i]), (double)floatData[i]);
                 Assert.AreEqual(logFile.ReadAs<double>("My Subgroup", "myDouble", timeline[i]), doubleData[i]);
+
+                // Test string; this only occurs 1/10 sample time.
+                // It should look up the last written string.
+                string lastString = stringData[i/10];
+                string foundString = logFile.ReadAs<string>("My Group", "myString", timeline[i]);
+                //Assert.AreEqual(lastString, foundString);
+
             }
             w.Stop();
 

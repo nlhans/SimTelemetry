@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Domain.Memory
 {
-    public class MemoryPool : IMemoryObject, ICloneable
+    public class MemoryPool : IMemoryObject, ICloneable, IDataNode
     {
         public string Name { get; protected set; }
         public MemoryProvider Memory { get; set; }

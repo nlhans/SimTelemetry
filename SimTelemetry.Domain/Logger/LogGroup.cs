@@ -51,6 +51,11 @@ namespace SimTelemetry.Domain.Logger
             return Fields.Any(x => x.ID == id);
         }
 
+        public T ReadAs<T>(string field)
+        {
+            return File.ReadAs<T>(Name, field, File.TimeReplay);
+        }
+
         public LogGroup CreateGroup(string name)
         {
             if (File.ReadOnly) return null;
@@ -67,30 +72,30 @@ namespace SimTelemetry.Domain.Logger
             return oGroup;
         }
 
-        public LogField<T> CreateField<T>(string name)
+        public LogField<T> CreateField<T>(string name, bool isConstant)
         {
-            var field = new LogField<T>(File.RequestNewFieldId(), name, this, File);
+            var field = new LogField<T>(File.RequestNewFieldId(), name, this, File, isConstant);
             _fields.Add(field);
             return field;
         }
 
-        public ILogField CreateField(string name, Type valueType)
+        public ILogField CreateField(string name, Type valueType, bool isConstant)
         {
             if (valueType == null) return null;
             var logFieldType = typeof(LogField<>).MakeGenericType(new[] { valueType });
             var logFieldInstance = (ILogField)Activator.CreateInstance(logFieldType,
-                                                            new object[4] { File.RequestNewFieldId(), name, this, File });
+                                                            new object[5] { File.RequestNewFieldId(), name, this, File , isConstant });
             _fields.Add(logFieldInstance);
             return logFieldInstance;
         }
 
 
-        public ILogField CreateField(string name, Type valueType, int id)
+        public ILogField CreateField(string name, Type valueType, int id, bool isConstant)
         {
             if (valueType == null) return null;
             var logFieldType = typeof(LogField<>).MakeGenericType(new[] { valueType });
             var logFieldInstance = (ILogField)Activator.CreateInstance(logFieldType,
-                                                            new object[4] { id, name, this, File });
+                                                            new object[5] { id, name, this, File, isConstant });
             _fields.Add(logFieldInstance);
             return logFieldInstance;
         }

@@ -28,6 +28,9 @@ namespace SimTelemetry.Domain.Logger
 
         public IEnumerable<int> Timeline { get; private set; }
         public List<Dictionary<int, int>> Time { get { return _time; } }
+
+        public int TimeReplay { get; protected set; }
+
         protected List<Dictionary<int, int>> _time = new List<Dictionary<int, int>>();
 
         #region Data Writer fields
@@ -66,7 +69,7 @@ namespace SimTelemetry.Domain.Logger
             return oGroup;
         }
 
-        public ILogField CreateField(string name, Type valueType, int id)
+        public ILogField CreateField(string name, Type valueType, int id, bool isConstant)
         {
             return null;
         }
@@ -268,7 +271,8 @@ namespace SimTelemetry.Domain.Logger
                 }
                 else
                 {
-                    var typeLength = BitConverter.ToInt32(structure, structureIndex + 13 + nameLength);
+                    bool isConstant = (BitConverter.ToInt32(structure, structureIndex + 13 + nameLength & 0x10000000) == 0x10000000);
+                    var typeLength = BitConverter.ToInt32(structure, structureIndex + 13 + nameLength) & 0x0FFFFFFF;
                     var type = Encoding.ASCII.GetString(structure, structureIndex + 17 + nameLength, typeLength);
 
                     blockSize += 4 + typeLength;
@@ -276,7 +280,7 @@ namespace SimTelemetry.Domain.Logger
                     Type valueTypeObject = Type.GetType(type);
                     var group = FindGroup(parent);
 
-                    group.CreateField(name, valueTypeObject, id);
+                    group.CreateField(name, valueTypeObject, id, isConstant);
                 }
 
                 structureIndex += blockSize;
@@ -388,12 +392,14 @@ namespace SimTelemetry.Domain.Logger
                 byte[] strName = Encoding.ASCII.GetBytes(fields.Name);
                 byte[] strType = Encoding.ASCII.GetBytes(fields.ValueType.FullName);
 
+                int isConstantBitCode = ((fields.IsConstant) ? 0x10000000 : 0);
+
                 tmp[0] = 0x1E;
                 Array.Copy(BitConverter.GetBytes(fields.ID), 0, tmp, 1, 4);
                 Array.Copy(BitConverter.GetBytes(fields.Group.ID), 0, tmp, 5, 4);
                 Array.Copy(BitConverter.GetBytes(strName.Length), 0, tmp, 9, 4);
                 Array.Copy(strName, 0, tmp, 13, strName.Length);
-                Array.Copy(BitConverter.GetBytes(strType.Length), 0, tmp, 13 + strName.Length, 4);
+                Array.Copy(BitConverter.GetBytes(strType.Length | isConstantBitCode), 0, tmp, 13 + strName.Length, 4);
                 Array.Copy(strType, 0, tmp, 13+4+strName.Length, strType.Length);
 
                 int length = 17 + strName.Length + strType.Length;
@@ -496,9 +502,15 @@ namespace SimTelemetry.Domain.Logger
             stream.Close();
         }
 
+        public T ReadAs<T>(string field)
+        {
+            // We don't have fields here!
+            return (T)new object();
+        }
+
         public T ReadAs<T>(string group, string field, int time)
         {
-            T errObj =  (T)Convert.ChangeType(0, typeof(T));
+            T errObj = (T) Convert.ChangeType(0, typeof (T));
             byte[] databuffer = null;
             int dataFileIndex = 1;
             int dataOffset = 0;
@@ -520,11 +532,13 @@ namespace SimTelemetry.Domain.Logger
             if (fieldId == (int)LogError.GroupNotFound) return errObj;
             var fieldObj = FindField((int)fieldId);
 
-            int fieldOffset = 0;
+            int fieldOffset = -1;
 
             // Search inside the buffer.
+            //int ind = nextDataOffset-1;
+            //while (ind >= 0)
             int ind = dataOffset;
-            while (ind < databuffer.Length)
+            while (ind < databuffer.Length-1)
             {
                 var isData = databuffer[ind + 1] == 0x1F && databuffer[ind] == 0x1F;
                 if (isData)
@@ -535,12 +549,15 @@ namespace SimTelemetry.Domain.Logger
                         fieldOffset = ind+2+4;
                         break;
                     }
-                    else
-                        ind += 4;
                 }
-                else
                 ind++;
             }
+
+            if (fieldOffset == -1)
+                if (typeof(T).Equals(typeof(string)))
+                    return (T)((object)"");
+                else
+                    return (T)Convert.ChangeType(-1, typeof (T));
 
             return fieldObj.ReadAs<T>(databuffer, fieldOffset);
 
