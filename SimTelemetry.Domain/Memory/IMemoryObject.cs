@@ -23,6 +23,8 @@ namespace SimTelemetry.Domain.Memory
         object Read();
         bool HasChanged();
 
+        void MarkDirty();
+
         void Refresh();
         void SetProvider(MemoryProvider provider);
         void SetPool(MemoryPool pool);

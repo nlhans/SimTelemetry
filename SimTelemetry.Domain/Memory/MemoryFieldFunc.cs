@@ -47,6 +47,11 @@ namespace SimTelemetry.Domain.Memory
             return IsChanging;
         }
 
+        public void MarkDirty()
+        {
+            IsChanging = true;
+        }
+
         public TOut ReadAs<TOut>()
         {
             return MemoryDataConverter.Cast<T, TOut>(ValidationFunc(Pool));

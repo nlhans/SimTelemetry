@@ -39,6 +39,11 @@ namespace SimTelemetry.Domain.Memory
             return false;
         }
 
+        public void MarkDirty()
+        {
+            firstCall = true;
+        }
+
         public MemoryFieldConstant(string name, T staticValue)
         {
             Name = name;

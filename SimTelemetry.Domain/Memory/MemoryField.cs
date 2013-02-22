@@ -39,6 +39,11 @@ namespace SimTelemetry.Domain.Memory
             return !_Value.Equals(_OldValue);
         }
 
+        public void MarkDirty()
+        {
+            readCounter = 0;
+        }
+
         public virtual TOut ReadAs<TOut>()
         {
             return MemoryDataConverter.Cast<T, TOut>(Value);
