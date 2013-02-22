@@ -60,9 +60,6 @@
     <Reference Include="nunit.framework">
       <HintPath>..\Binaries\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Simplicit.Net.Lzo">
-      <HintPath>..\..\..\..\Downloads\lzonet_1.0.1\lib\Simplicit.Net.Lzo.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -92,7 +89,6 @@
     <Compile Include="Logger\LogFileReaderTests.cs" />
     <Compile Include="Logger\LogFileWriterTests.cs" />
     <Compile Include="Logger\LogGroupTests.cs" />
-    <Compile Include="MemoryTests.cs" />
     <Compile Include="Memory\DiagnosticMemoryReader.cs" />
     <Compile Include="Memory\MemoryDataConverterTests.cs" />
     <Compile Include="Memory\MemoryFieldConstantTests.cs" />
@@ -106,8 +102,6 @@
     <Compile Include="Repositories\CarRepositoryTests.cs" />
     <Compile Include="Repositories\TrackRepositoryTests.cs" />
     <Compile Include="Aggregates\SimulatorTests.cs" />
-    <Compile Include="Sandbox.cs" />
-    <Compile Include="Telemetry\TelemetryTests.cs" />
     <Compile Include="TestConstants.cs" />
     <Compile Include="Utils\IniReaderTests.cs" />
     <Compile Include="Utils\ZipStorerTests.cs" />
@@ -145,7 +139,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Folder Include="Telemetry\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
