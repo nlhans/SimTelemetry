@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Domain.Telemetry;
 using SimTelemetry.Tests.Logger;
 using SimTelemetry.Tests.Telemetry;
 
@@ -39,9 +40,9 @@ namespace SimTelemetry.Tests
 
         }
 
-        static void RefreshDrivers(MemoryPool DriverPtrs)
+        static void RefreshDrivers(IDataNode DriverPtrsObj)
         {
-
+            var DriverPtrs = (MemoryPool) DriverPtrsObj;
             Console.WriteLine(("updating cars"));
             // Add found drivers.
             DriverPtrs.ClearPools();

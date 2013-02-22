@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Memory
 {
-    public class MemoryProvider
+    public class MemoryProvider : IDataProvider
     {
         public int BaseAddress { get; protected set; }
         public MemoryReader Reader { get; protected set; }
@@ -22,20 +22,20 @@ namespace SimTelemetry.Domain.Memory
             Scanner = new MemorySignatureScanner(this);
         }
 
-        public void Add(MemoryPool pool)
+        public void Add(IDataNode pool)
         {
-            _pools.Add(pool);
-            pool.SetProvider(this);
+            _pools.Add((MemoryPool) pool);
+            ((MemoryPool)pool).SetProvider(this);
         }
 
-        public void Remove(MemoryPool pool)
+        public void Remove(IDataNode pool)
         {
-            _pools.Remove(pool);
+            _pools.Remove((MemoryPool) pool);
         }
 
-        public MemoryPool Get(string name)
+        public IDataNode Get(string name)
         {
-            return _pools.Where(x => x.Name == name).FirstOrDefault();
+            return _pools.Where(x => x.Name == name).Cast<IDataNode>().FirstOrDefault();
         }
 
         public bool Contains(string name)

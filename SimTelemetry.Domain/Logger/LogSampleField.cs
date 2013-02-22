@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Logger
 {

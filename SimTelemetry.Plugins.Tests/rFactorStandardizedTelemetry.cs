@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
-using SimTelemetry.Objects;
 
 namespace SimTelemetry.Plugins.Tests
 {

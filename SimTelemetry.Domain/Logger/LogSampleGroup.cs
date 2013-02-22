@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using SimTelemetry.Domain.Common;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Logger
 {
@@ -72,6 +72,11 @@ namespace SimTelemetry.Domain.Logger
         public void GetDebugInfo(XmlWriter file)
         {
             // nothing
+        }
+
+        public IDataNode Clone(string newName, int newAddress)
+        {
+            return (IDataNode) MemberwiseClone();
         }
 
         public void Update(int timestamp, bool onlyThisSample)

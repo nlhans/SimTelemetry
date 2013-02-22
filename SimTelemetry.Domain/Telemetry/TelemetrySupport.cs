@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SimTelemetry.Domain.LoggerO;
 
 namespace SimTelemetry.Domain.Telemetry
 {
@@ -8,17 +7,11 @@ namespace SimTelemetry.Domain.Telemetry
     {
         public Dictionary<string, bool> Supported { get; protected set; }
 
-        public void Update(Aggregates.Telemetry telemetry)
+        public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
-
             Supported = new Dictionary<string, bool>();
-            Supported.Add("Driver.Meters", telemetry.Memory.Get("DriverTemplate").Fields.ContainsKey("MetersDriven"));
+            Supported.Add("Driver.Meters", Memory.Get("DriverTemplate").Fields.ContainsKey("MetersDriven"));
 
-        }
-
-        public void Update(LogFile logFile)
-        {
-            throw new NotImplementedException();
         }
     }
 }

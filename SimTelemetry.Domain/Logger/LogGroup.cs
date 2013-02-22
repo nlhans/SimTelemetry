@@ -5,9 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using System.Xml.Schema;
-using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Logger
 {

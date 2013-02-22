@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using SimTelemetry.Domain.Common;
+﻿using System.Collections.Generic;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Logger
 {

@@ -230,8 +230,8 @@ namespace SimTelemetry.Tests
             // From here 'application'.
             provider.Refresh();
 
-            MemoryPool drv1 = provider.Get("Drivers").Pools["Driver0"];
-            foreach(var drv in provider.Get("Drivers").Pools)
+            MemoryPool drv1 = ((MemoryPool) provider.Get("Drivers")).Pools["Driver0"];
+            foreach(var drv in  ((MemoryPool) provider.Get("Drivers")).Pools)
                 Debug.WriteLine("#" + drv.Value.ReadAs<int>("Index") + " -> " + drv.Value.ReadAs<string>("Name"));
 
             MemoryPool sess = provider.Pools.Where(x => x.Name == "Session").FirstOrDefault();
@@ -370,11 +370,11 @@ namespace SimTelemetry.Tests
 
             foreach(var field in memory.Get("Player").Fields)
             {
-                    Debug.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
+                Debug.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), ((IMemoryObject)field.Value).Address, ((IMemoryObject)field.Value).Offset, field.Key);
             }
             foreach (var field in memory.Get("Environment").Fields)
             {
-                Debug.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), field.Value.Address, field.Value.Offset, field.Key);
+                Debug.WriteLine("\"{3}\" : {0} -> {1:X}+{2:X}", field.Value.ReadAs<string>(), ((MemoryPool)field.Value).Address, ((MemoryPool)field.Value).Offset, field.Key);
             }
             w.Stop();
             Debug.WriteLine(w.ElapsedMilliseconds);

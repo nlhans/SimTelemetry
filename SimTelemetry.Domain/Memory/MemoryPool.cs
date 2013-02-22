@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Xml;
-using SimTelemetry.Domain.Common;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Memory
 {
-    public class MemoryPool : IMemoryObject, ICloneable, IDataNode
+    public class MemoryPool : IMemoryObject, IDataNode
     {
         public string Name { get; protected set; }
         public MemoryProvider Memory { get; set; }
@@ -30,6 +29,7 @@ namespace SimTelemetry.Domain.Memory
         public byte[] Value { get; protected set; }
         public Type ValueType { get { return typeof(MemoryPool); } }
 
+        Dictionary<string, IDataField> IDataNode.Fields { get { return _fields.Cast<IDataField>().ToDictionary(x => x.Name, x => x); } }
         public Dictionary<string, IMemoryObject> Fields { get { return _fields; } }
         public Dictionary<string, MemoryPool> Pools { get { return _pools; } }
 
@@ -384,11 +384,11 @@ namespace SimTelemetry.Domain.Memory
         }
 
 
-        public MemoryPool Clone(string newName, int address)
+        public IDataNode Clone(string newName, int address)
         {
             var target = new MemoryPool(newName, AddressType, address, Size);
             CloneContents(target);
-            return target;
+            return (IDataNode)target;
         }
         protected void CloneContents(MemoryPool target)
         {

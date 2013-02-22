@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Telemetry;
 using SimTelemetry.Domain.Utils;
 
 namespace SimTelemetry.Domain.Logger
@@ -22,7 +20,7 @@ namespace SimTelemetry.Domain.Logger
 
         private ZipStorer _archive;
 
-        public LogFileWriter (string file)
+        public LogFileWriter(string file)
         {
             FileName = file;
             _archive = ZipStorer.Create(file, "SimTelemetry log");
@@ -32,66 +30,62 @@ namespace SimTelemetry.Domain.Logger
 
             Directory.CreateDirectory("./tmp/");
 
-            GlobalEvents.Hook<LogFileWriteAction>((x) =>
-                                                      {
-                                                          if (x.File == this)
-                                                          {
-                                                              pendingFileWrites++;
-                                                              ThreadPool.QueueUserWorkItem(WriteTemporaryFile, x);
-                                                          }
-                                                      }, false);
+            GlobalEvents.Hook<LogFileWriteAction>(StartWriteTemporaryFile, false);
         }
 
+        private void StartWriteTemporaryFile(LogFileWriteAction lfwa)
+        {
+            if (lfwa.File != this) return;
+            pendingFileWrites++;
+            ThreadPool.QueueUserWorkItem(WriteTemporaryFile, lfwa);
+
+            
+        }
         private void WriteTemporaryFile(object oLfwa)
         {
             var lfwa = (LogFileWriteAction) oLfwa;
             pendingFileWrites--;
 
-            if (lfwa.File == this)
+            var file = "";
+            var fm = FileMode.Append;
+            switch (lfwa.FileType)
             {
-                var file = "";
-                var fm = FileMode.Append;
-                switch (lfwa.FileType)
-                {
-                    case LogFileType.Data:
-                        file = "Data.bin";
-                        break;
+                case LogFileType.Data:
+                    file = "Data.bin";
+                    break;
 
-                    case LogFileType.Time:
-                        file = "Time.bin";
-                        break;
+                case LogFileType.Time:
+                    file = "Time.bin";
+                    break;
 
-                    case LogFileType.Structure:
-                        file = "Structure.xml";
-                        fm = FileMode.Create;
-                        break;
+                case LogFileType.Structure:
+                    file = "Structure.xml";
+                    fm = FileMode.Create;
+                    break;
 
-                    case LogFileType.Laps:
-                        file = "Laps.xml";
-                        break;
-                }
-
-                string path = "";
-
-                if (lfwa.Group != "")
-                {
-                    path = "./tmp/" + lfwa.Group + "/" + file;
-                    if (!Directory.Exists("./tmp/" + lfwa.Group + "/"))
-                        Directory.CreateDirectory("./tmp/" + lfwa.Group + "/");
-                }
-                else
-                    path = "./tmp/" + file;
-
-
-
-                // Open the file stream.
-                FileStream fs = File.Open(path, fm);
-                fs.Write(lfwa.Data, 0, lfwa.Data.Length);
-                fs.Close();
-
-                if (temporaryFiles.Contains(path) == false)
-                    temporaryFiles.Add(path);
+                case LogFileType.Laps:
+                    file = "Laps.xml";
+                    break;
             }
+
+            string path = "";
+
+            if (lfwa.Group != "")
+            {
+                path = "./tmp/" + lfwa.Group + "/" + file;
+                if (!Directory.Exists("./tmp/" + lfwa.Group + "/"))
+                    Directory.CreateDirectory("./tmp/" + lfwa.Group + "/");
+            }
+            else
+                path = "./tmp/" + file;
+
+            // Open the file stream.
+            FileStream fs = File.Open(path, fm);
+            fs.Write(lfwa.Data, 0, lfwa.Data.Length);
+            fs.Close();
+
+            if (temporaryFiles.Contains(path) == false)
+                temporaryFiles.Add(path);
         }
 
         public bool Subscribe(IDataNode dataSource)
@@ -110,6 +104,11 @@ namespace SimTelemetry.Domain.Logger
             return true;
         }
 
+        public bool Unsubscribe(IDataNode logGroup)
+        {
+            return Unsubscribe(logGroup.Name);
+        }
+
         public bool Unsubscribe(string name)
         {
             if (!_groups.Any(x => x.Name == name))
@@ -118,11 +117,6 @@ namespace SimTelemetry.Domain.Logger
             _groups.Where(x => x.Name == name).FirstOrDefault().Close();
 
             return true;
-        }
-
-        public bool Unsubscribe(IDataNode logGroup)
-        {
-            return Unsubscribe(logGroup.Name);
         }
 
         public void Update(int time)
@@ -143,10 +137,10 @@ namespace SimTelemetry.Domain.Logger
                 timeout -= 25;
             }
 
-
             foreach (var file in temporaryFiles)
             {
-                _archive.AddFile(ZipStorer.Compression.Deflate, file, file.Substring(6), ""); // 6 is removing ./tmp/
+                _archive.AddFile(ZipStorer.Compression.Deflate, file,
+                                 file.Substring(6), ""); // 6 is removing ./tmp/
                 File.Delete(file);
             }
 

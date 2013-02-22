@@ -11,7 +11,7 @@ using SimTelemetry.Domain.Utils;
 
 namespace SimTelemetry.Domain.Aggregates
 {
-    public class Telemetry
+    public class Telemetry : ITelemetry
     {
         public bool IsRunning { get; protected set; }
         public bool IsDriving { get; protected set; }
@@ -19,7 +19,7 @@ namespace SimTelemetry.Domain.Aggregates
 
         private MMTimer Clock;
 
-        internal MemoryProvider Memory { get; set; }
+        private MemoryProvider Memory { get; set; }
         public IPluginTelemetryProvider Provider { get; protected set; }
 
         public LogFileWriter Logger { get; protected set; }
@@ -99,15 +99,15 @@ namespace SimTelemetry.Domain.Aggregates
             Memory.Refresh();
 
             // Simulator environment etc.
-            Support.Update(this);
-            Simulator.Update(this);
-            Session.Update(this);
-            Acquisition.Update(this);
+            Support.Update(this, Memory);
+            Simulator.Update(this, Memory);
+            Session.Update(this, Memory);
+            Acquisition.Update(this, Memory);
 
             // Drivers
             UpdateDrivers();
             foreach(var driver in Drivers)
-                driver.Update(this);
+                driver.Update(this, Memory);
 
             // Update game status reports.
             var isSessionLoading = Session.IsLoading;
@@ -135,16 +135,6 @@ namespace SimTelemetry.Domain.Aggregates
             if (Logger.Groups.Any(x => x.Name == "Session") == false)
                 Logger.Subscribe(Memory.Get("Session"));
 
-            if (Player != null)
-                foreach (var field in Player.Pool.Fields)
-                {
-                    if(field.Key == "TyreCompoundRear")
-                    {
-                        //
-                    }
-                    field.Value.Read();
-                }
-
             if (Logger != null)
                 Logger.Update((int)Math.Round(Session.Time*1000));
         }
@@ -169,7 +159,7 @@ namespace SimTelemetry.Domain.Aggregates
 
                     var isPlayer = validDriverPtr == playerDriverPtr;
                     var memPool = Memory.Get("DriverTemplate").Clone("Driver " + validDriverPtr, validDriverPtr);
-                    Provider.CreateDriver(memPool, isPlayer);
+                    Provider.CreateDriver((MemoryPool)memPool, isPlayer);
 
                     Memory.Add(memPool);
 

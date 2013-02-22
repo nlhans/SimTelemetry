@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimTelemetry.Domain.Common
+namespace SimTelemetry.Domain.Telemetry
 {
     public interface IDataField
     {

@@ -1,4 +1,5 @@
 ﻿using SimTelemetry.Domain.Memory;
+using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Plugins
 {

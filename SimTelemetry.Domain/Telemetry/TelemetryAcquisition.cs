@@ -1,20 +1,13 @@
-﻿using System;
-using SimTelemetry.Domain.LoggerO;
-
-namespace SimTelemetry.Domain.Telemetry
+﻿namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetryAcquisition : ITelemetryObject
     {
         public Aggregates.Telemetry Telemetry { get; protected set; }
 
-        public void Update(Aggregates.Telemetry telemetry)
+        public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
 
         }
 
-        public void Update(LogFile logFile)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

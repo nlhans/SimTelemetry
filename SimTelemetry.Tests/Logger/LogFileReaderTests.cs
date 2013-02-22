@@ -23,13 +23,13 @@ namespace SimTelemetry.Tests.Logger
         }
 
         [Test]
-        public void ReadFixedPeriodData()
+        public void ReadFrequentData()
         {
             var reader = new LogFileReader("test4.zip");
 
             var sampleProvider = reader.GetProvider(new[] { "test" }, 100, 20000); // from 100ms to 2000ms
 
-            int startI = 101;
+            int startI = 100;
             foreach (var sample in sampleProvider.GetSamples())
             {
                 var group = sample.Get("test");
@@ -39,17 +39,15 @@ namespace SimTelemetry.Tests.Logger
                 startI++;
 
                 Assert.LessOrEqual(whatWasAnInteger, 20001);
-                Assert.GreaterOrEqual(whatWasAnInteger, 101);
+                Assert.GreaterOrEqual(whatWasAnInteger, 100);
             }
         }
 
         [Test]
-        public void ReadData()
+        public void ReadInfrequentData()
         {
             var reader = new LogFileReader("test5.zip");
-
-
-            var sampleProvider = reader.GetProvider(new[] { "test", "Henk" }, 100, 20000); // from 100ms to 2000ms
+            var sampleProvider = reader.GetProvider(new[] { "test", "Henk" }, 100, 20000); // from 100ms to 20000ms
 
             var lastTime = 99;
             int inperiodIntegerCheck = 100 / 20 - 1;
@@ -62,7 +60,6 @@ namespace SimTelemetry.Tests.Logger
                 Assert.AreEqual(1, time - lastTime);
                 lastTime = time;
 
-                // Okay, and then other:
                 var other = sample.Get("Henk");
                 var int1 = other.ReadAs<int>("testInt");
                 var string1 = other.ReadAs<string>("test");
@@ -84,7 +81,7 @@ namespace SimTelemetry.Tests.Logger
 
             }
 
-            var sampleProvider2 = reader.GetProvider(new[] { "Henk" }, 100, 2000000); // from 100ms to 2000ms
+            var sampleProvider2 = reader.GetProvider(new[] { "Henk" }, 100, 2000000); // from 100ms to 20000ms
             lastTime = 99;
 
             foreach (var sample in sampleProvider2.GetSamples())

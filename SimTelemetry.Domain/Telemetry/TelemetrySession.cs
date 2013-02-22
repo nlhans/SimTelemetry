@@ -1,7 +1,4 @@
-﻿using SimTelemetry.Domain.Common;
-using SimTelemetry.Domain.LoggerO;
-
-namespace SimTelemetry.Domain.Telemetry
+﻿namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetrySession : ITelemetryObject
     {
@@ -13,27 +10,17 @@ namespace SimTelemetry.Domain.Telemetry
         public float Time { get; protected set; }
         public int Cars { get; protected set; }
 
-        protected void Update(IDataNode sesionGroup)
+        public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
-            Cars = sesionGroup.ReadAs<int>("Cars");
-            Time = sesionGroup.ReadAs<float>("Time");
+            IDataNode sessionGroup = Memory.Get("Session");
 
-            IsActive = sesionGroup.ReadAs<bool>("IsActive");
-            IsOffline = sesionGroup.ReadAs<bool>("IsOffline");
-            IsReplay = sesionGroup.ReadAs<bool>("IsReplay");
-            IsLoading = sesionGroup.ReadAs<bool>("IsLoading");
-        }
+            Cars = sessionGroup.ReadAs<int>("Cars");
+            Time = sessionGroup.ReadAs<float>("Time");
 
-        public void Update(Aggregates.Telemetry  telemetry)
-        {
-            var sessionPool = (IDataNode)telemetry.Memory.Get("Session");
-            Update(sessionPool);
-        }
-
-        public void Update(LogFile logFile)
-        {
-            var sessionPool = (IDataNode)logFile.FindGroup("Session");
-            Update(sessionPool);
+            IsActive = sessionGroup.ReadAs<bool>("IsActive");
+            IsOffline = sessionGroup.ReadAs<bool>("IsOffline");
+            IsReplay = sessionGroup.ReadAs<bool>("IsReplay");
+            IsLoading = sessionGroup.ReadAs<bool>("IsLoading");
         }
 
         public TelemetrySession Clone()

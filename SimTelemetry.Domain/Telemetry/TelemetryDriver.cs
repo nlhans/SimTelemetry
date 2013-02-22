@@ -1,14 +1,11 @@
 ﻿using System;
-using SimTelemetry.Domain.LoggerO;
 using SimTelemetry.Domain.Memory;
 
 namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetryDriver : ITelemetryObject
     {
-        public int BaseAddress { get { return Pool.Address; }}
-
-        internal MemoryPool Pool { get; set; }
+        internal IDataNode Pool { get; set; }
 
         public bool IsPlayer { get; protected set; }
         public string Name { get; protected set; }
@@ -52,9 +49,11 @@ namespace SimTelemetry.Domain.Telemetry
         public float InputThrottle { get; protected set; }
         public float InputBrake { get; protected set; }
 
+        public int BaseAddress { get; private set; }
+
         private bool _initial = true;
 
-        public void Update(Aggregates.Telemetry telemetry)
+        public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
             if(_initial)
             {
@@ -110,19 +109,16 @@ namespace SimTelemetry.Domain.Telemetry
             }
         }
 
-        public void Update(LogFile logFile)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TelemetryDriver(MemoryPool pool)
+        public TelemetryDriver(IDataNode pool)
         {
             Pool = pool;
+
+            if (Pool is MemoryPool)
+            {
+                BaseAddress = ((MemoryPool) Pool).Address;
+            }
         }
 
-        public TelemetryDriver(ILogNode f)
-        {
-        }
 
         public TelemetryDriver Clone()
         {
