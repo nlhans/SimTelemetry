@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using SimTelemetry.Domain.Logger;
+using SimTelemetry.Domain.LoggerO;
 using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.ValueObjects

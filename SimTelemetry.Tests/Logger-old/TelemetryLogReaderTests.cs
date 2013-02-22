@@ -4,7 +4,7 @@ using NUnit.Framework;
 using SimTelemetry.Domain.Aggregates;
 
 
-namespace SimTelemetry.Tests.Logger
+namespace SimTelemetry.Tests.LoggerO
 {
     [TestFixture]
     public class TelemetryLogReaderTests

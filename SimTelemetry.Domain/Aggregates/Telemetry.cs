@@ -22,7 +22,7 @@ namespace SimTelemetry.Domain.Aggregates
         internal MemoryProvider Memory { get; set; }
         public IPluginTelemetryProvider Provider { get; protected set; }
 
-        public ITelemetryLogger Logger { get; protected set; }
+        public LogFileWriter Logger { get; protected set; }
 
         #region Telemetry data yard
         public TelemetrySession Session { get; protected set; }
@@ -81,15 +81,15 @@ namespace SimTelemetry.Domain.Aggregates
             Provider.Deinitialize();
         }
 
-        public void SetLogger(ITelemetryLogger logger)
+        public void SetLogger(LogFileWriter logger)
         {
             Logger = logger;
-            Logger.Initialize(this, Memory);
+            //Logger.Initialize(this, Memory);
         }
 
         public void RemoveLogger()
         {
-            Logger.Deinitialize();
+            //Logger.Deinitialize();
             Logger = null;
         }
 
@@ -131,12 +131,22 @@ namespace SimTelemetry.Domain.Aggregates
                 if (isDriving != IsDriving)
                     SetDrivingStatus(isDriving);
             }
+
+            if (Logger.Groups.Any(x => x.Name == "Session") == false)
+                Logger.Subscribe(Memory.Get("Session"));
+
             if (Player != null)
-            foreach (var field in Player.Pool.Fields)
-                field.Value.Read();
+                foreach (var field in Player.Pool.Fields)
+                {
+                    if(field.Key == "TyreCompoundRear")
+                    {
+                        //
+                    }
+                    field.Value.Read();
+                }
 
             if (Logger != null)
-                Logger.UpdateData();
+                Logger.Update((int)Math.Round(Session.Time*1000));
         }
 
         protected virtual void UpdateDrivers()
@@ -195,6 +205,10 @@ namespace SimTelemetry.Domain.Aggregates
                     GlobalEvents.Fire(new DriversAdded(this, driversAdded), true);
                 if (driversRemoved.Count > 0)
                     GlobalEvents.Fire(new DriversRemoved(this, driversAdded), true);
+
+                if (Logger != null)
+                driversAdded.ForEach(x => Logger.Subscribe(x.Pool));
+                driversRemoved.ForEach(x => Logger.Unsubscribe(x.Pool));
 
             }
         }

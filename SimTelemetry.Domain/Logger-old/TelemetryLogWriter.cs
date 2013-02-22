@@ -6,7 +6,7 @@ using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Memory;
 using Triton.Maths;
 
-namespace SimTelemetry.Domain.Logger
+namespace SimTelemetry.Domain.LoggerO
 {
     public class TelemetryLogWriter : ITelemetryLogger
     {

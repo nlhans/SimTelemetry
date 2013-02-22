@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SimTelemetry.Domain.Logger;
+using SimTelemetry.Domain.LoggerO;
 using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Aggregates

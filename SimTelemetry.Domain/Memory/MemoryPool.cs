@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Xml;
 using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Domain.Memory
@@ -68,6 +69,58 @@ namespace SimTelemetry.Domain.Memory
                 return Fields[field].ReadAs<TOut>();
             else
                 return MemoryDataConverter.Read<TOut>(new byte[32], 0);
+        }
+
+        public IEnumerable<IDataField> GetDataFields()
+        {
+            return Fields.Select(x => (IDataField)x.Value);
+        }
+
+        public byte[] ReadBytes(string field)
+        {
+            var oField = this.Fields[field];
+            if (oField.HasChanged())
+            {
+                return MemoryDataConverter.Rawify(oField.Read);
+            }
+            else
+            {
+                return new byte[0];
+            }
+        }
+
+        public void GetDebugInfo(XmlWriter file)
+        {
+            file.WriteStartElement("debug");
+            file.WriteAttributeString("name", this.Name);
+            file.WriteAttributeString("fields", Fields.Count().ToString());
+
+            file.WriteAttributeString("template", IsTemplate.ToString());
+            if (AddressTree == null)
+                file.WriteAttributeString("address", Address.ToString("X"));
+            else
+                file.WriteAttributeString("address", string.Concat(AddressTree.Select(x => x.ToString("X") + ", ")));
+            file.WriteAttributeString("size", Size.ToString("X"));
+            file.WriteAttributeString("offset", Offset.ToString("X"));
+
+            foreach(var field in Fields)
+            {
+                file.WriteStartElement("debug-field");
+                file.WriteAttributeString("name", field.Value.Name);
+                file.WriteAttributeString("address", field.Value.Address.ToString());
+                file.WriteAttributeString("size", field.Value.Size.ToString());
+                file.WriteAttributeString("offset", field.Value.Offset.ToString());
+                file.WriteAttributeString("type", field.Value.ValueType.ToString());
+                file.WriteEndElement();
+            }
+            foreach(var pool in Pools)
+            {
+                pool.Value.GetDebugInfo(file);
+            }
+
+            file.WriteEndElement();
+
+            //return string.Format("Type:{0}, Fields: {1}, IsTemplate: {2}, Address: 0x{3:X}, Offset: 0x{4:X}, Size: 0x{5:X}", AddressType, Fields.Count(), IsTemplate, Address, Offset, Size);
         }
 
         public void Refresh()

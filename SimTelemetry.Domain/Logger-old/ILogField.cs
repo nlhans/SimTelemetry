@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimTelemetry.Domain.Logger
+namespace SimTelemetry.Domain.LoggerO
 {
     public interface ILogField
     {

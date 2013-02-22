@@ -1,5 +1,5 @@
 ﻿using System;
-using SimTelemetry.Domain.Logger;
+using SimTelemetry.Domain.LoggerO;
 using SimTelemetry.Domain.Memory;
 
 namespace SimTelemetry.Domain.Telemetry

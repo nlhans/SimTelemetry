@@ -8,7 +8,7 @@ using System.Threading;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Utils;
 
-namespace SimTelemetry.Domain.Logger
+namespace SimTelemetry.Domain.LoggerO
 {
     public class LogFile : ILogNode
     {

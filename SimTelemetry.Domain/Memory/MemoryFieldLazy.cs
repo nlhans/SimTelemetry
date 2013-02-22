@@ -32,6 +32,7 @@ namespace SimTelemetry.Domain.Memory
             {
                 _LazyValue = new Lazy<T>(() =>
                                              {
+                                                 readCounter++;
                                                  Refreshed = true;
                                                  _OldValue = _Value;
                                                  if (IsStatic)

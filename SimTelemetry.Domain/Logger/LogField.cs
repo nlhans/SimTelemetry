@@ -1,48 +1,67 @@
 ﻿using System;
+using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Memory;
 
 namespace SimTelemetry.Domain.Logger
 {
-    public class LogField<T> : ILogField
+    public class LogFieldDataField : IDataField
     {
-        public int ID { get; protected set; }
         public string Name { get; protected set; }
+        public Type ValueType { get; protected set; }
 
-        public bool IsConstant { get; protected set; }
-        public TOutput ReadAs<TOutput>(byte[] databuffer, int index)
+        public LogFieldDataField(string name, Type valueType)
         {
-            return MemoryDataConverter.Unrawify<T, TOutput>(databuffer, index);
+            Name = name;
+            ValueType = valueType;
         }
 
+        public LogFieldDataField(string name, string type)
+        {
+            Name = name;
+            ValueType = Type.GetType(type);
+        }
+
+        public bool HasChanged()
+        {
+            return true;
+        }
+
+        public T1 ReadAs<T1>()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class LogField
+    {
+        public int ID;
+        public string Name { get; protected set; }
         public LogGroup Group { get; protected set; }
-        public LogFile File { get; protected set; }
+        public IDataField DataSource { get; protected set; }
 
         public Type ValueType { get; protected set; }
 
-        public int SampleOffset;
-        public T[] Data;
-
-        public T ReadAs<T>(double time)
-        {
-            //
-            return (T)new object();
-        }
-        public T ReadAs<T>(int sample)
-        {
-            //
-            return (T)new object();
-        }
-
-        public LogField(int id, string name, LogGroup @group, LogFile file, bool isConstant)
+        public LogField(LogGroup group, IDataField field, int id)
         {
             ID = id;
-            Name = name;
+            Name = field.Name;
             Group = group;
-            File = file;
-            ValueType = typeof(T);
-            IsConstant = isConstant;
+            DataSource = field;
+            this.ValueType = field.ValueType;
         }
 
+        public LogField(LogGroup group, string name, string id, string type)
+        {
+            ID = Int32.Parse(id);
+            Name = name;
+            Group = group;
+            DataSource = new LogFieldDataField(name, type);
+            this.ValueType = Type.GetType(type);
+        }
 
+        public bool HasChanged()
+        {
+            return DataSource.HasChanged();
+        }
     }
 }

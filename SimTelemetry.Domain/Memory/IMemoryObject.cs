@@ -1,8 +1,9 @@
 ﻿using System;
+using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Domain.Memory
 {
-    public interface IMemoryObject : ICloneable
+    public interface IMemoryObject : ICloneable, IDataField
     {
         string Name { get; }
         MemoryProvider Memory { get; }

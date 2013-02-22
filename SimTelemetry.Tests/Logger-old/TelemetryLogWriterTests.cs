@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Events;
-using SimTelemetry.Domain.Logger;
+using SimTelemetry.Domain.LoggerO;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Telemetry;
 
-namespace SimTelemetry.Tests.Logger
+namespace SimTelemetry.Tests.LoggerO
 {
     [TestFixture]
     public class TelemetryLogWriterTests

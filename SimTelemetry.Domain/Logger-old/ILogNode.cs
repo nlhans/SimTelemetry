@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using SimTelemetry.Domain.Common;
 
-namespace SimTelemetry.Domain.Logger
+namespace SimTelemetry.Domain.LoggerO
 {
-    public interface ILogNode : IDataNode
+    public interface ILogNode 
     {
         int ID { get; }
         IEnumerable<LogGroup> Groups { get; }

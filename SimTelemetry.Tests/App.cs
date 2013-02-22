@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Tests.Logger;
 using SimTelemetry.Tests.Telemetry;
 
 namespace SimTelemetry.Tests
@@ -14,6 +15,10 @@ namespace SimTelemetry.Tests
 
         static void Main(string[] args)
         {
+            LogFileWriterTests tests = new LogFileWriterTests();
+            tests.Create();
+
+            return;
             Stopwatch w = new Stopwatch();
             w.Start();
 

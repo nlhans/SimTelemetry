@@ -1,16 +1,15 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using SimTelemetry.Domain.Logger;
+using SimTelemetry.Domain.LoggerO;
 
-namespace SimTelemetry.Tests.Logger
+namespace SimTelemetry.Tests.LoggerO
 {
     [TestFixture]
     class LogReaderTests
     {
         private LogWriterTests _logWriter;
-        private LogFile logFile;
+        private LogFile LogFileTests;
         [TestFixtureSetUp]
         public void CreateDataFile()
         {
@@ -20,7 +19,7 @@ namespace SimTelemetry.Tests.Logger
             _logWriter.BinaryTests();
 
             // create our own logfile Reader
-            logFile = new LogFile("temp.zip");
+            LogFileTests = new LogFile("temp.zip");
 
         }
 
@@ -29,25 +28,25 @@ namespace SimTelemetry.Tests.Logger
         {
             Assert.AreNotEqual(_logWriter, null);
 
-            Assert.AreEqual(1, logFile.Groups.Count());
-            Assert.AreEqual(0, logFile.Fields.Count());
+            Assert.AreEqual(1, LogFileTests.Groups.Count());
+            Assert.AreEqual(0, LogFileTests.Fields.Count());
 
-            var myGroup = logFile.Groups.FirstOrDefault();
-            var myGroupById = logFile.FindGroup(1);
-            var myGroupId = logFile.GetGroupId("My Group");
+            var myGroup = LogFileTests.Groups.FirstOrDefault();
+            var myGroupById = LogFileTests.FindGroup(1);
+            var myGroupId = LogFileTests.GetGroupId("My Group");
             Assert.AreEqual(myGroupId, myGroupById.ID);
             Assert.AreEqual(myGroupById, myGroup);
             Assert.AreEqual("My Group", myGroup.Name);
             Assert.AreEqual(1, myGroup.ID);
-            Assert.AreEqual(logFile, myGroup.Master);
-            Assert.AreEqual(logFile, myGroup.File);
+            Assert.AreEqual(LogFileTests, myGroup.Master);
+            Assert.AreEqual(LogFileTests, myGroup.File);
 
             Assert.AreEqual(2, myGroup.Fields.Count());
             Assert.AreEqual(1, myGroup.Groups.Count());
 
             // myFloat
-            var myFloatFieldById = logFile.FindField(1);
-            var floatFieldId = logFile.GetFieldId("My Group", "myFloat");
+            var myFloatFieldById = LogFileTests.FindField(1);
+            var floatFieldId = LogFileTests.GetFieldId("My Group", "myFloat");
             var myFloatField = myGroup.Fields.Where(x => x.ID == 1).FirstOrDefault();
 
             Assert.AreEqual(floatFieldId, myFloatFieldById.ID);
@@ -59,8 +58,8 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual("myFloat", myFloatField.Name);
 
             // myString
-            var myStringFieldById = logFile.FindField(2);
-            var stringFieldId = logFile.GetFieldId("My Group", "myString");
+            var myStringFieldById = LogFileTests.FindField(2);
+            var stringFieldId = LogFileTests.GetFieldId("My Group", "myString");
             var myStringField = myGroup.Fields.Where(x => x.ID == 2).FirstOrDefault();
 
             Assert.AreEqual(stringFieldId, myStringFieldById.ID);
@@ -72,8 +71,8 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual("myString", myStringField.Name);
 
             // subGroup
-            var mySubGroupById = logFile.FindGroup(2);
-            var mySubGroupId = logFile.GetGroupId("My Subgroup");
+            var mySubGroupById = LogFileTests.FindGroup(2);
+            var mySubGroupId = LogFileTests.GetGroupId("My Subgroup");
             var mySubGroup = myGroup.Groups.Where(x => x.ID == 2).FirstOrDefault();
 
             Assert.AreEqual(mySubGroup.ID, mySubGroupId);
@@ -83,12 +82,12 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(1, mySubGroup.Fields.Count());
             Assert.AreEqual(0, mySubGroup.Groups.Count());
             Assert.AreEqual(myGroup, mySubGroup.Master);
-            Assert.AreEqual(logFile, mySubGroup.File);
+            Assert.AreEqual(LogFileTests, mySubGroup.File);
             Assert.AreEqual("My Subgroup", mySubGroup.Name);
 
             // myDouble
-            var myDoubleFieldById = logFile.FindField(3);
-            var doubleFieldId = logFile.GetFieldId("My Subgroup", "myDouble");
+            var myDoubleFieldById = LogFileTests.FindField(3);
+            var doubleFieldId = LogFileTests.GetFieldId("My Subgroup", "myDouble");
             var myDoubleField = mySubGroup.Fields.Where(x => x.ID == 3).FirstOrDefault();
 
             Assert.AreEqual(doubleFieldId, myDoubleFieldById.ID);
@@ -105,12 +104,12 @@ namespace SimTelemetry.Tests.Logger
         public void TestTime()
         {
             // 2 data files:
-            Assert.AreEqual(2, logFile.Time.Count());
+            Assert.AreEqual(2, LogFileTests.Time.Count());
 
             var lastTime = 0;
             var lastOffset = 0;
             var mySwitchpoint = 0;
-            foreach (var timeDict in logFile.Time)
+            foreach (var timeDict in LogFileTests.Time)
             {
                 foreach(var timeKVP in timeDict)
                 {
@@ -132,27 +131,27 @@ namespace SimTelemetry.Tests.Logger
         [Test]
         public void TestData()
         {
-            var timeline = logFile.Timeline.ToList();
+            var timeline = LogFileTests.Timeline.ToList();
             Assert.AreEqual(timeline.Count, _logWriter.testDataFrames);
             var floatData = _logWriter.GetFloatData();
             var doubleData = _logWriter.GetDoubleData();
             var stringData = _logWriter.GetStringData();
 
-            var myFloat1 = logFile.ReadAs<float>("My Group", "myFloat", timeline.FirstOrDefault());
+            var myFloat1 = LogFileTests.ReadAs<float>("My Group", "myFloat", timeline.FirstOrDefault());
             Assert.AreEqual(myFloat1, floatData[0]);
 
             Stopwatch w = new Stopwatch();
             w.Start();
             for (int i = 0; i < floatData.Length; i++)
             {
-                Assert.AreEqual(logFile.ReadAs<float>("My Group", "myFloat", timeline[i]), floatData[i]);
+                Assert.AreEqual(LogFileTests.ReadAs<float>("My Group", "myFloat", timeline[i]), floatData[i]);
                 //Assert.AreEqual(logFile.ReadAs<double>("My Group", "myFloat", timeline[i]), (double)floatData[i]);
-                Assert.AreEqual(logFile.ReadAs<double>("My Subgroup", "myDouble", timeline[i]), doubleData[i]);
+                Assert.AreEqual(LogFileTests.ReadAs<double>("My Subgroup", "myDouble", timeline[i]), doubleData[i]);
 
                 // Test string; this only occurs 1/10 sample time.
                 // It should look up the last written string.
                 string lastString = stringData[i/10];
-                string foundString = logFile.ReadAs<string>("My Group", "myString", timeline[i]);
+                string foundString = LogFileTests.ReadAs<string>("My Group", "myString", timeline[i]);
                 //Assert.AreEqual(lastString, foundString);
 
             }

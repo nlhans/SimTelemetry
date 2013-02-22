@@ -42,7 +42,7 @@ namespace SimTelemetry.Domain.Memory
         }
 
         protected bool IsChanging = false;
-        public bool HasChanged()
+        public virtual bool HasChanged()
         {
             return IsChanging;
         }

@@ -92,6 +92,4 @@ namespace SimTelemetry.Tests
         }
 
     }
-
-    }
 }

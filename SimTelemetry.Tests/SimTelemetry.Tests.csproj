@@ -89,10 +89,13 @@
     <Compile Include="Events\PluginTestSimulatorTrackScanner.cs" />
     <Compile Include="Events\PluginTestWidgetConstructor.cs" />
     <Compile Include="Core\PluginTests.cs" />
-    <Compile Include="Logger\LogReaderTests.cs" />
-    <Compile Include="Logger\LogWriterTests.cs" />
-    <Compile Include="Logger\TelemetryLogReaderTests.cs" />
-    <Compile Include="Logger\TelemetryLogWriterTests.cs" />
+    <Compile Include="Logger-old\LogReaderTests.cs" />
+    <Compile Include="Logger-old\LogWriterTests.cs" />
+    <Compile Include="Logger-old\TelemetryLogReaderTests.cs" />
+    <Compile Include="Logger-old\TelemetryLogWriterTests.cs" />
+    <Compile Include="Logger\LogFileReaderTests.cs" />
+    <Compile Include="Logger\LogFileWriterTests.cs" />
+    <Compile Include="Logger\LogGroupTests.cs" />
     <Compile Include="MemoryTests.cs" />
     <Compile Include="Memory\DiagnosticMemoryReader.cs" />
     <Compile Include="Memory\MemoryDataConverterTests.cs" />

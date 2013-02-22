@@ -3,6 +3,6 @@
     public interface ITelemetryObject
     {
         void Update(Aggregates.Telemetry telemInstance);
-        void Update(Logger.LogFile logFile);
+        void Update(LoggerO.LogFile logFile);
     }
 }

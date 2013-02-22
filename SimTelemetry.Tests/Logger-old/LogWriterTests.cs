@@ -3,41 +3,41 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using SimTelemetry.Domain.Logger;
+using SimTelemetry.Domain.LoggerO;
 using SimTelemetry.Domain.Memory;
 
-namespace SimTelemetry.Tests.Logger
+namespace SimTelemetry.Tests.LoggerO
 {
     [TestFixture]
     class LogWriterTests
     {
-        public LogFile logFile;
+        public LogFile LogFileTests;
         public Domain.Utils.ZipStorer zipFile;
         public int testDataFrames = 400000; // Enough data for 2 log files
         public int switchPoint = 0;
         [Test]
         public void HouseKeeping()
         {
-             logFile = new LogFile();
-            Assert.AreEqual(false, logFile.ReadOnly);
-            Assert.AreEqual(0, logFile.ID);
-            Assert.AreEqual(0, logFile.Groups.Count());
-            Assert.AreEqual(0, logFile.Fields.Count());
+            LogFileTests = new LogFile();
+            Assert.AreEqual(false, LogFileTests.ReadOnly);
+            Assert.AreEqual(0, LogFileTests.ID);
+            Assert.AreEqual(0, LogFileTests.Groups.Count());
+            Assert.AreEqual(0, LogFileTests.Fields.Count());
 
             // Our logger doesn't support top-entry level fields
-            logFile.CreateField("Test", typeof(string), 1, false);
-            Assert.AreEqual(0, logFile.Fields.Count());
+            LogFileTests.CreateField("Test", typeof(string), 1, false);
+            Assert.AreEqual(0, LogFileTests.Fields.Count());
 
-            LogGroup myGroup = logFile.CreateGroup("My Group");
-            Assert.AreEqual(logFile.Groups.Count(), 1);
+            LogGroup myGroup = LogFileTests.CreateGroup("My Group");
+            Assert.AreEqual(LogFileTests.Groups.Count(), 1);
             Assert.AreEqual("My Group", myGroup.Name);
             Assert.AreEqual(1, myGroup.ID);
             Assert.AreEqual(0, myGroup.Fields.Count());
             Assert.AreEqual(0, myGroup.Groups.Count());
-            Assert.AreEqual(logFile, myGroup.Master);
-            Assert.AreEqual(logFile, myGroup.File);
-            Assert.AreEqual(myGroup, logFile.FindGroup(1));
-            Assert.AreEqual(myGroup, logFile.Groups.Where(x => x.ID == 1).FirstOrDefault());
+            Assert.AreEqual(LogFileTests, myGroup.Master);
+            Assert.AreEqual(LogFileTests, myGroup.File);
+            Assert.AreEqual(myGroup, LogFileTests.FindGroup(1));
+            Assert.AreEqual(myGroup, LogFileTests.Groups.Where(x => x.ID == 1).FirstOrDefault());
 
             // Add a field to a group
             var myFloat = myGroup.CreateField<float>("myFloat",false);
@@ -52,8 +52,8 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(myGroup, myString.Group);
 
             // File
-            Assert.AreEqual(logFile, myFloat.File);
-            Assert.AreEqual(logFile, myString.File);
+            Assert.AreEqual(LogFileTests, myFloat.File);
+            Assert.AreEqual(LogFileTests, myString.File);
 
             // ValueType
             Assert.AreEqual(typeof(float), myFloat.ValueType);
@@ -61,16 +61,16 @@ namespace SimTelemetry.Tests.Logger
 
             Assert.AreEqual(2, myGroup.Fields.Count());
 
-            Assert.AreEqual(myFloat, logFile.FindField(1));
-            Assert.AreEqual(myString, logFile.FindField(2));
-            Assert.AreEqual(1, logFile.GetFieldId("My Group", "myFloat"));
-            Assert.AreEqual(1, logFile.GetFieldId(1, "myFloat"));
-            Assert.AreEqual(2, logFile.GetFieldId("My Group", "myString"));
-            Assert.AreEqual(2, logFile.GetFieldId(1, "myString"));
+            Assert.AreEqual(myFloat, LogFileTests.FindField(1));
+            Assert.AreEqual(myString, LogFileTests.FindField(2));
+            Assert.AreEqual(1, LogFileTests.GetFieldId("My Group", "myFloat"));
+            Assert.AreEqual(1, LogFileTests.GetFieldId(1, "myFloat"));
+            Assert.AreEqual(2, LogFileTests.GetFieldId("My Group", "myString"));
+            Assert.AreEqual(2, LogFileTests.GetFieldId(1, "myString"));
 
             // Subgroup
             var subGroup = myGroup.CreateGroup("My Subgroup");
-            Assert.AreEqual(logFile.Groups.Count(), 1);
+            Assert.AreEqual(LogFileTests.Groups.Count(), 1);
             Assert.AreEqual(myGroup.Groups.Count(), 1);
             Assert.AreEqual(2, subGroup.ID);
             Assert.AreEqual("My Subgroup", subGroup.Name);
@@ -78,10 +78,10 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(0, subGroup.Fields.Count());
             Assert.AreEqual(0, subGroup.Groups.Count());
             Assert.AreEqual(myGroup, subGroup.Master);
-            Assert.AreEqual(logFile, subGroup.File);
+            Assert.AreEqual(LogFileTests, subGroup.File);
 
-            Assert.AreEqual(subGroup, logFile.FindGroup(2));
-            Assert.AreEqual(null, logFile.Groups.Where(x => x.ID == 2).FirstOrDefault());
+            Assert.AreEqual(subGroup, LogFileTests.FindGroup(2));
+            Assert.AreEqual(null, LogFileTests.Groups.Where(x => x.ID == 2).FirstOrDefault());
 
             // Add test field
             var myDouble = subGroup.CreateField("myDouble", typeof(double), false);
@@ -91,7 +91,7 @@ namespace SimTelemetry.Tests.Logger
             Assert.AreEqual(typeof(double), myDouble.ValueType);
             Assert.AreEqual(subGroup, myDouble.Group);
             Assert.AreEqual(typeof(LogField<double>), myDouble.GetType());
-            Assert.AreEqual(logFile, ((LogField<double>)myDouble).File);
+            Assert.AreEqual(LogFileTests, ((LogField<double>)myDouble).File);
 
         }
 
@@ -153,19 +153,19 @@ namespace SimTelemetry.Tests.Logger
             i = 0;
             while (i < testDataFrames)
             {
-                logFile.Write("My Subgroup","myDouble", MemoryDataConverter.Rawify(readDouble));
+                LogFileTests.Write("My Subgroup","myDouble", MemoryDataConverter.Rawify(readDouble));
                 if (i%10 == 0)
-                    logFile.Write("My Group", "myString", MemoryDataConverter.Rawify(readString));
-                logFile.Write("My Group", "myFloat", MemoryDataConverter.Rawify(readFloat));
+                    LogFileTests.Write("My Group", "myString", MemoryDataConverter.Rawify(readString));
+                LogFileTests.Write("My Group", "myFloat", MemoryDataConverter.Rawify(readFloat));
 
-                logFile.Flush(i*40); // simulate every 40ms, 25Hz
-                if (logFile.Time.Count == 2 && switchPoint == 0)
+                LogFileTests.Flush(i*40); // simulate every 40ms, 25Hz
+                if (LogFileTests.Time.Count == 2 && switchPoint == 0)
                     switchPoint = i*40;
                 i++;
             }
 
             // This stores it into a zip
-            logFile.Finish("temp.zip");
+            LogFileTests.Finish("temp.zip");
 
             // Use ZipStorer to extract the data again and byte-by-byte analyze the format.
             zipFile = Domain.Utils.ZipStorer.Open("temp.zip", FileAccess.Read);
