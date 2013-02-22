@@ -6,13 +6,12 @@ namespace SimTelemetry.Tests
 {
     public class TestConstants
     {
-        public const string TestFolder = @"C:\Users\Hans\Documents\GitHub\SimTelemetry\TestData\";
+        public const string TestFolder = @"C:\Users\Hans\Documents\Visual Studio 2010\Projects\SimTelemetry\TestData\";
 
         public const string TelemetryFolder =
-            @"C:\Users\Hans\Documents\GitHub\SimTelemetry\LiveTelemetry\bin\Debug\";
+            @"C:\Users\Hans\Documents\Visual Studio 2010\Projects\SimTelemetry\SimTelemetry.Plugins.Tests\bin\Debug\";
 
-        public const string SimulatorsBinFolder = TelemetryFolder + "Simulators\\";
-
+        public const string SimulatorsBinFolder = TelemetryFolder;
         public static int Warnings { get; set; }
 
         public static void Prepare()

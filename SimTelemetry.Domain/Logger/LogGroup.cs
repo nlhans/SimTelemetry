@@ -98,6 +98,21 @@ namespace SimTelemetry.Domain.Logger
             _fields = dataSource.GetDataFields().Select(x => new LogField(this, x, GetNewFieldId())).ToList();
         }
 
+        public LogGroup(LogFileWriter writer, string name, IDataNode dataSource, IEnumerable<string> fieldLimit)
+        {
+            FileWriter = writer;
+            Name = name;
+            DataSource = dataSource;
+            Subscribed = true;
+
+            DataStreamOffset = 0;
+
+            AllocDataBuffer();
+            AllocTimeBuffer();
+
+            _fields = dataSource.GetDataFields().Where(x => fieldLimit.Any(y => x.Name==y)).Select(x => new LogField(this, x, GetNewFieldId())).ToList();
+        }
+
 
         public bool Resubscribe(IDataNode dataSource)
         {

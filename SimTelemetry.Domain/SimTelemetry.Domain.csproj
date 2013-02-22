@@ -24,7 +24,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -85,6 +85,7 @@
     <Compile Include="Events\LoadingFinished.cs" />
     <Compile Include="Events\LoadingStarted.cs" />
     <Compile Include="Events\LogFileWriteAction.cs" />
+    <Compile Include="Events\LogFinished.cs" />
     <Compile Include="Events\ReferenceLapChanged.cs" />
     <Compile Include="Events\SessionStarted.cs" />
     <Compile Include="Events\SessionStopped.cs" />
@@ -155,6 +156,9 @@
     <Compile Include="Telemetry\TelemetryAcquisition.cs" />
     <Compile Include="Telemetry\TelemetryDriver.cs" />
     <Compile Include="Telemetry\TelemetryGame.cs" />
+    <Compile Include="Telemetry\TelemetryLoggerConfiguration.cs" />
+    <Compile Include="Telemetry\TelemetryLogger.cs" />
+    <Compile Include="Telemetry\TelemetryLoggerLevel.cs" />
     <Compile Include="Telemetry\TelemetrySession.cs" />
     <Compile Include="Telemetry\TelemetrySupport.cs" />
     <Compile Include="Utils\IniReader.cs" />

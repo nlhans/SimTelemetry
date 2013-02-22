@@ -22,7 +22,7 @@ namespace SimTelemetry.Domain.Aggregates
         private MemoryProvider Memory { get; set; }
         public IPluginTelemetryProvider Provider { get; protected set; }
 
-        public LogFileWriter Logger { get; protected set; }
+        public TelemetryLogger Logger { get; protected set; }
 
         #region Telemetry data yard
         public TelemetrySession Session { get; protected set; }
@@ -48,9 +48,6 @@ namespace SimTelemetry.Domain.Aggregates
             mem.Open(simulatorProcess);
 
             Memory = new MemoryProvider(mem);
-#if DEBUG
-            Memory.Reader.Diagnostic = true;
-#endif
 
             // Fill memory provider
             Memory.Scanner.Enable();
@@ -64,11 +61,7 @@ namespace SimTelemetry.Domain.Aggregates
             Acquisition = new TelemetryAcquisition();
             Support = new TelemetrySupport();
 
-#if DEBUG
             Clock = new MMTimer(25);
-#else
-            Clock = new MMTimer(20);
-#endif
             Clock.Tick += (o, s) => GlobalEvents.Fire(new TelemetryRefresh(this), true);
             Clock.Start();
 
@@ -77,19 +70,19 @@ namespace SimTelemetry.Domain.Aggregates
 
         ~Telemetry()
         {
-            RemoveLogger();
+            ResetLogger();
             Provider.Deinitialize();
         }
 
-        public void SetLogger(LogFileWriter logger)
+        public void SetLogger(TelemetryLogger logger)
         {
             Logger = logger;
-            //Logger.Initialize(this, Memory);
+            Logger.SetDatasource(this.Memory);
         }
 
-        public void RemoveLogger()
+        public void ResetLogger()
         {
-            //Logger.Deinitialize();
+            Logger.Close();
             Logger = null;
         }
 
@@ -98,16 +91,7 @@ namespace SimTelemetry.Domain.Aggregates
             // Updates memory pools and reads value to this class.
             Memory.Refresh();
 
-            // Simulator environment etc.
-            Support.Update(this, Memory);
-            Simulator.Update(this, Memory);
             Session.Update(this, Memory);
-            Acquisition.Update(this, Memory);
-
-            // Drivers
-            UpdateDrivers();
-            foreach(var driver in Drivers)
-                driver.Update(this, Memory);
 
             // Update game status reports.
             var isSessionLoading = Session.IsLoading;
@@ -132,8 +116,21 @@ namespace SimTelemetry.Domain.Aggregates
                     SetDrivingStatus(isDriving);
             }
 
-            if (Logger.Groups.Any(x => x.Name == "Session") == false)
-                Logger.Subscribe(Memory.Get("Session"));
+            // Simulator environment etc.
+            Support.Update(this, Memory);
+            Simulator.Update(this, Memory);
+            Acquisition.Update(this, Memory);
+            if (isSessionActive)
+            {
+
+                // Drivers
+                UpdateDrivers();
+                foreach (var driver in Drivers)
+                    driver.Update(this, Memory);
+            }
+
+            foreach (var field in Player.Pool.Fields.Values.Cast<IMemoryObject>())
+                field.Read();
 
             if (Logger != null)
                 Logger.Update((int)Math.Round(Session.Time*1000));
@@ -143,7 +140,6 @@ namespace SimTelemetry.Domain.Aggregates
         {
             if (Session.Cars != _drivers.Count)
             {
-                
                 var driversAdded = new List<TelemetryDriver>();
                 var driversRemoved = new List<TelemetryDriver>();
 
@@ -195,11 +191,6 @@ namespace SimTelemetry.Domain.Aggregates
                     GlobalEvents.Fire(new DriversAdded(this, driversAdded), true);
                 if (driversRemoved.Count > 0)
                     GlobalEvents.Fire(new DriversRemoved(this, driversAdded), true);
-
-                if (Logger != null)
-                driversAdded.ForEach(x => Logger.Subscribe(x.Pool));
-                driversRemoved.ForEach(x => Logger.Unsubscribe(x.Pool));
-
             }
         }
 

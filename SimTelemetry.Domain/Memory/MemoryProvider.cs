@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SimTelemetry.Domain.Telemetry;
 
@@ -36,6 +37,16 @@ namespace SimTelemetry.Domain.Memory
         public IDataNode Get(string name)
         {
             return _pools.Where(x => x.Name == name).Cast<IDataNode>().FirstOrDefault();
+        }
+
+        public IEnumerable<IDataNode> GetAll()
+        {
+            return _pools;
+        }
+
+        public void MarkDirty()
+        {
+            _pools.SelectMany(x => x.Fields.Values).ToList().ForEach(x => x.MarkDirty());
         }
 
         public bool Contains(string name)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -13,7 +14,7 @@ namespace SimTelemetry.Domain.Logger
         public string FileName { get; protected set; }
 
         public IEnumerable<LogGroup> Groups { get { return _groups; } }
-        protected List<LogGroup> _groups = new List<LogGroup>();
+        protected ConcurrentBag<LogGroup> _groups = new ConcurrentBag<LogGroup>();
 
         private List<string> temporaryFiles = new List<string>();
         private int pendingFileWrites = 0;
@@ -104,6 +105,22 @@ namespace SimTelemetry.Domain.Logger
             return true;
         }
 
+        public bool Subscribe(IDataNode dataSource, string[] fieldLimit)
+        {
+            LogGroup logGroup;
+
+            if (_groups.Any(x => x.Name == dataSource.Name))
+            {
+                logGroup = _groups.Where(x => x.Name == dataSource.Name).FirstOrDefault();
+                return logGroup.Resubscribe(dataSource);
+            }
+
+            logGroup = new LogGroup(this, dataSource.Name, dataSource, fieldLimit);
+            _groups.Add(logGroup);
+
+            return true;
+        }
+
         public bool Unsubscribe(IDataNode logGroup)
         {
             return Unsubscribe(logGroup.Name);
@@ -137,7 +154,7 @@ namespace SimTelemetry.Domain.Logger
                 timeout -= 25;
             }
 
-            foreach (var file in temporaryFiles)
+            foreach (var file in temporaryFiles.ToList())
             {
                 _archive.AddFile(ZipStorer.Compression.Deflate, file,
                                  file.Substring(6), ""); // 6 is removing ./tmp/

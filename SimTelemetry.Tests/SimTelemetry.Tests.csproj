@@ -36,7 +36,7 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <PlatformTarget>x86</PlatformTarget>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
@@ -102,6 +102,7 @@
     <Compile Include="Repositories\CarRepositoryTests.cs" />
     <Compile Include="Repositories\TrackRepositoryTests.cs" />
     <Compile Include="Aggregates\SimulatorTests.cs" />
+    <Compile Include="Telemetry\TelemetryTests.cs" />
     <Compile Include="TestConstants.cs" />
     <Compile Include="Utils\IniReaderTests.cs" />
     <Compile Include="Utils\ZipStorerTests.cs" />
@@ -138,9 +139,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Telemetry\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

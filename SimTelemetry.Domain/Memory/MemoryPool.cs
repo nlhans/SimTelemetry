@@ -29,7 +29,7 @@ namespace SimTelemetry.Domain.Memory
         public byte[] Value { get; protected set; }
         public Type ValueType { get { return typeof(MemoryPool); } }
 
-        Dictionary<string, IDataField> IDataNode.Fields { get { return _fields.Cast<IDataField>().ToDictionary(x => x.Name, x => x); } }
+        Dictionary<string, IDataField> IDataNode.Fields { get { return _fields.Values.Cast<IDataField>().ToDictionary(x => x.Name, x => x); } }
         public Dictionary<string, IMemoryObject> Fields { get { return _fields; } }
         public Dictionary<string, MemoryPool> Pools { get { return _pools; } }
 
@@ -51,6 +51,10 @@ namespace SimTelemetry.Domain.Memory
         public bool HasChanged()
         {
             return false;
+        }
+
+        public void MarkDirty()
+        {
         }
 
         public TOut ReadAs<TOut>(int offset)
