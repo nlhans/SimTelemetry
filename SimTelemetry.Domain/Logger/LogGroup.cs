@@ -259,14 +259,14 @@ namespace SimTelemetry.Domain.Logger
 
         private void AllocDataBuffer()
         {
-            DataStream = new byte[16 * 1024 * 1024];
+            DataStream = new byte[4 * 1024 * 1024];
             DataStreamOffset += DataStreamIndex;
             DataStreamIndex = 0;
         }
 
         private void AllocTimeBuffer()
         {
-            TimeStream = new byte[16*1024*1024];
+            TimeStream = new byte[8*1024*1024];
             TimeStreamIndex = 0;
         }
 

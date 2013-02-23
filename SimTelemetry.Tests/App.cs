@@ -7,7 +7,7 @@ namespace SimTelemetry.Tests
         static void Main(string[] args)
         {
             var t = new TelemetryTests();
-            t.Playback();
+            t.Record();
             return;
         }
     }
