@@ -63,18 +63,18 @@ namespace SimTelemetry.Tests.Telemetry
                 var sess = sample.Get("Session");
                 samples++;
 
-                csv.AppendLine(sample.Timestamp + "," +
+                /*csv.AppendLine(sample.Timestamp + "," +
                                  sess.ReadAs<float>("Time") + "," +
                                  me.ReadAs<string>("TyreCompoundFront") + "," +
                                  me.ReadAs<float>("Speed") + "," +
                                  me.ReadAs<float>("TyreTemperatureInsideLF") + "," +
                                  me.ReadAs<float>("RPM") + "," +
-                                 me.ReadAs<int>("Gear"));
+                                 me.ReadAs<int>("Gear"));*/
             }
 
             w.Stop();
-                Debug.WriteLine(w.ElapsedMilliseconds +","+samples);
-            File.WriteAllText("dump.csv", csv.ToString());
+            Debug.WriteLine(w.ElapsedMilliseconds +","+samples);
+           // File.WriteAllText("dump.csv", csv.ToString());
 
         }
     }

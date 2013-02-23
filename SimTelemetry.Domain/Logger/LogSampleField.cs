@@ -9,28 +9,27 @@ namespace SimTelemetry.Domain.Logger
         public string Name { get; protected set; }
         public Type ValueType { get; protected set; }
         private LogSampleGroup Group { get; set; }
-
-        internal int CurrentOffset { get; set; }
+        public int Offset { get; set; }
 
         public LogSampleField(string name, Type valueType, LogSampleGroup @group)
         {
             Name = name;
             ValueType = valueType;
             Group = group;
-            CurrentOffset = -1;
+            Offset = -1;
         }
 
 
         public void SetOffset(int offset)
         {
-            CurrentOffset = offset;
+            Offset = offset;
         }
 
         public TOut ReadAs<TOut>()
         {
-            if (CurrentOffset == -1) // no offset initialized; field not in file??
+            if (Offset == -1) // no offset initialized; field not in file??
                 return (TOut) Convert.ChangeType(0, typeof (TOut));
-            return MemoryDataConverter.Unrawify<T, TOut>(Group.Buffer, CurrentOffset);
+            return MemoryDataConverter.Unrawify<T, TOut>(Group.Buffer, Offset);
         }
 
         public bool HasChanged()

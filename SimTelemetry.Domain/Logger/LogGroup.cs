@@ -200,7 +200,11 @@ namespace SimTelemetry.Domain.Logger
 
                 if (data.Length > 0 && DataStream != null)
                 {
-                    var outData = new byte[6 + data.Length];
+                    var dataLength = 6 + data.Length;
+                    if (dataLength % 4 != 0)
+                        dataLength += 4 - (dataLength%4);
+
+                    var outData = new byte[dataLength];
                     outData[0] = 0x1F;
                     outData[1] = 0x1F;
                     Array.Copy(BitConverter.GetBytes(field.ID), 0, outData, 2, 4);

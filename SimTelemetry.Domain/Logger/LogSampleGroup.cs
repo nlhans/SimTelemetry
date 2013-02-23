@@ -84,12 +84,18 @@ namespace SimTelemetry.Domain.Logger
             if ( !TimeLine_Current.ContainsKey(timestamp)) return;
 
             var fieldsToDo = _fieldById.Keys.ToList();
+            var fieldsToDoCount = fieldsToDo.Count;
+
+            if (fieldsToDoCount == 0)
+                return;
 
             var startOffset = TimeLine_Current[timestamp];
             var endOffset = TimeLine_Next[timestamp];
             var index = endOffset - 1;
-            if (index > Buffer.Length)
-                index = Buffer.Length - 1;
+            if (index % 4 != 0)
+                index += 4 - (index % 4);
+            if (index >= Buffer.Length)
+                index = Buffer.Length - (Buffer.Length%4) - 4;
 
             if (!onlyThisSample)
                 startOffset = 0; // scan all the way to beginning if required.
@@ -100,15 +106,14 @@ namespace SimTelemetry.Domain.Logger
             // Or: we have run out of fields to initialize.
 
 
-            while (index >= startOffset
-                   && fieldsToDo.Count != 0)
+            while (index >= startOffset)
             {
                 bool isValue = (Buffer[index] == 0x1F)
                                && (Buffer[index + 1] == 0x1F);
 
                 if (!isValue)
                 {
-                    index--;
+                    index -= 4;
                     continue;
                 }
 
@@ -117,14 +122,16 @@ namespace SimTelemetry.Domain.Logger
                 if (!_fieldById.ContainsKey(fieldId)
                     || !fieldsToDo.Contains(fieldId))
                 {
-                    index--;
+                    index -= 4;
                     continue;
                 }
 
-                ((ILogSampleField) _fieldById[fieldId]).SetOffset(index + 6);
+                ((ILogSampleField)_fieldById[fieldId]).Offset = index + 6;
                 fieldsToDo.Remove(fieldId);
+                fieldsToDoCount--;
+                if (fieldsToDoCount == 0) break;
 
-                index -= 6;
+                index -= 8;
             }
 
         }
