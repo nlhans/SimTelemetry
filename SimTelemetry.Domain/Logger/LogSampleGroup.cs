@@ -83,57 +83,85 @@ namespace SimTelemetry.Domain.Logger
         {
             if ( !TimeLine_Current.ContainsKey(timestamp)) return;
 
-            var fieldsToDo = _fieldById.Keys.ToList();
-            var fieldsToDoCount = fieldsToDo.Count;
-
-            if (fieldsToDoCount == 0)
-                return;
-
             var startOffset = TimeLine_Current[timestamp];
             var endOffset = TimeLine_Next[timestamp];
             var index = endOffset - 1;
             if (index % 4 != 0)
                 index += 4 - (index % 4);
             if (index >= Buffer.Length)
-                index = Buffer.Length - (Buffer.Length%4) - 4;
+                index = Buffer.Length - (Buffer.Length % 4) - 4;
 
-            if (!onlyThisSample)
+            if (onlyThisSample)
+            {
+                // Fast scanning.
+
+                // Scan backwards
+                // Untill either; we reached end of our sample containing data.
+                // Or: we have run out of fields to initialize.
+                while (index >= startOffset)
+                {
+                    bool isValue = (Buffer[index] == 0x1F)
+                                   && (Buffer[index + 1] == 0x1F);
+
+                    if (!isValue)
+                    {
+                        index -= 4;
+                        continue;
+                    }
+
+                    int fieldId = BitConverter.ToInt32(Buffer, index + 2);
+
+                    if (!_fieldById.ContainsKey(fieldId))
+                    {
+                        index -= 4;
+                        continue;
+                    }
+                    ((ILogSampleField) _fieldById[fieldId]).Offset = index + 6;
+                    index -= 8;
+                }
+            }
+            else
+            {
                 startOffset = 0; // scan all the way to beginning if required.
 
+                // Extended scanning:
+                var fieldsToDo = _fieldById.ToDictionary(x => x.Key, x => 1);
+                var fieldsToDoCount = fieldsToDo.Count;
 
-            // Scan backwards
-            // Untill either; we reached end of our sample containing data.
-            // Or: we have run out of fields to initialize.
+                if (fieldsToDoCount == 0)
+                    return;
 
-
-            while (index >= startOffset)
-            {
-                bool isValue = (Buffer[index] == 0x1F)
-                               && (Buffer[index + 1] == 0x1F);
-
-                if (!isValue)
+                // Scan backwards
+                // Untill either; we reached end of our sample containing data.
+                // Or: we have run out of fields to initialize.
+                while (index >= startOffset)
                 {
-                    index -= 4;
-                    continue;
+                    bool isValue = (Buffer[index] == 0x1F)
+                                   && (Buffer[index + 1] == 0x1F);
+
+                    if (!isValue)
+                    {
+                        index -= 4;
+                        continue;
+                    }
+
+                    int fieldId = BitConverter.ToInt32(Buffer, index + 2);
+
+                    if (!fieldsToDo.ContainsKey(fieldId)
+                      || !_fieldById.ContainsKey(fieldId))
+                    {
+                        index -= 4;
+                        continue;
+                    }
+
+                    ((ILogSampleField) _fieldById[fieldId]).Offset = index + 6;
+                    fieldsToDo.Remove(fieldId);
+                    fieldsToDoCount--;
+                    if (fieldsToDoCount == 0) break;
+
+                    index -= 8;
                 }
-
-                int fieldId = BitConverter.ToInt32(Buffer, index + 2);
-
-                if (!_fieldById.ContainsKey(fieldId)
-                    || !fieldsToDo.Contains(fieldId))
-                {
-                    index -= 4;
-                    continue;
-                }
-
-                ((ILogSampleField)_fieldById[fieldId]).Offset = index + 6;
-                fieldsToDo.Remove(fieldId);
-                fieldsToDoCount--;
-                if (fieldsToDoCount == 0) break;
-
-                index -= 8;
             }
-
         }
     }
 }
