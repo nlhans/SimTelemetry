@@ -60,20 +60,17 @@ namespace SimTelemetry.Domain.Telemetry
 
         public void LogStart(SessionStarted e)
         {
-            if (_writer == null)
-            {
-                _writer = new LogFileWriter("tmp.zip");
-            }
+            if (_writer != null) return;
+            _writer = new LogFileWriter("tmp.zip");
+            _dataSource.MarkDirty();
         }
 
         public void LogStop(SessionStopped e)
          {
-             if (_writer != null)
-             {
-                 _writer.Save();
-                 GlobalEvents.Fire(new LogFinished(_writer, Configuration), true);
-                 _writer = null;
-             }
+            if (_writer == null) return;
+            _writer.Save();
+            GlobalEvents.Fire(new LogFinished(_writer, Configuration), true);
+            _writer = null;
          }
 
         public TelemetryLoggerLevel Qualifies(IDataNode node)

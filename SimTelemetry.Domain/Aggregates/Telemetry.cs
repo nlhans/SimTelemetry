@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SimTelemetry.Domain.Events;
-using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.Telemetry;
@@ -49,7 +48,7 @@ namespace SimTelemetry.Domain.Aggregates
 
             Memory = new MemoryProvider(mem);
 
-            // Fill memory provider
+            // Initialize telemetry provider; this class gives us the address layout to read.
             Memory.Scanner.Enable();
             Provider.Initialize(Memory);
             Memory.Scanner.Disable();
@@ -57,14 +56,15 @@ namespace SimTelemetry.Domain.Aggregates
             // Start outside-world telemetry objects
             Session = new TelemetrySession();
             Simulator = new TelemetryGame();
-
             Acquisition = new TelemetryAcquisition();
             Support = new TelemetrySupport();
 
+            // Start 40Hz clock signal (25ms)
             Clock = new MMTimer(25);
             Clock.Tick += (o, s) => GlobalEvents.Fire(new TelemetryRefresh(this), true);
             Clock.Start();
 
+            // Hook both events together:
             GlobalEvents.Hook<TelemetryRefresh>(Update, true);
         }
 
@@ -77,7 +77,7 @@ namespace SimTelemetry.Domain.Aggregates
         public void SetLogger(TelemetryLogger logger)
         {
             Logger = logger;
-            Logger.SetDatasource(this.Memory);
+            Logger.SetDatasource(Memory);
         }
 
         public void ResetLogger()
@@ -88,6 +88,8 @@ namespace SimTelemetry.Domain.Aggregates
 
         public void Update(TelemetryRefresh instance)
         {
+            if (instance.Telemetry != this) return;
+
             // Updates memory pools and reads value to this class.
             Memory.Refresh();
 
@@ -120,15 +122,16 @@ namespace SimTelemetry.Domain.Aggregates
             Support.Update(this, Memory);
             Simulator.Update(this, Memory);
             Acquisition.Update(this, Memory);
+
             if (isSessionActive)
             {
-
                 // Drivers
                 UpdateDrivers();
                 foreach (var driver in Drivers)
                     driver.Update(this, Memory);
             }
 
+            if (Player != null)
             foreach (var field in Player.Pool.Fields.Values.Cast<IMemoryObject>())
                 field.Read();
 

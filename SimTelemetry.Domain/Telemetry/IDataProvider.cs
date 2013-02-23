@@ -10,5 +10,6 @@ namespace SimTelemetry.Domain.Telemetry
         IEnumerable<IDataNode> GetAll();
 
         void MarkDirty();
+        void Refresh();
     }
 }

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Logger;
+using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.Telemetry;
 
@@ -16,7 +19,7 @@ namespace SimTelemetry.Tests.Telemetry
     class TelemetryTests
     {
         [Test]
-        public void TestData()
+        public void Record()
         {
             if(Process.GetProcessesByName("rfactor").Length==0) Assert.Ignore();
             var rFactorProcess = Process.GetProcessesByName("rfactor")[0];
@@ -36,12 +39,43 @@ namespace SimTelemetry.Tests.Telemetry
                 var telLogger = new TelemetryLogger(new TelemetryLoggerConfiguration(true, false, true, false));
                 telSource.SetLogger(telLogger);
 
-                while(Console.KeyAvailable==false)
-                Thread.Sleep(1000);
+                Thread.Sleep(120000);
 
                 telSource = null;
                 telLogger.Close();
             }
+        }
+
+        [Test]
+        public void Playback()
+        {
+            StringBuilder csv = new StringBuilder();
+
+            var telRead = new LogFileReader("Tel.zip");
+            var telProvider = telRead.GetProvider(new[] {"Session","Driver 7427264"}, 0, 1000000);
+
+            Stopwatch w = new Stopwatch();
+            w.Start();
+            int samples = 0;
+            foreach(var sample in telProvider.GetSamples())
+            {
+                var me = sample.Get("Driver 7427264");
+                var sess = sample.Get("Session");
+                samples++;
+
+                csv.AppendLine(sample.Timestamp + "," +
+                                 sess.ReadAs<float>("Time") + "," +
+                                 me.ReadAs<string>("TyreCompoundFront") + "," +
+                                 me.ReadAs<float>("Speed") + "," +
+                                 me.ReadAs<float>("TyreTemperatureInsideLF") + "," +
+                                 me.ReadAs<float>("RPM") + "," +
+                                 me.ReadAs<int>("Gear"));
+            }
+
+            w.Stop();
+                Debug.WriteLine(w.ElapsedMilliseconds +","+samples);
+            File.WriteAllText("dump.csv", csv.ToString());
+
         }
     }
 }

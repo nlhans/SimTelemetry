@@ -189,7 +189,8 @@ namespace SimTelemetry.Domain.Logger
         {
             if (!Subscribed)
                 return;
-
+            if (DataStream == null)
+                return;
             var frameStart = DataStreamIndex;
 
             // Update the data of all fields.
@@ -197,7 +198,7 @@ namespace SimTelemetry.Domain.Logger
             {
                 var data = DataSource.ReadBytes(field.Name);
 
-                if (data.Length > 0)
+                if (data.Length > 0 && DataStream != null)
                 {
                     var outData = new byte[6 + data.Length];
                     outData[0] = 0x1F;

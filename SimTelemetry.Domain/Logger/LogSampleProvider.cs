@@ -24,10 +24,15 @@ namespace SimTelemetry.Domain.Logger
             EndTime = endTime;
 
             // Make base sample.
+            TimeLine = reader.Groups.SelectMany(x => x.Timeline.Keys).Distinct().ToList();
+
+            // If this time doesn't exist; search the closest related.
+            if (!TimeLine.Contains(startTime))
+                startTime = TimeLine.Select(x => x - startTime).OrderBy(x => x).Take(1).FirstOrDefault() + startTime;
+
             Sample = new LogSample(this, startTime, groups.Select(reader.GetGroup));
 
 
-            TimeLine = reader.Groups.SelectMany(x => x.Timeline.Keys).Distinct().ToList();
 
             InitializeSample(Sample, startTime);
 

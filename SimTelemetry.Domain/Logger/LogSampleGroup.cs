@@ -81,49 +81,52 @@ namespace SimTelemetry.Domain.Logger
 
         public void Update(int timestamp, bool onlyThisSample)
         {
-            if (TimeLine_Current.ContainsKey(timestamp))
+            if ( !TimeLine_Current.ContainsKey(timestamp)) return;
+
+            var fieldsToDo = _fieldById.Keys.ToList();
+
+            var startOffset = TimeLine_Current[timestamp];
+            var endOffset = TimeLine_Next[timestamp];
+            var index = endOffset - 1;
+            if (index > Buffer.Length)
+                index = Buffer.Length - 1;
+
+            if (!onlyThisSample)
+                startOffset = 0; // scan all the way to beginning if required.
+
+
+            // Scan backwards
+            // Untill either; we reached end of our sample containing data.
+            // Or: we have run out of fields to initialize.
+
+
+            while (index >= startOffset
+                   && fieldsToDo.Count != 0)
             {
-                var fieldsToDo = _fieldById.Keys.ToList();
+                bool isValue = (Buffer[index] == 0x1F)
+                               && (Buffer[index + 1] == 0x1F);
 
-                var startOffset = TimeLine_Current[timestamp];
-                var endOffset = TimeLine_Next[timestamp]-1;
-                var index = endOffset;
-
-                if (!onlyThisSample)
-                    startOffset = 0; // scan all the way to beginning if required.
-
-
-                // Scan backwards
-                // Untill either; we reached end of our sample containing data.
-                // Or: we have run out of fields to initialize.
-
-                while (index >= startOffset
-                    && fieldsToDo.Count != 0)
+                if (!isValue)
                 {
-                    bool isValue = (Buffer[index] == 0x1F) 
-                        && (Buffer[index+1] == 0x1F);
-
-                    if (!isValue)
-                    {
-                        index--;
-                        continue;
-                    }
-
-                    int fieldId = BitConverter.ToInt32(Buffer, index + 2);
-
-                    if (!_fieldById.ContainsKey(fieldId)
-                        || !fieldsToDo.Contains(fieldId))
-                    {
-                        index--;
-                        continue;
-                    }
-
-                    ((ILogSampleField) _fieldById[fieldId]).SetOffset(index + 6);
-                    fieldsToDo.Remove(fieldId);
-
-                    index -= 6;
+                    index--;
+                    continue;
                 }
+
+                int fieldId = BitConverter.ToInt32(Buffer, index + 2);
+
+                if (!_fieldById.ContainsKey(fieldId)
+                    || !fieldsToDo.Contains(fieldId))
+                {
+                    index--;
+                    continue;
+                }
+
+                ((ILogSampleField) _fieldById[fieldId]).SetOffset(index + 6);
+                fieldsToDo.Remove(fieldId);
+
+                index -= 6;
             }
+
         }
     }
 }
