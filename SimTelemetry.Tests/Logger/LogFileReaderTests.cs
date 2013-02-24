@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -9,6 +10,12 @@ namespace SimTelemetry.Tests.Logger
     [TestFixture]
     public class LogFileReaderTests
     {
+        [TestFixtureSetUp]
+        public void SetToRAMDisk()
+        {
+            Directory.SetCurrentDirectory(TestConstants.RAMDISK);
+        }
+
         [Test]
         public void Open()
         {

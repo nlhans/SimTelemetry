@@ -24,7 +24,7 @@ namespace SimTelemetry.Domain.Logger
             EndTime = endTime;
 
             // Make base sample.
-            TimeLine = reader.Groups.SelectMany(x => x.Timeline.Keys).Distinct().ToList();
+            TimeLine = reader.Groups.SelectMany(x => x.Timeline.Keys).Distinct().OrderBy(x => x).ToList();
 
             // If this time doesn't exist; search the closest related.
             if (!TimeLine.Contains(startTime))

@@ -12,6 +12,12 @@ namespace SimTelemetry.Tests.Logger
     [TestFixture]
     public class LogFileWriterTests
     {
+        [TestFixtureSetUp]
+        public void SetToRAMDisk()
+        {
+            Directory.SetCurrentDirectory(TestConstants.RAMDISK);
+        }
+
         [Test]
         public void Create()
         {
@@ -92,8 +98,8 @@ namespace SimTelemetry.Tests.Logger
             file.Subscribe(source);
 
             // Fill up  a data file
-            for (int i = 0; i < 1441792; i++) // 33MiB
-                file.Update(i); // +24 bytes
+            for (int i = 0; i < 1441792; i++) // 38.5MiB
+                file.Update(i); // +28 bytes
 
             // We should have logged 2 data files by now.
             Assert.True(File.Exists("tmp/test/Data.bin"));
@@ -105,7 +111,8 @@ namespace SimTelemetry.Tests.Logger
             var files = z.ReadCentralDir();
             Assert.AreEqual(3, files.Count);
             Assert.True(files.Any(x => x.FilenameInZip == "test/Data.bin"));
-            Assert.True(files.Where(x => x.FilenameInZip == "test/Data.bin").FirstOrDefault().FileSize == 33 * 1024 * 1024);
+            Assert.True(files.Where(x => x.FilenameInZip == "test/Data.bin").FirstOrDefault().FileSize ==
+                        1441792*((2 + 4 + 4 + 2) + (2 + 4 + 4 + 4 + 2)));
             Assert.True(files.Any(x => x.FilenameInZip == "test/Structure.xml"));
             Assert.True(files.Any(x => x.FilenameInZip == "test/Time.bin"));
             Assert.True(files.Where(x => x.FilenameInZip == "test/Time.bin").FirstOrDefault().FileSize == 1441792 * 8);
@@ -149,7 +156,7 @@ namespace SimTelemetry.Tests.Logger
             var files = z.ReadCentralDir();
             Assert.AreEqual(3, files.Count);
             Assert.True(files.Any(x => x.FilenameInZip == "test/Data.bin"));
-            Assert.True(files.Where(x => x.FilenameInZip == "test/Data.bin").FirstOrDefault().FileSize == 33 * 1024 * 1024 - 24);
+            Assert.True(files.Where(x => x.FilenameInZip == "test/Data.bin").FirstOrDefault().FileSize == (1441792-1)*28);
             Assert.True(files.Any(x => x.FilenameInZip == "test/Structure.xml"));
             Assert.True(files.Any(x => x.FilenameInZip == "test/Time.bin"));
             Assert.True(files.Where(x => x.FilenameInZip == "test/Time.bin").FirstOrDefault().FileSize == 1441792 * 8 - 8);
@@ -184,7 +191,7 @@ namespace SimTelemetry.Tests.Logger
             file.Subscribe(source2);
 
             // Fill up next 1/2 of data file
-            for (i = 0; i < 1441792; i++) // 33MiB
+            for (i = 0; i < 224695; i++) // 33MiB
                 file.Update(i); // +24 bytes
 
             // We should have logged 2 data files by now.

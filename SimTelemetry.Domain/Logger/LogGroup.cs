@@ -29,12 +29,9 @@ namespace SimTelemetry.Domain.Logger
         public bool Subscribed { get; protected set; }
         internal LogFileWriter FileWriter { get; set; }
 
-        protected byte[] DataStream;
-        protected byte[] TimeStream;
+        private LogGroupStream DataStream;
+        private LogGroupStream TimeStream;
 
-        protected int DataStreamIndex;
-        protected int DataStreamOffset;
-        protected int TimeStreamIndex;
         #endregion
         protected int fieldCounter = 0;
 
@@ -90,10 +87,8 @@ namespace SimTelemetry.Domain.Logger
             DataSource = dataSource;
             Subscribed = true;
 
-            DataStreamOffset = 0;
-
-            AllocDataBuffer();
-            AllocTimeBuffer();
+            TimeStream = new LogGroupStream(this, LogFileType.Time, 1024 * 1024);
+            DataStream = new LogGroupStream(this, LogFileType.Data, 1024 * 1024);
 
             _fields = dataSource.GetDataFields().Select(x => new LogField(this, x, GetNewFieldId())).ToList();
         }
@@ -105,10 +100,8 @@ namespace SimTelemetry.Domain.Logger
             DataSource = dataSource;
             Subscribed = true;
 
-            DataStreamOffset = 0;
-
-            AllocDataBuffer();
-            AllocTimeBuffer();
+            TimeStream = new LogGroupStream(this, LogFileType.Time, 1024 * 1024);
+            DataStream = new LogGroupStream(this, LogFileType.Data, 1024 * 1024);
 
             _fields = dataSource.GetDataFields().Where(x => fieldLimit.Any(y => x.Name==y)).Select(x => new LogField(this, x, GetNewFieldId())).ToList();
         }
@@ -128,8 +121,9 @@ namespace SimTelemetry.Domain.Logger
             _fields.AddRange(newFields);
 
             // Reinit streams
-            AllocDataBuffer();
-            AllocTimeBuffer();
+
+            TimeStream = new LogGroupStream(this, LogFileType.Time, 1024 * 1024);
+            DataStream = new LogGroupStream(this, LogFileType.Data, 1024 * 1024);
 
             return false;
         }
@@ -141,11 +135,8 @@ namespace SimTelemetry.Domain.Logger
 
         public void Close()
         {
-            SaveDataBuffer();
-            SaveTimeBuffer();
-
-            DataStream = null;
-            TimeStream = null;
+            TimeStream.Close();
+            DataStream.Close();
 
             // Save XML structure
             var xmlText = new StringBuilder();
@@ -180,7 +171,7 @@ namespace SimTelemetry.Domain.Logger
             structureFile.Flush();
 
             var xmlData = Encoding.ASCII.GetBytes(xmlText.ToString());
-            GlobalEvents.Fire(new LogFileWriteAction(FileWriter, Name, LogFileType.Structure, xmlData), false);
+            GlobalEvents.Fire(new LogFileWriteAction(FileWriter, Name, LogFileType.Structure, xmlData, 0), false);
 
             Subscribed = false;
         }
@@ -189,9 +180,10 @@ namespace SimTelemetry.Domain.Logger
         {
             if (!Subscribed)
                 return;
-            if (DataStream == null)
+            if (DataStream.Closed || TimeStream.Closed)
                 return;
-            var frameStart = DataStreamIndex;
+
+            var frameStart = DataStream.Index;
 
             // Update the data of all fields.
             foreach(var field in _fields)
@@ -210,64 +202,21 @@ namespace SimTelemetry.Domain.Logger
                     Array.Copy(BitConverter.GetBytes(field.ID), 0, outData, 2, 4);
                     Array.Copy(data, 0, outData, 6, data.Length);
 
-                    if (DataStreamIndex + outData.Length > DataStream.Length)
-                        Array.Resize(ref DataStream, DataStreamIndex + outData.Length );
-
-                    Array.Copy(outData, 0, DataStream, DataStreamIndex, outData.Length);
-                    DataStreamIndex += outData.Length;
+                    DataStream.Write(outData);
                 }
             }
 
-            if (frameStart != DataStreamIndex)
+            if (frameStart != DataStream.Index)
             {
                 // There is new data, so write it to the TimeStream file.
                 var timePtr = new byte[8];
                 Array.Copy(BitConverter.GetBytes(time), 0, timePtr, 0, 4);
-                Array.Copy(BitConverter.GetBytes( DataStreamOffset + frameStart), 0, timePtr, 4, 4);
+                Array.Copy(BitConverter.GetBytes(DataStream.Offset + frameStart), 0, timePtr, 4, 4);
 
-                _timeline.Add(time, DataStreamOffset + frameStart);
+                _timeline.Add(time, DataStream.Offset + frameStart);
 
-                if (TimeStreamIndex + timePtr.Length > TimeStream.Length)
-                    Array.Resize(ref TimeStream, TimeStreamIndex + timePtr.Length);
-
-                Array.Copy(timePtr, 0, TimeStream, TimeStreamIndex, timePtr.Length);
-                TimeStreamIndex += timePtr.Length;
+                TimeStream.Write(timePtr);
             }
-
-            if (DataStreamIndex == DataStream.Length)
-            {
-                SaveDataBuffer();
-                AllocDataBuffer();
-            }
-        }
-
-        private void SaveDataBuffer()
-        {
-            if (DataStreamIndex != DataStream.Length)
-                Array.Resize(ref DataStream, DataStreamIndex);
-
-            GlobalEvents.Fire(new LogFileWriteAction(FileWriter, Name, LogFileType.Data, DataStream), false);
-        }
-
-        private void SaveTimeBuffer()
-        {
-            if (TimeStreamIndex != TimeStream.Length)
-                Array.Resize(ref TimeStream, TimeStreamIndex);
-
-            GlobalEvents.Fire(new LogFileWriteAction(FileWriter, Name, LogFileType.Time, TimeStream), false);
-        }
-
-        private void AllocDataBuffer()
-        {
-            DataStream = new byte[4 * 1024 * 1024];
-            DataStreamOffset += DataStreamIndex;
-            DataStreamIndex = 0;
-        }
-
-        private void AllocTimeBuffer()
-        {
-            TimeStream = new byte[8*1024*1024];
-            TimeStreamIndex = 0;
         }
 
         public byte[] ExtractDataBuffer()

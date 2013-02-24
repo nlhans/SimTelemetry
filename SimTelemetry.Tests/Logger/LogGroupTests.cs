@@ -55,16 +55,16 @@ namespace SimTelemetry.Tests.Logger
             var group = new LogGroup(null, "test", source);
 
             // Fill up  a data file
-            for (int i = 0; i < 1441792; i++) // 33MiB
-                group.Update(i); // +24 bytes
+            for (int i = 0; i < 1441792; i++) // 28 * 1441792 = 38.5MiB
+                group.Update(i); // +28 bytes
 
-            Assert.AreEqual(2, dataWrites); // 2*16MiB
-            Assert.AreEqual(0, timeWrites);
+            Assert.AreEqual(38, dataWrites); // 38*1MiB
+            Assert.AreEqual(10, timeWrites);
 
             group.Close();
 
-            Assert.AreEqual(3, dataWrites); // last 1MiB
-            Assert.AreEqual(1, timeWrites);
+            Assert.AreEqual(39, dataWrites); // last 0.5MiB
+            Assert.AreEqual(11, timeWrites);
         }
     }
 }

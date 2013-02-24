@@ -84,7 +84,7 @@ namespace SimTelemetry.Domain.Logger
             if ( !TimeLine_Current.ContainsKey(timestamp)) return;
 
             var startOffset = TimeLine_Current[timestamp];
-            var endOffset = TimeLine_Next[timestamp];
+            var endOffset = TimeLine_Next[timestamp]-4;
             var index = endOffset - 1;
             if (index % 4 != 0)
                 index += 4 - (index % 4);

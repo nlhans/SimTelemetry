@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
-using SimTelemetry.Domain;
-using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Logger;
-using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.Telemetry;
 
@@ -23,6 +20,8 @@ namespace SimTelemetry.Tests.Telemetry
         {
             if(Process.GetProcessesByName("rfactor").Length==0) Assert.Ignore();
             var rFactorProcess = Process.GetProcessesByName("rfactor")[0];
+
+            IntPtr alloc = Marshal.AllocHGlobal(512*1024*1024);
 
             using(var host = new Plugins())
             {
@@ -39,11 +38,13 @@ namespace SimTelemetry.Tests.Telemetry
                 var telLogger = new TelemetryLogger(new TelemetryLoggerConfiguration(true, false, true, false));
                 telSource.SetLogger(telLogger);
 
-                Thread.Sleep(300000);
+                Thread.Sleep(60000);
 
                 telLogger.Close();
                 telSource = null;
             }
+
+            Marshal.FreeHGlobal(alloc);
         }
 
         [Test]
@@ -51,7 +52,7 @@ namespace SimTelemetry.Tests.Telemetry
         {
             StringBuilder csv = new StringBuilder();
 
-            var telRead = new LogFileReader("Tel.zip");
+            var telRead = new LogFileReader(TestConstants.RAMDISK + "Tmp.zip");
             var telProvider = telRead.GetProvider(new[] {"Session","Driver 9183488"}, 0, 1000000);
 
             Stopwatch w = new Stopwatch();

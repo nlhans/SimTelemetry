@@ -6,6 +6,8 @@ namespace SimTelemetry.Tests
 {
     public class TestConstants
     {
+        public const string RAMDISK = "H:\\";
+
         public const string TestFolder = @"C:\Users\Hans\Documents\Visual Studio 2010\Projects\SimTelemetry\TestData\";
 
         public const string TelemetryFolder =
