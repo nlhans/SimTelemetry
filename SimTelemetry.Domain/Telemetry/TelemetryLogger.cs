@@ -1,23 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetryLogger
     {
         public TelemetryLoggerConfiguration Configuration { get; private set; }
+        public IFileAnnotater Annotater { get; protected set; }
+        public string Simulator { get; private set; }
+
+        public IEnumerable<int> TimeLine { get { return _TimeLine; } }
+        private readonly IList<int> _TimeLine = new List<int>();
 
         private LogFileWriter _writer;
         private IDataProvider _dataSource;
 
         protected static readonly string[] TimepathFields = new[] { "Index", "IsAI", "IsPlayer", "Laps", "Meter", "Speed" };
 
-        public TelemetryLogger(TelemetryLoggerConfiguration config)
+        private int lastTime = -1;
+
+        public Track Track;
+        public Session Session;
+
+        public TelemetryLogger(string simulator, TelemetryLoggerConfiguration config)
         {
+            Simulator = simulator;
             Configuration = config;
 
             GlobalEvents.Hook<SessionStarted>(LogStart, true);
@@ -68,8 +83,27 @@ namespace SimTelemetry.Domain.Telemetry
         public void LogStop(SessionStopped e)
          {
             if (_writer == null) return;
-            _writer.Save();
-            GlobalEvents.Fire(new LogFinished(_writer, Configuration), true);
+            if (Annotater == null)
+            {
+                ThreadPool.QueueUserWorkItem(x => ((LogFileWriter)x).Save(), _writer);
+            }
+            else
+            {
+                if (Annotater.QualifiesForStorage(this))
+                {
+                    var t = new Task((x) => {
+                                                         ((LogFileWriter)x).Save();
+                                                         Annotater.Store(this, ((LogFileWriter)x));
+                                                     }, _writer);
+                    t.Start();
+                    t.Wait();
+                }
+                else
+                {
+                    _writer.Clear();
+                }
+            }
+
             _writer = null;
          }
 
@@ -115,8 +149,6 @@ namespace SimTelemetry.Domain.Telemetry
 
             return TelemetryLoggerLevel.Full;
         }
-
-        private int lastTime = 0;
         public void Update(int time)
         {
             if (_writer != null)
@@ -124,7 +156,10 @@ namespace SimTelemetry.Domain.Telemetry
                 var dt = time - lastTime;
 
                 if (dt > 0)
+                {
                     _writer.Update(time);
+                    _TimeLine.Add(time);
+                }
 
                 lastTime = time;
             }
@@ -134,5 +169,11 @@ namespace SimTelemetry.Domain.Telemetry
         {
             LogStop(null);
         }
+
+        public void SetAnnotater(IFileAnnotater annotater)
+        {
+            Annotater = annotater;
+        }
+
     }
 }

@@ -17,10 +17,13 @@ namespace SimTelemetry.Domain.Memory
 
         public MemoryProvider(MemoryReader reader)
         {
-            BaseAddress = reader.Process.MainModule.BaseAddress.ToInt32();
-            Reader = reader;
+            if (reader != null)
+            {
+                BaseAddress = reader.Process.MainModule.BaseAddress.ToInt32();
+                Reader = reader;
 
-            Scanner = new MemorySignatureScanner(this);
+                Scanner = new MemorySignatureScanner(this);
+            }
         }
 
         public void Add(IDataNode pool)

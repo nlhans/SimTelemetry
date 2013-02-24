@@ -25,12 +25,12 @@ namespace SimTelemetry.Tests.Utils
 
             var filesizeOfInput = new FileInfo("tmp.txt").Length;
 
-            ZipStorer writeZipFile = ZipStorer.Create("tmp.zip",zipFileComment);
+            ZipStorer writeZipFile = ZipStorer.Create("ziptmp2.zip", zipFileComment);
             writeZipFile.AddFile(ZipStorer.Compression.Deflate, "tmp.txt", "tmp.txt",fileComment);
             writeZipFile.AddFile(ZipStorer.Compression.Deflate, "tmp.txt", "tmp2.txt",fileComment);
             writeZipFile.Close();
 
-            ZipStorer readZipFile = ZipStorer.Open("tmp.zip", FileAccess.Read);
+            ZipStorer readZipFile = ZipStorer.Open("ziptmp2.zip", FileAccess.Read);
             Assert.AreEqual(zipFileComment, readZipFile.Comment);
 
             var files = readZipFile.ReadCentralDir();
@@ -66,7 +66,7 @@ namespace SimTelemetry.Tests.Utils
             readZipFile = null;
             writeZipFile = null;
             File.Delete("tmp.txt");
-            File.Delete("tmp.zip");
+            File.Delete("ziptmp2.zip");
             File.Delete("tmpout.txt");
             File.Delete("tmp2out.txt");
         }
@@ -87,12 +87,12 @@ namespace SimTelemetry.Tests.Utils
 
             var filesizeOfInput = new FileInfo("tmp.bin").Length;
 
-            ZipStorer writeZipFile = ZipStorer.Create("tmp.zip", zipFileComment);
+            ZipStorer writeZipFile = ZipStorer.Create("ziptmp.zip", zipFileComment);
             writeZipFile.AddFile(ZipStorer.Compression.Deflate, "tmp.bin", "tmp.bin", fileComment);
             writeZipFile.AddFile(ZipStorer.Compression.Deflate, "tmp.bin", "tmp2.bin", fileComment);
             writeZipFile.Close();
 
-            ZipStorer readZipFile = ZipStorer.Open("tmp.zip", FileAccess.Read);
+            ZipStorer readZipFile = ZipStorer.Open("ziptmp.zip", FileAccess.Read);
             Assert.AreEqual(zipFileComment, readZipFile.Comment);
 
             var files = readZipFile.ReadCentralDir();
@@ -130,7 +130,10 @@ namespace SimTelemetry.Tests.Utils
             readZipFile = null;
             writeZipFile = null;
             File.Delete("tmp.txt");
-            File.Delete("tmp.zip");
+            File.Delete("tmp.bin");
+            File.Delete("tmpout.bin");
+            File.Delete("tmp2out.bin");
+            File.Delete("ziptmp.zip");
             File.Delete("tmpout.txt");
             File.Delete("tmp2out.txt");
         }

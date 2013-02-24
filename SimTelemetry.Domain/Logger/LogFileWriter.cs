@@ -17,6 +17,7 @@ namespace SimTelemetry.Domain.Logger
         public IEnumerable<LogGroup> Groups { get { return _groups; } }
         protected ConcurrentBag<LogGroup> _groups = new ConcurrentBag<LogGroup>();
 
+        #region Private fields
         private ZipStorer _archive;
 
         private Dictionary<string, FileStream> fileStreams = new Dictionary<string, FileStream>();
@@ -24,6 +25,7 @@ namespace SimTelemetry.Domain.Logger
         private bool _pendingWriteActive = false;
         private bool _pendingWriteBusy = false;
         private Thread _pendingWriteWorker;
+        #endregion
 
         private void WriteWorker()
         {
@@ -205,6 +207,15 @@ namespace SimTelemetry.Domain.Logger
             // Close zip file.
             _archive.Close();
 
+            Directory.Delete("./tmp/", true);
+        }
+
+        public void Clear()
+        {
+            // We don't want this log file.
+            _archive.Close();
+
+            File.Delete("./tmp.zip");
             Directory.Delete("./tmp/", true);
         }
     }

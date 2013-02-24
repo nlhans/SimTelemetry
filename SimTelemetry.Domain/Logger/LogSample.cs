@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using SimTelemetry.Domain.Telemetry;
 
 namespace SimTelemetry.Domain.Logger
@@ -16,7 +17,7 @@ namespace SimTelemetry.Domain.Logger
             Provider = provider;
             Timestamp = timestamp;
 
-            foreach(var group in groups)
+            foreach(var group in groups.Where(x => x!=null))
                 _groups.Add(group.Name, new LogSampleGroup(group));
         }
 

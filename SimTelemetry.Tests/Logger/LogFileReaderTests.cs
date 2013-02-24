@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using SimTelemetry.Domain.Exceptions;
 using SimTelemetry.Domain.Logger;
 
 namespace SimTelemetry.Tests.Logger
@@ -100,6 +101,13 @@ namespace SimTelemetry.Tests.Logger
                 // even though this group only has new data every '1', the main timeline still has every 1.
                 // So they are synchronised this way
             }
+        }
+
+        [Test]
+        [ExpectedException(typeof(LogFileException))]
+        public void ReadEmptyFile()
+        {
+            LogFileReader reader = new LogFileReader(TestConstants.TestFolder + "EmptyTelemetryFile.zip");
         }
     }
 }
