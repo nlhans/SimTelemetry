@@ -12,6 +12,7 @@ namespace SimTelemetry.Domain.Logger
 {
     public class LogFileWriter
     {
+        public string TemporaryDirectory { get; private set; }
         public string FileName { get; protected set; }
 
         public IEnumerable<LogGroup> Groups { get { return _groups; } }
@@ -66,12 +67,12 @@ namespace SimTelemetry.Domain.Logger
 
                     if (action.Group != "")
                     {
-                        path = "./tmp/" + action.Group + "/" + file;
-                        if (!Directory.Exists("./tmp/" + action.Group + "/"))
-                            Directory.CreateDirectory("./tmp/" + action.Group + "/");
+                        path = "./"+TemporaryDirectory+"/" + action.Group + "/" + file;
+                        if (!Directory.Exists("./" + TemporaryDirectory + "/" + action.Group + "/"))
+                            Directory.CreateDirectory("./" + TemporaryDirectory + "/" + action.Group + "/");
                     }
                     else
-                        path = "./tmp/" + file;
+                        path = "./" + TemporaryDirectory + "/" + file;
 
                     // Open the file stream.
                     if (!fileStreams.ContainsKey(path))
@@ -102,15 +103,15 @@ namespace SimTelemetry.Domain.Logger
             _pendingWriteBusy = false;
         }
 
-        public LogFileWriter(string file)
+        public LogFileWriter(string file, string tmp_dir)
         {
+            TemporaryDirectory = tmp_dir;
             FileName = file;
-            _archive = ZipStorer.Create(file, "SimTelemetry log");
 
-            if(Directory.Exists("./tmp/"))
-                Directory.Delete("./tmp/", true);
+            if (Directory.Exists("./" + TemporaryDirectory + "/"))
+                Directory.Delete("./" + TemporaryDirectory + "/", true);
 
-            Directory.CreateDirectory("./tmp/");
+            Directory.CreateDirectory("./" + TemporaryDirectory + "/");
 
             GlobalEvents.Hook<LogFileWriteAction>(WriteTemporaryFile, false);
 
@@ -195,11 +196,12 @@ namespace SimTelemetry.Domain.Logger
                 timeout -= 25;
             }
 
-            foreach(var file in Directory.GetFiles("./tmp/", "*", SearchOption.AllDirectories))
+            _archive = ZipStorer.Create(FileName, "SimTelemetry log");
+            foreach (var file in Directory.GetFiles("./" + TemporaryDirectory + "/", "*", SearchOption.AllDirectories))
             {
-                var tmpIndex = file.LastIndexOf("tmp/", 0, 1);
-                if (tmpIndex == -1) tmpIndex = file.IndexOf("tmp/");
-                var filenameInZip = file.Substring(tmpIndex+4);
+                var tmpIndex = file.LastIndexOf(TemporaryDirectory+"/", 0, 1);
+                if (tmpIndex == -1) tmpIndex = file.IndexOf("" + TemporaryDirectory + "/");
+                var filenameInZip = file.Substring(tmpIndex+TemporaryDirectory.Length+1);
 
                 _archive.AddFile(ZipStorer.Compression.Deflate, file, filenameInZip, "");
             }
@@ -207,16 +209,17 @@ namespace SimTelemetry.Domain.Logger
             // Close zip file.
             _archive.Close();
 
-            Directory.Delete("./tmp/", true);
+            Directory.Delete("./" + TemporaryDirectory + "/", true);
         }
 
         public void Clear()
         {
             // We don't want this log file.
+            if(_archive != null)
             _archive.Close();
 
-            File.Delete("./tmp.zip");
-            Directory.Delete("./tmp/", true);
+            File.Delete(FileName);
+            Directory.Delete("./" + TemporaryDirectory + "/", true);
         }
     }
 }

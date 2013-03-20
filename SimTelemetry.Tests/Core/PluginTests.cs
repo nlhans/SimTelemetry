@@ -45,7 +45,7 @@ namespace SimTelemetry.Tests.Core
 
             // Manually count the no of plugins in the bin directory.
             var files = Directory.GetFiles(TestConstants.SimulatorsBinFolder);
-            var plugins = files.Where(x => x.Contains("SimTelemetry.Plugins."));
+            var plugins = files.Where(x => Path.GetFileName(x).Contains("SimTelemetry.Plugins.") && x.ToLower().EndsWith(".dll"));
 
             using (var pluginHost = new Plugins())
             {

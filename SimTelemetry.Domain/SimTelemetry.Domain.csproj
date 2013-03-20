@@ -94,6 +94,7 @@
     <Compile Include="Events\SimulatorStopped.cs" />
     <Compile Include="Events\TelemetryDriverAdded.cs" />
     <Compile Include="Events\TelemetryDriverRemoved.cs" />
+    <Compile Include="Events\TelemetryLapComplete.cs" />
     <Compile Include="Events\TelemetryRefresh.cs" />
     <Compile Include="Exceptions\CarAlreadyHasBrakeException.cs" />
     <Compile Include="Exceptions\CarAlreadyHasChassisException.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Repositories\ICarRepository.cs" />
     <Compile Include="Repositories\ITrackRepositoryDataProvider.cs" />
     <Compile Include="Repositories\ITrackRepository.cs" />
+    <Compile Include="Repositories\TelemetryRepository.cs" />
     <Compile Include="Repositories\TrackRepository.cs" />
     <Compile Include="Telemetry\IDataField.cs" />
     <Compile Include="Telemetry\IDataNode.cs" />

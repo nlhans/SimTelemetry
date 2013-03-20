@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using NUnit.Framework;
 using SimTelemetry.Domain.Logger;
 using SimTelemetry.Domain.Memory;
@@ -21,10 +22,10 @@ namespace SimTelemetry.Tests.Logger
         [Test]
         public void Create()
         {
-            var file = new LogFileWriter("test.zip");
+            var file = new LogFileWriter("test.zip","LogFileWriterTestsCreate");
             Assert.AreEqual("test.zip", file.FileName);
             Assert.AreEqual(0, file.Groups.Count());
-            Assert.True(Directory.Exists("tmp"));
+            Assert.True(Directory.Exists("LogFileWriterTestsCreate"));
 
             file.Save();
 
@@ -32,14 +33,14 @@ namespace SimTelemetry.Tests.Logger
 
             Assert.AreEqual("SimTelemetry log", zip.Comment);
             Assert.AreEqual(0, zip.ReadCentralDir().Count);
-            Assert.False(Directory.Exists("tmp"));
+            Assert.False(Directory.Exists("LogFileWriterTestsCreate"));
 
         }
 
         [Test]
         public void Groups()
         {
-            var file = new LogFileWriter("test2.zip");
+            var file = new LogFileWriter("test2.zip", "LogFileWriterTestsGroups");
             var source = new MemoryPool("test", MemoryAddress.StaticAbsolute, 0x123456, 0, 0x1234);
 
             source.Add(new MemoryFieldFunc<int>("testInt", (pool) => 123));
@@ -89,7 +90,7 @@ namespace SimTelemetry.Tests.Logger
         public void Data()
         {
             var counter = 0;
-            var file = new LogFileWriter("test3.zip");
+            var file = new LogFileWriter("test3.zip", "LogFileWriterTestsData");
             var source = new MemoryPool("test", MemoryAddress.StaticAbsolute, 0x123456, 0, 0x1234);
 
             source.Add(new MemoryFieldFunc<int>("testInt", (pool) => counter++)); // these are always logged
@@ -102,7 +103,7 @@ namespace SimTelemetry.Tests.Logger
                 file.Update(i); // +28 bytes
 
             // We should have logged 2 data files by now.
-            Assert.True(File.Exists("tmp/test/Data.bin"));
+            Assert.True(File.Exists("LogFileWriterTestsData/test/Data.bin"));
 
             file.Save();
 
@@ -122,7 +123,7 @@ namespace SimTelemetry.Tests.Logger
         public void DataWithResubscriptions()
         {
             var counter = 0;
-            var file = new LogFileWriter("test4.zip");
+            var file = new LogFileWriter("test4.zip", "LogFileWriterTestsDataWithResubscriptions");
             var source = new MemoryPool("test", MemoryAddress.StaticAbsolute, 0x123456, 0, 0x1234);
 
             source.Add(new MemoryFieldFunc<int>("testInt", (pool) => counter++)); // these are always logged
@@ -145,9 +146,10 @@ namespace SimTelemetry.Tests.Logger
             for (; i < 1441792; i++) // 33MiB
                 file.Update(i); // +24 bytes
 
+            Thread.Sleep(500);
 
             // We should have logged 2 data files by now.
-            Assert.True(File.Exists("tmp/test/Data.bin"));
+            Assert.True(File.Exists("LogFileWriterTestsDataWithResubscriptions/test/Data.bin"));
 
             file.Save();
 
@@ -170,7 +172,7 @@ namespace SimTelemetry.Tests.Logger
             var counter = 0;
             var counter2 = 0;
             var checkCalls = 0;
-            var file = new LogFileWriter("test5.zip");
+            var file = new LogFileWriter("test5.zip", "LogFileWriterTestsCreateDataWithInfrequentFields");
             var source = new MemoryPool("test", MemoryAddress.StaticAbsolute, 0x123456, 0, 0x1234);
 
             source.Add(new MemoryFieldFunc<int>("testInt", (pool) => counter++)); // these are always logged
@@ -195,8 +197,8 @@ namespace SimTelemetry.Tests.Logger
                 file.Update(i); // +24 bytes
 
             // We should have logged 2 data files by now.
-            Assert.True(File.Exists("tmp/test/Data.bin"));
-            Assert.False(File.Exists("tmp/Henk/Data.bin"));
+            Assert.True(File.Exists("LogFileWriterTestsCreateDataWithInfrequentFields/test/Data.bin"));
+            Assert.False(File.Exists("LogFileWriterTestsCreateDataWithInfrequentFields/Henk/Data.bin"));
 
             file.Save();
 

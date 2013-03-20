@@ -100,8 +100,13 @@
     <Compile Include="Memory\MemorySignatureScannerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\CarRepositoryTests.cs" />
+    <Compile Include="Repositories\TelemetryRepositoryTests.cs" />
     <Compile Include="Repositories\TrackRepositoryTests.cs" />
     <Compile Include="Aggregates\SimulatorTests.cs" />
+    <Compile Include="Telemetry\MockDataNode.cs" />
+    <Compile Include="Telemetry\MockDataSource.cs" />
+    <Compile Include="Telemetry\TelemetryArchiveTests.cs" />
+    <Compile Include="Telemetry\TelemetryLoggerTests.cs" />
     <Compile Include="Telemetry\TelemetryTests.cs" />
     <Compile Include="TestConstants.cs" />
     <Compile Include="Utils\IniReaderTests.cs" />

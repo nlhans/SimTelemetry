@@ -6,7 +6,7 @@ namespace SimTelemetry.Tests
     {
         static void Main(string[] args)
         {
-            var t = new TelemetryTests();
+            var t = new TelemetryLoggerTests();
             t.Record();
             return;
         }

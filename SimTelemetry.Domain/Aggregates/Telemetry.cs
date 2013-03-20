@@ -7,6 +7,7 @@ using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.Telemetry;
 using SimTelemetry.Domain.Utils;
+using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Aggregates
 {
@@ -132,8 +133,8 @@ namespace SimTelemetry.Domain.Aggregates
             }
 
             if (Player != null)
-            foreach (var field in Player.Pool.Fields.Values.Cast<IMemoryObject>())
-                field.Read();
+                foreach (var field in Player.Pool.Fields.Values.Cast<IMemoryObject>())
+                    field.Read();
 
             if (Logger != null)
                 Logger.Update((int)Math.Round(Session.Time*1000));

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Events;
@@ -17,21 +16,28 @@ namespace SimTelemetry.Domain.Telemetry
         public IFileAnnotater Annotater { get; protected set; }
         public string Simulator { get; private set; }
 
-        public IEnumerable<int> TimeLine { get { return _TimeLine; } }
-        private readonly IList<int> _TimeLine = new List<int>();
+        public Track Track { get; protected set; }
+        public Session Session { get; protected set; }
+
+        public IEnumerable<int> TimeLine { get { return _timeLine; } }
+        private readonly IList<int> _timeLine = new List<int>();
+
+        public Dictionary<string, List<Lap>> Laps { get { return _laps; } }
+        private readonly Dictionary<string, List<Lap>> _laps = new Dictionary<string, List<Lap>>();
+
+        public string TemporaryFile { get; private set; }
+        public string TemporaryDirectory { get; private set; }
 
         private LogFileWriter _writer;
         private IDataProvider _dataSource;
+        private Task _closeWriter;
+        private int _lastTime = -1;
 
         protected static readonly string[] TimepathFields = new[] { "Index", "IsAI", "IsPlayer", "Laps", "Meter", "Speed" };
 
-        private int lastTime = -1;
-
-        public Track Track;
-        public Session Session;
-
         public TelemetryLogger(string simulator, TelemetryLoggerConfiguration config)
         {
+            TemporaryFile = "tmp.zip";
             Simulator = simulator;
             Configuration = config;
 
@@ -40,6 +46,16 @@ namespace SimTelemetry.Domain.Telemetry
 
             GlobalEvents.Hook<DriversAdded>(UpdateStructure, true);
             GlobalEvents.Hook<DriversRemoved>(UpdateStructure, true);
+
+            GlobalEvents.Hook<TelemetryLapComplete>(RecordLap, true);
+        }
+
+        private void RecordLap(TelemetryLapComplete obj)
+        {
+            if (_laps.ContainsKey(obj.Driver.Name))
+                _laps[obj.Driver.Name].Add(obj.Lap);
+            else
+                _laps.Add(obj.Driver.Name, new List<Lap>(new[] {obj.Lap}));
         }
 
         public void SetDatasource(IDataProvider source)
@@ -76,7 +92,7 @@ namespace SimTelemetry.Domain.Telemetry
         public void LogStart(SessionStarted e)
         {
             if (_writer != null) return;
-            _writer = new LogFileWriter("tmp.zip");
+            _writer = new LogFileWriter(TemporaryFile, TemporaryDirectory);
             _dataSource.MarkDirty();
         }
 
@@ -85,18 +101,19 @@ namespace SimTelemetry.Domain.Telemetry
             if (_writer == null) return;
             if (Annotater == null)
             {
-                ThreadPool.QueueUserWorkItem(x => ((LogFileWriter)x).Save(), _writer);
+                _closeWriter = new Task((x) => ((LogFileWriter)x).Save(), _writer);
+                _closeWriter.Start();
             }
             else
             {
                 if (Annotater.QualifiesForStorage(this))
                 {
-                    var t = new Task((x) => {
-                                                         ((LogFileWriter)x).Save();
-                                                         Annotater.Store(this, ((LogFileWriter)x));
-                                                     }, _writer);
-                    t.Start();
-                    t.Wait();
+                    _closeWriter = new Task((x) =>
+                                               {
+                                                   ((LogFileWriter) x).Save();
+                                                   Annotater.Store(this, ((LogFileWriter) x));
+                                               }, _writer);
+                    _closeWriter.Start();
                 }
                 else
                 {
@@ -153,21 +170,26 @@ namespace SimTelemetry.Domain.Telemetry
         {
             if (_writer != null)
             {
-                var dt = time - lastTime;
+                var dt = time - _lastTime;
 
                 if (dt > 0)
                 {
                     _writer.Update(time);
-                    _TimeLine.Add(time);
+                    _timeLine.Add(time);
                 }
 
-                lastTime = time;
+                _lastTime = time;
             }
         }
 
         public void Close()
         {
             LogStop(null);
+            if (_closeWriter != null)
+            {
+                _closeWriter.Wait();
+                _closeWriter = null;
+            }
         }
 
         public void SetAnnotater(IFileAnnotater annotater)
@@ -175,5 +197,10 @@ namespace SimTelemetry.Domain.Telemetry
             Annotater = annotater;
         }
 
+        public void SetTemporaryLocations(string file, string dir)
+        {
+            TemporaryFile = file;
+            TemporaryDirectory = dir;
+        }
     }
 }

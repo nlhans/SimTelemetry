@@ -9,7 +9,8 @@ namespace SimTelemetry.Domain.Telemetry
     {
         public bool QualifiesForStorage(TelemetryLogger logger)
         {
-            return (logger.TimeLine.Max() - logger.TimeLine.Min()) >= 10000;
+            if (logger.TimeLine.Count() == 0) return false;
+return (logger.TimeLine.Max() - logger.TimeLine.Min()) >= 10000;
         }
 
         public string GetPath(TelemetryLogger logger)
