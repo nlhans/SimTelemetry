@@ -17,10 +17,13 @@ namespace SimTelemetry.Domain.ValueObjects
 
         public int PitlaneSpeed { get; private set; }
 
-        public Session(string name, SessionType type, string day, Time start, TimeSpan duration, int laps, int pitlaneSpeed)
+        public int Number { get; private set; }
+
+        public Session(string name, SessionType type, int number, string day, Time start, TimeSpan duration, int laps, int pitlaneSpeed)
         {
             Name = name;
             Type = type;
+            Number = number;
             Day = day;
             Start = start;
             Duration = duration;
@@ -30,7 +33,7 @@ namespace SimTelemetry.Domain.ValueObjects
 
         public bool Equals(Session other)
         {
-            return other.Type == Type && Name == other.Name;
+            return other.Type == Type && other.Number == Number && Name == other.Name;
         }
     }
 }

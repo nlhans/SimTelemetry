@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Memory;
+using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Telemetry
 {
@@ -51,7 +54,53 @@ namespace SimTelemetry.Domain.Telemetry
 
         public int BaseAddress { get; private set; }
 
+        public double EngineLifetime { get; private set; }
+
+        public TelemetryWheel WheelRF
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double OilTemperature
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double WaterTemperature
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public double EngineTorque
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public TrackPointType TrackPosition
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
         private bool _initial = true;
+        public TelemetryWheel WheelRR;
+        public TelemetryWheel WheelLR;
+        public TelemetryWheel WheelLF;
+        public float Sector_1_Last;
+        public float LapTime_Best_Sector1;
+        public float Sector_1_Best;
+        public float Sector_2_Best;
+        public float Sector_3_Best;
+        public float LapTime_Best_Sector2;
+        public float Sector_2_Last;
+        public float Sector_3_Last;
+        public float LapTime_Best_Sector3;
+        public float LapTime_Best;
+        public float LapTime_Last;
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
@@ -66,6 +115,9 @@ namespace SimTelemetry.Domain.Telemetry
                 CarClasses = Pool.ReadAs<string>("CarClasses");
 
                 FuelCapacity = Pool.ReadAs<float>("FuelCapacity");
+
+                // TODO: check
+                EngineLifetime = Pool.ReadAs<float>("EngineLifetime");
             }
 
             Meter = Pool.ReadAs<float>("Meter");
@@ -123,6 +175,78 @@ namespace SimTelemetry.Domain.Telemetry
         public TelemetryDriver Clone()
         {
             return (TelemetryDriver)MemberwiseClone();
+        }
+
+        public IEnumerable<Lap> GetLaps()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Lap GetBestLap()
+        {
+            throw new NotImplementedException();
+        }
+
+        public double GetSplitTime(TelemetryDriver telemetryDriver)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class TelemetryWheel
+    {
+        public float BrakeThickness
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float BrakeThicknessBase
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float Pressure
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float Wear
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float TemperatureMiddle
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float TemperatureInside
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float TemperatureOutside
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float Speed
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public float BrakeTemperature
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
         }
     }
 }

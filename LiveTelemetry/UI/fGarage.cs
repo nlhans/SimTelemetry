@@ -20,12 +20,12 @@
  ************************************************************************/
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using LiveTelemetry.Garage;
-using SimTelemetry.Data;
-using SimTelemetry.Objects;
-using SimTelemetry.Objects.Garage;
-using SimTelemetry.Objects.Plugins;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Entities;
+using SimTelemetry.Domain.Plugins;
 
 namespace LiveTelemetry
 {
@@ -39,8 +39,8 @@ namespace LiveTelemetry
 
         private Button btBack;
 
-        public static ISimulator Sim { get; set; }
-        public static IMod Mod { get; set; }
+        public static IPluginSimulator Sim { get; set; }
+        public static Mod Mod { get; set; }
 
         public fGarage()
         {
@@ -74,29 +74,27 @@ namespace LiveTelemetry
         {
             // TODO: ADd track selection as well!
             var smod = sender.ToString();
-            Mod = Sim.Garage.Mods.Find(delegate(IMod m) { if(m.Name == null) m.Scan();
-                return m.Name.Equals(smod); });
-            if (Mod == null)
-                Window = GarageWindow.TrackCars;
-            else
-            {
-                Window = GarageWindow.Mod;
-                Mod.Scan();
-            }
+            Mod = TelemetryApplication.Simulator.Mods.FirstOrDefault(x => x.Name.Equals(smod));
+
+            Window = Mod == null ? GarageWindow.TrackCars : GarageWindow.Mod;
             Redraw();
         }
 
         private void ucGame_Chosen(object sim)
         {
-            Sim = Telemetry.m.Sims.Sims.Find(delegate(ISimulator s) { return s.Name.Equals(sim.ToString()); });
-            if (Sim.Garage == null)
+            Sim = TelemetryApplication.Plugins.Simulators.FirstOrDefault(x => x.Name.Equals(sim.ToString()));
+            //Telemetry.m.Sims.Sims.Find(delegate(ISimulator s) { return s.Name.Equals(sim.ToString()); });
+            if (Sim == null || (Sim.TrackProvider == null && Sim.CarProvider == null))
+            {
                 // TODO: Display errors.
                 // TODO: Check if sim is installed.
                 Window = GarageWindow.GameSelect;
+            }
             else
             {
                 Window = GarageWindow.TrackCars;
-                Sim.Garage.Scan();
+
+                // TODO: Setup garage & repo's
             }
 
             Redraw();

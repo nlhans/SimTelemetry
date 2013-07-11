@@ -26,12 +26,9 @@ using System.IO;
 using System.Windows.Forms;
 using LiveTelemetry.UI;
 using SimTelemetry;
-using SimTelemetry.Data;
-using SimTelemetry.Objects.Plugins;
-using SimTelemetry.Peripherals.Dashboard;
+using SimTelemetry.Domain.Plugins;
 using Triton;
 using Triton.Joysticks;
-using SimTelemetry.Objects;
 using System.Globalization;
 
 namespace LiveTelemetry
@@ -39,7 +36,6 @@ namespace LiveTelemetry
     public partial class LiveTelemetry : Form
     {
         private static LiveTelemetry _liveTelemetry;
-        private Simulators Sims;
         
         // Joystick data for cycling through panels.
         private Joystick Joystick_Instance;
@@ -98,16 +94,14 @@ namespace LiveTelemetry
             }
 
             // Boot up the telemetry service. Wait for it to start and register events that trigger interface changes.
-            Telemetry.m.Run();
+            /*Telemetry.m.Run();
             while (Telemetry.m.Sims == null) System.Threading.Thread.Sleep(1);
             Telemetry.m.Sim_Start += mUpdateUI;
             Telemetry.m.Sim_Stop += mUpdateUI;
             Telemetry.m.Session_Start += mUpdateUI;
             Telemetry.m.Session_Stop += mUpdateUI;
-
-            System.Threading.Thread.Sleep(500);
-            if (Telemetry.m.Sim != null)
-                Telemetry.m.Sim.Garage.Scan();
+            */
+            TelemetryApplication.Init();
 
             // TODO: Detect hardware devices (COM-ports or USB devices)
             // GameData is used for my own hardware extension projects.
@@ -185,7 +179,7 @@ namespace LiveTelemetry
 
             InitializeComponent();
 
-            this.SuspendLayout();
+            SuspendLayout();
             BackColor = Color.Black;
             ucLaps = new Gauge_Laps();
             ucSplits = new Gauge_Splits();
@@ -233,12 +227,9 @@ namespace LiveTelemetry
             Tmr_LwSpeed.Start();
 
             System.Threading.Thread.Sleep(500);
-#if DEBUG
-            // This is for hardware peripheral support
-            new GameData();
-#endif
+
             SetupUI();
-            this.ResumeLayout(false);
+            ResumeLayout(false);
         }
 
         void btNetwork_Click(object sender, EventArgs e)
@@ -334,7 +325,7 @@ namespace LiveTelemetry
         /// </summary>
         private void SetupUI()
         {
-            if (Telemetry.m.Active_Session)
+            if (TelemetryApplication.TelemetryAvailable)
             {
                 this.Controls.Clear();
                 this.Padding = new Padding(0);
@@ -347,7 +338,7 @@ namespace LiveTelemetry
                 SetStatusControls(null, null);
 
             }
-            else if (Telemetry.m.Active_Sim)
+            else if (TelemetryApplication.SimulatorAvailable)
             {
                 this.Controls.Clear();
                 this.Padding = new Padding(0);
@@ -361,9 +352,9 @@ namespace LiveTelemetry
 
                 FlowLayoutPanel panel = new FlowLayoutPanel();
 
-                if (File.Exists("Simulators/" + Telemetry.m.Sim.ProcessName + ".png") && this.Width > 80 && this.Height > 100)
+                if (File.Exists("Simulators/" + TelemetryApplication.Simulator.Name + ".png") && this.Width > 80 && this.Height > 100)
                 {
-                    ucResizableImage pb = new ucResizableImage("Simulators/" + Telemetry.m.Sim.ProcessName + ".png");
+                    ucResizableImage pb = new ucResizableImage("Simulators/" + TelemetryApplication.Simulator.Name + ".png");
                     pb.Crop(Size.Width - 80, Size.Height - 70);
                     panel.Controls.Add(pb);
                     panel.Location = new Point(40, (Height - pb.Size.Height - 60) / 2);
@@ -388,25 +379,25 @@ namespace LiveTelemetry
                 FlowLayoutPanel panel = new FlowLayoutPanel();
                 this.Padding = new Padding(35);
 
-                int columns = (int)Math.Ceiling(Math.Sqrt(Telemetry.m.Sims.Sims.Count));
+                int columns = (int)Math.Ceiling(Math.Sqrt(TelemetryApplication.Plugins.Simulators.Count));
                 if (columns == 0) columns = 1;
-                if (Telemetry.m.Sims.Sims.Count % columns == 1)
+                if (TelemetryApplication.Plugins.Simulators.Count % columns == 1)
                     columns++;
                 if (this.Width > 233)
                 {
                     while (233 * columns > this.Width)
                         columns--;
                 }
-                int rows = (int)Math.Ceiling(Telemetry.m.Sims.Sims.Count * 1.0 / columns) + 1;
+                int rows = (int)Math.Ceiling(TelemetryApplication.Plugins.Simulators.Count * 1.0 / columns) + 1;
 
                 panel.Size = new Size(233 * columns, rows * 140);
                 panel.Location = new Point((this.Width - panel.Size.Width) / 2, (this.Height - panel.Size.Height) / 2);
 
-                foreach (ISimulator sim in Telemetry.m.Sims.Sims)
+                foreach (IPluginSimulator sim in TelemetryApplication.Plugins.Simulators)
                 {
-                    if (File.Exists("Simulators/" + sim.ProcessName + ".png"))
+                    if (File.Exists("Simulators/" + sim.Name + ".png"))
                     {
-                        ucResizableImage pb = new ucResizableImage("Simulators/" + sim.ProcessName + ".png");
+                        ucResizableImage pb = new ucResizableImage("Simulators/" + sim.Name + ".png");
                         pb.Margin = new Padding(10);
                         pb.Crop(213, 120);
                         panel.Controls.Add(pb);
@@ -479,7 +470,7 @@ namespace LiveTelemetry
         {
             try
             {
-                if (Telemetry.m.Active_Session)
+                if (TelemetryApplication.TelemetryAvailable)
                 {
                     if (ucA1GP != null)
                     {
@@ -566,5 +557,9 @@ namespace LiveTelemetry
             if (Controls.Contains(ucSplits)) ucSplits.Invalidate();
         }
 
+    }
+
+    internal class LiveTrackMap : Control
+    {
     }
 }

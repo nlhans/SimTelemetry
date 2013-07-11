@@ -2,6 +2,7 @@
 {
     public class Team
     {
+        public int Position { get; private set; }
         // Name
         public string Name { get; private set; }
 
@@ -16,8 +17,9 @@
         public int Seasons { get; private set; }
         public int Races { get; private set; }
 
-        public Team(string name, string headquarters, int founded, int wins, int poles, int championships, int seasons, int races)
+        public Team(int position, string name, string headquarters, int founded, int wins, int poles, int championships, int seasons, int races)
         {
+            Position = position;
             Name = name;
             Headquarters = headquarters;
             Founded = founded;

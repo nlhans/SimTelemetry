@@ -20,23 +20,22 @@
  ************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Data;
 
 namespace LiveTelemetry
 {
-    static class Program
+    internal static class Program
     {
         private static bool ReportingError = false;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 #if DEBUG
@@ -50,22 +49,24 @@ namespace LiveTelemetry
             Application.Run(new LiveTelemetry());
         }
 
-        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
             LogError(e.Exception, false);
         }
 
-        static void CurrentDomain_FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
+        private static void CurrentDomain_FirstChanceException(object sender,
+                                                               System.Runtime.ExceptionServices.
+                                                                   FirstChanceExceptionEventArgs e)
         {
-            LogError(e.Exception,true);
+            LogError(e.Exception, true);
         }
 
-        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            LogError((Exception) e.ExceptionObject,false);
+            LogError((Exception) e.ExceptionObject, false);
         }
 
-        static void LogError(Exception ex, bool firstchance)
+        private static void LogError(Exception ex, bool firstchance)
         {
             if (ReportingError)
             {
@@ -101,50 +102,47 @@ namespace LiveTelemetry
 
                 error.AppendLine(DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString() + "." +
                                  DateTime.Now.Millisecond);
-                if (Telemetry.m == null) error.AppendLine("No Telemetry object");
-                else
+                error.AppendLine("-----------------------------------------------------------------");
+                error.Append("Simulator: ");
+                if (TelemetryApplication.SimulatorAvailable == false) error.AppendLine("No simulator running");
+                else error.AppendLine(TelemetryApplication.Simulator.Name.ToLower());
+
+                error.AppendLine("-----------------------------------------------------------------");
+                error.Append("Session: ");
+                if (TelemetryApplication.TelemetryAvailable == false) error.AppendLine("No session running");
+                else error.AppendLine(TelemetryApplication.Telemetry.Session.Info.Type.ToString());
+
+                if (TelemetryApplication.TelemetryAvailable)
                 {
                     error.AppendLine("-----------------------------------------------------------------");
-                    error.Append("Simulator: ");
-                    if (Telemetry.m.Active_Sim == false) error.AppendLine("No simulator running");
-                    else error.AppendLine(Telemetry.m.Sim.ProcessName.ToLower());
-
-                    error.AppendLine("-----------------------------------------------------------------");
-                    error.Append("Session: ");
-                    if (Telemetry.m.Active_Session == false) error.AppendLine("No session running");
-                    else error.AppendLine(Telemetry.m.Sim.Session.Type.Type.ToString());
-
-                    if (Telemetry.m.Active_Session && Telemetry.m.Sim != null)
+                    error.Append("Driver: ");
+                    if (TelemetryApplication.SimulatorAvailable && TelemetryApplication.Telemetry.Drivers != null &&
+                        TelemetryApplication.Telemetry.Player != null)
                     {
-                        error.AppendLine("-----------------------------------------------------------------");
-                        error.Append("Driver: ");
-                        if (Telemetry.m.Sim != null && Telemetry.m.Sim.Drivers != null &&
-                            Telemetry.m.Sim.Drivers.Player != null)
-                        {
-                            error.AppendLine(Telemetry.m.Sim.Drivers.Player.Name + " / " +
-                                             Telemetry.m.Sim.Drivers.Player.CarClass + " / " +
-                                             Telemetry.m.Sim.Drivers.Player.CarModel);
-                            error.AppendLine("Laps: " + Telemetry.m.Sim.Drivers.Player.Laps);
-                        }
-                        else if (Telemetry.m.Sim == null)
-                            error.AppendLine("Error in Sim object");
-                        else if (Telemetry.m.Sim.Drivers == null)
-                            error.AppendLine("Error in Drivers object");
-                        else if (Telemetry.m.Sim.Drivers.Player == null)
-                            error.AppendLine("No player found");
-
-                        error.AppendLine("Cars: " + Telemetry.m.Sim.Session.Cars);
-                        error.AppendLine("-----------------------------------------------------------------");
-                        error.AppendLine("Track loaded: " + ((Telemetry.m.Track == null) ? "No" : "Yes"));
-                        error.AppendLine("Track: " + Telemetry.m.Sim.Session.GameData_TrackFile);
-                        if (Telemetry.m.Track != null)
-                        {
-                            error.AppendLine("Track: " + Telemetry.m.Track.Name);
-                            error.AppendLine("Route points: " + Telemetry.m.Track.Route.Racetrack.Count.ToString());
-                        }
-
+                        error.AppendLine(TelemetryApplication.Telemetry.Player.Name + " / " +
+                                         TelemetryApplication.Telemetry.Player.CarClasses + " / " +
+                                         TelemetryApplication.Telemetry.Player.CarModel);
+                        error.AppendLine("Laps: " + TelemetryApplication.Telemetry.Player.Laps);
                     }
+                    else if (TelemetryApplication.SimulatorAvailable == false)
+                        error.AppendLine("Error in Sim object");
+                    else if (TelemetryApplication.Telemetry.Drivers == null)
+                        error.AppendLine("Error in Drivers object");
+                    else if (TelemetryApplication.Telemetry.Player == null)
+                        error.AppendLine("No player found");
+
+                    error.AppendLine("Cars: " + TelemetryApplication.Telemetry.Session.Cars);
+                    error.AppendLine("-----------------------------------------------------------------");
+                    error.AppendLine("Track loaded: " + ((TelemetryApplication.TrackAvailable == false) ? "No" : "Yes"));
+                    error.AppendLine("Track: " + TelemetryApplication.Telemetry.Session.Track);
+                    if (TelemetryApplication.TrackAvailable)
+                    {
+                        error.AppendLine("Track: " + TelemetryApplication.Track.Name);
+                        error.AppendLine("Route points: " + TelemetryApplication.Track.Route.Count());
+                    }
+
                 }
+
 
                 error.AppendLine("-----------------------------------------------------------------");
                 error.AppendLine("Simulator Event log:");
@@ -176,7 +174,8 @@ namespace LiveTelemetry
                     Error err = new Error();
                     err.ShowDialog();
                 }
-            }catch(Exception w)
+            }
+            catch (Exception w)
             {
 
             }

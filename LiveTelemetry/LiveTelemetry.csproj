@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TelemetryApplication.cs" />
     <Compile Include="UI\Data.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,9 +148,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Gauges\LiveTrackMap.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Gauges\LiveTrackMap.cs" />
     <Compile Include="UI\fNetwork.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -217,13 +219,9 @@
       <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
       <Name>SimTelemetry.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
-      <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
-      <Name>SimTelemetry.Objects</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimTelemetry.Peripherals\SimTelemetry.Peripherals.csproj">
-      <Project>{C13964E5-773D-414F-AF87-5D6CE41E1066}</Project>
-      <Name>SimTelemetry.Peripherals</Name>
+    <ProjectReference Include="..\SimTelemetry.Domain\SimTelemetry.Domain.csproj">
+      <Project>{25f653cd-5503-45b6-ad1b-c8f5c2034da6}</Project>
+      <Name>SimTelemetry.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\SimTelemetry\SimTelemetry.csproj">
       <Project>{9C68C799-305F-417C-BFA5-9BF6E1280107}</Project>
@@ -232,6 +230,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

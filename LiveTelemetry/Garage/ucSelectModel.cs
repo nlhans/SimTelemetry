@@ -21,14 +21,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using SimTelemetry.Objects.Garage;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Repositories;
 using Triton;
 using Triton.Controls;
 
@@ -43,8 +40,7 @@ namespace LiveTelemetry.Garage
         public event Signal Chosen;
         private List<ListViewItem> models = new List<ListViewItem>();
 
-        private ICar car;
-        private CarEngineTools engineinfo;
+        private Car car;
 
         private ucSelectModel_EngineCurve ucEngine;
 
@@ -62,15 +58,15 @@ namespace LiveTelemetry.Garage
             splitContainer1.Panel1.Controls.Add(_models);
 
             ucEngine = new ucSelectModel_EngineCurve();
-            ucEngine.CurveUpdated += new AnonymousSignal(ucEngine_CurveUpdated);
+            ucEngine.CurveUpdated += ucEngine_CurveUpdated;
             splitContainer1.Panel2.Controls.Add(ucEngine);
 
         }
 
         void ucEngine_CurveUpdated()
         {
-            engineinfo.Scan(ucEngine.Settings_Speed, ucEngine.Settings_Throttle,
-                            ucEngine.Settings_Mode);
+            car.Engine.Apply(ucEngine.Settings_Speed, ucEngine.Settings_Throttle, ucEngine.Settings_Mode);
+
             UpdateLabels();
         }
 
@@ -85,14 +81,12 @@ namespace LiveTelemetry.Garage
                 file = _models.Items[0].SubItems[2].Text;
 
 
-            car = fGarage.Sim.Garage.CarFactory(fGarage.Mod, file);
+            //car = fGarage.Sim.Garage.CarFactory(fGarage.Mod, file);
 
-            engineinfo = new CarEngineTools(car);
-            engineinfo.Scan();
-
+            car = TelemetryApplication.Cars.GetByFile(file);
             UpdateLabels();
 
-            ucEngine.Load(car, engineinfo);
+            ucEngine.Load(car);
             Resize();
 
         }
@@ -105,19 +99,19 @@ namespace LiveTelemetry.Garage
                 lbl_Team.Text = car.Driver + " [" + car.Team + "]";
 
                 lbl1 = "[Team]\n";
-                lbl1 += "Start number: " + car.Number.ToString() + "\n";
-                lbl1 += "Engine: " + car.Info_Engine_Manufacturer.ToString() + "\n";
+                lbl1 += "Start number: " + car.Team.Position.ToString() + "\n";
+                lbl1 += "Engine: " + car.Engine.Manufacturer.ToString() + "\n";
                 lbl1 += "\n";
-                lbl1 += "Team Founded: " + car.Info_YearFounded.ToString() + "\n";
-                lbl1 += "Team Headquarters: " + car.Info_HQ + "\n";
-                if (car.Info_Starts > 0)
+                lbl1 += "Team Founded: " + car.Team.Founded.ToString() + "\n";
+                lbl1 += "Team Headquarters: " + car.Team.Headquarters + "\n";
+                if (car.Team.Races > 0)
                 {
-                    lbl1 += "Team Starts: " + car.Info_Starts.ToString() + "\n";
-                    lbl1 += "Team Pole positions: " + car.Info_Poles.ToString() + " (" +
-                                      (100.0 * car.Info_Poles / car.Info_Starts).ToString("000.0") + "%)\n";
-                    lbl1 += "Team Race Wins: " + car.Info_Wins.ToString() + " (" +
-                                      (100.0 * car.Info_Wins / car.Info_Starts).ToString("000.0") + "%)\n";
-                    lbl1 += "Team Championship Wins: " + car.Info_Championships.ToString() + "\n";
+                    lbl1 += "Team Starts: " + car.Team.Races.ToString() + "\n";
+                    lbl1 += "Team Pole positions: " + car.Team.Poles.ToString() + " (" +
+                                      (100.0 * car.Team.Poles / car.Team.Races).ToString("000.0") + "%)\n";
+                    lbl1 += "Team Race Wins: " + car.Team.Wins.ToString() + " (" +
+                                      (100.0 * car.Team.Wins / car.Team.Races).ToString("000.0") + "%)\n";
+                    lbl1 += "Team Championship Wins: " + car.Team.Championships.ToString() + "\n";
                 }
 
                 lbl1 += "\n";
@@ -126,13 +120,13 @@ namespace LiveTelemetry.Garage
                 if (car.Engine != null)
                 {
                     lbl2 = "[Engine]\n";
-                    lbl2 += "Maximum RPM: " + car.Engine.MaxRPM.ToString("00000") + "rpm\n";
-                    lbl2 += "Idle RPM: " + car.Engine.IdleRPM.ToString("00000") + "rpm\n";
+                    lbl2 += "Maximum RPM: " + car.Engine.MaximumRpm.Maximum.ToString("00000") + "rpm\n";
+                    lbl2 += "Idle RPM: " + car.Engine.IdleRpm.Minimum.ToString("00000") + "rpm\n";
 
-                    lbl2 += "Maximum torque: " + engineinfo.MaxTorque_NM.ToString("0000.0") + "nm  at " + engineinfo.MaxTorque_RPM.ToString("00000") + " rpm\n";
-                    lbl2 += "Maximum power: " + engineinfo.MaxPower_HP.ToString("0000.0") + "hp at " + engineinfo.MaxPower_RPM.ToString("00000") + " rpm\n";
+                    lbl2 += string.Format("Maximum torque: {0}nm  at {1} rpm\n", car.Engine.MaximumTorque.ToString("0000.0"), car.Engine.MaximumTorqueRpm.ToString("00000"));
+                    lbl2 += string.Format("Maximum power: {0}hp at {1} rpm\n", car.Engine.MaximumPower.ToString("0000.0"), car.Engine.MaximumPowerRpm.ToString("00000"));
 
-                    lbl2 += "Boost steps: " + car.Engine.EngineModes.Count.ToString() + "\n";
+                    lbl2 += "Boost steps: " + car.Engine.Modes.Count().ToString() + "\n";
                 }
 
                 lbl_info1.Text = lbl1;
@@ -145,23 +139,20 @@ namespace LiveTelemetry.Garage
             models = new List<ListViewItem>();
             _models.Items.Clear();
 
-            foreach (ICar car in fGarage.Mod.Models)
+            foreach (Car car in fGarage.Mod.Cars)
             {
-                car.Scan();
                 string driver = car.Description;
 
-                if (car.Number > 0 && driver.StartsWith("#") == false)
-                    driver = "#" + car.Number.ToString("000") + " " + driver;
+                if (car.Team.Position > 0 && driver.StartsWith("#") == false)
+                    driver = "#" + car.Team.Position.ToString("000") + " " + driver;
                 models.Add(
                     new ListViewItem(new string[3]
                                          {
-                                             driver, car.Team, car.File
+                                             driver, car.Team.Name, car.ID
                                          }));
             }
 
-            models.Sort(
-                delegate(ListViewItem lvi1, ListViewItem lvi2)
-                { return lvi1.SubItems[0].Text.CompareTo(lvi2.SubItems[0].Text); });
+            models.Sort((lvi1, lvi2) => lvi1.SubItems[0].Text.CompareTo(lvi2.SubItems[0].Text));
 
             _models.Items.AddRange(models.ToArray());
             _models_ItemSelectionChanged(null, null);

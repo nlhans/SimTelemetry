@@ -21,14 +21,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Data;
-using SimTelemetry.Objects;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Telemetry;
+using SimTelemetry.Domain.ValueObjects;
 
 namespace LiveTelemetry
 {
@@ -36,6 +35,8 @@ namespace LiveTelemetry
     {
         private Dictionary<string, int> DisplayTimers = new Dictionary<string, int>();
         private Dictionary<string, int> LastPitLap = new Dictionary<string, int>();
+
+        private SessionType LastSession = SessionType.TEST_DAY;
         public LapChart()
         {
             InitializeComponent();
@@ -47,7 +48,7 @@ namespace LiveTelemetry
 
         }
 
-        private int sortDriver(IDriverGeneral d1, IDriverGeneral d2)
+        private int sortDriver(TelemetryDriver d1, TelemetryDriver d2)
         {
             if (d1 == null || d2 == null) return 0;
             if (d1.Position == d2.Position) return 0;
@@ -81,14 +82,14 @@ namespace LiveTelemetry
             this.Size = new Size(460, this.Size.Height);
             Graphics g = e.Graphics;
             g.FillRectangle(Brushes.Black, e.ClipRectangle);
-            if (!Telemetry.m.Active_Session) return;
+            if (TelemetryApplication.TelemetryAvailable ==false) return;
 
             // Draw header
-            System.Drawing.Font f = new Font("Arial", 8, FontStyle.Regular);
+            var f = new Font("Arial", 8, FontStyle.Regular);
 
             try
             {
-                switch (Telemetry.m.Sim.Session.Type.Type)
+                switch (TelemetryApplication.Telemetry.Session.Info.Type)
                 {
                     default:
                         g.DrawString("P", f, Brushes.DarkGray, 10f, 10f);
@@ -117,7 +118,7 @@ namespace LiveTelemetry
                 int ind = 1;
                 float LineHeight = 15f;
 
-                List<IDriverGeneral> drivers = Telemetry.m.Sim.Drivers.AllDrivers;
+                List<TelemetryDriver> drivers = TelemetryApplication.Telemetry.Drivers.ToList();
                 drivers.Sort(sortDriver);
 
                 double lapTimeBest = 10000;
@@ -139,10 +140,11 @@ namespace LiveTelemetry
                 string FastestDriver = "";
                 int DriverCount = 0;
                 // get all time best sector times
-                if (Telemetry.m.Sim.Modules.Times_History_LapTimes)
+                // TODO: Detect mod capabilities
+                if (true) // Telemetry.m.Sim.Modules.Times_History_LapTimes)
                 {
-                    List<ILap> mylaps = Telemetry.m.Sim.Drivers.Player.GetLapTimes();
-                    foreach (ILap l in mylaps)
+                    var mylaps = TelemetryApplication.Telemetry.Player.GetLaps();
+                    foreach (Lap l in mylaps)
                     {
                         if (l.Sector1 > 0.1 && l.Sector2 > 0.1 && l.Sector3 > 0.1)
                         {
@@ -154,7 +156,7 @@ namespace LiveTelemetry
                     }
                 }
 
-                foreach (IDriverGeneral driver in drivers)
+                foreach (TelemetryDriver driver in drivers)
                 {
 
                     if (driver.Position != 0 && driver.Position <= 120 && Math.Abs(driver.CoordinateX) >= 0.1)
@@ -165,12 +167,12 @@ namespace LiveTelemetry
 
                         // fastest lap
                         DriverCount++;
-                        ILap fastlap = driver.GetBestLap();
+                        Lap fastlap = driver.GetBestLap();
 
 
-                        if (fastlap != null && fastlap.LapTime < FastestLap && fastlap.LapTime > 0)
+                        if (fastlap != null && fastlap.Total < FastestLap && fastlap.Total > 0)
                         {
-                            FastestLap = fastlap.LapTime;
+                            FastestLap = fastlap.Total;
                             FastestDriver = driver.Name;
                         }
                         if (driver.LapTime_Best_Sector1 > 0)
@@ -213,9 +215,9 @@ namespace LiveTelemetry
                 // Go through all drivers
                 if (drivers.Count > 0)
                 {
-                    IDriverGeneral Lastdriver = drivers[0];
+                    TelemetryDriver Lastdriver = drivers[0];
                     double Previous_SplitLeader = 0;
-                    foreach (IDriverGeneral driver in drivers)
+                    foreach (TelemetryDriver driver in drivers)
                     {
                         driverIndex++;
                         Lastdriver = driver;
@@ -226,7 +228,7 @@ namespace LiveTelemetry
                         //if (driver.Position >= 120 || driver.Position == 0 || driver.__LapsData.ToInt32() == 0) continue;
                         //if (driver.Name.Trim() == "")
                         //    continue;
-                        Brush OntrackBrush = ((!driver.Pits && driver.Speed > 5) ? Brushes.White : Brushes.Red);
+                        Brush OntrackBrush = ((!driver.IsPits && driver.Speed > 5) ? Brushes.White : Brushes.Red);
                         g.DrawString(driver.Position.ToString(), f, Brushes.White, 10f, 10f + ind*LineHeight);
                         string[] name = driver.Name.ToUpper().Split(" ".ToCharArray());
                         if (name.Length == 1)
@@ -237,12 +239,12 @@ namespace LiveTelemetry
 
                         if (!LastPitLap.ContainsKey(driver.Name))
                             LastPitLap.Add(driver.Name, -1);
-                        if (driver.Pits)
+                        if (driver.IsPits)
                         {
                             LastPitLap[driver.Name] = driver.Laps;
                         }
 
-                        if (Telemetry.m.Sim.Session.Type.Type == SessionType.RACE)
+                        if (TelemetryApplication.Telemetry.Session.Info.Type == SessionType.RACE)
                         {
                             if (driver.LapTime_Last < lapTimeBest && driver.LapTime_Last != -1f)
                                 lapTimeBest = driver.LapTime_Last;
@@ -281,7 +283,7 @@ namespace LiveTelemetry
                             }
 
 
-                            if (driver.Pits && driver.Sector_1_Best > 0)
+                            if (driver.IsPits && driver.Sector_1_Best > 0)
                             {
                                 Brush Sector1Brush = Brushes.Yellow;
                                 Brush Sector2Brush = Brushes.Yellow;
@@ -302,30 +304,30 @@ namespace LiveTelemetry
 
                                 if (!DisplayTimers.ContainsKey(driver.Name))
                                     DisplayTimers.Add(driver.Name, -1);
-                                if (driver.TrackPosition == TrackPosition.SECTOR1)
+                                if (driver.TrackPosition == TrackPointType.SECTOR1)
                                     DisplayTimers[driver.Name]--;
-                                if (driver.TrackPosition == TrackPosition.SECTOR2)
+                                if (driver.TrackPosition == TrackPointType.SECTOR2)
                                     DisplayTimers[driver.Name] = 10;
-                                if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPosition.SECTOR1)
+                                if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPointType.SECTOR1)
                                     DisplayAllSectors = true;
                                 //if (data[driverIndex].CurrentSector >= 2 || data[driverIndex].CurrentSector == 0)
-                                if (driver.TrackPosition == TrackPosition.SECTOR2 ||
-                                    driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                if (driver.TrackPosition == TrackPointType.SECTOR2 ||
+                                    driver.TrackPosition == TrackPointType.SECTOR3 || DisplayAllSectors)
                                 {
                                     Brush Sector1Brush = Brushes.Yellow;
-                                    if (driver.TrackPosition == TrackPosition.SECTOR2) Sector1Brush = Brushes.White;
+                                    if (driver.TrackPosition == TrackPointType.SECTOR2) Sector1Brush = Brushes.White;
                                     if (driver.Sector_1_Last == driver.LapTime_Best_Sector1)
                                         Sector1Brush = Brushes.Green;
                                     if (driver.Sector_1_Last <= BestSector1) Sector1Brush = Brushes.Magenta;
                                     g.DrawString(PrintLapTime(driver.Sector_1_Last, true), f, Sector1Brush, 245f,
                                                  10f + ind*LineHeight);
                                 }
-                                if (driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                if (driver.TrackPosition == TrackPointType.SECTOR3 || DisplayAllSectors)
                                     //if (data[driverIndex].CurrentSector == 3 || data[driverIndex].CurrentSector == 0)
                                 {
 
                                     Brush Sector2Brush = Brushes.Yellow;
-                                    if (driver.TrackPosition == TrackPosition.SECTOR3) Sector2Brush = Brushes.White;
+                                    if (driver.TrackPosition == TrackPointType.SECTOR3) Sector2Brush = Brushes.White;
                                     if (driver.Sector_2_Last == driver.LapTime_Best_Sector2)
                                         Sector2Brush = Brushes.Green;
                                     if (driver.Sector_2_Last <= BestSector2) Sector2Brush = Brushes.Magenta;
@@ -336,25 +338,25 @@ namespace LiveTelemetry
                                     //if (data[driverIndex].CurrentSector == 0)
                                 {
                                     Brush Sector3Brush = Brushes.Yellow;
-                                    if (driver.TrackPosition == TrackPosition.SECTOR1) Sector3Brush = Brushes.White;
+                                    if (driver.TrackPosition == TrackPointType.SECTOR1) Sector3Brush = Brushes.White;
                                     if (driver.Sector_3_Last == driver.LapTime_Best_Sector3)
                                         Sector3Brush = Brushes.Green;
                                     if (driver.Sector_3_Last <= BestSector3) Sector3Brush = Brushes.Magenta;
                                     g.DrawString(PrintLapTime(driver.Sector_3_Last, true), f, Sector3Brush, 345f,
                                                  10f + ind*LineHeight);
                                 }
-                                if (!driver.Pits && driver.Speed < 5)
+                                if (!driver.IsPits && driver.Speed < 5)
                                 {
-                                    if (driver.TrackPosition == TrackPosition.SECTOR1)
+                                    if (driver.TrackPosition == TrackPointType.SECTOR1)
                                         g.DrawString("[STOP]", f, Brushes.Red, 245f, 10f + ind*LineHeight);
-                                    if (driver.TrackPosition == TrackPosition.SECTOR2)
+                                    if (driver.TrackPosition == TrackPointType.SECTOR2)
                                         g.DrawString("[STOP]", f, Brushes.Red, 295f, 10f + ind*LineHeight);
-                                    if (driver.TrackPosition == TrackPosition.SECTOR3)
+                                    if (driver.TrackPosition == TrackPointType.SECTOR3)
                                         g.DrawString("[STOP]", f, Brushes.Red, 345f, 10f + ind*LineHeight);
 
                                 }
                             }
-                            else if (driver.Laps > 0 || (driver.Laps == 0 && driver.Pits == false))
+                            else if (driver.Laps > 0 || (driver.Laps == 0 && driver.IsPits == false))
                                 g.DrawString("OUT", f, Brushes.Red, 265f, 10f + ind*LineHeight);
 
                             g.DrawString(driver.Pitstops.ToString(), f, Brushes.White, 395f, 10f + ind*LineHeight);
@@ -368,7 +370,7 @@ namespace LiveTelemetry
 
                             }
                             else */
-                            if (driver.Pits && driver.Sector_1_Best > 0)
+                            if (driver.IsPits && driver.Sector_1_Best > 0)
                             {
 
                                 if (driver.LapTime_Best < lapTimeBest && driver.LapTime_Best != -1f)
@@ -400,21 +402,21 @@ namespace LiveTelemetry
                                 bool DisplayAllSectors = false;
                                 if (!DisplayTimers.ContainsKey(driver.Name))
                                     DisplayTimers.Add(driver.Name, -1);
-                                if (driver.TrackPosition == TrackPosition.SECTOR1)
+                                if (driver.TrackPosition == TrackPointType.SECTOR1)
                                     DisplayTimers[driver.Name]--;
-                                if (driver.TrackPosition == TrackPosition.SECTOR2)
+                                if (driver.TrackPosition == TrackPointType.SECTOR2)
                                     DisplayTimers[driver.Name] = 10;
-                                if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPosition.SECTOR1)
+                                if (DisplayTimers[driver.Name] > 0 && driver.TrackPosition == TrackPointType.SECTOR1)
                                     DisplayAllSectors = true;
                                 //if (data[driverIndex].CurrentSector >= 2 || data[driverIndex].CurrentSector == 0)
 
-                                if ((LastPitLap[driver.Name] == driver.Laps || driver.Sector_1_Last < 0) && !driver.Pits)
+                                if ((LastPitLap[driver.Name] == driver.Laps || driver.Sector_1_Last < 0) && !driver.IsPits)
                                     g.DrawString("OUT", f, Brushes.Red, 245f, 10f + ind*LineHeight);
-                                else if (driver.TrackPosition == TrackPosition.SECTOR2 ||
-                                         driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                else if (driver.TrackPosition == TrackPointType.SECTOR2 ||
+                                         driver.TrackPosition == TrackPointType.SECTOR3 || DisplayAllSectors)
                                 {
                                     Brush Sector1Brush = Brushes.Yellow;
-                                    if (driver.TrackPosition == TrackPosition.SECTOR2) Sector1Brush = Brushes.White;
+                                    if (driver.TrackPosition == TrackPointType.SECTOR2) Sector1Brush = Brushes.White;
                                     if (driver.Sector_1_Last == driver.LapTime_Best_Sector1)
                                         Sector1Brush = Brushes.Green;
                                     if (driver.Sector_1_Last <= BestSector1) Sector1Brush = Brushes.Magenta;
@@ -422,12 +424,12 @@ namespace LiveTelemetry
                                                  10f + ind*LineHeight);
                                 }
 
-                                if (driver.TrackPosition == TrackPosition.SECTOR3 || DisplayAllSectors)
+                                if (driver.TrackPosition == TrackPointType.SECTOR3 || DisplayAllSectors)
                                     //if (data[driverIndex].CurrentSector == 3 || data[driverIndex].CurrentSector == 0)
                                 {
 
                                     Brush Sector2Brush = Brushes.Yellow;
-                                    if (driver.TrackPosition == TrackPosition.SECTOR3) Sector2Brush = Brushes.White;
+                                    if (driver.TrackPosition == TrackPointType.SECTOR3) Sector2Brush = Brushes.White;
                                     if (driver.Sector_2_Last == driver.LapTime_Best_Sector2)
                                         Sector2Brush = Brushes.Green;
                                     if (driver.Sector_2_Last <= BestSector2) Sector2Brush = Brushes.Magenta;
@@ -438,7 +440,7 @@ namespace LiveTelemetry
                                     //if (data[driverIndex].CurrentSector == 0)
                                 {
                                     Brush Sector3Brush = Brushes.Yellow;
-                                    if (driver.TrackPosition == TrackPosition.SECTOR1) Sector3Brush = Brushes.White;
+                                    if (driver.TrackPosition == TrackPointType.SECTOR1) Sector3Brush = Brushes.White;
                                     if (driver.Sector_3_Last == driver.LapTime_Best_Sector3)
                                         Sector3Brush = Brushes.Green;
                                     if (driver.Sector_3_Last <= BestSector3) Sector3Brush = Brushes.Magenta;
@@ -475,13 +477,13 @@ namespace LiveTelemetry
                                                      10f + ind*LineHeight);
                                     }
                                 }
-                                if (!driver.Pits && driver.Speed < 5)
+                                if (!driver.IsPits && driver.Speed < 5)
                                 {
-                                    if (driver.TrackPosition == TrackPosition.SECTOR1)
+                                    if (driver.TrackPosition == TrackPointType.SECTOR1)
                                         g.DrawString("[STOP]", f, Brushes.Red, 245f, 10f + ind*LineHeight);
-                                    if (driver.TrackPosition == TrackPosition.SECTOR2)
+                                    if (driver.TrackPosition == TrackPointType.SECTOR2)
                                         g.DrawString("[STOP]", f, Brushes.Red, 295f, 10f + ind*LineHeight);
-                                    if (driver.TrackPosition == TrackPosition.SECTOR3)
+                                    if (driver.TrackPosition == TrackPointType.SECTOR3)
                                         g.DrawString("[STOP]", f, Brushes.Red, 345f, 10f + ind*LineHeight);
 
                                 }
@@ -548,8 +550,6 @@ namespace LiveTelemetry
             }
             base.OnPaint(e);
         }
-
-        private SessionType LastSession = SessionType.TEST_DAY;
 
     }
 

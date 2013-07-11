@@ -14,6 +14,18 @@ namespace SimTelemetry.Domain.Entities
         public Range PitsTemperature { get; private set; }
         public Range PeakPressure { get; private set; }
 
+        public Range BrakeTemperature
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
+
+        public float BrakeThicknessFailurePoint
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
+
         public Wheel(WheelLocation location, float perimeter, float rollResistance, Range peakTemperature, Range pitsTemperature, Range peakPressure)
         {
             Location = location;

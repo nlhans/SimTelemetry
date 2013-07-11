@@ -23,10 +23,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SimTelemetry.Data.Track;
-using SimTelemetry.Objects.Garage;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Entities;
 using Triton;
 
 namespace LiveTelemetry.Garage
@@ -89,25 +91,23 @@ namespace LiveTelemetry.Garage
                 this.BackColor = Color.Black;
                 Loading = true;
 
-                Task load = new Task(() =>
+                var load = new Task(() =>
                                          {
-                                             if (fGarage.Sim != null && fGarage.Sim.Garage != null && fGarage.Sim.Garage.Mods != null)
+                                             if (fGarage.Sim != null)
                                              {
-                                                 foreach (IMod mod in fGarage.Sim.Garage.Mods)
+                                                 foreach (Mod mod in fGarage.Sim.GetSimulator().Mods)
                                                  {
                                                      // If required, scan:
-                                                     mod.Scan();
-
                                                      if (mod.Image != "" &&
                                                          File.Exists(mod.Image))
                                                      {
 
-                                                         ucResizableImage pb =
+                                                         var pb =
                                                              new ucResizableImage(mod.Image);
                                                          pb.Caption = mod.Name;
                                                          pb.Margin = new Padding(10);
                                                          pb.Name = mod.Name;
-                                                         if (mod.Models.Count == 0)
+                                                         if (!mod.Cars.Any())
                                                          {
                                                              pb.Disabled = true;
                                                          }
@@ -128,7 +128,7 @@ namespace LiveTelemetry.Garage
                                                          l.Font = new Font("Tahoma", 24.0f,
                                                                            FontStyle.Bold);
                                                          l.Size = new Size(213, 120);
-                                                         if (mod.Models.Count == 0)
+                                                         if (!mod.Cars.Any())
                                                          {
                                                              l.ForeColor = Color.Gray;
                                                          }
@@ -150,37 +150,34 @@ namespace LiveTelemetry.Garage
                                       });
 
                 Task loadtracks = new Task(() =>
-                                               {
-                                                   TrackThumbnail thumbnail_generator = new TrackThumbnail();
-                                                   fGarage.Sim.Garage.Scan();
-                                                   if (fGarage.Sim.Garage.Tracks != null){
-                                                       foreach (ITrack track in fGarage.Sim.Garage.Tracks)
-                                                       {
-                                                           track.Scan();
-                                                           if (File.Exists(track.Thumbnail) == false)
-                                                           {
-                                                               track.ScanRoute();
-                                                               thumbnail_generator.Create(track.Thumbnail, track.Name,
-                                                                                          track.Version, track.Route,
-                                                                                          220,
-                                                                                          220);
-                                                           }
+                    {
+                        TrackThumbnail thumbnail_generator = new TrackThumbnail();
 
-                                                           if (File.Exists(track.Thumbnail))
-                                                           {
-                                                               ucResizableImage pb =
-                                                                   new ucResizableImage(track.Thumbnail);
-                                                               pb.Caption = track.Name;
-                                                               pb.Margin = new Padding(10);
-                                                               pb.Name = track.Name;
-                                                               pb.Cursor = Cursors.Hand;
-                                                               //pb.Click +=pb_Click;
-                                                               pb.Crop(220, 220);
-                                                               mods_list.Add(pb);
-                                                           }
-                                                       }
-                                                   }
-                                               });
+                        foreach (var track in fGarage.Sim.GetSimulator().Tracks)
+                        {
+                            if (File.Exists(track.Image) == false)
+                            {
+                                thumbnail_generator.Create(track.Image, track.Name,
+                                                           track.Version, track.Route,
+                                                           220,
+                                                           220);
+                            }
+
+                            if (File.Exists(track.Image))
+                            {
+                                var pb =
+                                    new ucResizableImage(track.Image);
+                                pb.Caption = track.Name;
+                                pb.Margin = new Padding(10);
+                                pb.Name = track.Name;
+                                pb.Cursor = Cursors.Hand;
+                                //pb.Click +=pb_Click;
+                                pb.Crop(220, 220);
+                                mods_list.Add(pb);
+                            }
+                        }
+
+                    });
                 loadtracks.ContinueWith((r) => {
                                                    load.Start();
                 });
@@ -206,7 +203,8 @@ namespace LiveTelemetry.Garage
         {
             try
             {
-                int grid_content_size = fGarage.Sim.Garage.Mods.Count + fGarage.Sim.Garage.Tracks.Count;
+                int grid_content_size = fGarage.Sim.GetSimulator().Mods.Count() +
+                                        fGarage.Sim.GetSimulator().Tracks.Count();
                 int columns = (int) Math.Ceiling(Math.Sqrt(grid_content_size)) + 2;
                 if (grid_content_size%columns == 1)
                     columns++;

@@ -1,4 +1,7 @@
-﻿namespace SimTelemetry.Domain.Telemetry
+﻿using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.ValueObjects;
+
+namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetrySession : ITelemetryObject
     {
@@ -9,6 +12,32 @@
 
         public float Time { get; protected set; }
         public int Cars { get; protected set; }
+
+        public int RaceLaps { get; protected set; }
+
+        public double TrackTemperature
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
+
+        public double AmbientTemperature
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
+
+        public Session Info
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
+
+        public string Track
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {

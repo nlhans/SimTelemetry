@@ -23,12 +23,12 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using SimTelemetry.Data;
-using SimTelemetry.Controls;
-using SimTelemetry.Objects;
+using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Telemetry;
 
 namespace LiveTelemetry
 {
+    /*
     public class LiveTrackMap : TrackMap
     {
         public LiveTrackMap()
@@ -42,16 +42,13 @@ namespace LiveTelemetry
             {
 
                 Graphics g = e.Graphics;
-                if (!Telemetry.m.Active_Session) return;
+                if (!TelemetryApplication.TelemetryAvailable) return;
                 if (_BackgroundTrackMap == null)
                 {
                     g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
                 }
                 else
                 {
-                    if (!IsValidTrackmap())
-                        Telemetry.m.ForceTrackLoad();
-
                     CompositingMode compMode = g.CompositingMode;
                     g.InterpolationMode = InterpolationMode.NearestNeighbor;
                     g.CompositingMode = CompositingMode.SourceCopy;
@@ -68,9 +65,9 @@ namespace LiveTelemetry
                 Pen pDarkGreen = new Pen(Color.DarkGreen, 3f);
                 float bubblesize = 34f;
                 // get all drivers and draw a dot!
-                lock (Telemetry.m.Sim.Drivers.AllDrivers)
+                lock (TelemetryApplication.Telemetry.Drivers)
                 {
-                    foreach (IDriverGeneral driver in Telemetry.m.Sim.Drivers.AllDrivers)
+                    foreach (TelemetryDriver driver in TelemetryApplication.Telemetry.Drivers)
                     {
                         if (driver.Position != 0 && driver.Position <= 120 && Math.Abs( driver.CoordinateX)>=0.1)
                         {
@@ -79,15 +76,15 @@ namespace LiveTelemetry
 
 
                             Brush c;
-                            if (driver.Position == Telemetry.m.Sim.Drivers.Player.Position) // Player
+                            if (driver.Position == TelemetryApplication.Telemetry.Player.Position) // Player
                                 c = Brushes.Magenta;
                             else if (driver.Speed < 5) // Stopped
                                 c = Brushes.Red;
-                            else if (driver.Flag_Yellow) // Local yellow flag
+                            else if (driver.FlagYellow) // Local yellow flag
                                 c = Brushes.Yellow;
-                            else if (Telemetry.m.Sim.Session.Type.Type == SessionType.RACE && driver.GetSplitTime(Telemetry.m.Sim.Drivers.Player) >= 10000) // InRace && lapped vehicle
+                            else if (TelemetryApplication.Telemetry.Session.Type == SessionType.RACE && driver.GetSplitTime(TelemetryApplication.Telemetry.Player) >= 10000) // InRace && lapped vehicle
                                 c = new SolidBrush(Color.FromArgb(80, 80, 80));
-                            else if (driver.Position > Telemetry.m.Sim.Drivers.Player.Position) // In front of player.
+                            else if (driver.Position > TelemetryApplication.Telemetry.Player.Position) // In front of player.
                                 c = Brushes.YellowGreen;
                             else // Behind player, but not lapped.
                                 c = new SolidBrush(Color.FromArgb(90, 120, 120));
@@ -113,10 +110,10 @@ namespace LiveTelemetry
                             g.DrawString(driver.Position.ToString(), f, Brushes.White, a1 + 5, a2 + 2);
 
                             g.DrawLine(pDarkRed, a1 + bubblesize / 2f - 10, a2 + 3 + bubblesize / 2f,
-                                       a1 + bubblesize / 2f - 10 + Convert.ToInt32(driver.Brake * 20),
+                                       a1 + bubblesize / 2f - 10 + Convert.ToInt32(driver.InputBrake * 20),
                                        a2 + 3 + bubblesize / 2f);
                             g.DrawLine(pDarkGreen, a1 + bubblesize / 2f - 10, a2 + 3 + bubblesize / 2f,
-                                       a1 + bubblesize / 2f - 10 + Convert.ToInt32(driver.Throttle * 20),
+                                       a1 + bubblesize / 2f - 10 + Convert.ToInt32(driver.InputThrottle * 20),
                                        a2 + 3 + bubblesize / 2f);
                             g.DrawString((driver.Speed * 3.6).ToString("000"), ft, Brushes.White, a1 + bubblesize / 2f - 10,
                                          a2 + bubblesize / 2f + 5);
@@ -138,5 +135,5 @@ namespace LiveTelemetry
             }
             //base.OnPaint(e);
         }
-    }
+    }*/
 }

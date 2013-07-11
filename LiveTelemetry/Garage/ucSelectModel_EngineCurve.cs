@@ -21,33 +21,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Objects.Garage;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.ValueObjects;
 using Triton;
 
 namespace LiveTelemetry.Garage
 {
-    internal class ucSelectModel_EngineCurve_Mode
-    {
-        public int index { get; set; }
-        public string mode { get; set; }
-
-        public ucSelectModel_EngineCurve_Mode(int i, string m)
-        {
-            index = i;
-            mode = m;
-        }
-    }
     public partial class ucSelectModel_EngineCurve : UserControl
     {
-        private ICarEngine eng;
-        private CarEngineTools tools;
+        private Car _car;
 
         private int _Settings_mode = 0;
         private double _Settings_speed = 0;
@@ -65,27 +50,18 @@ namespace LiveTelemetry.Garage
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer, true);
 
-            cb_mode.Items.Add(new ucSelectModel_EngineCurve_Mode(0, "Mode 0"));
             cb_mode.SelectedIndex = 0;
             tb_throttle.Value = 100;
             tb_speed.Text = "0";
 
         }
 
-        public void Load(ICar car)
-        {
-            CarEngineTools t = new CarEngineTools(car);
-            t.Scan();
-            Load(car, t);
-        }
-        public void Load(ICar car, CarEngineTools t)
+        public void Load(Car car)
         {
             if (car != null && car.Engine != null)
             {
+                _car = car;
                 this.BackColor = Color.Black;
-
-                eng = car.Engine;
-                tools = t;
 
                 _Settings_mode = 0;
                 _Settings_speed = 0;
@@ -95,9 +71,9 @@ namespace LiveTelemetry.Garage
                 cb_mode.Items.Clear();
                 cb_mode.DisplayMember = "mode";
                 cb_mode.ValueMember = "index";
-                foreach (KeyValuePair<int, string> mode in car.Engine.EngineModes)
+                foreach (EngineMode mode in car.Engine.Modes)
                 {
-                    cb_mode.Items.Add(new ucSelectModel_EngineCurve_Mode(mode.Key, mode.Value));
+                    cb_mode.Items.Add(mode);
                 }
 
                 if (cb_mode.Items.Count >= _Settings_mode)
@@ -117,15 +93,15 @@ namespace LiveTelemetry.Garage
             Font label_font = new Font("Tahoma", 10.0f);
             Pen gridPen = new Pen(Color.Gray, 1.0f);
             Pen axisPen = new Pen(Color.White, 1.0f);
-            if(eng !=null)
+            if(_car !=null)
             {
+                _car.Engine.Apply(_Settings_speed, _Settings_throttle, _Settings_mode);
                 // Draw grid
-                double max_y = Math.Max(tools.MaxPower_HP, tools.MaxTorque_NM);
-                double max_rpm = Math.Max(eng.MaxRPM, eng.MaxRPMCurve);
+                double max_y = Math.Max(_car.Engine.MaximumPower, _car.Engine.MaximumTorque);
+                double max_rpm = Math.Max(_car.Engine.MaximumRpm.Maximum, 0.0);
 
-                Dictionary<double, double> curve_power = eng.GetPowerCurve(_Settings_speed, _Settings_throttle,
-                                                                           _Settings_mode);
-                Dictionary<double, double> curve_torque = eng.GetTorqueCurve(_Settings_speed, _Settings_throttle, _Settings_mode);
+                var curve_power = _car.Engine.GetPowerCurve();
+                var curve_torque = _car.Engine.GetTorqueCurve();
 
                 if (_Settings_mode != 0)
                 {
@@ -133,7 +109,6 @@ namespace LiveTelemetry.Garage
                         max_y = Math.Max(kvp.Value, max_y);
                     foreach (KeyValuePair<double, double> kvp in curve_torque)
                         max_y = Math.Max(kvp.Value, max_y);
-                    max_rpm = Math.Max( eng.MaxRPM_Mode[_Settings_mode], eng.MaxRPMCurve);
                 }
 
                 double max_x = Math.Ceiling(max_rpm / 500.0) * 500.0; // steps of 500rpm
@@ -210,7 +185,7 @@ namespace LiveTelemetry.Garage
                 }
 
                 // Maximum RPM
-                float x_max = Convert.ToSingle(labelsLeft + eng.MaxRPM / max_x * graph_x);
+                float x_max = Convert.ToSingle(labelsLeft + _car.Engine.MaximumRpm.Maximum / max_x * graph_x);
                 g.DrawLine(new Pen(Color.DarkBlue, 2.0f), x_max, 10, x_max, e.ClipRectangle.Height - labelsBot);
 
                 g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -257,9 +232,9 @@ namespace LiveTelemetry.Garage
 
         private void cb_mode_SelectedValueChanged(object sender, EventArgs e)
         {
-            if (((ucSelectModel_EngineCurve_Mode)cb_mode.SelectedItem) != null)
+            if ((cb_mode.SelectedItem) != null)
             {
-                _Settings_mode = ((ucSelectModel_EngineCurve_Mode) cb_mode.SelectedItem).index;
+                _Settings_mode = ((EngineMode) cb_mode.SelectedItem).Index;
                 this.Invalidate();
             }
         }

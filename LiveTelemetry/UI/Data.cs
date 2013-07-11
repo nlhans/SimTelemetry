@@ -1,15 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Data;
-using SimTelemetry.Objects;
-using SimTelemetry.Objects.HyperType;
 
 namespace LiveTelemetry.UI
 {
@@ -22,7 +14,7 @@ namespace LiveTelemetry.UI
             InitializeComponent();
 
             t = new Timer {Interval =500};
-            t.Tick += new EventHandler(t_Tick);
+            t.Tick += t_Tick;
             t.Start();
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -42,11 +34,15 @@ namespace LiveTelemetry.UI
             // Sim.Session
             // Sim.Drivers.Player
             // Sim.Player
-            if (Telemetry.m.Active_Sim)
+            if (TelemetryApplication.TelemetryAvailable)
             {
-                List<string> session = DumpToLabels(Telemetry.m.Sim.Session, typeof(ISession));
-                List<string> driver = DumpToLabels(Telemetry.m.Sim.Drivers.Player, typeof(IDriverGeneral));
-                List<string> player = DumpToLabels(Telemetry.m.Sim.Player, typeof(IDriverPlayer));
+                //List<string> session = DumpToLabels(Telemetry.m.Sim.Session, typeof(ISession));
+                //List<string> driver = DumpToLabels(Telemetry.m.Sim.Drivers.Player, typeof(IDriverGeneral));
+                //List<string> player = DumpToLabels(Telemetry.m.Sim.Player, typeof(IDriverPlayer));
+
+                var session = new List<string>(new[]{":)"});
+                var driver = new List<string>(new[] { ":)" });
+                var player = new List<string>(new[] { ":)" });
 
                 session[0] = "[Telemetry.m.Sim.Session]\r\n" + session[0];
                 driver[0] = "[Telemetry.m.Sim.Drivers.Player]\r\n" + driver[0];
@@ -60,7 +56,7 @@ namespace LiveTelemetry.UI
                 {
                     if (d.Trim() != "")
                     {
-                        Label lbl = new Label
+                        var lbl = new Label
                                         {Text = d, Size = new Size(colsize, this.Height), Location = new Point(l, 10), Font = new Font("Tahoma", 7.0f)};
                         labels.Controls.Add(lbl);
                         l += colsize + 5;
@@ -70,7 +66,7 @@ namespace LiveTelemetry.UI
                 {
                     if (d.Trim() != "")
                     {
-                        Label lbl = new Label { Text = d, Size = new Size(colsize, this.Height), Location = new Point(l, 10), Font = new Font("Tahoma", 7.0f) };
+                        var lbl = new Label { Text = d, Size = new Size(colsize, this.Height), Location = new Point(l, 10), Font = new Font("Tahoma", 7.0f) };
                         labels.Controls.Add(lbl);
                         l += colsize + 5;
                     }
@@ -79,7 +75,7 @@ namespace LiveTelemetry.UI
                 {
                     if (d.Trim() != "")
                     {
-                        Label lbl = new Label { Text = d, Size = new Size(colsize, this.Height), Location = new Point(l, 10), Font = new Font("Tahoma", 7.0f) };
+                        var lbl = new Label { Text = d, Size = new Size(colsize, this.Height), Location = new Point(l, 10), Font = new Font("Tahoma", 7.0f) };
                         labels.Controls.Add(lbl);
                         l += colsize + 5;
                     }
@@ -89,13 +85,13 @@ namespace LiveTelemetry.UI
             {
 
                 Label lbl = new Label { Size = new Size(this.Width, this.Height), Location = new Point(10, 10), Font = new Font("Tahoma", 36.0f) };
-                if(!Telemetry.m.Active_Sim)
+                if (!TelemetryApplication.SimulatorAvailable)
                 {
                     lbl.Text = "No simulator running";
                 }
                 else
                 {
-                    lbl.Text = "No session running in simulator " + Telemetry.m.Sim.Name;
+                    lbl.Text = "No session running in simulator " + TelemetryApplication.Simulator.Name;
                 }
                 labels.Controls.Add(lbl);
             }
@@ -103,50 +99,5 @@ namespace LiveTelemetry.UI
 
         }
 
-        private List<string> DumpToLabels(object inst, Type type)
-        {
-            List<StringBuilder> builders = new List<StringBuilder>();
-                    builders.Add(new StringBuilder());
-            int row = 0;
-            int column = 0;
-            int rows = this.Height/12-6;
-            // Make it go FAST
-            HyperTypeDescriptionProvider.Add(type);
-                
-            PropertyDescriptorCollection PropertyDescriptors = TypeDescriptor.GetProperties(type);
-            PropertyInfo[] pic = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            foreach (PropertyInfo pi in pic)
-            {
-                PropertyDescriptor fi = PropertyDescriptors[pi.Name];
-                object  value = fi.GetValue(inst);
-                string txt = "";
-                if(fi.PropertyType == typeof(double))
-                {
-                    txt = string.Format("{0} = {1} ", pi.Name, Math.Round((double)value, 3));
-                }
-                else if (fi.PropertyType == typeof(float))
-                {
-                    txt = string.Format("{0} = {1} ", pi.Name, Math.Round((float)value,3));
-                } 
-                else if (value != null)
-                {
-                    txt = string.Format("{0} = {1} ", pi.Name, value.ToString());
-                }
-                builders[column].AppendLine(txt);
-                if (txt.Length > 30)
-                    row++; // double rows
-                row++;
-
-                // Go to next side.
-                if(row == rows)
-                {
-                    builders.Add(new StringBuilder());
-                    column++;
-                    row = 0;
-                }
-            }
-
-            return builders.Select(x => x.ToString()).ToList();
-        }
     }
 }

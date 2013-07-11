@@ -1,3 +1,0 @@
-controller=G25
-button=6
-index=0

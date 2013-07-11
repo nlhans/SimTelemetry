@@ -24,6 +24,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
+using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.ValueObjects;
 using SimTelemetry.Objects;
 
 namespace SimTelemetry.Data.Track
@@ -63,7 +65,7 @@ namespace SimTelemetry.Data.Track
         Font font_version = new Font("calibri", 24f, FontStyle.Bold | FontStyle.Italic);
         #endregion
 
-        public void Create(string file, string name, string version, RouteCollection route, int width, int height)
+        public void Create(string file, string name, string version, IEnumerable<TrackPoint> route, int width, int height)
         {
             Pen pen_track = new Pen(brush_sector1, track_width);
             try
@@ -72,7 +74,7 @@ namespace SimTelemetry.Data.Track
                 Graphics g = Graphics.FromImage(track_img);
                 g.FillRectangle(Brushes.Black, 0, 0, width, height);
 
-                if (route == null || route.Racetrack == null) return;
+                if (route == null) return;
 
                 g.SmoothingMode = SmoothingMode.AntiAlias;
 
@@ -81,9 +83,9 @@ namespace SimTelemetry.Data.Track
                 pos_y_max = -100000;
                 pos_y_min = 1000000;
 
-                foreach (TrackWaypoint wp in route.Racetrack)
+                foreach (var wp in route)
                 {
-                    if (wp.Route == TrackRoute.MAIN)
+                    if (wp.Type != TrackPointType.GRID)
                     {
                         pos_x_max = Math.Max(wp.X, pos_x_max);
                         pos_x_min = Math.Min(wp.X, pos_x_min);
@@ -99,18 +101,13 @@ namespace SimTelemetry.Data.Track
 
                 double offset_x = map_width/2 - (pos_x_max - pos_x_min)/scale*map_width/2;
                 double offset_y = 0-(scale - pos_y_max + pos_y_min)/scale*map_height/2;
-                bool swap_xy = false;
-                if(pos_x_max + pos_x_min < pos_y_max + pos_y_min)
-                {
-                    swap_xy = true;
-
-                }
-                List<PointF> track = new List<PointF>();
+                bool swap_xy = pos_x_max + pos_x_min < pos_y_max + pos_y_min;
+                var track = new List<PointF>();
 
                 int i = 0;
-                foreach (TrackWaypoint wp in route.Racetrack)
+                foreach (var wp in route)
                 {
-                    if (wp.Route == TrackRoute.MAIN)
+                    if (wp.Type != TrackPointType.GRID)
                     {
                         float x1 = Convert.ToSingle(6 + ((wp.X - pos_x_min)/scale*map_width) + offset_x);
                         float y1 = Convert.ToSingle(6 + (1 - (wp.Y - pos_y_min)/scale)*map_height + offset_y);

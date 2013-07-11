@@ -108,11 +108,15 @@ namespace SimTelemetry.Domain.Logger
             TemporaryDirectory = tmp_dir;
             FileName = file;
 
-            if (Directory.Exists("./" + TemporaryDirectory + "/"))
-                Directory.Delete("./" + TemporaryDirectory + "/", true);
+            if (TemporaryDirectory != null && TemporaryDirectory != string.Empty)
+            {
+                if (Directory.Exists("./" + TemporaryDirectory + "/"))
+                    Directory.Delete("./" + TemporaryDirectory + "/", true);
 
-            Directory.CreateDirectory("./" + TemporaryDirectory + "/");
-
+                Directory.CreateDirectory("./" + TemporaryDirectory + "/");
+                
+                
+            }
             GlobalEvents.Hook<LogFileWriteAction>(WriteTemporaryFile, false);
 
             // Start my thread

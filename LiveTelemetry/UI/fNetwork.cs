@@ -19,14 +19,9 @@
  * Source code only available at https://github.com/nlhans/SimTelemetry/ *
  ************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Data;
+using SimTelemetry.Domain.Aggregates;
 
 namespace LiveTelemetry.UI
 {
@@ -45,17 +40,13 @@ namespace LiveTelemetry.UI
                                        {
                                            _mStatusUpdate.Interval = 3000;
                                            string txt = "";
-                                           if (Telemetry.m.Net.IsHost)
+                                           if (TelemetryApplication.NetworkHost)
                                            {
-                                               txt = "Running server - " + Telemetry.m.Net.Host.Clients +
-                                                     " clients connected - " +
-                                                     Math.Round(Telemetry.m.Net.Host.Traffic/3/1024.0, 1)
-                                                     + "kB/s upload";
-                                               Telemetry.m.Net.Host.Traffic = 0;
-                                           }
-                                           else if (Telemetry.m.Net.IsClient)
-                                               txt = "Client connected to " + Telemetry.m.Net.Listener.IP + ":" +
-                                                     Telemetry.m.Net.Listener.Port;
+                                               // TODO: Add traffic.
+                                               txt = string.Format("Running server - {0} clients connected - {1}kB/s upload", TelemetryApplication.Telemetry.Session.Cars, Math.Round(0/3/1024.0, 1));
+                                               }
+                                           else if (TelemetryApplication.NetworkHost == false)
+                                               txt = string.Format("Client connected to {0}:{1}", "", ""); //Telemetry.m.Net.Listener.IP, Telemetry.m.Net.Listener.Port);
                                            else
                                            {
                                                txt = "Offline mode";
@@ -66,7 +57,8 @@ namespace LiveTelemetry.UI
             _mStatusUpdate.Interval = 1;
             _mStatusUpdate.Start();
 
-            Telemetry.m.Net.Error += new Triton.Signal(Net_Error);
+            // TODO: Add error event
+            //Telemetry.m.Net.Error += new Triton.Signal(Net_Error);
         }
 
         void Net_Error(object sender)
@@ -81,7 +73,7 @@ namespace LiveTelemetry.UI
 
         private void UpdateFormComponents()
         {
-            if (Telemetry.m.Net.IsHost)
+            if (TelemetryApplication.NetworkHost)
             {
                 bt_Server_StartStop.Text = "Stop";
                 bt_Server_StartStop.Enabled = true;
@@ -96,7 +88,7 @@ namespace LiveTelemetry.UI
                 bt_Client_StartStop.Enabled = false;
 
             }
-            else if (Telemetry.m.Net.IsClient)
+            else if (!TelemetryApplication.NetworkHost)
             {
                 bt_Client_StartStop.Text = "Stop";
                 bt_Client_StartStop.Enabled = true;
@@ -132,18 +124,18 @@ namespace LiveTelemetry.UI
 
         private void bt_Server_StartStop_Click(object sender, EventArgs e)
         {
-            if (Telemetry.m.Net.IsHost)
+            if (TelemetryApplication.NetworkHost)
             {
                 // Already started
-                Telemetry.m.Net.AbortServer();
+                //Telemetry.m.Net.AbortServer();
 
             }
-            else if (Telemetry.m.Net.IsClient)
+            else if (!TelemetryApplication.NetworkHost)
                 MessageBox.Show("Must close client connection first.");
             else
             {
                 // TODO: Adjust settings.
-                Telemetry.m.Net.ConfigureServer(tb_Server_Port.Text, tb_Server_Clients.Text, tb_Server_Bandwidth.Value);
+                //Telemetry.m.Net.ConfigureServer(tb_Server_Port.Text, tb_Server_Clients.Text, tb_Server_Bandwidth.Value);
 
             }
 
@@ -153,18 +145,18 @@ namespace LiveTelemetry.UI
         private void bt_Client_StartStop_Click(object sender, EventArgs e)
         {
 
-            if (Telemetry.m.Net.IsClient)
+            if (!TelemetryApplication.NetworkHost)
             {
                 // Already started, abort
-                Telemetry.m.Net.AbortClient();
+                //Telemetry.m.Net.AbortClient();
 
             }
-            else if (Telemetry.m.Net.IsHost)
+            else if (TelemetryApplication.NetworkHost)
                 MessageBox.Show("Must close server first.");
             else
             {
                 // TODO: Adjust settings.
-                Telemetry.m.Net.ConfigureClient(tb_Client_IP.Text, tb_Client_Port.Text);
+                //Telemetry.m.Net.ConfigureClient(tb_Client_IP.Text, tb_Client_Port.Text);
 
             }
 
@@ -174,17 +166,21 @@ namespace LiveTelemetry.UI
         private void tb_Server_Bandwidth_ValueChanged(object sender, EventArgs e)
         {
             int cars = 20;
-            if (Telemetry.m.Active_Session)
-                cars = Telemetry.m.Sim.Session.Cars;
+            if (TelemetryApplication.TelemetryAvailable)
+                cars = TelemetryApplication.Telemetry.Session.Cars;
+
             if (cars == 1)
                 cars = 20;
+            
             double traffic_1car = 1500/1024.0 + tb_Server_Bandwidth.Value*650.0/1024.0;
             double traffic_xcars = traffic_1car + 80*cars*tb_Server_Bandwidth.Value/1024.0;
             lbl_Server_BandwidthSetting.Text = tb_Server_Bandwidth.Value + " Hz\r\n1 car: " + Math.Round(traffic_1car, 1) + "kB/s  - " + cars + " cars: " + Math.Round(traffic_xcars, 1) + "kB/s";
 
-            if (Telemetry.m.Net.Host != null)
+            // We're a host?
+            if (TelemetryApplication.NetworkHost)
             {
-                Telemetry.m.Net.HostData.Bandwidth = tb_Server_Bandwidth.Value;
+                // TODO: Re-enable
+                //Telemetry.m.Net.HostData.Bandwidth = tb_Server_Bandwidth.Value;
             }
         }
     }

@@ -13,13 +13,13 @@ namespace SimTelemetry.Tests.Core
     [TestFixture]
     public class PluginTests
     {
-        const int cfgSimulatorPlugins = 1;
-        const int cfgExtensionPlugins = 0;
-        const int cfgWidgetPlugins = 2;
+        const int CfgSimulatorPlugins = 1;
+        const int CfgExtensionPlugins = 0;
+        const int CfgWidgetPlugins = 2;
 
-        private const int cfgSimulatorPluginsInvalid = 0;
-        private const int cfgExtensionPluginsInvalid = 0;
-        private const int cfgWidgetPluginsInvalid = 1;
+        private const int CfgSimulatorPluginsInvalid = 0;
+        private const int CfgExtensionPluginsInvalid = 0;
+        private const int CfgWidgetPluginsInvalid = 1;
 
         [Test]
         public void PluginsFound()
@@ -36,9 +36,9 @@ namespace SimTelemetry.Tests.Core
                 Assert.AreNotEqual(x.Widgets, null);
                 Assert.AreNotEqual(x.Extensions, null);
 
-                Assert.AreEqual(x.Simulators.ToList().Count, cfgSimulatorPlugins - cfgSimulatorPluginsInvalid);
-                Assert.AreEqual(x.Widgets.ToList().Count, cfgWidgetPlugins - cfgWidgetPluginsInvalid);
-                Assert.AreEqual(x.Extensions.ToList().Count, cfgExtensionPlugins - cfgExtensionPluginsInvalid);
+                Assert.AreEqual(x.Simulators.ToList().Count, CfgSimulatorPlugins - CfgSimulatorPluginsInvalid);
+                Assert.AreEqual(x.Widgets.ToList().Count, CfgWidgetPlugins - CfgWidgetPluginsInvalid);
+                Assert.AreEqual(x.Extensions.ToList().Count, CfgExtensionPlugins - CfgExtensionPluginsInvalid);
 
                 pluginsLoadedEventFire = true;
             }, true);
@@ -62,7 +62,7 @@ namespace SimTelemetry.Tests.Core
             }
 
             Assert.AreEqual(pluginsLoadedEventFire, true);
-            Assert.AreEqual(TestConstants.Warnings, cfgWidgetPluginsInvalid + cfgSimulatorPluginsInvalid + cfgExtensionPluginsInvalid);
+            Assert.AreEqual(TestConstants.Warnings, CfgWidgetPluginsInvalid + CfgSimulatorPluginsInvalid + CfgExtensionPluginsInvalid);
         }
 
         [Test]
@@ -84,9 +84,9 @@ namespace SimTelemetry.Tests.Core
                                                      Assert.AreNotEqual(x.Widgets, null);
                                                      Assert.AreNotEqual(x.Extensions, null);
 
-                                                     Assert.AreEqual(x.Simulators.ToList().Count, cfgSimulatorPlugins - cfgSimulatorPluginsInvalid);
-                                                     Assert.AreEqual(x.Widgets.ToList().Count, cfgWidgetPlugins - cfgWidgetPluginsInvalid);
-                                                     Assert.AreEqual(x.Extensions.ToList().Count, cfgExtensionPlugins - cfgExtensionPluginsInvalid);
+                                                     Assert.AreEqual(x.Simulators.ToList().Count, CfgSimulatorPlugins - CfgSimulatorPluginsInvalid);
+                                                     Assert.AreEqual(x.Widgets.ToList().Count, CfgWidgetPlugins - CfgWidgetPluginsInvalid);
+                                                     Assert.AreEqual(x.Extensions.ToList().Count, CfgExtensionPlugins - CfgExtensionPluginsInvalid);
                                                  }, true);
 
             // Count number of constructors.
@@ -94,7 +94,7 @@ namespace SimTelemetry.Tests.Core
             GlobalEvents.Hook<PluginTestWidgetConstructor>((x) => constructorWidget++, false);
             GlobalEvents.Hook<PluginTestSimulatorConstructor>((x) => constructorSimulator++, false);
 
-            using (var pluginHost = new SimTelemetry.Domain.Plugins.Plugins())
+            using (var pluginHost = new Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
@@ -109,7 +109,7 @@ namespace SimTelemetry.Tests.Core
                 pluginHost.Unload();
             }
 
-            using (var pluginHost = new SimTelemetry.Domain.Plugins.Plugins())
+            using (var pluginHost = new Plugins())
             {
                 pluginHost.PluginDirectory = TestConstants.SimulatorsBinFolder;
 
@@ -117,13 +117,13 @@ namespace SimTelemetry.Tests.Core
             }
 
             // Verify everything!
-            Assert.AreEqual(constructorSimulator, pluginLoadIterations * cfgSimulatorPlugins);
-            Assert.AreEqual(constructorExtension, pluginLoadIterations * cfgExtensionPlugins);
-            Assert.AreEqual(constructorWidget, pluginLoadIterations * cfgWidgetPlugins);
+            Assert.AreEqual(constructorSimulator, pluginLoadIterations * CfgSimulatorPlugins);
+            Assert.AreEqual(constructorExtension, pluginLoadIterations * CfgExtensionPlugins);
+            Assert.AreEqual(constructorWidget, pluginLoadIterations * CfgWidgetPlugins);
 
             Assert.AreEqual(TestConstants.Warnings,
                             pluginLoadIterations *
-                            (cfgWidgetPluginsInvalid + cfgSimulatorPluginsInvalid + cfgExtensionPluginsInvalid));
+                            (CfgWidgetPluginsInvalid + CfgSimulatorPluginsInvalid + CfgExtensionPluginsInvalid));
 
         }
     }

@@ -20,17 +20,11 @@
  ************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using SimTelemetry.Data;
-using SimTelemetry.Objects;
-using SimTelemetry.Objects.Plugins;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Plugins;
 using Triton;
 
 namespace LiveTelemetry.Garage
@@ -65,13 +59,13 @@ namespace LiveTelemetry.Garage
             lbl_selectsim.TextAlign = ContentAlignment.MiddleCenter;
             panel.Controls.Add(lbl_selectsim);
 
-            foreach (ISimulator sim in Telemetry.m.Sims.Sims)
+            foreach (IPluginSimulator sim in TelemetryApplication.Plugins.Simulators)
             {
-                bool validSim = (sim.Garage == null || sim.Garage.Available == false ||
-                                 !Directory.Exists(sim.Session.GameDirectory));
-                if (File.Exists("Simulators/" + sim.ProcessName + ".png"))
+                bool validSim = (sim.CarProvider != null || sim.TrackProvider != null);
+
+                if (File.Exists("Simulators/" + sim.Name + ".png"))
                 {
-                    ucResizableImage pb = new ucResizableImage("Simulators/" + sim.ProcessName + ".png");
+                    ucResizableImage pb = new ucResizableImage("Simulators/" + sim.Name + ".png");
                     pb.Margin = new Padding(10);
                     pb.Name = sim.Name;
                     if (validSim)
@@ -112,16 +106,16 @@ namespace LiveTelemetry.Garage
         public void Resize()
         {
 
-            int columns = (int)Math.Ceiling(Math.Sqrt(Telemetry.m.Sims.Sims.Count));
+            int columns = (int)Math.Ceiling(Math.Sqrt( TelemetryApplication.Plugins.Simulators.Count));
             if (columns == 0) columns = 1;
-            if (Telemetry.m.Sims.Sims.Count % columns == 1)
+            if (TelemetryApplication.Plugins.Simulators.Count % columns == 1)
                 columns++;
             if (this.Width > 233)
             {
                 while (233 * columns > this.Width)
                     columns--;
             }
-            int rows = (int)Math.Ceiling(Telemetry.m.Sims.Sims.Count * 1.0 / columns) + 1;
+            int rows = (int)Math.Ceiling(TelemetryApplication.Plugins.Simulators.Count * 1.0 / columns) + 1;
 
 
             panel.Size = new Size(233 * columns+20, rows * 140);

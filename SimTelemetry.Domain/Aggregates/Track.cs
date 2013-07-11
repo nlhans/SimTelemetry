@@ -12,6 +12,7 @@ namespace SimTelemetry.Domain.Aggregates
         public string ID { get; private set; }
 
         public string Name { get; private set; }
+        public string Image { get; private set; }
         public string Location { get; private set; }
         public double Length { get; private set; }
 
@@ -30,6 +31,7 @@ namespace SimTelemetry.Domain.Aggregates
         private IList<Session> _sessions { get; set; }
         public IEnumerable<Session> Sessions { get { return _sessions; } }
 
+        public string Version { get; private set; }
         public bool Equals(Track other) { return other.ID == ID; }
         public bool Equals(string other) { return other == ID; }
 
@@ -42,13 +44,15 @@ namespace SimTelemetry.Domain.Aggregates
             TrackCoordinateMaxY = float.MinValue;
         }
 
-        public Track(string file, string name, string location, float laprecordRace, float laprecordQualify) : this()
+        public Track(string file, string name, string image, string location, float laprecordRace, float laprecordQualify, string version) : this()
         {
             ID = file;
             Name = name;
+            Image = Image;
             Location = location;
             LaprecordRace = laprecordRace;
             LaprecordQualify = laprecordQualify;
+            Version = version;
         }
 
         /********* TRACK ROUTE *********/

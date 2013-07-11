@@ -22,8 +22,10 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using SimTelemetry.Data;
-using SimTelemetry.Objects;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Telemetry;
+using SimTelemetry.Domain.ValueObjects;
 
 namespace LiveTelemetry
 {
@@ -44,10 +46,11 @@ namespace LiveTelemetry
             try
             {
                 g.FillRectangle(Brushes.Black, e.ClipRectangle);
-                if (!Telemetry.m.Active_Session) return;
+                if (!TelemetryApplication.TelemetryAvailable) return;
 
                 // What session type?
-                SessionInfo i = Telemetry.m.Sim.Session.Type;
+                // TODO: Get session type from track
+                Session i = new Session("", SessionType.RACE, 1, "Sunday", new Time(0), new TimeSpan(1), 125, 80);
 
                 string sSessionType = "";
                 switch (i.Type)
@@ -87,20 +90,20 @@ namespace LiveTelemetry
                     // Timed session.
                     // 30 seconds is typical offset used in rFactor.
                     // TODO: Fix time offsets.
-                    double ftime = Telemetry.m.Sim.Session.Time-30;
+                    double ftime = TelemetryApplication.Telemetry.Session.Time;
 
                     int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
                     int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
                     int seconds = Convert.ToInt32((ftime - hours * 3600 - minutes * 60));
 
+                    double duration = i.Duration.TotalSeconds;
                     // Test-days often don't have time limits, so display 24 hours.
                     if (i.Type == SessionType.TEST_DAY)
-                        i.Length = 30+24*3600;
-                    i.Length -= 30;
+                        duration = 24*3600;
 
-                    int hours_l = Convert.ToInt32(Math.Floor(i.Length / 3600));
-                    int minutes_l = Convert.ToInt32(Math.Floor((i.Length - hours_l * 3600) / 60));
-                    int seconds_l = Convert.ToInt32((i.Length - hours_l * 3600 - minutes_l * 60));
+                    int hours_l = Convert.ToInt32(Math.Floor(duration / 3600));
+                    int minutes_l = Convert.ToInt32(Math.Floor((duration - hours_l * 3600) / 60));
+                    int seconds_l = Convert.ToInt32((duration - hours_l * 3600 - minutes_l * 60));
 
                     // Display time.
                     // If session not yet started, display --:--:--
@@ -114,16 +117,18 @@ namespace LiveTelemetry
                 else
                 {
                     // Race session. Time/laps based.
-                    double ftime = Telemetry.m.Sim.Session.Time - 30;
+                    double ftime = TelemetryApplication.Telemetry.Session.Time;
+
                     int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
                     int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
                     int seconds = Convert.ToInt32((ftime - hours * 3600 - minutes * 60));
 
-                    int hours_l = Convert.ToInt32(Math.Floor(i.Length / 3600));
-                    int minutes_l = Convert.ToInt32(Math.Floor((i.Length - hours_l * 3600) / 60));
-                    int seconds_l = Convert.ToInt32((i.Length - hours_l * 3600 - minutes_l * 60));
+                    double duration = i.Duration.TotalSeconds;
+                    int hours_l = Convert.ToInt32(Math.Floor(duration / 3600));
+                    int minutes_l = Convert.ToInt32(Math.Floor((duration - hours_l * 3600) / 60));
+                    int seconds_l = Convert.ToInt32((duration - hours_l * 3600 - minutes_l * 60));
 
-                    int total_laps = Telemetry.m.Sim.Session.RaceLaps;
+                    int total_laps = TelemetryApplication.Telemetry.Session.RaceLaps;
                     
                     if (total_laps > 0)
                     {
@@ -140,7 +145,7 @@ namespace LiveTelemetry
 
                         // TODO: Add LeaderLaps property to frame-work.
                         int leader_laps = 0;
-                        foreach (IDriverGeneral dg in Telemetry.m.Sim.Drivers.AllDrivers)
+                        foreach (TelemetryDriver dg in TelemetryApplication.Telemetry.Drivers)
                         {
                             if (dg.Position == 1)
                             {

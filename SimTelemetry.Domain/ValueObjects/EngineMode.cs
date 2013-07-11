@@ -11,7 +11,13 @@ namespace SimTelemetry.Domain.ValueObjects
         public float Fuel { get; private set; }
         public float Wear { get; private set; }
 
-        public EngineMode(float power, float torque, float rpm, float fuel, float wear)
+        public int Index
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public EngineMode(int index, float power, float torque, float rpm, float fuel, float wear)
         {
             Power = power;
             Torque = torque;
