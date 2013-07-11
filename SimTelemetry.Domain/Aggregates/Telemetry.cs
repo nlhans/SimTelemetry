@@ -41,6 +41,9 @@ namespace SimTelemetry.Domain.Aggregates
 
         public Telemetry(IPluginTelemetryProvider provider, Process simulatorProcess)
         {
+            if (provider == null)
+                throw new Exception("Cannot accept an empty telemetry provider");
+
             Provider = provider;
 
             // Initialize memory objects

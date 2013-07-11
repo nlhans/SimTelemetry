@@ -15,7 +15,7 @@ namespace SimTelemetry.Tests.Aggregates
         private Track track;
         public TrackTests()
         {
-            track = new Track("Test.gdb", "Test", "Belgium", 100, 95);
+            track = new Track("Test.gdb", "Test", "none.png", "Belgium", 100, 95, "1.0");
             var points = new List<TrackPoint>
                              {
                                  new TrackPoint(0, TrackPointType.SECTOR1, 1, 1, 1, new float[0], new float[0]),
@@ -44,6 +44,8 @@ namespace SimTelemetry.Tests.Aggregates
         {
             Assert.AreEqual("Test.gdb", track.ID);
             Assert.AreEqual("Test", track.Name);
+            Assert.AreEqual("none.png", track.Image);
+            Assert.AreEqual("1.0", track.Version);
             Assert.AreEqual("Belgium", track.Location);
             Assert.AreEqual(100.0f, track.LaprecordRace);
             Assert.AreEqual(95.0f, track.LaprecordQualify);

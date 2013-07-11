@@ -64,7 +64,8 @@ namespace SimTelemetry.Domain.Utils
         public int ReadAsInteger(int index)
         {
             if (!IsTuple) throw new Exception("This is not a tuple value");
-            return int.Parse(ValueArray[index]);
+            return Convert.ToInt32(ReadAsDouble(index));
+            //return int.Parse(ValueArray[index]);
         }
 
         public double ReadAsDouble(int index)

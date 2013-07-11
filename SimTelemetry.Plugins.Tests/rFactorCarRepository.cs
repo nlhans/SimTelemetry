@@ -200,7 +200,7 @@ namespace SimTelemetry.Plugins.Tests
                     var powerPlus = factor * engineBoostPower;
                     var torquePlus = factor * engineBoostTorque;
 
-                    engineMode.Add(new EngineMode(powerPlus, torquePlus, rpmPlus, fuelPlus, wearPlus));
+                    engineMode.Add(new EngineMode(mode, powerPlus, torquePlus, rpmPlus, fuelPlus, wearPlus));
                 }
             }
             var lifetime = new EngineLifetime(lifetimeTime, lifetimeRpm, lifetimeOil);

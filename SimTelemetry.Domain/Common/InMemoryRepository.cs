@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SimTelemetry.Domain.Common
@@ -28,12 +27,20 @@ namespace SimTelemetry.Domain.Common
 
         public virtual void Clear()
         {
-            data.Clear();
+            lock (data)
+            {
+                data.Clear();
+            }
+
         }
 
         public virtual bool Contains(TType entity)
         {
-            return data.Any(x => x.Equals(entity));
+            lock (data)
+            {
+                return data.Any(x => x.Equals(entity));
+            }
+
         }
 
         public virtual bool Store(TType entity)
@@ -42,8 +49,11 @@ namespace SimTelemetry.Domain.Common
                 return false;
             else
             {
-                var index = data.IndexOf(entity);
-                data[index] = entity;
+                lock (data)
+                {
+                    var index = data.IndexOf(entity);
+                    data[index] = entity;
+                }
 
                 return true;
             }
@@ -53,7 +63,10 @@ namespace SimTelemetry.Domain.Common
         {
             if (Contains(entity))
             {
-                data.Remove(entity);
+                lock (data)
+                {
+                    data.Remove(entity);
+                }
                 return true;
             }
             else
@@ -64,7 +77,7 @@ namespace SimTelemetry.Domain.Common
 
         public virtual IEnumerable<TType> GetAll()
         {
-            return data;
+            return new List<TType>(data);
         }
     }
 }

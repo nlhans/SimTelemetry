@@ -143,7 +143,7 @@ namespace SimTelemetry.Plugins.Tests
                                                          });
             track_aiw.Read();
 
-            var t = new Track(id, name, location, laprecordRace, laprecordQualify);
+            var t = new Track(id, name, name.Replace(" ","_")+".png", location, laprecordRace, laprecordQualify, "1.0");
             t.SetTrack(path);
 
             

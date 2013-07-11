@@ -27,24 +27,27 @@ namespace SimTelemetry.Domain.Common
 
         public virtual TType GetById(TId id)
         {
-            if (data.Any(x => x.ID.Equals(id)))
+            lock (data)
             {
-                return data.Where(x => x.ID.Equals(id)).FirstOrDefault();
-            }
-            else
-            {
-                if (Contains(id) == false)
-                    return null;
-
-                var obj = DataSource.Get(id);
-                if (obj == null || obj.ID == null || !obj.ID.Equals(id))
+                if (data.Any(x => x.ID.Equals(id)))
                 {
-                    return obj;
+                    return data.Where(x => x.ID.Equals(id)).FirstOrDefault();
                 }
                 else
                 {
-                    Add(obj);
-                    return obj;
+                    if (Contains(id) == false)
+                        return null;
+
+                    var obj = DataSource.Get(id);
+                    if (obj == null || obj.ID == null || !obj.ID.Equals(id))
+                    {
+                        return obj;
+                    }
+                    else
+                    {
+                        Add(obj);
+                        return obj;
+                    }
                 }
             }
         }
