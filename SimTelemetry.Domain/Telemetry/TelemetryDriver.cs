@@ -56,51 +56,31 @@ namespace SimTelemetry.Domain.Telemetry
 
         public double EngineLifetime { get; private set; }
 
-        public TelemetryWheel WheelRF
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public TelemetryWheel WheelRF { get; private set; }
 
-        public double OilTemperature
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public double OilTemperature { get; private set; }
 
-        public double WaterTemperature
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public double WaterTemperature { get; private set; }
 
-        public double EngineTorque
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public double EngineTorque { get; private set; }
 
-        public TrackPointType TrackPosition
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public TrackPointType TrackPosition { get; private set; }
 
         private bool _initial = true;
-        public TelemetryWheel WheelRR;
-        public TelemetryWheel WheelLR;
-        public TelemetryWheel WheelLF;
-        public float Sector_1_Last;
-        public float LapTime_Best_Sector1;
-        public float Sector_1_Best;
-        public float Sector_2_Best;
-        public float Sector_3_Best;
-        public float LapTime_Best_Sector2;
-        public float Sector_2_Last;
-        public float Sector_3_Last;
-        public float LapTime_Best_Sector3;
-        public float LapTime_Best;
-        public float LapTime_Last;
+        public TelemetryWheel WheelRR { get; private set; }
+        public TelemetryWheel WheelLR { get; private set; }
+        public TelemetryWheel WheelLF { get; private set; }
+        public float Sector_1_Last { get; private set; }
+        public float LapTime_Best_Sector1 { get; private set; }
+        public float Sector_1_Best { get; private set; }
+        public float Sector_2_Best { get; private set; }
+        public float Sector_3_Best { get; private set; }
+        public float LapTime_Best_Sector2 { get; private set; }
+        public float Sector_2_Last { get; private set; }
+        public float Sector_3_Last { get; private set; }
+        public float LapTime_Best_Sector3 { get; private set; }
+        public float LapTime_Best { get; private set; }
+        public float LapTime_Last { get; private set; }
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
@@ -179,17 +159,17 @@ namespace SimTelemetry.Domain.Telemetry
 
         public IEnumerable<Lap> GetLaps()
         {
-            throw new NotImplementedException();
+            return new List<Lap>();
         }
 
         public Lap GetBestLap()
         {
-            throw new NotImplementedException();
+            return new Lap(1, 1, 25, 25, 25);
         }
 
         public double GetSplitTime(TelemetryDriver telemetryDriver)
         {
-            throw new NotImplementedException();
+            return 0;
         }
     }
 

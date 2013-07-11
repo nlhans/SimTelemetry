@@ -86,8 +86,12 @@ namespace SimTelemetry.Domain.Aggregates
 
         public void ResetLogger()
         {
-            Logger.Close();
-            Logger = null;
+            if (Logger != null)
+            {
+                Logger.Close();
+
+                Logger = null;
+            }
         }
 
         public void Update(TelemetryRefresh instance)

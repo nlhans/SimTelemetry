@@ -1,4 +1,5 @@
-﻿using SimTelemetry.Domain.Enumerations;
+﻿using System;
+using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Telemetry
@@ -27,11 +28,7 @@ namespace SimTelemetry.Domain.Telemetry
             set { throw new System.NotImplementedException(); }
         }
 
-        public Session Info
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+        public Session Info { get; private set; }
 
         public string Track
         {
@@ -50,6 +47,8 @@ namespace SimTelemetry.Domain.Telemetry
             IsOffline = sessionGroup.ReadAs<bool>("IsOffline");
             IsReplay = sessionGroup.ReadAs<bool>("IsReplay");
             IsLoading = sessionGroup.ReadAs<bool>("IsLoading");
+
+           Info = new Session("race 1", SessionType.RACE, 1, "Sunday", new Time(16,30,0,0), new TimeSpan(0,3,0,0), 150, 80);
         }
 
         public TelemetrySession Clone()

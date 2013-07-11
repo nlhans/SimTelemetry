@@ -111,8 +111,31 @@ namespace SimTelemetry.Plugins.Tests
             if (engFile == string.Empty) throw new Exception("could not build this car, engine file not found");
 
             carObj.Assign(BuildEngine(engFile, engineName, engineManufacturer));
+            carObj.Assign(BuildChassis(hdvFile));
 
             return carObj;
+        }
+
+        private Chassis BuildChassis(string hdvFile)
+        {
+            float weight = 0;
+            float fuelTankSize = 0;
+            float dragBody = 0;
+
+            // Create other objects.
+            using (var hdvIni = new IniReader(hdvFile, true))
+            {
+                hdvIni.AddHandler(x =>
+                {
+                    if (x.Key == "Mass" && x.Group == "GENERAL") weight = x.ReadAsFloat();
+                    if (x.Key == "BodyDragBase" && x.Group == "GENERAL") dragBody = x.ReadAsFloat();
+                    if (x.Key == "FuelRange" && x.Group == "GENERAL") fuelTankSize = x.ReadAsFloat(2);
+                });
+                hdvIni.Parse();
+            }
+            //TODO: Do aero work
+            Chassis s = new Chassis(weight, fuelTankSize, dragBody, new Polynomial(0), new Polynomial(0), new Polynomial(0), new Polynomial(0), 0 );
+            return s;
         }
 
         private Engine BuildEngine(string file, string name, string manufacturer)

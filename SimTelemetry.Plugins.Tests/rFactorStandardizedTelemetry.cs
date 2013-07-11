@@ -41,8 +41,8 @@ namespace SimTelemetry.Plugins.Tests
 
             templateDriver.Add(new MemoryFieldLazy<float>("Meter", MemoryAddress.Dynamic, 0, 0x3D04, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("Speed", MemoryAddress.Dynamic, 0, 0x57C0, 4));
-            templateDriver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0x317C, 4));
-            templateDriver.Add(new MemoryFieldLazy<float>("RPMMax", MemoryAddress.Dynamic, 0, 0x3180, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0x317C, 4, (x) => x/ 0.104720f));
+            templateDriver.Add(new MemoryFieldLazy<float>("RPMMax", MemoryAddress.Dynamic, 0, 0x3180, 4, (x) => x / 0.104720f));
             templateDriver.Add(new MemoryFieldLazy<int>("Gear", MemoryAddress.Dynamic, 0, 0x321C, 1));
 
             templateDriver.Add(new MemoryFieldLazy<float>("Mass", MemoryAddress.Dynamic, 0, 0x28DC, 4));

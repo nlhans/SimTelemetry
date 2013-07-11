@@ -67,7 +67,9 @@ namespace LiveTelemetry
                     Timer t = new Timer {Interval = 500};
                     t.Elapsed += (s, e) =>
                         {
-                            Car = Cars.GetByClass(Telemetry.Player.CarClasses).FirstOrDefault();
+                            // TODO: Temporary
+                            Car = Cars.GetByFile("audi_r18.veh");
+                            //Car = Cars.GetByClass(Telemetry.Player.CarClasses).FirstOrDefault();
                             if (Car != null)
                                 CarAvailable = true;
                         };

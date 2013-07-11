@@ -25,6 +25,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
 using System.Windows.Forms;
+using SimTelemetry.Domain;
+using SimTelemetry.Domain.Events;
 using Triton.Joysticks;
 using Triton.Maths;
 using Timer = System.Windows.Forms.Timer;
@@ -76,6 +78,9 @@ namespace LiveTelemetry
             t.Tick += t_Tick;
             t.Start();
 
+            GlobalEvents.Hook<SessionStarted>(x => PaintBackground(0), true);
+            GlobalEvents.Hook<SessionStopped>(x => PaintBackground(0), true);
+            GlobalEvents.Hook<DrivingStarted>(x => PaintBackground(0), true);
             //Telemetry.m.Session_Start += PaintBackground;
             //Telemetry.m.Session_Stop += PaintBackground;
             //Telemetry.m.Driving_Start += PaintBackground;
