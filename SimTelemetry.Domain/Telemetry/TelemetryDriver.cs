@@ -12,6 +12,7 @@ namespace SimTelemetry.Domain.Telemetry
 
         public bool IsPlayer { get; protected set; }
         public string Name { get; protected set; }
+
         public string CarTeam { get; protected set; }
         public string CarModel { get; protected set; }
         public string CarClasses { get; protected set; }
@@ -82,6 +83,8 @@ namespace SimTelemetry.Domain.Telemetry
         public float LapTime_Best { get; private set; }
         public float LapTime_Last { get; private set; }
 
+        public double Heading { get; private set; }
+
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
             if(_initial)
@@ -134,7 +137,12 @@ namespace SimTelemetry.Domain.Telemetry
             FlagBlue = Pool.ReadAs<bool>("FlagBlue");
             FlagBlack = Pool.ReadAs<bool>("FlagBlack");
             Ignition = Pool.ReadAs<bool>("Ignition");
-            
+
+            CarClasses = Pool.ReadAs<string>("CarClasses");
+            CarModel = Pool.ReadAs<string>("CarModel");
+
+            Heading = Pool.ReadAs<float>("Yaw");
+
             if (IsPlayer)
             {
 

@@ -30,11 +30,7 @@ namespace SimTelemetry.Domain.Telemetry
 
         public Session Info { get; private set; }
 
-        public string Track
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+        public string Track { get; private set; }
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
@@ -47,6 +43,8 @@ namespace SimTelemetry.Domain.Telemetry
             IsOffline = sessionGroup.ReadAs<bool>("IsOffline");
             IsReplay = sessionGroup.ReadAs<bool>("IsReplay");
             IsLoading = sessionGroup.ReadAs<bool>("IsLoading");
+
+            Track = sessionGroup.ReadAs<string>("LocationTrack");
 
            Info = new Session("race 1", SessionType.RACE, 1, "Sunday", new Time(16,30,0,0), new TimeSpan(0,3,0,0), 150, 80);
         }

@@ -23,12 +23,12 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using LiveTelemetry.Gauges;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Telemetry;
 
 namespace LiveTelemetry
 {
-    /*
     public class LiveTrackMap : TrackMap
     {
         public LiveTrackMap()
@@ -82,7 +82,7 @@ namespace LiveTelemetry
                                 c = Brushes.Red;
                             else if (driver.FlagYellow) // Local yellow flag
                                 c = Brushes.Yellow;
-                            else if (TelemetryApplication.Telemetry.Session.Type == SessionType.RACE && driver.GetSplitTime(TelemetryApplication.Telemetry.Player) >= 10000) // InRace && lapped vehicle
+                            else if (TelemetryApplication.Telemetry.Session.Info.Type == SessionType.RACE && driver.GetSplitTime(TelemetryApplication.Telemetry.Player) >= 10000) // InRace && lapped vehicle
                                 c = new SolidBrush(Color.FromArgb(80, 80, 80));
                             else if (driver.Position > TelemetryApplication.Telemetry.Player.Position) // In front of player.
                                 c = Brushes.YellowGreen;
@@ -135,5 +135,5 @@ namespace LiveTelemetry
             }
             //base.OnPaint(e);
         }
-    }*/
+    }
 }

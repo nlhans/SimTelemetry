@@ -12,6 +12,9 @@ namespace LiveTelemetry
 {
     public static class TelemetryApplication
     {
+        public static Plugins Plugins { get; private set; }
+
+
         public static Telemetry Telemetry { get; private set; }
         public static bool TelemetryAvailable { get { return Telemetry != null; } }
 
@@ -19,18 +22,16 @@ namespace LiveTelemetry
         public static bool SimulatorAvailable { get; private set; }
         private static IPluginSimulator SimulatorPlugin { get; set; }
 
-        public static CarRepository Cars { get; private  set; }
-
-        public static Plugins Plugins { get; private  set; }
 
         public static bool NetworkHost { get; private set; }
 
         public static Car Car { get; private set; }
-
         public static bool CarAvailable { get; private set; }
+        public static CarRepository Cars { get; private set; }
 
-        public static bool TrackAvailable { get; private set; }
         public static Track Track { get; private set; }
+        public static bool TrackAvailable { get; private set; }
+        public static TrackRepository Tracks { get; private set; }
 
         public static void Init()
         {
@@ -63,13 +64,21 @@ namespace LiveTelemetry
                     Telemetry = new Telemetry(SimulatorPlugin.TelemetryProvider, rfactor);
 
                     Cars = new CarRepository(SimulatorPlugin.CarProvider);
+                    Tracks = new TrackRepository(SimulatorPlugin.TrackProvider);
 
                     Timer t = new Timer {Interval = 500};
                     t.Elapsed += (s, e) =>
                         {
                             // TODO: Temporary
-                            Car = Cars.GetByFile("audi_r18.veh");
-                            //Car = Cars.GetByClass(Telemetry.Player.CarClasses).FirstOrDefault();
+
+                            // Get track
+                            Track = Tracks.GetByFile(Telemetry.Session.Track);
+                            if (Track != null)
+                                TrackAvailable = true;
+
+                            // Get car
+                            Car = Cars.GetByClass(Telemetry.Player.CarClasses).FirstOrDefault();
+
                             if (Car != null)
                                 CarAvailable = true;
                         };

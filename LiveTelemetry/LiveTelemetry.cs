@@ -559,7 +559,4 @@ namespace LiveTelemetry
 
     }
 
-    internal class LiveTrackMap : Control
-    {
-    }
 }

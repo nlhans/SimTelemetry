@@ -90,7 +90,9 @@ namespace SimTelemetry.Plugins.Tests
                                                           if (values.Length == 1)
                                                           {
                                                               switch (values[0])
-                                                              {
+                                                              {case "0":
+                                                                      // do nothing
+                                                                      break;
                                                                   case "1":
                                                                       type = TrackPointType.PITS;
                                                                       break;

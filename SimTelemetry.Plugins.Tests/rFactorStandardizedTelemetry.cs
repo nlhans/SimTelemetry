@@ -22,7 +22,8 @@ namespace SimTelemetry.Plugins.Tests
             session.Add(new MemoryFieldLazy<float>("Time", MemoryAddress.Static, 0x60022C, 4));
             session.Add(new MemoryFieldLazy<float>("Clock", MemoryAddress.Static, 0x6E2CD8, 4));
 
-            session.Add(new MemoryFieldLazy<string>("LocationTrack", MemoryAddress.Static, 0x309D28, 0, 256));
+            session.Add(new MemoryFieldLazy<string>("LocationTrack", MemoryAddress.Static, 0x309D28, 0, 256,
+                                                    x => x.Substring(19).ToLower().Replace("aiw","gdb")));
 
             session.Add(new MemoryFieldLazy<bool>("IsOffline", MemoryAddress.Static, 0x315444, 1, (x) => !x));
             session.Add(new MemoryFieldLazy<bool>("IsActive", MemoryAddress.Static, 0x30FEE4, 1));

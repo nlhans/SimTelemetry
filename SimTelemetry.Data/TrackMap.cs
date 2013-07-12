@@ -113,9 +113,6 @@ namespace SimTelemetry.Controls
             Graphics g = Graphics.FromImage(_BackgroundTrackMap);
             g.FillRectangle(Brushes.Black, 0, 0, this.Size.Width, this.Size.Height);
 
-            if (Telemetry.m.Track == null || Telemetry.m.Track.Route == null ||
-                Telemetry.m.Track.Route.Racetrack == null || Telemetry.m.Track.Route.Racetrack.Count == 0)
-                return;
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
 

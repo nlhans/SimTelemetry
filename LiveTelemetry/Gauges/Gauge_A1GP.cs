@@ -171,6 +171,7 @@ namespace LiveTelemetry
             {
                 g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
                 if (!TelemetryApplication.TelemetryAvailable || !TelemetryApplication.CarAvailable) return;
+                if (TelemetryApplication.Telemetry.Player == null) return;
 
                 // ---------------------------------       Speed      ---------------------------------
                 Speed_Min = 0;
@@ -379,6 +380,7 @@ namespace LiveTelemetry
                 
                 //g.DrawImage(_EmptyGauges,0,0);
                 if (!TelemetryApplication.TelemetryAvailable || !TelemetryApplication.CarAvailable) return;
+                if (TelemetryApplication.Telemetry.Player == null) return;
                 lock (g)
                 {
 

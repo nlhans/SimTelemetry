@@ -36,6 +36,11 @@ namespace SimTelemetry.Domain.Repositories
         {
             return GetIds().Select(GetById).Where(x => x.BelongsTo(cls));
         }
+
+        public IEnumerable<Car> GetByModel(string carModel)
+        {
+            return GetIds().Select(GetById).Where(x => x.Name.Contains(carModel));
+        }
     }
 
 }
