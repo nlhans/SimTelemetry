@@ -18,6 +18,7 @@ namespace SimTelemetry.Domain.Repositories
 
         public Track GetByFile(string file)
         {
+            if (file == null) return null;
             file = Path.GetFileName(file.ToLower());
             return GetById(GetIds().Where(x => Path.GetFileName(x) == file).FirstOrDefault());
             //return data.Where(x => x.ID == file).FirstOrDefault();

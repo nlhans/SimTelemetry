@@ -90,23 +90,11 @@ namespace LiveTelemetry
                 float best_sector3 = 1000f;
 
                 // TODO: Determine laptimes
-                float absolute_best_lap = 0;
-                float absolute_best_sector1 = 0; // Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector1;
-                float absolute_best_sector2 = 0; // Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector2;
-                float absolute_best_sector3 = 0; //  Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector3;
+                float absolute_best_lap = laps.Min(x => x.Total);
+                float absolute_best_sector1 = laps.Min(x=>x.Sector1);
+                float absolute_best_sector2 = laps.Min(x=>x.Sector2);
+                float absolute_best_sector3 = laps.Min(x=>x.Sector3);
 
-                for (int lap = 0; lap <= laps.Count - ind; lap++)
-                {
-                    if (laps[lap].Total > 0)
-                        best_lap = Math.Min(best_lap, laps[lap].Total);
-                    if (laps[lap].Sector1 > 0)
-                        best_sector1 = Math.Min(best_sector1, laps[lap].Sector1);
-                    if (laps[lap].Sector2 > 0)
-                        best_sector2 = Math.Min(best_sector2, laps[lap].Sector2);
-                    if (laps[lap].Sector3 > 0)
-                        best_sector3 = Math.Min(best_sector3, laps[lap].Sector3);
-
-                }
                 for (int lap = laps.Count - ind; lap <= laps.Count - 1;  lap++)
                 {
                     if (lap <= 0) continue;

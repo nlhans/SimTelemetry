@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.ValueObjects;
@@ -50,6 +52,8 @@ namespace SimTelemetry.Domain.Telemetry
         public float CoordinateY { get; protected set; }
         public float CoordinateZ { get; protected set; }
 
+        public double Heading { get; private set; }
+
         public float InputThrottle { get; protected set; }
         public float InputBrake { get; protected set; }
 
@@ -71,20 +75,7 @@ namespace SimTelemetry.Domain.Telemetry
         public TelemetryWheel WheelRR { get; private set; }
         public TelemetryWheel WheelLR { get; private set; }
         public TelemetryWheel WheelLF { get; private set; }
-        public float Sector_1_Last { get; private set; }
-        public float LapTime_Best_Sector1 { get; private set; }
-        public float Sector_1_Best { get; private set; }
-        public float Sector_2_Best { get; private set; }
-        public float Sector_3_Best { get; private set; }
-        public float LapTime_Best_Sector2 { get; private set; }
-        public float Sector_2_Last { get; private set; }
-        public float Sector_3_Last { get; private set; }
-        public float LapTime_Best_Sector3 { get; private set; }
-        public float LapTime_Best { get; private set; }
-        public float LapTime_Last { get; private set; }
-
-        public double Heading { get; private set; }
-
+        
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
             if(_initial)
@@ -145,10 +136,14 @@ namespace SimTelemetry.Domain.Telemetry
 
             if (IsPlayer)
             {
-
+                // Minimize the amount of fields in this section
             }
+
+            if(Pool is MemoryPool && (Pool as MemoryPool).Pools.ContainsKey("Laps"))
+            LapsList = (Pool as MemoryPool).Pools["Laps"].ReadAs<List<Lap>>("List");
         }
 
+        protected List<Lap> LapsList { get; set; }
         public TelemetryDriver(IDataNode pool)
         {
             Pool = pool;
@@ -167,12 +162,13 @@ namespace SimTelemetry.Domain.Telemetry
 
         public IEnumerable<Lap> GetLaps()
         {
+            return LapsList;
             return new List<Lap>();
         }
 
         public Lap GetBestLap()
         {
-            return new Lap(1, 1, 25, 25, 25);
+            return LapsList[0] ;
         }
 
         public double GetSplitTime(TelemetryDriver telemetryDriver)

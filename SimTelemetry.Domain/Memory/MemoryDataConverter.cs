@@ -55,6 +55,7 @@ namespace SimTelemetry.Domain.Memory
             if (dataInput.Length <= index)
             {
                 index = 0;
+                // TODO: array.resize?
                 dataInput = new byte[128];
             }
             Type inputType = typeof(T);

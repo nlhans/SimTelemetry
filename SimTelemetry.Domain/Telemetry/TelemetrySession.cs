@@ -46,7 +46,7 @@ namespace SimTelemetry.Domain.Telemetry
 
             Track = sessionGroup.ReadAs<string>("LocationTrack");
 
-           Info = new Session("race 1", SessionType.RACE, 1, "Sunday", new Time(16,30,0,0), new TimeSpan(0,3,0,0), 150, 80);
+           Info = new Session("race 1", SessionType.PRACTICE, 1, "Sunday", new Time(16,30,0,0), new TimeSpan(0,3,0,0), 150, 80);
         }
 
         public TelemetrySession Clone()

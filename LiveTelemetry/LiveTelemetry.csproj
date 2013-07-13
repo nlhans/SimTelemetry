@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Gauges\ExtensionMethod.cs" />
     <Compile Include="Gauges\TrackMap.cs">
       <SubType>UserControl</SubType>
     </Compile>
