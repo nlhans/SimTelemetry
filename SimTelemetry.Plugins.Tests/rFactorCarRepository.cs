@@ -69,7 +69,7 @@ namespace SimTelemetry.Plugins.Tests
             int number = 0;
             var classes = new List<string>();
 
-            Debug.WriteLine("Car::Get(\"" + id + "\")");
+            //Debug.WriteLine("Car::Get(\"" + id + "\")");
 
             // Parse Vehicle File
             using (var vehIni = new IniReader(vehFile, true))

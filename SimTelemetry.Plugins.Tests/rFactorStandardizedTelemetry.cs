@@ -108,7 +108,7 @@ namespace SimTelemetry.Plugins.Tests
                         
                         float sector1 = BitConverter.ToSingle(data, i + 4);
                         float sector2 = BitConverter.ToSingle(data, i + 8) -sector1;
-                        float sector3 = BitConverter.ToSingle(data, i + 12)-sector2;
+                        float sector3 = BitConverter.ToSingle(data, i + 12)-sector2-sector1;
 
                         var l = new Lap(-1, lapId, sector1, sector2, sector3); // TODO: Add start time in session
                         lapList.Add(l);

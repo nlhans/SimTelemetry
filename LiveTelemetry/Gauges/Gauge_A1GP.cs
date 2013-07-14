@@ -165,8 +165,8 @@ namespace LiveTelemetry
             int clip_height = this.Height;
             int clip_width = this.Width;
 
-            _EmptyGauges = new Bitmap(this.Size.Width, this.Size.Height);
-            Graphics g = Graphics.FromImage(_EmptyGauges);
+            var backgroundGauges = new Bitmap(this.Size.Width, this.Size.Height);
+            Graphics g = Graphics.FromImage(backgroundGauges);
             lock (g)
             {
                 g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
@@ -214,8 +214,8 @@ namespace LiveTelemetry
 
                 if (RPM_Max >= 12000 && RPM_Max < 20000)
                 {
-                    RPM_Step = 2000;
-                    RPM_Min = RPM_Max - 6*2000;
+                    RPM_Step = 1000;
+                    RPM_Min = RPM_Max - 4*2000;
 
                 }
                 if (RPM_Max >= 20000)
@@ -278,23 +278,31 @@ namespace LiveTelemetry
                     g.DrawString((RPM/1000.0).ToString("0"), font_arial_10, Brushes.White, Convert.ToSingle(x_c),
                                  Convert.ToSingle(y_c));
 
-                    for (int i = 1; i < 5; i++)
+                    for (int i = 1; i < 10; i++)
                     {
-                        double angle2 = angle + 225.0/((RPM_Max - RPM_Min)/RPM_Step)*i/5;
+                        double angle2 = angle + 225.0/((RPM_Max - RPM_Min)/RPM_Step)*i/10;
+                        var stripeWidth = 1.0f;
+                        var stripeLength = 6;
+                        if (i == 5)
+                        {
+                            stripeLength = 8;
+                            stripeWidth = 2.0f;
+                        }
+
                         if (angle2 > 90 + 225) break;
                         double sin2_a = Math.Sin(angle2/180.0*Math.PI);
                         double cos2_a = Math.Cos(angle2/180.0*Math.PI);
 
                         double y2_a = clip_height/2 + sin2_a*72;
                         double x2_a = clip_height/2 + cos2_a*72;
-                        double y2_b = clip_height/2 + sin2_a*78;
-                        double x2_b = clip_height/2 + cos2_a*78;
+                        double y2_b = clip_height/2 + sin2_a*(72+stripeLength);
+                        double x2_b = clip_height / 2 + cos2_a * (72 + stripeLength);
 
-                        if (angle2 > 90 + fAngle_RPM_RedLine)
-                            g.DrawLine(new Pen(Color.Red, 1f), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
+                        if (angle2 > 90 + Angle_RPM_WarningLine)
+                            g.DrawLine(new Pen(Color.Red, stripeWidth), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
                                        Convert.ToSingle(x2_b), Convert.ToSingle(y2_b));
                         else
-                            g.DrawLine(new Pen(Color.White, 1f), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
+                            g.DrawLine(new Pen(Color.White, stripeWidth), Convert.ToSingle(x2_a), Convert.ToSingle(y2_a),
                                        Convert.ToSingle(x2_b), Convert.ToSingle(y2_b));
 
                     }
@@ -353,6 +361,8 @@ namespace LiveTelemetry
                 g.DrawString("Laptimes", small_font, DimBrush, this.Width - 51, this.Height - 30);
                 g.DrawString("Split", small_font, DimBrush, this.Width - 30, this.Height - 15);
             }
+
+            _EmptyGauges = backgroundGauges;
         }
 
         protected override void OnPaint(PaintEventArgs e)

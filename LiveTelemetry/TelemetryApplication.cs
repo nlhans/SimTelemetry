@@ -72,15 +72,23 @@ namespace LiveTelemetry
                             // TODO: Temporary
 
                             // Get track
-                            Track = Tracks.GetByFile(Telemetry.Session.Track);
-                            if (Track != null)
-                                TrackAvailable = true;
+                            if (TelemetryApplication.TelemetryAvailable)
+                            {
+                                Track = Tracks.GetByFile(Telemetry.Session.Track);
+                                if (Track != null)
+                                    TrackAvailable = true;
 
-                            // Get car
-                            Car = Cars.GetByClass(Telemetry.Player.CarClasses).FirstOrDefault();
+                                // Get car
+                                Car = Cars.GetByClass(Telemetry.Player.CarClasses).FirstOrDefault();
 
-                            if (Car != null)
-                                CarAvailable = true;
+                                if (Car != null)
+                                    CarAvailable = true;
+                            }
+                            else
+                            {
+                                TrackAvailable = false;
+                                CarAvailable = false;
+                            }
                         };
                     t.Start();
                 }, true);
