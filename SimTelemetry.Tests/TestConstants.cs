@@ -13,8 +13,11 @@ namespace SimTelemetry.Tests
         public const string TelemetryFolder =
             @"C:\Projects\Software\SimTelemetry\SimTelemetry.Tests\bin\Debug\";
 
-        public const string SimulatorsBinFolder = TelemetryFolder;
+        public const string SimulatorsBinFolder = @"C:\Projects\Software\SimTelemetry\SimTelemetry.Plugins.Tests\bin\Debug\";
         public static int Warnings { get; set; }
+
+
+        public const  float MemoryTestFuelCapacity = 260.0f;
 
         public static void Prepare()
         {

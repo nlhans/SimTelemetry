@@ -31,7 +31,7 @@ namespace SimTelemetry.Domain.Common
             {
                 if (data.Any(x => x.ID.Equals(id)))
                 {
-                    return data.Where(x => x.ID.Equals(id)).FirstOrDefault();
+                    return data.FirstOrDefault(x => x.ID.Equals(id));
                 }
                 else
                 {

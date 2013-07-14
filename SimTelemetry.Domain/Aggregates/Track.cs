@@ -48,7 +48,7 @@ namespace SimTelemetry.Domain.Aggregates
         {
             ID = file;
             Name = name;
-            Image = Image;
+            Image = image;
             Location = location;
             LaprecordRace = laprecordRace;
             LaprecordQualify = laprecordQualify;

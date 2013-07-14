@@ -37,11 +37,11 @@ namespace SimTelemetry.Tests.Repositories
 
 
                 w.Start();
-                var f1Car = carRepo.GetByFile("JButton05.veh");
+                var f1Car = carRepo.GetByFile("Sauber_22.veh");
                 Assert.AreNotEqual(f1Car, null);
                 if (f1Car != null)
                     Debug.WriteLine("#" + f1Car.StartNumber + ". " + f1Car.Driver);
-                Debug.WriteLine("[TIME] Retrieving JButton05.veh car costs " + w.ElapsedMilliseconds + "ms");
+                Debug.WriteLine("[TIME] Retrieving Sauber_22.veh car costs " + w.ElapsedMilliseconds + "ms");
                 w.Stop();
                 w.Reset();
 
@@ -54,22 +54,22 @@ namespace SimTelemetry.Tests.Repositories
                 w.Reset();*/
 
                 w.Start();
-                f1Car = carRepo.GetByFile("TSATO05.veh");
+                f1Car = carRepo.GetByFile("Sauber_23.veh");
                 Assert.AreNotEqual(f1Car, null);
                 if (f1Car != null)
                     Debug.WriteLine("#" + f1Car.StartNumber + ". " + f1Car.Driver);
-                Debug.WriteLine("[TIME] Retrieving TSATO05.veh car costs " + w.ElapsedMilliseconds + "ms");
+                Debug.WriteLine("[TIME] Retrieving Sauber_23.veh car costs " + w.ElapsedMilliseconds + "ms");
                 w.Stop();
 
                 w.Reset();
 
                 // Verify that when cached, this is very quick:
                 w.Start();
-                f1Car = carRepo.GetByFile("JButton05.veh");
+                f1Car = carRepo.GetByFile("Sauber_22.veh");
                 Assert.AreNotEqual(f1Car, null);
                 if (f1Car != null)
                     Debug.WriteLine("#" + f1Car.StartNumber + ". " + f1Car.Driver);
-                Debug.WriteLine("[TIME] Retrieving JButton05.veh car costs " + w.ElapsedMilliseconds + "ms");
+                Debug.WriteLine("[TIME] Retrieving Sauber_22.veh car costs " + w.ElapsedMilliseconds + "ms");
 
                 w.Stop();
                 w.Reset();

@@ -26,8 +26,6 @@ namespace SimTelemetry.Tests.Telemetry
             if (Process.GetProcessesByName("rfactor").Length == 0) Assert.Ignore();
             var rFactorProcess = Process.GetProcessesByName("rfactor")[0];
 
-            IntPtr alloc = Marshal.AllocHGlobal(512 * 1024 * 1024);
-
             using (var host = new Plugins())
             {
                 host.PluginDirectory = TestConstants.SimulatorsBinFolder;
@@ -36,21 +34,20 @@ namespace SimTelemetry.Tests.Telemetry
 
                 // Simulators are now loaded
 
-                var testPlugin = host.Simulators.Where(x => x.Name == "Test simulator").FirstOrDefault();
+                var testPlugin = host.Simulators.FirstOrDefault(x => x.Name == "Test simulator");
                 testPlugin.SimulatorStart(rFactorProcess);
 
                 var telSource = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rFactorProcess);
                 var telLogger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, false, true, false));
                 telLogger.SetAnnotater(new TelemetryArchive());
+                telLogger.SetTemporaryLocations("Record.zip", "SimTelemetry.Tests.Telemetry.TelemetryTests/");
                 telSource.SetLogger(telLogger);
 
-                Thread.Sleep(15000);
+                Thread.Sleep(1000);
 
                 telLogger.Close();
                 telSource = null;
             }
-
-            Marshal.FreeHGlobal(alloc);
         }
 
 
@@ -94,6 +91,7 @@ namespace SimTelemetry.Tests.Telemetry
             TelemetryLogger logger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, true, true, true));
             logger.SetDatasource(provider);
             logger.SetAnnotater( new TelemetryArchive());
+            logger.SetTemporaryLocations("TestData.zip", "SimTelemetry.Tests.Telemetry.TelemetryTests/");
             GlobalEvents.Fire(new SessionStarted(), true);
             GlobalEvents.Fire(new DriversAdded(null, fakeDrivers), true);
 
@@ -103,7 +101,7 @@ namespace SimTelemetry.Tests.Telemetry
             GlobalEvents.Fire(new SessionStopped(), true);
             Thread.Sleep(500);
 
-            ZipStorer checkFile = ZipStorer.Open("tmp.zip", FileAccess.Read);
+            ZipStorer checkFile = ZipStorer.Open("TestData.zip", FileAccess.Read);
 
             var files = checkFile.ReadCentralDir();
             Assert.AreEqual(3, files.Count);
@@ -119,7 +117,7 @@ namespace SimTelemetry.Tests.Telemetry
 
             StringBuilder outSine = new StringBuilder();
 
-            var telRead = new LogFileReader("Tmp.zip");
+            var telRead = new LogFileReader("TestData.zip");
             var telProvider = telRead.GetProvider(new[] { "Driver" }, 0, 1024*25);
             var index = 0;
             foreach (var sample in telProvider.GetSamples())
@@ -161,7 +159,7 @@ namespace SimTelemetry.Tests.Telemetry
         {
             StringBuilder csv = new StringBuilder();
 
-            var telRead = new LogFileReader("Tmp.zip");
+            var telRead = new LogFileReader("TestData.zip");
             var telProvider = telRead.GetProvider(new[] {"Session","Driver 7427264"}, 0, 1000000);
 
             foreach(var sample in telProvider.GetSamples())

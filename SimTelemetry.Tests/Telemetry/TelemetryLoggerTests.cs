@@ -63,6 +63,8 @@ namespace SimTelemetry.Tests.Telemetry
 
             var logger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, true, true, true));
             logger.SetDatasource(provider);
+            logger.SetTemporaryLocations("LapTests.zip", "SimTelemetry.Tests.Telemetry.TelemetryLoggerTests");
+            
             //logger.SetAnnotater(new TelemetryArchive());
             GlobalEvents.Fire(new SessionStarted(), true);
             GlobalEvents.Fire(new DriversAdded(null, fakeDrivers), true);
@@ -105,15 +107,17 @@ namespace SimTelemetry.Tests.Telemetry
 
                 // Simulators are now loaded
 
-                var testPlugin = host.Simulators.Where(x => x.Name == "Test simulator").FirstOrDefault();
+                var testPlugin = host.Simulators.FirstOrDefault(x => x.Name == "Test simulator");
+                Assert.AreNotEqual(null, testPlugin);
                 testPlugin.SimulatorStart(rFactorProcess);
 
                 var telSource = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rFactorProcess);
                 var telLogger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, false, true, false));
                 telLogger.SetAnnotater(new TelemetryArchive());
+                telLogger.SetTemporaryLocations("Logger.zip", "SimTelemetry.Tests.Telemetry.TelemetryLoggerTests");
                 telSource.SetLogger(telLogger);
 
-                Thread.Sleep(60000);
+                Thread.Sleep(500);
 
                 telLogger.Close();
                 telSource = null;
@@ -177,8 +181,8 @@ namespace SimTelemetry.Tests.Telemetry
 
             var files = checkFile.ReadCentralDir();
             Assert.AreEqual(3, files.Count);
-            Assert.AreEqual(1024 * 2 * 12 + 2 * 8, files.Where(x => x.FilenameInZip.Contains("Data.bin")).FirstOrDefault().FileSize);
-            Assert.AreEqual(1024*8, files.Where(x => x.FilenameInZip.Contains("Time.bin")).FirstOrDefault().FileSize);
+            Assert.AreEqual(1024 * 2 * 12 + 2 * 8, files.FirstOrDefault(x => x.FilenameInZip.Contains("Data.bin")).FileSize);
+            Assert.AreEqual(1024*8, files.FirstOrDefault(x => x.FilenameInZip.Contains("Time.bin")).FileSize);
         }
 
         public void PlaybackTestData()
@@ -189,7 +193,7 @@ namespace SimTelemetry.Tests.Telemetry
 
             StringBuilder outSine = new StringBuilder();
 
-            var telRead = new LogFileReader("Tmp.zip");
+            var telRead = new LogFileReader("TelemetryLoggerTests_Tmp.zip");
             var telProvider = telRead.GetProvider(new[] { "Driver" }, 0, 1024*25);
             var index = 0;
             foreach (var sample in telProvider.GetSamples())

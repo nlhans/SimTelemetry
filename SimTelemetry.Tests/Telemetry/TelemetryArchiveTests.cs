@@ -19,6 +19,7 @@ namespace SimTelemetry.Tests.Telemetry
             var loggerFromZero = new TelemetryLogger("test", new TelemetryLoggerConfiguration(true, true, true, true));
             loggerFromZero.SetDatasource(dummyDataSource);
             loggerFromZero.SetAnnotater(archive);
+            loggerFromZero.SetTemporaryLocations("StoreLogFile", "SimTelemetry.Tests.Telemetry.TelemetryArchiveTests");
             var logWriter = new LogFileWriter("test.zip","TelemetryArchiveTestsStoreLogFile");
 
             GlobalEvents.Fire(new SessionStarted(), true);
@@ -41,6 +42,7 @@ namespace SimTelemetry.Tests.Telemetry
             var archive = new TelemetryArchive();
             var loggerFromZero = new TelemetryLogger("test", new TelemetryLoggerConfiguration(true, true, true, true));
             loggerFromZero.SetDatasource(dummyDataSource);
+            loggerFromZero.SetTemporaryLocations("QualifyTest", "SimTelemetry.Tests.Telemetry.TelemetryArchiveTests");
             GlobalEvents.Fire(new SessionStarted(), true);
 
             Assert.False(archive.QualifiesForStorage(loggerFromZero));

@@ -95,9 +95,6 @@ namespace SimTelemetry.Plugins.Tests
             // Add converter for byte <> List<Laps>
             MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<List<Lap>>((data, offset) =>
                 {
-                    //
-                    Debug.WriteLine("Hello");
-
                     int lapId = 0;
                     var lapList = new List<Lap>();
 
@@ -115,7 +112,7 @@ namespace SimTelemetry.Plugins.Tests
 
                         var l = new Lap(-1, lapId, sector1, sector2, sector3); // TODO: Add start time in session
                         lapList.Add(l);
-
+                        lapId++;
                     }
 
                     return lapList;

@@ -62,9 +62,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             memory.Refresh();
 
@@ -104,9 +104,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(2.0f * 100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(2 * 100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(2 * 100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             memory.Refresh();
 
@@ -150,9 +150,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             memory.Refresh();
 
@@ -204,9 +204,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(2.0f * 100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(2 * 100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(2 * 100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             memory.Refresh();
 
@@ -258,9 +258,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             memory.Refresh();
 
@@ -312,9 +312,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(2.0f * 100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(2 * 100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(2 * 100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             memory.Refresh();
 

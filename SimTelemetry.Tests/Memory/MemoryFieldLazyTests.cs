@@ -60,9 +60,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             Assert.True(FieldIndex.HasChanged());
             Assert.True(FieldFuel.HasChanged());
@@ -105,9 +105,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(2.0f*100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(2*100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(2*100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             Assert.True(FieldIndex.HasChanged());
             Assert.True(FieldFuel.HasChanged());
@@ -151,9 +151,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             Assert.AreEqual(3, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
@@ -182,7 +182,7 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0x6000, actionLogbook[3].Size);
 
             Assert.AreEqual(0, drvPool.ReadAs<int>("Index"));
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
 
             Assert.AreEqual(6, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
@@ -225,9 +225,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(2.0f * 100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(2*100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(2 * 100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             Assert.AreEqual(3, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
@@ -256,7 +256,7 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0x6000, actionLogbook[3].Size);
 
             Assert.AreEqual(0, drvPool.ReadAs<int>("Index"));
-            Assert.AreEqual(2.0f * 100.0f, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
 
             Assert.AreEqual(6, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
@@ -299,9 +299,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             Assert.AreEqual(3, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
@@ -331,7 +331,7 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0x6000, actionLogbook[3].Size);
 
             Assert.AreEqual(0, drvPool.ReadAs<int>("Index"));
-            Assert.AreEqual(100.0f, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
 
             Assert.AreEqual(6, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
@@ -374,9 +374,9 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0, drvPool.ReadAs<uint>("Index"));
             Assert.AreEqual(0.0f, drvPool.ReadAs<float>("Index"));
 
-            Assert.AreEqual(2.0f*100.0f, drvPool.ReadAs<float>("FuelCapacity"));
-            Assert.AreEqual(2*100, drvPool.ReadAs<int>("FuelCapacity"));
-            Assert.AreEqual(2 * 100.0, drvPool.ReadAs<double>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<int>("FuelCapacity"));
+            Assert.AreEqual(2 * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<double>("FuelCapacity"));
 
             Assert.AreEqual(3, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
@@ -405,7 +405,7 @@ namespace SimTelemetry.Tests.Memory
             Assert.AreEqual(0x6000, actionLogbook[3].Size);
 
             Assert.AreEqual(0, drvPool.ReadAs<int>("Index"));
-            Assert.AreEqual(2.0f * 100.0f, drvPool.ReadAs<float>("FuelCapacity"));
+            Assert.AreEqual(2.0f * TestConstants.MemoryTestFuelCapacity, drvPool.ReadAs<float>("FuelCapacity"));
 
             Assert.AreEqual(6, actionLogbook.Count);
             Assert.AreEqual(0x7154C0, actionLogbook[0].Address);
