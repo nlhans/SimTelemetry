@@ -69,20 +69,20 @@ namespace SimTelemetry.Domain.Memory
 
         public TOut ReadAs<TOut>(string field)
         {
-            if (Fields.ContainsKey(field))
-                return Fields[field].ReadAs<TOut>();
+            if (_fields.ContainsKey(field))
+                return _fields[field].ReadAs<TOut>();
             else
                 return MemoryDataConverter.Read<TOut>(new byte[32], 0);
         }
 
         public IEnumerable<IDataField> GetDataFields()
         {
-            return Fields.Select(x => (IDataField)x.Value);
+            return _fields.Select(x => (IDataField)x.Value);
         }
 
         public byte[] ReadBytes(string field)
         {
-            var oField = this.Fields[field];
+            var oField = this._fields[field];
             if (oField.HasChanged())
             {
                 return MemoryDataConverter.Rawify(oField.Read);
@@ -97,7 +97,7 @@ namespace SimTelemetry.Domain.Memory
         {
             file.WriteStartElement("debug");
             file.WriteAttributeString("name", this.Name);
-            file.WriteAttributeString("fields", Fields.Count().ToString());
+            file.WriteAttributeString("fields", _fields.Count().ToString());
 
             file.WriteAttributeString("template", IsTemplate.ToString());
             if (AddressTree == null)
@@ -144,7 +144,7 @@ namespace SimTelemetry.Domain.Memory
                     case MemoryAddress.Static:
                         if (result == 0) return;
 
-                        if (Pointers.Count() == 0)
+                        if (!Pointers.Any())
                         {
                             // The result is directly our address
                             Address = (int)result;
@@ -214,7 +214,7 @@ namespace SimTelemetry.Domain.Memory
             }
 
             // Refresh underlying fields.
-            foreach (var field in Fields)
+            foreach (var field in _fields)
                 field.Value.Refresh();
 
             foreach (var pool in Pools.Values)
