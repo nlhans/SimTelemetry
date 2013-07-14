@@ -177,6 +177,9 @@
     <Compile Include="Gauges\ucSessionInfo.Designer.cs">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Gauges\TrackMap.resx">
+      <DependentUpon>TrackMap.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\Data.resx">
       <DependentUpon>Data.cs</DependentUpon>
     </EmbeddedResource>
@@ -224,10 +227,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">
-      <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
-      <Name>SimTelemetry.Data</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SimTelemetry.Domain\SimTelemetry.Domain.csproj">
       <Project>{25f653cd-5503-45b6-ad1b-c8f5c2034da6}</Project>
       <Name>SimTelemetry.Domain</Name>

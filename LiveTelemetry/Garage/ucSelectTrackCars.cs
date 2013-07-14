@@ -26,8 +26,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using SimTelemetry.Data.Track;
-using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Entities;
 using Triton;
 
@@ -151,16 +149,17 @@ namespace LiveTelemetry.Garage
 
                 Task loadtracks = new Task(() =>
                     {
-                        TrackThumbnail thumbnail_generator = new TrackThumbnail();
+                        //TrackThumbnail thumbnail_generator = new TrackThumbnail();
 
                         foreach (var track in fGarage.Sim.GetSimulator().Tracks)
                         {
                             if (File.Exists(track.Image) == false)
                             {
-                                thumbnail_generator.Create(track.Image, track.Name,
+                                /*thumbnail_generator.Create(track.Image, track.Name,
                                                            track.Version, track.Route,
                                                            220,
-                                                           220);
+                                                           220);*/
+                                // TODO: Add thumbnail generator
                             }
 
                             if (File.Exists(track.Image))

@@ -25,7 +25,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
-using SimTelemetry.Data;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Events;

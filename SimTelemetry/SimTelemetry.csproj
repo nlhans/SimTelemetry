@@ -90,9 +90,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ucCoordinateMap.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="ucCoordinateMap.cs" />
     <Compile Include="ucCoordinateMap.Designer.cs">
       <DependentUpon>ucCoordinateMap.cs</DependentUpon>
     </Compile>
@@ -129,16 +127,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimTelemetry.Data\SimTelemetry.Data.csproj">
-      <Project>{5897DD6E-1D95-4C28-9362-A96C084C903C}</Project>
-      <Name>SimTelemetry.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimTelemetry.Objects\SimTelemetry.Objects.csproj">
-      <Project>{9292F888-9ED7-42D3-A673-9D70D565FA4E}</Project>
-      <Name>SimTelemetry.Objects</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\folder-horizontal-open-icon.png" />
