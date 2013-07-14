@@ -124,6 +124,11 @@ namespace LiveTelemetry
                 var allLaps = TelemetryApplication.Telemetry.Drivers.SelectMany(x => x.GetLaps());
                 var drivers = TelemetryApplication.Telemetry.Drivers.OrderBy(x => x.Position);
 
+                // TODO: Fix when first lap is driven, this skips all
+                int validLaps = allLaps.Where(x => x.Total > 0).Count();
+                if (validLaps == 0)
+                    return;
+
                 double lapTimeBest = allLaps.Where(x => x.Total > 0).Min(x => x.Total);
 
                 float BestSector1 = allLaps.Where(x => x.Sector1 > 0).Min(x => x.Sector1);
@@ -156,6 +161,7 @@ namespace LiveTelemetry
                     foreach (TelemetryDriver driver in drivers)
                     {
                         var hisLaps = driver.GetLaps();
+                        if (!hisLaps.Any()) continue;
                         var bestSector1 = hisLaps.Where(x=>x.Sector1>0).Min(x => x.Sector1);
                         var bestSector2 = hisLaps.Where(x => x.Sector2 > 0).Min(x => x.Sector2);
                         var bestSector3 = hisLaps.Where(x => x.Sector3 > 0).Min(x => x.Sector3);

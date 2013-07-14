@@ -10,6 +10,9 @@ namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetryDriver : ITelemetryObject
     {
+        private bool _initial = true;
+
+
         internal IDataNode Pool { get; set; }
 
         public bool IsPlayer { get; protected set; }
@@ -17,7 +20,8 @@ namespace SimTelemetry.Domain.Telemetry
 
         public string CarTeam { get; protected set; }
         public string CarModel { get; protected set; }
-        public string CarClasses { get; protected set; }
+        public List<string> CarClasses { get; protected set; }
+        public int CarNumber { get; private set; }
 
         public int Pitstops { get; protected set; }
         public int Position { get; protected set; }
@@ -71,11 +75,12 @@ namespace SimTelemetry.Domain.Telemetry
 
         public TrackPointType TrackPosition { get; private set; }
 
-        private bool _initial = true;
         public TelemetryWheel WheelRR { get; private set; }
         public TelemetryWheel WheelLR { get; private set; }
         public TelemetryWheel WheelLF { get; private set; }
-        
+
+        protected List<Lap> LapsList { get; set; }
+
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
             if(_initial)
@@ -85,8 +90,6 @@ namespace SimTelemetry.Domain.Telemetry
                 IsPlayer = Pool.ReadAs<bool>("IsPlayer");
                 Name = Pool.ReadAs<string>("Name");
                 CarTeam = Pool.ReadAs<string>("CarTeam");
-                CarModel = Pool.ReadAs<string>("CarModel");
-                CarClasses = Pool.ReadAs<string>("CarClasses");
 
                 FuelCapacity = Pool.ReadAs<float>("FuelCapacity");
 
@@ -129,8 +132,9 @@ namespace SimTelemetry.Domain.Telemetry
             FlagBlack = Pool.ReadAs<bool>("FlagBlack");
             Ignition = Pool.ReadAs<bool>("Ignition");
 
-            CarClasses = Pool.ReadAs<string>("CarClasses");
+            CarClasses = Pool.ReadAs<string>("CarClasses").Split(" ".ToCharArray()).ToList();
             CarModel = Pool.ReadAs<string>("CarModel");
+            CarNumber = Pool.ReadAs<int>("CarNumber");
 
             Heading = Pool.ReadAs<float>("Yaw");
 
@@ -146,6 +150,7 @@ namespace SimTelemetry.Domain.Telemetry
             else
             {
                 // Generate from lap list.
+                // TODO: Write test code for this
                 var lastlap = LapsList.LastOrDefault();
                 if (lastlap != null)
                 {
@@ -164,7 +169,6 @@ namespace SimTelemetry.Domain.Telemetry
             }
         }
 
-        protected List<Lap> LapsList { get; set; }
         public TelemetryDriver(IDataNode pool)
         {
             Pool = pool;

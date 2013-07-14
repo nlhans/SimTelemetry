@@ -46,7 +46,7 @@ namespace LiveTelemetry
 #endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new LiveTelemetry());
+            Application.Run(new frmLiveTelemetry());
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)

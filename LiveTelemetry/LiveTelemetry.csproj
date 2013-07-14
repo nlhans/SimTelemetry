@@ -117,11 +117,11 @@
     <Compile Include="Garage\ucSelectTrackCars.Designer.cs">
       <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gauges\Gauge_A1GP.cs">
+    <Compile Include="Gauges\ucGaugeA1Gp.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Gauges\Gauge_A1GP.Designer.cs">
-      <DependentUpon>Gauge_A1GP.cs</DependentUpon>
+    <Compile Include="Gauges\ucGaugeA1Gp.Designer.cs">
+      <DependentUpon>ucGaugeA1Gp.cs</DependentUpon>
     </Compile>
     <Compile Include="Gauges\Gauge_Laps.cs">
       <SubType>UserControl</SubType>
@@ -147,11 +147,11 @@
     <Compile Include="Gauges\LapChart.Designer.cs">
       <DependentUpon>LapChart.cs</DependentUpon>
     </Compile>
-    <Compile Include="LiveTelemetry.cs">
+    <Compile Include="frmLiveTelemetry.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LiveTelemetry.Designer.cs">
-      <DependentUpon>LiveTelemetry.cs</DependentUpon>
+    <Compile Include="frmLiveTelemetry.Designer.cs">
+      <DependentUpon>frmLiveTelemetry.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -201,8 +201,8 @@
     <EmbeddedResource Include="Garage\ucSelectTrackCars.resx">
       <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Gauges\Gauge_A1GP.resx">
-      <DependentUpon>Gauge_A1GP.cs</DependentUpon>
+    <EmbeddedResource Include="Gauges\ucGaugeA1Gp.resx">
+      <DependentUpon>ucGaugeA1Gp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Gauges\Gauge_Laps.resx">
       <DependentUpon>Gauge_Laps.cs</DependentUpon>
@@ -216,8 +216,8 @@
     <EmbeddedResource Include="Gauges\LapChart.resx">
       <DependentUpon>LapChart.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LiveTelemetry.resx">
-      <DependentUpon>LiveTelemetry.cs</DependentUpon>
+    <EmbeddedResource Include="frmLiveTelemetry.resx">
+      <DependentUpon>frmLiveTelemetry.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Gauges\ucSessionInfo.resx">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>

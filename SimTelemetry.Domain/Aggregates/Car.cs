@@ -142,7 +142,13 @@ namespace SimTelemetry.Domain.Aggregates
 
         public bool BelongsTo(IEnumerable<string> cls)
         {
-            return (CarClass.Intersect(cls).Count(x => true) > 0);
+            return CarClass.Intersect(cls).Any();
+        }
+
+        // TODO: Test this utilization
+        public int BelongsToScore(IEnumerable<string> cls)
+        {
+            return CarClass.Intersect(cls).Count();
         }
 
     }

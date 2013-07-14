@@ -22,7 +22,7 @@ namespace SimTelemetry.Plugins.Tests
         public string SearchHDV(string id)
         {
             id = id.ToLower();
-            return hdvFiles.Any(x => x.Contains(id)) ? hdvFiles.Where(x => x.Contains(id)).FirstOrDefault() : string.Empty;
+            return hdvFiles.Any(x => x.Contains(id)) ? hdvFiles.FirstOrDefault(x => x.Contains(id)) : string.Empty;
         }
 
 
@@ -30,7 +30,7 @@ namespace SimTelemetry.Plugins.Tests
         {
             id = id.ToLower();
             return iniFiles.Any(x => x.Contains(id))
-                       ? iniFiles.Where(x => x.Contains(id)).FirstOrDefault()
+                       ? iniFiles.FirstOrDefault(x => x.Contains(id))
                        : string.Empty;
         }
 
@@ -80,7 +80,7 @@ namespace SimTelemetry.Plugins.Tests
                                            if (x.Key == "Driver") driver = x.ReadAsString();
                                            if (x.Key == "Description") description = x.ReadAsString();
                                            if (x.Key == "Number") number = x.ReadAsInteger();
-                                           if (x.Key == "Classes") classes.AddRange(x.ReadAsStringArray());
+                                           if (x.Key == "Classes") classes.AddRange(x.ReadAsString().Split(" ".ToCharArray())); // TODO: Test this better
                                            if (x.Key == "HDVehicle") hdvFile = x.ReadAsString();
                                            if (x.Key == "Engine") engineName = x.ReadAsString();
                                            if (x.Key == "Manufacturer") engineManufacturer = x.ReadAsString();
@@ -134,7 +134,7 @@ namespace SimTelemetry.Plugins.Tests
                 hdvIni.Parse();
             }
             //TODO: Do aero work
-            Chassis s = new Chassis(weight, fuelTankSize, dragBody, new Polynomial(0), new Polynomial(0), new Polynomial(0), new Polynomial(0), 0 );
+            var s = new Chassis(weight, fuelTankSize, dragBody, new Polynomial(0), new Polynomial(0), new Polynomial(0), new Polynomial(0), 0 );
             return s;
         }
 

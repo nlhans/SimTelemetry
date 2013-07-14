@@ -27,7 +27,7 @@ namespace SimTelemetry.Plugins.Tests
             session.Add(new MemoryFieldLazy<float>("Clock", MemoryAddress.Static, 0x6E2CD8, 4));
 
             session.Add(new MemoryFieldLazy<string>("LocationTrack", MemoryAddress.Static, 0x309D28, 0, 256,
-                                                    x => x.Substring(19).ToLower().Replace("aiw","gdb")));
+                                                    x => x.Length > 20 ? x.Substring(19).ToLower().Replace("aiw", "gdb") : string.Empty));
 
             session.Add(new MemoryFieldLazy<bool>("IsOffline", MemoryAddress.Static, 0x315444, 1, (x) => !x));
             session.Add(new MemoryFieldLazy<bool>("IsActive", MemoryAddress.Static, 0x30FEE4, 1));
@@ -43,6 +43,7 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<string>("CarTeam", MemoryAddress.Dynamic, 0, 0x5C22, 64));
             templateDriver.Add(new MemoryFieldLazy<string>("CarModel", MemoryAddress.Dynamic, 0, 0x5C62, 64));
             templateDriver.Add(new MemoryFieldLazy<string>("CarClasses", MemoryAddress.Dynamic, 0, 0x39BC, 64));
+            templateDriver.Add(new MemoryFieldLazy<int>("CarNumber", MemoryAddress.Dynamic, 0, 0x5D0C, 4));
 
             templateDriver.Add(new MemoryFieldLazy<float>("Meter", MemoryAddress.Dynamic, 0, 0x3D04, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("Speed", MemoryAddress.Dynamic, 0, 0x57C0, 4));

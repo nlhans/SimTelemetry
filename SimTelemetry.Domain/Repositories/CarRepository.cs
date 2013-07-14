@@ -34,7 +34,7 @@ namespace SimTelemetry.Domain.Repositories
 
         public IEnumerable<Car> GetByClasses(IEnumerable<string> cls)
         {
-            return GetIds().Select(GetById).Where(x => x.BelongsTo(cls));
+            return GetIds().Select(GetById).OrderBy(x => 0-x.BelongsToScore(cls));
         }
 
         public IEnumerable<Car> GetByModel(string carModel)

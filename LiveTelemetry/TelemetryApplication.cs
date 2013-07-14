@@ -72,23 +72,55 @@ namespace LiveTelemetry
                             // TODO: Temporary
 
                             // Get track
-                            if (TelemetryApplication.TelemetryAvailable)
+                            if (TelemetryAvailable && Telemetry.Player!=null)
                             {
                                 Track = Tracks.GetByFile(Telemetry.Session.Track);
                                 if (Track != null)
                                     TrackAvailable = true;
 
                                 // Get car
-                                Car = Cars.GetByClass(Telemetry.Player.CarClasses).FirstOrDefault();
+                                // TODO Provide an interface/abstraction for searching the right car.
+                                // based on priorities and different set of rules, 
+                                // TelemetryDriver, and others 'drivers', should implement this interface to let the CarRepo search the right car.
+                                var cars = Cars.GetByClasses(Telemetry.Player.CarClasses);
 
-                                if (Car != null)
-                                    CarAvailable = true;
+                                if (cars.Any())
+                                {
+                                    if (cars.Count() == 1)
+                                    {
+                                        CarAvailable = true;
+                                        Car = cars.FirstOrDefault();
+
+                                    }
+                                    else
+                                    {
+                                        cars = cars.Where(c =>c.StartNumber == Telemetry.Player.CarNumber);
+
+                                        if (!cars.Any())
+                                        {
+                                            // Error..
+                                        }
+                                        else
+                                        {
+                                            CarAvailable = true;
+                                            Car = cars.FirstOrDefault();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Car = Cars.GetByClass(Telemetry.Player.CarModel).FirstOrDefault();
+                                    if (Car != null)
+                                        CarAvailable = true;
+                                }
                             }
                             else
                             {
                                 TrackAvailable = false;
                                 CarAvailable = false;
                             }
+
+                            t.Stop();
                         };
                     t.Start();
                 }, true);
