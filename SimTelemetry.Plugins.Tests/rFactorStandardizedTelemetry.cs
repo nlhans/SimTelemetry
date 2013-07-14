@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Memory;
 using SimTelemetry.Domain.Plugins;
 using SimTelemetry.Domain.ValueObjects;

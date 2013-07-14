@@ -166,12 +166,12 @@ namespace LiveTelemetry
                         var bestSector2HotLap = bestLapObj.Sector2;
                         var bestSector3HotLap = bestLapObj.Sector3;
 
-                        var lastlap = hisLaps.LastOrDefault().Total;
+                        var lastlap = hisLaps.LastOrDefault(x => x.Total>0).Total;
                         var lastLap = lastlap;
 
-                        var lastSector1 = hisLaps.LastOrDefault().Sector1; // TODO: Figure out which lap the last sector was at
-                        var lastSector2 = hisLaps.LastOrDefault().Sector2;
-                        var lastSector3 = hisLaps.LastOrDefault().Sector3;
+                        var lastSector1 = hisLaps.LastOrDefault(x => x.Sector1>0).Sector1; // TODO: Figure out which lap the last sector was at
+                        var lastSector2 = hisLaps.LastOrDefault(x => x.Sector2 > 0).Sector2;
+                        var lastSector3 = hisLaps.LastOrDefault(x => x.Sector3 > 0).Sector3;
 
                         if (ind*LineHeight > Size.Height - 20 - 3*20)
                             break;

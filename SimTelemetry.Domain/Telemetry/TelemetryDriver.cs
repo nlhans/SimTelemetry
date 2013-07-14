@@ -134,13 +134,34 @@ namespace SimTelemetry.Domain.Telemetry
 
             Heading = Pool.ReadAs<float>("Yaw");
 
+            Name = Pool.ReadAs<string>("Name");
+
+            if (Pool is MemoryPool && (Pool as MemoryPool).Pools.ContainsKey("Laps"))
+                LapsList = (Pool as MemoryPool).Pools["Laps"].ReadAs<List<Lap>>("List");
+
+            if (Pool.Fields.ContainsKey("TrackSector"))
+            {
+                TrackPosition = Pool.ReadAs<TrackPointType>("TrackSector");
+            }
+            else
+            {
+                // Generate from lap list.
+                var lastlap = LapsList.LastOrDefault();
+                if (lastlap != null)
+                {
+                    if (lastlap.Sector1 <= 0) TrackPosition = TrackPointType.SECTOR1;
+                    else if (lastlap.Sector2 <= 0) TrackPosition = TrackPointType.SECTOR2;
+                    else if (lastlap.Sector3 <= 0) TrackPosition = TrackPointType.SECTOR3;
+                }
+                else
+                {
+                    TrackPosition = TrackPointType.SECTOR1;
+                }
+            }
             if (IsPlayer)
             {
                 // Minimize the amount of fields in this section
             }
-
-            if(Pool is MemoryPool && (Pool as MemoryPool).Pools.ContainsKey("Laps"))
-            LapsList = (Pool as MemoryPool).Pools["Laps"].ReadAs<List<Lap>>("List");
         }
 
         protected List<Lap> LapsList { get; set; }
