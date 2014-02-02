@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using SimTelemetry.Domain.Aggregates;
@@ -69,6 +70,7 @@ namespace SimTelemetry.Domain.Repositories
 
         public void Export()
         {
+            Debug.WriteLine("Creating file " + DiskFile);
             //
             using (XmlWriter writer = XmlWriter.Create(DiskFile))
             {
@@ -76,7 +78,7 @@ namespace SimTelemetry.Domain.Repositories
                 writer.WriteStartElement("telemetry");
 
                 // Add all logs
-                foreach(var telemetryLog in base.data)
+                foreach(var telemetryLog in base.data.Values)
                 {
                     writer.WriteStartElement("log");
                     writer.WriteAttributeString("id", telemetryLog.ID.ToString());

@@ -330,8 +330,8 @@ namespace SimTelemetry.Tests.Memory
             var p = new MemoryPool("MyPool", MemoryAddress.StaticAbsolute, 0x715298, 
                                    new[]
                                        {
-                                           new MemoryFieldSignaturePointer(0, false),
-                                           new MemoryFieldSignaturePointer("7CD5D9XX????????518BCFD91C24E8", true),
+                                           new MemoryPointer(0, false),
+                                           new MemoryPointerSignature("7CD5D9XX????????518BCFD91C24E8", true),
                                        }, 0x4);
 
             var provider = new MemoryProvider(reader);
@@ -550,8 +550,8 @@ namespace SimTelemetry.Tests.Memory
                                    "A0XXXXXXXX8B0D????????F6D81BC0",
                                    new[]
                                        {
-                                           new MemoryFieldSignaturePointer(0, false),
-                                           new MemoryFieldSignaturePointer("7CD5D9XX????????518BCFD91C24E8", true),
+                                           new MemoryPointer(0, false),
+                                           new MemoryPointerSignature("7CD5D9XX????????518BCFD91C24E8", true),
                                        }, 0x4);
 
             var provider = new MemoryProvider(reader);

@@ -29,7 +29,7 @@ namespace SimTelemetry.Tests.Repositories
                 var carRepo = new CarRepository(testSim.CarProvider);
                 var cars = carRepo.GetIds().Count();
 
-                // I got over 1106 cars installed, so that's more than 1000.
+                // I got over 1106 cars installed, so that's more than 100.
                 Assert.Greater(cars,100);
                 w.Stop();
                 Debug.WriteLine("[TIME] Retrieving ID list (" + cars + ") costs " + w.ElapsedMilliseconds + "ms");
@@ -37,6 +37,8 @@ namespace SimTelemetry.Tests.Repositories
 
 
                 w.Start();
+
+                // TODO: You need to install CM F1 2010 rFactor mod.
                 var f1Car = carRepo.GetByFile("Sauber_22.veh");
                 Assert.AreNotEqual(f1Car, null);
                 if (f1Car != null)

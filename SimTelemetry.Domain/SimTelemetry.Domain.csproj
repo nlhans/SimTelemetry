@@ -79,7 +79,9 @@
     <Compile Include="Enumerations\TelemetrySupportLevel.cs" />
     <Compile Include="Events\CarAdded.cs" />
     <Compile Include="Events\CarDeleted.cs" />
+    <Compile Include="Events\CarLoaded.cs" />
     <Compile Include="Events\CarRepositoryCleared.cs" />
+    <Compile Include="Events\CarUnloaded.cs" />
     <Compile Include="Events\CarUpdated.cs" />
     <Compile Include="Events\DriversAdded.cs" />
     <Compile Include="Events\DriversRemoved.cs" />
@@ -99,6 +101,8 @@
     <Compile Include="Events\TelemetryDriverRemoved.cs" />
     <Compile Include="Events\TelemetryLapComplete.cs" />
     <Compile Include="Events\TelemetryRefresh.cs" />
+    <Compile Include="Events\TrackLoaded.cs" />
+    <Compile Include="Events\TrackUnloaded.cs" />
     <Compile Include="Exceptions\CarAlreadyHasBrakeException.cs" />
     <Compile Include="Exceptions\CarAlreadyHasChassisException.cs" />
     <Compile Include="Exceptions\CarAlreadyHasDrivetrainException.cs" />
@@ -126,6 +130,7 @@
     <Compile Include="Logger\LogSampleField.cs" />
     <Compile Include="Logger\LogSampleGroup.cs" />
     <Compile Include="Memory\IMemoryObject.cs" />
+    <Compile Include="Memory\IMemoryPointer.cs" />
     <Compile Include="Memory\MemoryAddress.cs" />
     <Compile Include="Memory\MemoryDataConverter.cs" />
     <Compile Include="Memory\MemoryDataConverterProvider.cs" />
@@ -133,8 +138,9 @@
     <Compile Include="Memory\MemoryFieldConstant.cs" />
     <Compile Include="Memory\MemoryFieldFunc.cs" />
     <Compile Include="Memory\MemoryFieldLazy.cs" />
+    <Compile Include="Memory\MemoryPointer.cs" />
     <Compile Include="Memory\MemoryFieldSignature.cs" />
-    <Compile Include="Memory\MemoryFieldSignaturePointer.cs" />
+    <Compile Include="Memory\MemoryPointerSignature.cs" />
     <Compile Include="Memory\MemoryPool.cs" />
     <Compile Include="Memory\MemoryProvider.cs" />
     <Compile Include="Memory\MemoryReader.cs" />

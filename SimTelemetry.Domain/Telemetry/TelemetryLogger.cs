@@ -166,6 +166,8 @@ namespace SimTelemetry.Domain.Telemetry
 
             return TelemetryLoggerLevel.Full;
         }
+
+
         public void Update(int time)
         {
             if (_writer != null)

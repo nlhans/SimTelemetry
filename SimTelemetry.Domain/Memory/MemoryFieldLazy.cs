@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SimTelemetry.Domain.Memory
 {
@@ -54,14 +56,33 @@ namespace SimTelemetry.Domain.Memory
         {
         }
 
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int size, IEnumerable<int> intPointers)
+            : base(name, type, address, size)
+        {
+            Pointers = intPointers.Select(x => new MemoryPointer(x, false));
+        }
+
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int size, IEnumerable<IMemoryPointer> ptrs)
+            : base(name, type, address, size)
+        {
+            Pointers = ptrs;
+        }
+
         public MemoryFieldLazy(string name, MemoryAddress type, int address, int offset, int size)
             : base(name, type, address, offset, size)
         {
         }
 
-        public MemoryFieldLazy(string name, MemoryAddress type, MemoryPool pool, int offset, int size)
-            : base(name, type, pool, offset, size)
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int offset, int size, IEnumerable<int> intPointers)
+            : base(name, type, address, offset, size)
         {
+            Pointers = intPointers.Select(x => new MemoryPointer(x, false));
+        }
+
+        public MemoryFieldLazy(string name, MemoryAddress type, int address, int offset, int size, IEnumerable<IMemoryPointer> ptrs)
+            : base(name, type, address, offset, size)
+        {
+            Pointers = ptrs;
         }
 
         public MemoryFieldLazy(string name, MemoryAddress type, int address, int size, Func<T, T> conversion)
@@ -71,6 +92,11 @@ namespace SimTelemetry.Domain.Memory
 
         public MemoryFieldLazy(string name, MemoryAddress type, int address, int offset, int size, Func<T, T> conversion)
             : base(name, type, address, offset, size, conversion)
+        {
+        }
+
+        public MemoryFieldLazy(string name, MemoryAddress type, MemoryPool pool, int offset, int size)
+            : base(name, type, pool, offset, size)
         {
         }
 

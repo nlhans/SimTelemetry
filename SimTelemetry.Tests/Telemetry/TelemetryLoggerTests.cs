@@ -39,17 +39,17 @@ namespace SimTelemetry.Tests.Telemetry
             fakePool.Add(new MemoryFieldFunc<float>("RPM", (pool) => rpmWave[index++], true));
             fakePool.Add(new MemoryFieldFunc<float>("Laps", (pool) =>
                                                                 {
-                                                                    if(index <= 100)
+                                                                    if(index <= 100)                    // 100
                                                                         return 0;
-                                                                    if (index > 100 && index <= 225)
+                                                                    if (index > 100 && index <= 225)    // 125
                                                                         return 1;
-                                                                    if (index > 225 && index <= 325)
+                                                                    if (index > 225 && index <= 325)    // 100
                                                                         return 2;
-                                                                    if (index > 325 && index <= 500)
+                                                                    if (index > 325 && index <= 500)    // 175
                                                                         return 3;
-                                                                    if (index > 500 && index <= 575)
+                                                                    if (index > 500 && index <= 575)    // 75
                                                                         return 4;
-                                                                    if (index > 575 && index <= 1024)
+                                                                    if (index > 575 && index <= 1024)   // 449
                                                                         return 5;
 
                                                                         return -1;

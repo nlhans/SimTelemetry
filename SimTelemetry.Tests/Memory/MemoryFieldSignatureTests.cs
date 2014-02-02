@@ -157,11 +157,11 @@ namespace SimTelemetry.Tests.Memory
             // test data for Lister Storm EOAA GT:
             var FieldIndex = new MemoryFieldSignature<int>("Index", MemoryAddress.Dynamic,
                                                            "8B0C85XXXXXXXX8B56??3B91XXXXXXXX",
-                                                           new[] { new MemoryFieldSignaturePointer(4, true) }, 4);
+                                                           new[] { new MemoryPointer(4, true) }, 4);
             // sig is +0x4, add additional +0x4 ->> +0x8 = driver index
             var FieldFuel = new MemoryFieldSignature<float>("FuelCapacity", MemoryAddress.Dynamic,
                                                             "DC86XXXXXXXXD993????????D9E8D9C0",
-                                                            new[] { new MemoryFieldSignaturePointer(4, true) }, 4);
+                                                            new[] { new MemoryPointer(4, true) }, 4);
             drvPool.Add(FieldIndex);
             drvPool.Add(FieldFuel);
             memory.Scanner.Enable();
@@ -208,11 +208,11 @@ namespace SimTelemetry.Tests.Memory
             // test data for Lister Storm EOAA GT:
             var FieldIndex = new MemoryFieldSignature<int>("Index", MemoryAddress.Dynamic,
                                                            "8B0C85XXXXXXXX8B56??3B91XXXXXXXX",
-                                                           new[] { new MemoryFieldSignaturePointer(4, true) }, 4);
+                                                           new[] { new MemoryPointer(4, true) }, 4);
             // sig is +0x4, add additional +0x4 ->> +0x8 = driver index
             var FieldFuel = new MemoryFieldSignature<float>("FuelCapacity", MemoryAddress.Dynamic,
                                                             "DC86XXXXXXXXD993????????D9E8D9C0",
-                                                            new[] { new MemoryFieldSignaturePointer(4, true) }, 4, (x) => 2.0f * x);
+                                                            new[] { new MemoryPointer(4, true) }, 4, (x) => 2.0f * x);
             drvPool.Add(FieldIndex);
             drvPool.Add(FieldFuel);
             memory.Scanner.Enable();
@@ -261,18 +261,18 @@ namespace SimTelemetry.Tests.Memory
                                                             "A0XXXXXXXX8B0D????????F6D81BC0", // player ptr
                                                            new[]
                                                                {
-                                                                   new MemoryFieldSignaturePointer(0, false), 
-                                                                   new MemoryFieldSignaturePointer("8B0C85XXXXXXXX8B56??3B91XXXXXXXX", true),
-                                                                   new MemoryFieldSignaturePointer(4, true)
+                                                                   new MemoryPointer(0, false), 
+                                                                   new MemoryPointerSignature("8B0C85XXXXXXXX8B56??3B91XXXXXXXX", true),
+                                                                   new MemoryPointer(4, true)
                                                                }, 4);
             // sig is +0x4, add additional +0x4 ->> +0x8 = driver index
             var FieldFuel = new MemoryFieldSignature<float>("FuelCapacity", MemoryAddress.StaticAbsolute,
                                                              "A0XXXXXXXX8B0D????????F6D81BC0",  // player ptr
                                                             new[]
                                                                 {
-                                                                   new MemoryFieldSignaturePointer(0, false), 
-                                                                    new MemoryFieldSignaturePointer("DC86XXXXXXXXD993????????D9E8D9C0", true),
-                                                                   new MemoryFieldSignaturePointer(4, true)
+                                                                   new MemoryPointer(0, false), 
+                                                                    new MemoryPointerSignature("DC86XXXXXXXXD993????????D9E8D9C0", true),
+                                                                   new MemoryPointer(4, true)
                                                                 }, 4);
             drvPool.Add(FieldIndex);
             drvPool.Add(FieldFuel);
@@ -333,18 +333,18 @@ namespace SimTelemetry.Tests.Memory
                                                             "A0XXXXXXXX8B0D????????F6D81BC0", // player ptr
                                                            new[]
                                                                {
-                                                                   new MemoryFieldSignaturePointer(0, false), 
-                                                                   new MemoryFieldSignaturePointer("8B0C85XXXXXXXX8B56??3B91XXXXXXXX", true),
-                                                                   new MemoryFieldSignaturePointer(4, true)
+                                                                   new MemoryPointer(0, false), 
+                                                                   new MemoryPointerSignature("8B0C85XXXXXXXX8B56??3B91XXXXXXXX", true),
+                                                                   new MemoryPointer(4, true)
                                                                }, 4);
             // sig is +0x4, add additional +0x4 ->> +0x8 = driver index
             var FieldFuel = new MemoryFieldSignature<float>("FuelCapacity", MemoryAddress.StaticAbsolute,
                                                              "A0XXXXXXXX8B0D????????F6D81BC0",  // player ptr
                                                             new[]
                                                                 {
-                                                                   new MemoryFieldSignaturePointer(0, false), 
-                                                                    new MemoryFieldSignaturePointer("DC86XXXXXXXXD993????????D9E8D9C0", true),
-                                                                   new MemoryFieldSignaturePointer(4, true)
+                                                                   new MemoryPointer(0, false), 
+                                                                    new MemoryPointerSignature("DC86XXXXXXXXD993????????D9E8D9C0", true),
+                                                                   new MemoryPointer(4, true)
                                                                 }, 4, (x) => 2.0f * x);
             drvPool.Add(FieldIndex);
             drvPool.Add(FieldFuel);

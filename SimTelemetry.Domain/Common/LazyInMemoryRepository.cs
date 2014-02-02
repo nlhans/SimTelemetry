@@ -27,9 +27,9 @@ namespace SimTelemetry.Domain.Common
 
         public virtual TType GetById(TId id)
         {
-            if (data.Any(x => x.ID.Equals(id)))
+            if (data.Any(x => x.Key.Equals(id)))
             {
-                return data.FirstOrDefault(x => x.ID.Equals(id));
+                return data.FirstOrDefault(x => x.Key.Equals(id)).Value;
             }
             else
             {

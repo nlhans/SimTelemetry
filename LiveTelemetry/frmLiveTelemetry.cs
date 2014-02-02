@@ -27,6 +27,8 @@ using System.Windows.Forms;
 using LiveTelemetry.Gauges;
 using LiveTelemetry.UI;
 using SimTelemetry;
+using SimTelemetry.Domain;
+using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Plugins;
 using Triton;
 using Triton.Joysticks;
@@ -67,15 +69,14 @@ namespace LiveTelemetry
         /// </summary>
         public static int StatusMenu
         {
-            get { return _StatusMenu; }
+            get { return _statusMenu; }
             set
             {
-                _StatusMenu = value;
+                _statusMenu = value;
                 _frmLiveTelemetry.SetStatusControls(null, null);
-
             }
         }
-        private static int _StatusMenu;
+        private static int _statusMenu;
 
         /// <summary>
         /// Initializes for the window. This setups the data back-end framework, as well searches for joystick
@@ -87,32 +88,15 @@ namespace LiveTelemetry
             // This is mainly used within track parsers.
             Application.CurrentCulture = new CultureInfo("en-US");
             
-            if(false)
-            {
-                TelemetryViewer t = new TelemetryViewer();
-                t.ShowDialog();
-                return;
-            }
-
-            // Boot up the telemetry service. Wait for it to start and register events that trigger interface changes.
-            /*Telemetry.m.Run();
-            while (Telemetry.m.Sims == null) System.Threading.Thread.Sleep(1);
-            Telemetry.m.Sim_Start += mUpdateUI;
-            Telemetry.m.Sim_Stop += mUpdateUI;
-            Telemetry.m.Session_Start += mUpdateUI;
-            Telemetry.m.Session_Stop += mUpdateUI;
-            */
+            // Boot up the Telemetry Domain
             TelemetryApplication.Init();
 
+            GlobalEvents.Hook<SessionStarted>(mUpdateUI, true);
+            GlobalEvents.Hook<SessionStopped>(mUpdateUI, true);
+            GlobalEvents.Hook<SimulatorStarted>(mUpdateUI, true);
+            GlobalEvents.Hook<SimulatorStopped>(mUpdateUI, true);
+
             // TODO: Detect hardware devices (COM-ports or USB devices)
-            // GameData is used for my own hardware extension projects.
-            // Race dashboard:
-            // https://dl.dropbox.com/u/207647/IMAG0924.jpg
-            // https://dl.dropbox.com/u/207647/IMAG1204.jpg
-            // Switchboard:
-            // https://dl.dropbox.com/u/207647/IMAG0928.jpg
-            // https://dl.dropbox.com/u/207647/IMAG0934.jpg
-            //GameData g = new GameData();
 
             // Form of singleton for public StatusMenu access.
             _frmLiveTelemetry = this;
@@ -233,18 +217,18 @@ namespace LiveTelemetry
             ResumeLayout(false);
         }
 
-        void btNetwork_Click(object sender, EventArgs e)
+        private void btNetwork_Click(object sender, EventArgs e)
         {
             fNetwork ntwk = new fNetwork();
             ntwk.ShowDialog();
         }
 
-        void btSettings_Click(object sender, EventArgs e)
+        private void btSettings_Click(object sender, EventArgs e)
         {
-
+            // TODO: Need to create this panel
         }
 
-        void btGarage_Click(object sender, EventArgs e)
+        private void btGarage_Click(object sender, EventArgs e)
         {
             fGarage g = new fGarage();
             g.Show();
@@ -326,7 +310,7 @@ namespace LiveTelemetry
         /// </summary>
         private void SetupUI()
         {
-            if (TelemetryApplication.TelemetryAvailable)
+            if (TelemetryApplication.SessionAvailable)
             {
                 this.Controls.Clear();
                 this.Padding = new Padding(0);

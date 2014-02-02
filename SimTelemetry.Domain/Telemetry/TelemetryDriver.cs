@@ -18,6 +18,8 @@ namespace SimTelemetry.Domain.Telemetry
         public bool IsPlayer { get; protected set; }
         public string Name { get; protected set; }
 
+        public string CarFile { get; protected set; }
+
         public string CarTeam { get; protected set; }
         public string CarModel { get; protected set; }
         public List<string> CarClasses { get; protected set; }
@@ -131,6 +133,10 @@ namespace SimTelemetry.Domain.Telemetry
             FlagBlue = Pool.ReadAs<bool>("FlagBlue");
             FlagBlack = Pool.ReadAs<bool>("FlagBlack");
             Ignition = Pool.ReadAs<bool>("Ignition");
+
+            CarFile = Pool.ReadAs<string>("CarFile");
+            if (string.IsNullOrEmpty(CarFile))
+                CarFile = Pool.ReadAs<string>("CarFileName");
 
             CarClasses = Pool.ReadAs<string>("CarClasses").Split(" ".ToCharArray()).ToList();
             CarModel = Pool.ReadAs<string>("CarModel");

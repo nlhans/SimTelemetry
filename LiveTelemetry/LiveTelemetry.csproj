@@ -35,8 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -234,10 +234,6 @@
     <ProjectReference Include="..\SimTelemetry.Plugins.Tests\SimTelemetry.Plugins.Tests.csproj">
       <Project>{8f00bb8c-a49e-4ad7-981c-ea949a97b3c7}</Project>
       <Name>SimTelemetry.Plugins.Tests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimTelemetry\SimTelemetry.csproj">
-      <Project>{9C68C799-305F-417C-BFA5-9BF6E1280107}</Project>
-      <Name>SimTelemetry</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

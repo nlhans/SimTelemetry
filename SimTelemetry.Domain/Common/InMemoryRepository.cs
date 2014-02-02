@@ -1,17 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SimTelemetry.Domain.Common
 {
     public class InMemoryRepository<TType, TId> : IRepository<TType> where TType : IEntity<TId>
     {
-        protected IList<TType> data = new List<TType>();
+        protected ConcurrentDictionary<TId, TType> data = new ConcurrentDictionary<TId, TType>();
 
         public virtual bool Add(TType entity)
         {
             if (!this.Contains(entity))
             {
-                data.Add(entity);
+                return data.TryAdd(entity.ID, entity);
+                //data.Add(entity);
                 return true;
             }else
             {
@@ -38,7 +40,8 @@ namespace SimTelemetry.Domain.Common
         {
             lock (data)
             {
-                return data.Any(x => x.Equals(entity));
+                return data.Any(x => x.Key.Equals(entity.ID));
+                //return data.Any(x => x.Equals(entity.ID));
             }
 
         }
@@ -51,8 +54,9 @@ namespace SimTelemetry.Domain.Common
             {
                 lock (data)
                 {
-                    var index = data.IndexOf(entity);
-                    data[index] = entity;
+                    data[entity.ID] = entity;
+                    //var index = data.IndexOf(entity);
+                    //data[index] = entity;
                 }
 
                 return true;
@@ -61,11 +65,14 @@ namespace SimTelemetry.Domain.Common
 
         public virtual bool Remove(TType entity)
         {
+            TType tmp = default(TType);
+
             if (Contains(entity))
             {
                 lock (data)
                 {
-                    data.Remove(entity);
+                    data.TryRemove(entity.ID, out tmp);
+                    //data.Remove(entity);
                 }
                 return true;
             }
@@ -77,7 +84,7 @@ namespace SimTelemetry.Domain.Common
 
         public virtual IEnumerable<TType> GetAll()
         {
-            return new List<TType>(data);
+            return new List<TType>(data.Values);
         }
     }
 }

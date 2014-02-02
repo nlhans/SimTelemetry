@@ -36,7 +36,7 @@ namespace SimTelemetry.Domain.Memory
         private readonly Dictionary<string, IMemoryObject> _fields = new Dictionary<string, IMemoryObject>();
         private readonly Dictionary<string, MemoryPool> _pools = new Dictionary<string, MemoryPool>();
 
-        public IEnumerable<MemoryFieldSignaturePointer> Pointers { get; protected set; }
+        public IEnumerable<IMemoryPointer> Pointers { get; protected set; }
 
         public TOut ReadAs<TOut>()
         {
@@ -271,7 +271,7 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = signature;
-            Pointers = new List<MemoryFieldSignaturePointer>();
+            Pointers = new List<MemoryPointerSignature>();
 
             Value = new byte[size];
         }
@@ -285,12 +285,12 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryPointer(pointer, false)).ToList();
 
             Value = new byte[size];
         }
 
-        public MemoryPool(string name, MemoryAddress type, string signature, IEnumerable<MemoryFieldSignaturePointer> pointers, int size)
+        public MemoryPool(string name, MemoryAddress type, string signature, IEnumerable<IMemoryPointer> pointers, int size)
         {
             Name = name;
             Address = 0;
@@ -311,12 +311,12 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = string.Empty;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryPointer(pointer, false)).ToList();
 
             Value = new byte[Size];
         }
 
-        public MemoryPool(string name, MemoryAddress type, int address, IEnumerable<MemoryFieldSignaturePointer> pointers, int size)
+        public MemoryPool(string name, MemoryAddress type, int address, IEnumerable<IMemoryPointer> pointers, int size)
         {
             Name = name;
             Address = address;
@@ -337,7 +337,7 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = string.Empty;
-            Pointers = new List<MemoryFieldSignaturePointer>();
+            Pointers = new List<MemoryPointerSignature>();
 
             Value = new byte[Size];
         }
@@ -350,7 +350,7 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = string.Empty;
-            Pointers = new List<MemoryFieldSignaturePointer>();
+            Pointers = new List<MemoryPointerSignature>();
 
             Value = new byte[Size];
         }
@@ -363,7 +363,7 @@ namespace SimTelemetry.Domain.Memory
             Size = size;
             AddressType = type;
             Signature = string.Empty;
-            Pointers = new List<MemoryFieldSignaturePointer>();
+            Pointers = new List<MemoryPointerSignature>();
 
             Value = new byte[Size];
         }

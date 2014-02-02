@@ -57,6 +57,7 @@ namespace SimTelemetry.Plugins.Tests
 
         public Car Get(string id)
         {
+            Debug.WriteLine("Car::Get("+id+")");
             string vehFile = path + id;
 
             // Helpers for other car parts.

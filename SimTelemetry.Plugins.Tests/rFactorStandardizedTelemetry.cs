@@ -38,8 +38,10 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldConstant<bool>("IsActive", true));
 
             templateDriver.Add(new MemoryFieldLazy<int>("Index", MemoryAddress.Dynamic, 0, 0x8, 32));
-            
+
             templateDriver.Add(new MemoryFieldLazy<string>("Name", MemoryAddress.Dynamic, 0, 0x5B08, 32));
+            templateDriver.Add(new MemoryFieldLazy<string>("CarFile", MemoryAddress.Dynamic, 0, 0x5d18, 256, new[] { new MemoryPointer(0, true) })); // ptr to "GameData/Vehicles/" etc.
+            templateDriver.Add(new MemoryFieldLazy<string>("CarFileName", MemoryAddress.Dynamic, 0, 0x5d18, 64)); // ferrari_22.veh 
             templateDriver.Add(new MemoryFieldLazy<string>("CarTeam", MemoryAddress.Dynamic, 0, 0x5C22, 64));
             templateDriver.Add(new MemoryFieldLazy<string>("CarModel", MemoryAddress.Dynamic, 0, 0x5C62, 64));
             templateDriver.Add(new MemoryFieldLazy<string>("CarClasses", MemoryAddress.Dynamic, 0, 0x39BC, 64));

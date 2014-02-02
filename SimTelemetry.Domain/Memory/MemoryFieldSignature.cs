@@ -8,7 +8,7 @@ namespace SimTelemetry.Domain.Memory
     {
         public int[] AddressTree { get; protected set; }
 
-        public IEnumerable<MemoryFieldSignaturePointer> Pointers { get; protected set; }
+        public IEnumerable<IMemoryPointer> Pointers { get; protected set; }
         public string Signature { get; protected set; }
 
         public bool Initialized { get; protected set; }
@@ -93,7 +93,7 @@ namespace SimTelemetry.Domain.Memory
             Initialized = true;
         }
 
-        public MemoryFieldSignature(string name, MemoryAddress type, string signature, IEnumerable<MemoryFieldSignaturePointer> pointers, int size)
+        public MemoryFieldSignature(string name, MemoryAddress type, string signature, IEnumerable<IMemoryPointer> pointers, int size)
             : base(name, type, 0, size)
         {
             Signature = signature;
@@ -104,11 +104,11 @@ namespace SimTelemetry.Domain.Memory
             : base(name, type, 0, size)
         {
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryPointer(pointer, false)).ToList();
             Initialized = false;
         }
 
-        public MemoryFieldSignature(string name, MemoryAddress type, string signature, IEnumerable<MemoryFieldSignaturePointer> pointers, int size, Func<T,T> convert)
+        public MemoryFieldSignature(string name, MemoryAddress type, string signature, IEnumerable<IMemoryPointer> pointers, int size, Func<T,T> convert)
             : base(name, type, 0, size)
         {
             Signature = signature;
@@ -120,7 +120,7 @@ namespace SimTelemetry.Domain.Memory
             : base(name, type, 0, size)
         {
             Signature = signature;
-            Pointers = pointers.Select(pointer => new MemoryFieldSignaturePointer(pointer, false)).ToList();
+            Pointers = pointers.Select(pointer => new MemoryPointer(pointer, false)).ToList();
             Initialized = false;
             Conversion = convert;
         }

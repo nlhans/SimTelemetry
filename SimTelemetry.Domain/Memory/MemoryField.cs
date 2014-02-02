@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SimTelemetry.Domain.Memory
 {
@@ -11,6 +13,9 @@ namespace SimTelemetry.Domain.Memory
         public bool IsDynamic { get { return (AddressType == MemoryAddress.Dynamic); } }
         public bool IsStatic { get { return (AddressType == MemoryAddress.Static || AddressType == MemoryAddress.StaticAbsolute); } }
         public bool IsConstant { get { return false; } }
+
+        public int[] AddressTree { get; private set; }
+        public IEnumerable<IMemoryPointer> Pointers { get; protected set; }
 
         public MemoryPool Pool { get; protected set; }
         public int Offset { get; protected set; }
@@ -66,7 +71,32 @@ namespace SimTelemetry.Domain.Memory
         protected virtual void RefreshDynamic()
         {
             if (Pool == null || Pool.Value == null) return;
-            _Value = MemoryDataConverter.Read<T>(Pool.Value, Offset);
+
+            // TODO: Create unit tests
+            if (Pointers != null && Pointers.Any())
+            {
+                var computedAddress = MemoryDataConverter.Read<int>(Pool.Value, Offset);
+
+                foreach (var ptr in Pointers)
+                {
+                    if (ptr.Additive)
+                    {
+                        computedAddress += ptr.Offset;
+                    }
+                    else
+                    {
+                        computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
+                    }
+                }
+
+                var rawValue = Memory.Reader.ReadBytes(computedAddress, (uint)Size);
+
+                _Value = MemoryDataConverter.Read<T>(rawValue, 0);
+            }
+            else
+            {
+                _Value = MemoryDataConverter.Read<T>(Pool.Value, Offset);
+            }
         }
 
         protected virtual void RefreshStatic()
@@ -82,6 +112,22 @@ namespace SimTelemetry.Domain.Memory
                 computedAddress = AddressType == MemoryAddress.Static
                                       ? Memory.BaseAddress + Address
                                       : Address;
+            }
+
+            // TODO: Create unit tests
+            if (Pointers != null)
+            {
+                foreach (var ptr in Pointers)
+                {
+                    if (ptr.Additive)
+                    {
+                        computedAddress += ptr.Offset;
+                    }
+                    else
+                    {
+                        computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
+                    }
+                }
             }
 
             var data = Memory.Reader.ReadBytes(computedAddress, (uint)Size);
@@ -141,7 +187,7 @@ namespace SimTelemetry.Domain.Memory
             AddressType = type;
         }
 
-        public MemoryField(string name,  MemoryAddress type, int address, int offset, int size, Func<T, T> conversion)
+        public MemoryField(string name, MemoryAddress type, int address, int offset, int size, Func<T, T> conversion)
         {
             Name = name;
             ValueType = typeof(T);
@@ -152,7 +198,19 @@ namespace SimTelemetry.Domain.Memory
             AddressType = type;
         }
 
-        public MemoryField(string name,  MemoryAddress type, MemoryPool pool, int offset, int size, Func<T, T> conversion)
+        public MemoryField(string name, MemoryAddress type, int address, int offset, int size, Func<T, T> conversion, IEnumerable<IMemoryPointer> ptrs)
+        {
+            Name = name;
+            ValueType = typeof(T);
+            Address = address;
+            Size = size;
+            Offset = offset;
+            Conversion = conversion;
+            AddressType = type;
+            Pointers = ptrs;
+        }
+
+        public MemoryField(string name, MemoryAddress type, MemoryPool pool, int offset, int size, Func<T, T> conversion)
         {
             Name = name;
             ValueType = typeof(T);
@@ -165,7 +223,7 @@ namespace SimTelemetry.Domain.Memory
 
         public object Clone()
         {
-            var newObj = new MemoryField<T>(Name, AddressType, Address, Offset, Size, Conversion);
+            var newObj = new MemoryField<T>(Name, AddressType, Address, Offset, Size, Conversion, Pointers);
             return newObj;
         }
     }

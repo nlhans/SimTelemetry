@@ -19,6 +19,12 @@ namespace SimTelemetry.Domain.Logger
         public LogFileReader(string file)
         {
             FileName = file;
+
+            if (!File.Exists(file))
+            {
+                throw new LogFileException("Could not find file " + file, null);
+            }
+
             try
             {
                 zipFile = ZipStorer.Open(file, FileAccess.Read);

@@ -83,9 +83,12 @@ namespace LiveTelemetry.Gauges
             tmrUpdateConsumptionStats.Tick += TmrUpdateConsumptionStatsTick;
             tmrUpdateConsumptionStats.Start();
 
-            GlobalEvents.Hook<SessionStarted>(x => PaintBackground(0), true);
-            GlobalEvents.Hook<SessionStopped>(x => PaintBackground(0), true);
-            GlobalEvents.Hook<DrivingStarted>(x => PaintBackground(0), true);
+            //GlobalEvents.Hook<SessionStarted>(x => PaintBackground(0), true);
+            //GlobalEvents.Hook<SessionStopped>(x => PaintBackground(0), true);
+            //GlobalEvents.Hook<DrivingStarted>(x => PaintBackground(0), true);
+
+            GlobalEvents.Hook<CarLoaded>(PaintBackground, true);
+            GlobalEvents.Hook<CarUnloaded>(PaintBackground, true);
 
             _emptyGauges = new Bitmap(Size.Width, Size.Height);
         }
@@ -388,6 +391,7 @@ namespace LiveTelemetry.Gauges
                 if (TelemetryApplication.Telemetry.Player == null) return;
                 lock (g)
                 {
+                    g.DrawImage(_emptyGauges, 0, 0);
 
                     // ---------------------------------      RPM Needle    ---------------------------------
                     double rpmLive = TelemetryApplication.Telemetry.Player.EngineRpm;

@@ -207,6 +207,7 @@ namespace SimTelemetry.Domain.Aggregates
 
         public void SetSessionStatus(bool active)
         {
+            IsRunning = active;
             if (active)
             {
                 GlobalEvents.Fire(new SessionStarted(), true, 500);
@@ -215,11 +216,11 @@ namespace SimTelemetry.Domain.Aggregates
             {
                 GlobalEvents.Fire(new SessionStopped(), true, 500);
             }
-            IsRunning = active;
         }
 
         public void SetDrivingStatus(bool active)
         {
+            IsDriving = active;
             if (active)
             {
                 GlobalEvents.Fire(new DrivingStarted(), true, 500);
@@ -228,11 +229,11 @@ namespace SimTelemetry.Domain.Aggregates
             {
                 GlobalEvents.Fire(new DrivingStopped(), true, 500);
             }
-            IsDriving = active;
         }
 
         public void SetLoadingStatus(bool active)
         {
+            IsLoading = active;
             if (active)
             {
                 GlobalEvents.Fire(new LoadingStarted(), true, 500);
@@ -241,7 +242,6 @@ namespace SimTelemetry.Domain.Aggregates
             {
                 GlobalEvents.Fire(new LoadingFinished(), true, 500);
             }
-            IsLoading = active;
         }
     }
 }

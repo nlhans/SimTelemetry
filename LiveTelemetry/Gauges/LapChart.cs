@@ -120,6 +120,11 @@ namespace LiveTelemetry
                 float LineHeight = 15f;
 
                 var player = TelemetryApplication.Telemetry.Player;
+                if(player == null)
+                {
+                    g.DrawString("Could not find player memory object", f, Brushes.White, 10f, 30f);
+                    return;
+                }
                 var playerLaps = player.GetLaps();
                 var allLaps = TelemetryApplication.Telemetry.Drivers.SelectMany(x => x.GetLaps());
                 var drivers = TelemetryApplication.Telemetry.Drivers.OrderBy(x => x.Position);

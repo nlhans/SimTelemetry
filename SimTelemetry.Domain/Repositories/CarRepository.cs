@@ -19,7 +19,14 @@ namespace SimTelemetry.Domain.Repositories
 
             // Search for an ID that's identical >filename<)
             var id = GetIds().Where(x => Path.GetFileName(x) == file);
-            return GetById(id.FirstOrDefault());
+            if (id.Any())
+            {
+                return GetById(id.FirstOrDefault());
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public Car GetByName(string name)
@@ -40,6 +47,16 @@ namespace SimTelemetry.Domain.Repositories
         public IEnumerable<Car> GetByModel(string carModel)
         {
             return GetIds().Select(GetById).Where(x => x.Name.Contains(carModel));
+        }
+
+        public bool AnyByFile(string file)
+        {
+            file = file.ToLower();
+
+            // Search for an ID that's identical >filename<)
+            var id = GetIds().Where(x => Path.GetFileName(x) == file);
+
+            return id.Any();
         }
     }
 
