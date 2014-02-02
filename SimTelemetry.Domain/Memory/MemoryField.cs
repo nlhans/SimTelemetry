@@ -75,6 +75,10 @@ namespace SimTelemetry.Domain.Memory
             // TODO: Create unit tests
             if (Pointers != null && Pointers.Any())
             {
+                var treeInd = 0;
+                AddressTree = new int[Pointers.Count() + 1];
+
+                AddressTree[treeInd] = Pool.AddressTree.LastOrDefault() + Offset;
                 var computedAddress = MemoryDataConverter.Read<int>(Pool.Value, Offset);
 
                 foreach (var ptr in Pointers)
@@ -87,6 +91,7 @@ namespace SimTelemetry.Domain.Memory
                     {
                         computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
                     }
+                    AddressTree[++treeInd] = computedAddress;
                 }
 
                 var rawValue = Memory.Reader.ReadBytes(computedAddress, (uint)Size);
@@ -117,8 +122,11 @@ namespace SimTelemetry.Domain.Memory
             // TODO: Create unit tests
             if (Pointers != null)
             {
+                var treeInd = 0;
+                AddressTree = new int[Pointers.Count() + 1];
                 foreach (var ptr in Pointers)
                 {
+                    AddressTree[treeInd++] = computedAddress;
                     if (ptr.Additive)
                     {
                         computedAddress += ptr.Offset;
@@ -128,6 +136,7 @@ namespace SimTelemetry.Domain.Memory
                         computedAddress = Memory.Reader.ReadInt32(computedAddress + ptr.Offset);
                     }
                 }
+                AddressTree[treeInd] = computedAddress;
             }
 
             var data = Memory.Reader.ReadBytes(computedAddress, (uint)Size);
