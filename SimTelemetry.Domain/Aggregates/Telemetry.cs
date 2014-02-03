@@ -139,7 +139,8 @@ namespace SimTelemetry.Domain.Aggregates
                     driver.Update(this, Memory);
             }
 
-            if (Player != null)
+            // TODO: This takes a considerable amount of CPU time. Fix it.
+            if (Player != null && false)
                 foreach (var field in Player.Pool.Fields.Values.Cast<IMemoryObject>())
                     field.Read();
 

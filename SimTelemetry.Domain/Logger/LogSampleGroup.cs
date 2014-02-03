@@ -79,6 +79,11 @@ namespace SimTelemetry.Domain.Logger
             return (IDataNode) MemberwiseClone();
         }
 
+        public bool Contains(string name)
+        {
+            return _fields.ContainsKey(name);
+        }
+
         public void Update(int timestamp, bool onlyThisSample)
         {
             if ( !TimeLine_Current.ContainsKey(timestamp)) return;

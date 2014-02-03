@@ -515,7 +515,6 @@ namespace LiveTelemetry
             ucA1GP.Update();
             if (Controls.Contains(ucA1GP)) ucA1GP.Invalidate();
             if (Controls.Contains(ucTyres)) ucTyres.Invalidate();
-            ucTrackmap.Invalidate();
         }
 
         /// <summary>
@@ -526,6 +525,7 @@ namespace LiveTelemetry
         /// <param name="e"></param>
         void Tmr_MdSpeed_Tick(object sender, EventArgs e)
         {
+            ucTrackmap.Invalidate();
             ucSessionData.Invalidate();
 
         }

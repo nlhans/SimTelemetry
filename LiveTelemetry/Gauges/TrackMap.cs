@@ -41,9 +41,11 @@ namespace LiveTelemetry.Gauges
         protected float pos_x_min;
         protected float pos_y_max;
         protected float pos_y_min;
+        protected float scale_x;
+        protected float scale_y;
 
-        protected double map_width;
-        protected double map_height;
+        protected float map_width;
+        protected float map_height;
 
         protected Bitmap _BackgroundTrackMap;
 
@@ -56,10 +58,11 @@ namespace LiveTelemetry.Gauges
         Brush brush_sector2 = new SolidBrush(Color.FromArgb(47, 79, 79));
         Brush brush_sector3 = new SolidBrush(Color.FromArgb(85, 107, 47));
 
-        Font tf24 = new Font("Calibri", 24f);
-        Font tf16 = new Font("Calibri", 16f);
-        Font tf12 = new Font("Calibri", 12f);
-        Font tf18 = new Font("Calibri", 18f);
+        protected Font tf8 = new Font("Calibri", 8f);
+        protected Font tf12 = new Font("Calibri", 12f);
+        protected Font tf16 = new Font("Calibri", 16f);
+        protected Font tf18 = new Font("Calibri", 18f);
+        protected Font tf24 = new Font("Calibri", 24f);
 
         #endregion
 
@@ -70,26 +73,17 @@ namespace LiveTelemetry.Gauges
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            UpdateStyles();
 
-            SizeChanged += TrackMap_SizeChanged;
+            SizeChanged += TrackMapSizeChanged;
 
-            GlobalEvents.Hook<SessionStarted>(e => m_Track_Load(0), true);
-            GlobalEvents.Hook<DrivingStarted>(e => m_Track_Load(0), true);
-
-            _mUpdateBackground = new Timer {Interval = 1000};
-            _mUpdateBackground.Tick += new EventHandler(_mUpdateBackground_Tick);
-            _mUpdateBackground.Start();
-        }
-
-        void _mUpdateBackground_Tick(object sender, EventArgs e)
-        {
-            if (!IsValidTrackmap())
-                UpdateTrackmap();
+            GlobalEvents.Hook<TrackLoaded>(e => m_Track_Load(0), true);
+            GlobalEvents.Hook<TrackUnloaded>(e => m_Track_Load(0), true);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-
             Graphics g = e.Graphics;
 
             if (_BackgroundTrackMap == null)
@@ -98,7 +92,11 @@ namespace LiveTelemetry.Gauges
             }
             else
             {
-                g.DrawImage(_BackgroundTrackMap, 0, 0);
+                CompositingMode compMode = g.CompositingMode;
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                g.CompositingMode = CompositingMode.SourceCopy;
+                g.DrawImage(_BackgroundTrackMap, new Rectangle(Point.Empty, _BackgroundTrackMap.Size));
+                g.CompositingMode = compMode;
             }
         }
 
@@ -126,8 +124,8 @@ namespace LiveTelemetry.Gauges
             pos_x_min = TelemetryApplication.Track.TrackCoordinateMinX;
             pos_y_min = TelemetryApplication.Track.TrackCoordinateMinY;
 
-            double scale_x = pos_x_max - pos_x_min;
-            double scale_y = pos_y_max - pos_y_min;
+            scale_x = pos_x_max - pos_x_min;
+            scale_y = pos_y_max - pos_y_min;
             double scale = Math.Max(scale_x, scale_y);
 
             if (this.Height > this.Width)
@@ -144,13 +142,12 @@ namespace LiveTelemetry.Gauges
 
             }
 
-            Font f = new Font("Tahoma", 9f);
-            List<PointF> sector1a = new List<PointF>();
-            List<PointF> sector2a = new List<PointF>();
-            List<PointF> sector3a = new List<PointF>();
-            List<PointF> sector1b = new List<PointF>();
-            List<PointF> sector2b = new List<PointF>();
-            List<PointF> sector3b = new List<PointF>();
+            var sector1a = new List<PointF>();
+            var sector2a = new List<PointF>();
+            var sector3a = new List<PointF>();
+            var sector1b = new List<PointF>();
+            var sector2b = new List<PointF>();
+            var sector3b = new List<PointF>();
 
             TrackMapPainted = TelemetryApplication.Track.ID;
 
@@ -160,17 +157,12 @@ namespace LiveTelemetry.Gauges
                 if (wp.BoundsL == null || wp.BoundsR == null) continue;
 
                 // Left side
-                float x1 =
-                    Convert.ToSingle(10 + ((wp.BoundsL[0] - pos_x_min) / scale_x) * (map_width - 20));
-                float y1 =
-                    Convert.ToSingle(100 +
-                                     (1 - (wp.BoundsL[1] - pos_y_min) / scale_y) * (map_height - 20));
+                float x1 = GetImageX(wp.BoundsL[0]);
+                float y1 = GetImageY(wp.BoundsL[1]);
+
                 // Right side
-                float x2 =
-                    Convert.ToSingle(10 + ((wp.BoundsR[0] - pos_x_min) / scale_x) * (map_width - 20));
-                float y2 =
-                    Convert.ToSingle(100 +
-                                     (1 - (wp.BoundsR[1] - pos_y_min) / scale_y) * (map_height - 20));
+                float x2 = GetImageX(wp.BoundsR[0]);
+                float y2 = GetImageY(wp.BoundsR[1]);
 
                 // Add by sector
                 switch (wp.Type)
@@ -229,7 +221,17 @@ namespace LiveTelemetry.Gauges
             Invalidate();
         }
 
-        private void TrackMap_SizeChanged(object sender, EventArgs e)
+        protected float GetImageY(float y)
+        {
+            return 100.0f + (1.0f - (y - pos_y_min) / scale_y) * (map_height - 20.0f);
+        }
+
+        protected float GetImageX(float x)
+        {
+            return 10.0f + ((x - pos_x_min) / scale_x) * (map_width - 20.0f);
+        }
+
+        private void TrackMapSizeChanged(object sender, EventArgs e)
         {
             UpdateTrackmap();
         }

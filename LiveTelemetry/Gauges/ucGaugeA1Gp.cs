@@ -78,6 +78,7 @@ namespace LiveTelemetry.Gauges
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            this.UpdateStyles();
 
             tmrUpdateConsumptionStats = new Timer{Interval=500, Enabled=true};
             tmrUpdateConsumptionStats.Tick += TmrUpdateConsumptionStatsTick;
@@ -391,7 +392,11 @@ namespace LiveTelemetry.Gauges
                 if (TelemetryApplication.Telemetry.Player == null) return;
                 lock (g)
                 {
-                    g.DrawImage(_emptyGauges, 0, 0);
+                    CompositingMode compMode = g.CompositingMode;
+                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.CompositingMode = CompositingMode.SourceCopy;
+                    g.DrawImage(_emptyGauges, new Rectangle(Point.Empty, _emptyGauges.Size));
+                    g.CompositingMode = compMode;
 
                     // ---------------------------------      RPM Needle    ---------------------------------
                     double rpmLive = TelemetryApplication.Telemetry.Player.EngineRpm;

@@ -101,20 +101,19 @@ namespace LiveTelemetry
 
             if (TelemetryAvailable && Telemetry.Player != null)
             {
-                IEnumerable<Car> cars;
                 // Get car
                 // TODO Provide an interface/abstraction for searching the right car.
                 // based on priorities and different set of rules, 
                 // TelemetryDriver, and others 'drivers', should implement this interface to let the CarRepo search the right car.
-                if (!string.IsNullOrEmpty(Telemetry.Player.CarFile) && 
+                if (!string.IsNullOrEmpty(Telemetry.Player.CarFile) &&
                     Cars.AnyByFile(Telemetry.Player.CarFile))
                 {
-                        carAvail = true;
-                        Car = Cars.GetByFile(Telemetry.Player.CarFile);
+                    carAvail = true;
+                    Car = Cars.GetByFile(Telemetry.Player.CarFile);
                 }
                 else
                 {
-                    cars = Cars.GetByClasses(Telemetry.Player.CarClasses);
+                    var cars = Cars.GetByClasses(Telemetry.Player.CarClasses);
 
                     if (cars.Any())
                     {
@@ -122,7 +121,6 @@ namespace LiveTelemetry
                         {
                             carAvail = true;
                             Car = cars.FirstOrDefault();
-
                         }
                         else
                         {
@@ -130,7 +128,7 @@ namespace LiveTelemetry
 
                             if (!cars.Any())
                             {
-                                // Error..
+                                Debug.WriteLine("Could not find car for this session.");
                             }
                             else
                             {
@@ -153,12 +151,11 @@ namespace LiveTelemetry
                 CarAvailable = carAvail;
                 if (carAvail)
                 {
-                    GlobalEvents.Fire<CarLoaded>(new CarLoaded(Car), true);
+                    GlobalEvents.Fire(new CarLoaded(Car), true);
                 }
                 else
                 {
-
-                    GlobalEvents.Fire<CarUnloaded>(new CarUnloaded(Car), true);
+                    GlobalEvents.Fire(new CarUnloaded(Car), true);
                 }
             }
             if (trackAvail != TrackAvailable)
@@ -166,12 +163,11 @@ namespace LiveTelemetry
                 TrackAvailable = trackAvail;
                 if (carAvail)
                 {
-                    GlobalEvents.Fire<TrackLoaded>(new TrackLoaded(Track), true);
+                    GlobalEvents.Fire(new TrackLoaded(Track), true);
                 }
                 else
                 {
-
-                    GlobalEvents.Fire<TrackUnloaded>(new TrackUnloaded(Track), true);
+                    GlobalEvents.Fire(new TrackUnloaded(Track), true);
                 }
             }
         }

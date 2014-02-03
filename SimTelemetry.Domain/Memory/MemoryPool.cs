@@ -394,6 +394,12 @@ namespace SimTelemetry.Domain.Memory
             CloneContents(target);
             return (IDataNode)target;
         }
+
+        public bool Contains(string name)
+        {
+            return _fields.ContainsKey(name);
+        }
+
         protected void CloneContents(MemoryPool target)
         {
             foreach (var pool in Pools)

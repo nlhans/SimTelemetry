@@ -22,6 +22,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 using LiveTelemetry.Gauges;
 using SimTelemetry.Domain.Enumerations;
@@ -31,6 +32,10 @@ namespace LiveTelemetry
 {
     public class LiveTrackMap : TrackMap
     {
+        public const float Bubblesize = 34f;
+        public const float ArrowSize = Bubblesize / 2;
+        private const float ArrowAngle = (float) (50.0f / 180.0f * Math.PI);
+
         public LiveTrackMap()
         {
             BackgroundImage = _BackgroundTrackMap;
@@ -38,93 +43,88 @@ namespace LiveTelemetry
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            if (!TelemetryApplication.SessionAvailable) return;
+            base.OnPaint(e);
+            if (!TelemetryApplication.TelemetryAvailable) return;
+
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            var pDarkRed = new Pen(Color.DarkRed, 3f);
+            var pDarkGreen = new Pen(Color.DarkGreen, 3f);
+
             try
             {
-
-                Graphics g = e.Graphics;
-                if (!TelemetryApplication.TelemetryAvailable) return;
-                if (_BackgroundTrackMap == null)
-                {
-                    g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
-                }
-                else
-                {
-                    CompositingMode compMode = g.CompositingMode;
-                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                    g.CompositingMode = CompositingMode.SourceCopy;
-                    g.DrawImage(_BackgroundTrackMap, 0, 0);
-                    g.CompositingMode = compMode;
-
-                }
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-
-                var f = new Font("Arial", 12f);
-                var ft = new Font("Arial", 7f);
-
-                Pen pDarkRed = new Pen(Color.DarkRed, 3f);
-                Pen pDarkGreen = new Pen(Color.DarkGreen, 3f);
-                float bubblesize = 34f;
-                // get all drivers and draw a dot!
                 lock (TelemetryApplication.Telemetry.Drivers)
                 {
-                    foreach (TelemetryDriver driver in TelemetryApplication.Telemetry.Drivers)
+                    foreach (var driver in TelemetryApplication.Telemetry.Drivers)
                     {
-                        if (driver.Position != 0 && driver.Position <= 120 && Math.Abs( driver.CoordinateX)>=0.1)
-                        {
-                            float a1 = Convert.ToSingle(10 + ((driver.CoordinateX - pos_x_min) / (pos_x_max - pos_x_min)) * (map_width - 20));
-                            float a2 = Convert.ToSingle(100 + (1 - (driver.CoordinateY - pos_y_min) / (pos_y_max - pos_y_min)) * (map_height - 20));
+                        if (driver.Position == 0 || driver.Position > 120 || !(Math.Abs(driver.CoordinateX) >= 0.1))
+                            continue;
 
+                        var a1 = GetImageX(driver.CoordinateX);
+                        var a2 = GetImageY(driver.CoordinateY);
 
-                            Brush c;
-                            if (driver.Position == TelemetryApplication.Telemetry.Player.Position) // Player
-                                c = Brushes.Magenta;
-                            else if (driver.Speed < 5) // Stopped
-                                c = Brushes.Red;
-                            else if (driver.FlagYellow) // Local yellow flag
-                                c = Brushes.Yellow;
-                            else if (TelemetryApplication.Telemetry.Session.Info.Type == SessionType.RACE && driver.GetSplitTime(TelemetryApplication.Telemetry.Player) >= 10000) // InRace && lapped vehicle
-                                c = new SolidBrush(Color.FromArgb(80, 80, 80));
-                            else if (driver.Position > TelemetryApplication.Telemetry.Player.Position) // In front of player.
-                                c = Brushes.YellowGreen;
-                            else // Behind player, but not lapped.
-                                c = new SolidBrush(Color.FromArgb(90, 120, 120));
+                        Brush c;
+                        if (driver.Position == TelemetryApplication.Telemetry.Player.Position)      // Player
+                            c = Brushes.Magenta;
+                        else if (driver.Speed < 5)                                                  // Stopped
+                            c = Brushes.Red;
+                        else if (driver.FlagYellow)                                                 // Local yellow flag
+                            c = Brushes.Yellow;
+                        else if (TelemetryApplication.Telemetry.Session.Info.Type == SessionType.RACE &&
+                                 driver.GetSplitTime(TelemetryApplication.Telemetry.Player) >= 10000)
+                            c = new SolidBrush(Color.FromArgb(80, 80, 80));                         // InRace && lapped vehicle
+                        else if (driver.Position > TelemetryApplication.Telemetry.Player.Position)
+                            c = Brushes.YellowGreen;                                                // In front of player.
+                        else
+                            c = new SolidBrush(Color.FromArgb(90, 120, 120));                       // Behind player, but not lapped.
 
-                            double arrowSize = bubblesize/2;
-                            double arrowAngle = 50.0f / 180.0f * Math.PI;
-                            double heading_angle = driver.Heading;
-                            //heading_angle =  driver.Heading*Math.PI/2;
-                            PointF[] arrow = new PointF[3];
-                            arrow[0] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle) * (arrowSize + 10)), Convert.ToSingle(a2 + Math.Cos(heading_angle) * (arrowSize + 10)));
-                            arrow[1] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle + arrowAngle) * arrowSize), Convert.ToSingle(a2 + Math.Cos(heading_angle + arrowAngle) * arrowSize));
-                            arrow[2] = new PointF(Convert.ToSingle(a1 + Math.Sin(heading_angle - arrowAngle) * arrowSize), Convert.ToSingle(a2 + Math.Cos(heading_angle - arrowAngle) * arrowSize));
+                        var arrow = new PointF[3];
+                        arrow[0] = new PointF(Convert.ToSingle(a1 + Math.Sin(driver.Heading)*(ArrowSize + 10)),
+                                              Convert.ToSingle(a2 + Math.Cos(driver.Heading)*(ArrowSize + 10)));
+                        arrow[1] =
+                            new PointF(Convert.ToSingle(a1 + Math.Sin(driver.Heading + ArrowAngle)*ArrowSize),
+                                       Convert.ToSingle(a2 + Math.Cos(driver.Heading + ArrowAngle)*ArrowSize));
+                        arrow[2] =
+                            new PointF(Convert.ToSingle(a1 + Math.Sin(driver.Heading - ArrowAngle)*ArrowSize),
+                                       Convert.ToSingle(a2 + Math.Cos(driver.Heading - ArrowAngle)*ArrowSize));
 
-                            g.FillPolygon(Brushes.White, arrow, FillMode.Winding); ;
+                        g.FillPolygon(Brushes.White, arrow, FillMode.Winding);
 
+                        a1 -= Bubblesize/2f;
+                        a2 -= Bubblesize/2f;
 
-                            a1 -= bubblesize / 2f;
-                            a2 -= bubblesize / 2f;
+                        g.FillEllipse(c, a1, a2, Bubblesize, Bubblesize);
+                        g.DrawEllipse(new Pen(Color.White, 1f), a1, a2, Bubblesize, Bubblesize);
 
-                            g.FillEllipse(c, a1, a2, bubblesize, bubblesize);
-                            g.DrawEllipse(new Pen(Color.White, 1f), a1, a2, bubblesize, bubblesize);
+                        g.DrawString(driver.Position.ToString("00"), tf12, Brushes.White, a1 + 5, a2 + 2);
 
-                            g.DrawString(driver.Position.ToString(), f, Brushes.White, a1 + 5, a2 + 2);
+                        // Brake bar
+                        if (driver.InputBrake > 0)
+                            g.DrawLine(pDarkRed,
+                                       a1 + Bubblesize/2f - 10,
+                                       a2 + 3 + Bubblesize/2f,
+                                       a1 + Bubblesize/2f - 10 + Convert.ToInt32(driver.InputBrake*20),
+                                       a2 + 3 + Bubblesize/2f);
 
-                            g.DrawLine(pDarkRed, a1 + bubblesize / 2f - 10, a2 + 3 + bubblesize / 2f,
-                                       a1 + bubblesize / 2f - 10 + Convert.ToInt32(driver.InputBrake * 20),
-                                       a2 + 3 + bubblesize / 2f);
-                            g.DrawLine(pDarkGreen, a1 + bubblesize / 2f - 10, a2 + 3 + bubblesize / 2f,
-                                       a1 + bubblesize / 2f - 10 + Convert.ToInt32(driver.InputThrottle * 20),
-                                       a2 + 3 + bubblesize / 2f);
-                            g.DrawString((driver.Speed * 3.6).ToString("000"), ft, Brushes.White, a1 + bubblesize / 2f - 10,
-                                         a2 + bubblesize / 2f + 5);
+                        // Throttle bar
+                        if (driver.InputThrottle > 0)
+                            g.DrawLine(pDarkGreen,
+                                       a1 + Bubblesize/2f - 10,
+                                       a2 + 3 + Bubblesize/2f,
+                                       a1 + Bubblesize/2f - 10 + Convert.ToInt32(driver.InputThrottle*20),
+                                       a2 + 3 + Bubblesize/2f);
 
-                        }
+                        // Speed
+                        g.DrawString((driver.Speed*3.6).ToString("000"), tf8, Brushes.White,
+                                     a1 + Bubblesize/2f - 10,
+                                     a2 + Bubblesize/2f + 5);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Graphics g = e.Graphics;
                 g.FillRectangle(Brushes.Black, 0, 0, this.Width, this.Height);
 
                 Font f = new Font("Arial", 10f);

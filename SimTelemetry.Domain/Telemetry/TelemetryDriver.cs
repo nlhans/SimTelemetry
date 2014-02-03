@@ -149,7 +149,7 @@ namespace SimTelemetry.Domain.Telemetry
             if (Pool is MemoryPool && (Pool as MemoryPool).Pools.ContainsKey("Laps"))
                 LapsList = (Pool as MemoryPool).Pools["Laps"].ReadAs<List<Lap>>("List");
 
-            if (Pool.Fields.ContainsKey("TrackSector"))
+            if (Pool.Contains("TrackSector"))
             {
                 TrackPosition = Pool.ReadAs<TrackPointType>("TrackSector");
             }

@@ -34,116 +34,139 @@ namespace SimTelemetry.Plugins.Tests
 
         public Track Get(string id)
         {
-            System.Threading.Thread.Sleep(10);
             Debug.WriteLine("Track::Get(\"" + id + "\")");
-            //
-            var scan = new IniScannerOld { IniFile = FilePath + id };
-            scan.Read();
 
-            // Read data:
-            var name = scan.TryGetString("TrackName");
-            var location = scan.TryGetString("Location");
-            var laprecordRace = 0.0f;
-            var laprecordQualify = 0.0f;
-            float.TryParse(scan.TryGetString("Race Laptime").Trim(), out laprecordRace);
-            float.TryParse(scan.TryGetString("Qualify Laptime").Trim(), out laprecordQualify);
+            string name = string.Empty, location = string.Empty;
+            float laprecordRace = 0.0f, laprecordQualify = 0.0f;
 
-            // Read track path:
             var path = new List<TrackPoint>();
-            TrackPoint trackPoint = null;
-            
             // Temporary variables: 
-            float x = 0.0f, y = 0.0f, z = 0.0f, meter = 0.0f;
+            TrackPoint trackPoint = null;
             TrackPointType type = TrackPointType.GRID;
+
+            float x = 0.0f, y = 0.0f, z = 0.0f, meter = 0.0f;
             float[] boundsL = new float[0], boundsR = new float[0];
             var perpVector = new float[3] { 0.0f, 0.0f, 0.0f };
 
-            var track_aiw = new IniScannerOld { IniFile = FilePath + id.Replace("gdb", "aiw") };
-            track_aiw.HandleCustomKeys += (d) =>
-                                              {
+            // Parse main file.
+            using (var gdbFile = new IniReader(FilePath + id, true))
+            {
+                gdbFile.AddHandler(setting =>
+                                       {
+                                           switch (setting.Key)
+                                           {
+                                               case "TrackName":
+                                                   name = setting.ReadAsString();
+                                                   break;
 
-                                                  var a = (object[]) d;
-                                                  var key = (string) a[0];
-                                                  var values = (string[]) a[1];
+                                               case "Location":
+                                                   location = setting.ReadAsString();
+                                                   break;
 
+                                               case "Race Laptime":
+                                                   laprecordRace = setting.ReadAsFloat();
+                                                   break;
 
-                                                  switch (key)
-                                                  {
-                                                      // pos = coordinates)
-                                                      case "Main.wp_pos":
-                                                          x = Convert.ToSingle(values[0]);
-                                                          z = Convert.ToSingle(values[1]);
-                                                          y = Convert.ToSingle(values[2]);
-                                                          break;
+                                               case "Qualify Laptime":
+                                                   laprecordQualify = setting.ReadAsFloat();
+                                                   break;
+                                           }
+                                       });
+                gdbFile.Parse();
+            }
 
-                                                      // score = sector, distance
-                                                      case "Main.wp_score":
-                                                          var sector = Convert.ToInt32(values[0]) + 1;
-                                                          if (sector == 1) type = TrackPointType.SECTOR1;
-                                                          if (sector == 2) type = TrackPointType.SECTOR2;
-                                                          if (sector == 3) type = TrackPointType.SECTOR3;
-                                                          meter = Convert.ToSingle(values[1]);
-                                                          break;
+            using(var aiwFile = new IniReader(FilePath+id.Replace("gdb","aiw"), true))
+            {
+                aiwFile.AddHandler(setting =>
+                                       {
+                                           if (setting.Group != "Waypoint") return;
+                                           //Debug.WriteLine(setting.Key);
+                                           switch(setting.Key)
+                                           {
+                                               // pos = coordinates)
+                                               case "wp_pos":
+                                                   x = setting.ReadAsFloat(0);
+                                                   z = setting.ReadAsFloat(1);
+                                                   y = setting.ReadAsFloat(2);
+                                                   break;
 
-                                                      // branchID = path ID, 0=main, 1=pitlane
-                                                      case "Main.wp_branchid":
-                                                          if (values.Length == 1)
-                                                          {
-                                                              switch (values[0])
-                                                              {case "0":
-                                                                      // do nothing
-                                                                      break;
-                                                                  case "1":
-                                                                      type = TrackPointType.PITS;
-                                                                      break;
+                                               // score = sector, distance
+                                               case "wp_score":
+                                                   switch (setting.ReadAsInteger(0))
+                                                   {
+                                                       case 0:
+                                                           type = TrackPointType.SECTOR1;
+                                                           break;
 
-                                                                  default:
-                                                                      // TODO: Double check this.
-                                                                      type = TrackPointType.GRID;
-                                                                      break;
-                                                              }
-                                                          }
-                                                          else
-                                                              type = TrackPointType.GRID;
-                                                          break;
+                                                       case 1:
+                                                           type = TrackPointType.SECTOR2;
+                                                           break;
 
-                                                      case "Main.wp_perp":
+                                                       case 2:
+                                                           type = TrackPointType.SECTOR3;
+                                                           break;
+                                                   }
+                                                   meter = setting.ReadAsInteger(1);
+                                                   break;
 
-                                                          perpVector = new float[3]
+                                               // branchID = path ID, 0=main, 1=pitlane
+                                               case "wp_branchid":
+
+                                                   if (setting.ValueCount== 1)
+                                                   {
+                                                       switch (setting.ReadAsString(0))
+                                                       {
+                                                           case "0":
+                                                               // do nothing
+                                                               break;
+                                                           case "1":
+                                                               type = TrackPointType.PITS;
+                                                               break;
+
+                                                           default:
+                                                               // TODO: Double check this.
+                                                               type = TrackPointType.GRID;
+                                                               break;
+                                                       }
+                                                   }
+                                                   else
+                                                       type = TrackPointType.GRID;
+                                                   break;
+
+                                               case "wp_perp":
+
+                                                   perpVector = new float[3]
                                                                            {
-                                                                               Convert.ToSingle(values[0]),
-                                                                               Convert.ToSingle(values[1]),
-                                                                               Convert.ToSingle(values[2])
+                                                                               setting.ReadAsFloat(0),
+                                                                               setting.ReadAsFloat(1),
+                                                                               setting.ReadAsFloat(2)
                                                                            };
-                                                          break;
+                                                   break;
 
-                                                      case "Main.wp_width":
-                                                          boundsL = new float[2]
+                                               case "wp_width":
+                                                   boundsL = new float[2]
                                                                         {
-                                                                            x - perpVector[0]*Convert.ToSingle(values[0]),
-                                                                            y - perpVector[2]*Convert.ToSingle(values[0])
+                                                                            x - perpVector[0]*setting.ReadAsFloat(0),
+                                                                            y - perpVector[2]*setting.ReadAsFloat(0)
                                                                         };
-                                                          boundsR = new float[2]
+                                                   boundsR = new float[2]
                                                                         {
-                                                                            x + perpVector[0]*Convert.ToSingle(values[1]),
-                                                                            y + perpVector[2]*Convert.ToSingle(values[1])
+                                                                            x + perpVector[0]*setting.ReadAsFloat(1),
+                                                                            y + perpVector[2]*setting.ReadAsFloat(1)
                                                                         };
-                                                          break;
+                                                   break;
 
-                                                      // ptrs = next path, previous path, pitbox route (-1 for no pitbox), following branchID
-                                                      case "Main.wp_ptrs":
-                                                          path.Add(new TrackPoint(meter, type, x, y, z, boundsL, boundsR));
-                                                          break;
+                                               // ptrs = next path, previous path, pitbox route (-1 for no pitbox), following branchID
+                                               case "wp_ptrs":
+                                               case "WP_PTRS":
+                                                   path.Add(new TrackPoint(meter, type, x, y, z, boundsL, boundsR));
+                                                   break;
 
-                                                  }
-                                              };
-            track_aiw.FireEventsForKeys = new List<string>();
-            track_aiw.FireEventsForKeys.AddRange(new string[6]
-                                                         {
-                                                             "Main.wp_pos", "Main.wp_score", "Main.wp_branchid",
-                                                             "Main.wp_perp", "Main.wp_width", "Main.wp_ptrs"
-                                                         });
-            track_aiw.Read();
+                                           }
+                                       });
+                aiwFile.Parse();
+            }
+
 
             var t = new Track(id, name, name.Replace(" ","_")+".png", location, laprecordRace, laprecordQualify, "1.0");
             t.SetTrack(path);

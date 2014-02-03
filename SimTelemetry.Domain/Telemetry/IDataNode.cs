@@ -14,5 +14,6 @@ namespace SimTelemetry.Domain.Telemetry
         byte[] ReadBytes(string field);
         void GetDebugInfo(XmlWriter file);
         IDataNode Clone(string newName, int newAddress);
+        bool Contains(string name);
     }
 }

@@ -9,7 +9,7 @@ namespace LiveTelemetry.Gauges
     {
         public static T MinBy<T>(this IEnumerable<T> source, Func<T, float> selector)
         {
-            if (source == null || !source.Any()) throw new ArgumentException("mag niet");
+            if (source == null || !source.Any()) throw new ArgumentException("Cannot be supplied with empty source");
             var min = float.MaxValue;
             var result = default(T);
 

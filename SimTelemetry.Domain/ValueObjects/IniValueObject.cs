@@ -13,6 +13,8 @@ namespace SimTelemetry.Domain.Utils
         public string Key { get; private set; }
         public string RawValue { get; private set; }
 
+        public int ValueCount { get { return ValueArray.Count(); } }
+
         protected string Value { get; private set; }
         protected string[] ValueArray { get; private set; }
         public bool IsTuple { get; private set; }
@@ -26,9 +28,9 @@ namespace SimTelemetry.Domain.Utils
             var value = rawValue;
 
             // Does this rawValue contain multiple values?
-            if (value.StartsWith("(") && value.EndsWith(")") && value.Length > 2)
+            if (value.StartsWith("(") && value.EndsWith(")", StringComparison.Ordinal) && value.Length > 2)
                 value = value.Substring(1, value.Length - 2);
-            if (value.StartsWith("\"") && value.EndsWith("\"") && value.Length > 2)
+            if (value.StartsWith("\"") && value.EndsWith("\"", StringComparison.Ordinal) && value.Length > 2)
                 value = value.Substring(1, value.Length - 2);
 
             if (value.Contains(","))
@@ -41,7 +43,7 @@ namespace SimTelemetry.Domain.Utils
                 for (var i = 0; i < values.Length; i++)
                 {
                     var val = values[i];
-                    if (val.StartsWith("\"") && val.EndsWith("\"") && val.Length > 2)
+                    if (val.StartsWith("\"") && val.EndsWith("\"", StringComparison.Ordinal) && val.Length > 2)
                         val = val.Substring(1, val.Length - 2);
 
                     ValueArray[i] = val.Trim();

@@ -34,6 +34,11 @@ namespace SimTelemetry.Tests.Telemetry
             return this;
         }
 
+        public bool Contains(string name)
+        {
+            return Fields.ContainsKey(name);
+        }
+
         public void GetDebugInfo(XmlWriter file)
         {
             

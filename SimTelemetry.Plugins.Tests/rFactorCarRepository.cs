@@ -77,14 +77,40 @@ namespace SimTelemetry.Plugins.Tests
             {
                 vehIni.AddHandler(x =>
                                        {
-                                           if (x.Key == "Team") team = x.ReadAsString();
-                                           if (x.Key == "Driver") driver = x.ReadAsString();
-                                           if (x.Key == "Description") description = x.ReadAsString();
-                                           if (x.Key == "Number") number = x.ReadAsInteger();
-                                           if (x.Key == "Classes") classes.AddRange(x.ReadAsString().Split(" ".ToCharArray())); // TODO: Test this better
-                                           if (x.Key == "HDVehicle") hdvFile = x.ReadAsString();
-                                           if (x.Key == "Engine") engineName = x.ReadAsString();
-                                           if (x.Key == "Manufacturer") engineManufacturer = x.ReadAsString();
+                                           switch(x.Key)
+                                           {
+                                               case "Team":
+                                                   team =  x.ReadAsString();
+                                                   break;
+
+                                               case "Driver":
+                                                   driver = x.ReadAsString();
+                                                   break;
+
+                                               case "Description":
+                                                   description = x.ReadAsString();
+                                                   break;
+
+                                               case "Number":
+                                                   number = x.ReadAsInteger();
+                                                   break;
+
+                                               case "Classes":
+                                                   classes.AddRange(x.ReadAsString().Split(" ".ToCharArray()));
+                                                   break;
+
+                                               case "HDVehicle":
+                                                   hdvFile = x.ReadAsString();
+                                                   break;
+
+                                               case "Engine":
+                                                   engineName = x.ReadAsString();
+                                                   break;
+
+                                               case "Manufacturer":
+                                                   engineManufacturer = x.ReadAsString();
+                                                   break;
+                                           }
                                        });
 
                 vehIni.Parse();
