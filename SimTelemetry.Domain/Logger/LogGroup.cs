@@ -170,7 +170,8 @@ namespace SimTelemetry.Domain.Logger
             structureFile.WriteEndDocument();
             structureFile.Flush();
 
-            var xmlData = Encoding.ASCII.GetBytes(xmlText.ToString());
+            var xmlString = xmlText.ToString();
+            var xmlData = Encoding.ASCII.GetBytes(xmlString);
             GlobalEvents.Fire(new LogFileWriteAction(FileWriter, Name, LogFileType.Structure, xmlData, 0), false);
 
             Subscribed = false;

@@ -103,7 +103,6 @@
     <Compile Include="Telemetry\MockDataSource.cs" />
     <Compile Include="Telemetry\TelemetryArchiveTests.cs" />
     <Compile Include="Telemetry\TelemetryLoggerTests.cs" />
-    <Compile Include="Telemetry\TelemetryTests.cs" />
     <Compile Include="TestConstants.cs" />
     <Compile Include="Utils\IniReaderTests.cs" />
     <Compile Include="Utils\ZipStorerTests.cs" />

@@ -23,7 +23,7 @@ namespace SimTelemetry.Domain.Memory
             IsDirty = true;
         }
 
-        public void Refresh(MemoryProvider master)
+        public virtual void Refresh(MemoryProvider master)
         {
             IsDirty = false;
         }

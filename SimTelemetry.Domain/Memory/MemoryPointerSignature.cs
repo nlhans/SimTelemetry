@@ -12,7 +12,7 @@
             MarkDirty();
         }
 
-        public void Refresh(MemoryProvider master)
+        public override void Refresh(MemoryProvider master)
         {
             if (IsDirty && master.Scanner.Enabled && Signature != string.Empty)
             {

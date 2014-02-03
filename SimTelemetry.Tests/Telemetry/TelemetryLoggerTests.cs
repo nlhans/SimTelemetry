@@ -63,7 +63,7 @@ namespace SimTelemetry.Tests.Telemetry
 
             var logger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, true, true, true));
             logger.SetDatasource(provider);
-            logger.SetTemporaryLocations("LapTests.zip", "SimTelemetry.Tests.Telemetry.TelemetryLoggerTests");
+            logger.SetTemporaryLocations("LapTests.zip", "SimTelemetry.Tests.Telemetry.TelemetryLoggerTests_LapTests");
             
             //logger.SetAnnotater(new TelemetryArchive());
             GlobalEvents.Fire(new SessionStarted(), true);
@@ -73,7 +73,8 @@ namespace SimTelemetry.Tests.Telemetry
                 logger.Update(i * 25);
 
             GlobalEvents.Fire(new SessionStopped(), true);
-            Thread.Sleep(500);
+
+            logger.Close();
 
             Assert.AreEqual(6, lapsRecorded.Count);
             Assert.AreEqual(0, lapsRecorded[0].LapNumber);
@@ -91,41 +92,6 @@ namespace SimTelemetry.Tests.Telemetry
             Assert.AreEqual(-1, lapsRecorded[5].Total);
         }
 
-        [Test]
-        public void Record()
-        {
-            if (Process.GetProcessesByName("rfactor").Length == 0) Assert.Ignore();
-            var rFactorProcess = Process.GetProcessesByName("rfactor")[0];
-
-            IntPtr alloc = Marshal.AllocHGlobal(512 * 1024 * 1024);
-
-            using (var host = new Plugins())
-            {
-                host.PluginDirectory = TestConstants.SimulatorsBinFolder;
-
-                host.Load();
-
-                // Simulators are now loaded
-
-                var testPlugin = host.Simulators.FirstOrDefault(x => x.Name == "Test simulator");
-                Assert.AreNotEqual(null, testPlugin);
-                testPlugin.SimulatorStart(rFactorProcess);
-
-                var telSource = new Domain.Aggregates.Telemetry(testPlugin.TelemetryProvider, rFactorProcess);
-                var telLogger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, false, true, false));
-                telLogger.SetAnnotater(new TelemetryArchive());
-                telLogger.SetTemporaryLocations("Logger.zip", "SimTelemetry.Tests.Telemetry.TelemetryLoggerTests");
-                telSource.SetLogger(telLogger);
-
-                Thread.Sleep(500);
-
-                telLogger.Close();
-                telSource = null;
-            }
-
-            Marshal.FreeHGlobal(alloc);
-        }
-
 
         private void GetWaves(out float[] rpmWave, out float[] speedWave)
         {
@@ -139,15 +105,9 @@ namespace SimTelemetry.Tests.Telemetry
             }
         }
 
-        [Test]
-        public void TestData()
-        {
-            RecordTestData();
-            PlaybackTestData();
-        }
-
         public void RecordTestData()
         {
+            Thread.Sleep(1000);
             float[] rpmWave;
             float[] speedWave;
             GetWaves(out rpmWave, out speedWave);
@@ -165,7 +125,7 @@ namespace SimTelemetry.Tests.Telemetry
             var fakeDrivers = new List<TelemetryDriver>(new[] {fakeDriver});
 
             TelemetryLogger logger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, true, true, true));
-            logger.SetTemporaryLocations("TelemetryLoggerTests_Tmp.zip","TelemetryLoggerTests_TmpDir");
+            logger.SetTemporaryLocations("TelemetryLoggerTests_Tmp.zip", "TelemetryLoggerTests_Record" );
             logger.SetDatasource(provider);
             //logger.SetAnnotater( new TelemetryArchive());
             GlobalEvents.Fire(new SessionStarted(), true);
@@ -185,12 +145,14 @@ namespace SimTelemetry.Tests.Telemetry
             Assert.AreEqual(1024*8, files.FirstOrDefault(x => x.FilenameInZip.Contains("Time.bin")).FileSize);
         }
 
+        [Test]
         public void PlaybackTestData()
         {
+            RecordTestData();
+
             float[] rpmWave;
             float[] speedWave;
             GetWaves(out rpmWave, out speedWave);
-
             StringBuilder outSine = new StringBuilder();
 
             var telRead = new LogFileReader("TelemetryLoggerTests_Tmp.zip");
@@ -230,35 +192,5 @@ namespace SimTelemetry.Tests.Telemetry
             Assert.AreEqual(1024, index);
         }
 
-        [Test]
-        public void Export()
-        {
-            if (File.Exists("TelemetryLoggerTests_Tmp.zip") == false) Assert.Ignore();
-            StringBuilder csv = new StringBuilder();
-
-            var telRead = new LogFileReader("TelemetryLoggerTests_Tmp.zip");
-            var telProvider = telRead.GetProvider(new[] {"Session","Driver 7427264"}, 0, 1000000);
-
-            foreach(var sample in telProvider.GetSamples())
-            {
-                var me = sample.Get("Driver 7427264");
-                var sess = sample.Get("Session");
-
-                if(me!= null)
-                csv.AppendLine(sample.Timestamp + "," +
-                                 sess.ReadAs<float>("Time") + "," +
-                                 me.ReadAs<string>("TyreCompoundFront") + "," +
-                                 me.ReadAs<float>("Speed") + "," +
-                                 me.ReadAs<float>("Fuel") + "," +
-                                 me.ReadAs<float>("InputThrottle") + "," +
-                                 me.ReadAs<float>("InputBrake") + "," +
-                                 me.ReadAs<float>("TyreTemperatureInsideLF") + "," +
-                                 me.ReadAs<float>("RPM") + "," +
-                                 me.ReadAs<int>("Gear"));
-            }
-
-            File.WriteAllText("dump.csv", csv.ToString());
-
-        }
     }
 }

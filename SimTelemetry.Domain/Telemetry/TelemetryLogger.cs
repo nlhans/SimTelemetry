@@ -63,6 +63,17 @@ namespace SimTelemetry.Domain.Telemetry
             _dataSource = source;
         }
 
+        public void SetAnnotater(IFileAnnotater annotater)
+        {
+            Annotater = annotater;
+        }
+
+        public void SetTemporaryLocations(string file, string dir)
+        {
+            TemporaryFile = file;
+            TemporaryDirectory = dir;
+        }
+
         public void UpdateStructure(object driversAction)
         {
             if (_dataSource == null) return;
@@ -186,23 +197,20 @@ namespace SimTelemetry.Domain.Telemetry
 
         public void Close()
         {
+            GlobalEvents.Unhook<SessionStarted>(LogStart);
+            GlobalEvents.Unhook<SessionStopped>(LogStop);
+
+            GlobalEvents.Unhook<DriversAdded>(UpdateStructure);
+            GlobalEvents.Unhook<DriversRemoved>(UpdateStructure);
+
+            GlobalEvents.Unhook<TelemetryLapComplete>(RecordLap);
+
             LogStop(null);
             if (_closeWriter != null)
             {
                 _closeWriter.Wait();
                 _closeWriter = null;
             }
-        }
-
-        public void SetAnnotater(IFileAnnotater annotater)
-        {
-            Annotater = annotater;
-        }
-
-        public void SetTemporaryLocations(string file, string dir)
-        {
-            TemporaryFile = file;
-            TemporaryDirectory = dir;
         }
     }
 }

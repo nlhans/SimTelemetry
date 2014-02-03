@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -55,7 +56,7 @@ namespace SimTelemetry.Domain.Logger
 
                         case LogFileType.Structure:
                             file = "Structure.xml";
-                            fm = FileMode.Create;
+                            fm = FileMode.Truncate;
                             break;
 
                         case LogFileType.Laps:
@@ -76,10 +77,20 @@ namespace SimTelemetry.Domain.Logger
 
                     // Open the file stream.
                     if (!fileStreams.ContainsKey(path))
+                    {
+                        if (!File.Exists(path) && fm == FileMode.Truncate)
+                        {
+                            File.Delete(path);
+                            fm = FileMode.Create;
+                        }
                         fileStreams.Add(path, File.Open(path, fm));
-                    
+                    }
+
+                    if (action.FileType == LogFileType.Structure)
+                    {
+                        Debug.WriteLine("writing to structure.xml @ "+path);
+                    }
                     FileStream fs = fileStreams[path];
-                    if (fm == FileMode.Create)
                         fs.Seek(0, SeekOrigin.Begin);
 
                     fs.Write(action.Data, 0, action.Data.Length);
