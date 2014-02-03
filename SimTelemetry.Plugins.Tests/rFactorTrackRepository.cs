@@ -81,7 +81,7 @@ namespace SimTelemetry.Plugins.Tests
                                        {
                                            if (setting.Group != "Waypoint") return;
                                            //Debug.WriteLine(setting.Key);
-                                           switch(setting.Key)
+                                           switch(setting.Key.ToLower())
                                            {
                                                // pos = coordinates)
                                                case "wp_pos":
@@ -158,7 +158,6 @@ namespace SimTelemetry.Plugins.Tests
 
                                                // ptrs = next path, previous path, pitbox route (-1 for no pitbox), following branchID
                                                case "wp_ptrs":
-                                               case "WP_PTRS":
                                                    path.Add(new TrackPoint(meter, type, x, y, z, boundsL, boundsR));
                                                    break;
 

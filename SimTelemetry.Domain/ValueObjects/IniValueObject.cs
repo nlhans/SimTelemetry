@@ -13,7 +13,7 @@ namespace SimTelemetry.Domain.Utils
         public string Key { get; private set; }
         public string RawValue { get; private set; }
 
-        public int ValueCount { get { return ValueArray.Count(); } }
+        public int ValueCount { get { return !IsTuple ? 1 : ValueArray.Count(); } }
 
         protected string Value { get; private set; }
         protected string[] ValueArray { get; private set; }
@@ -65,6 +65,7 @@ namespace SimTelemetry.Domain.Utils
 
         public int ReadAsInteger(int index)
         {
+            if (!IsTuple && index == 0) return Convert.ToInt32(Value);
             if (!IsTuple) throw new Exception("This is not a tuple value");
             return Convert.ToInt32(ReadAsDouble(index));
             //return int.Parse(ValueArray[index]);
@@ -72,18 +73,21 @@ namespace SimTelemetry.Domain.Utils
 
         public double ReadAsDouble(int index)
         {
+            if (!IsTuple && index == 0) return double.Parse(Value);
             if (!IsTuple) throw new Exception("This is not a tuple value");
             return double.Parse(ValueArray[index]);
         }
 
         public float ReadAsFloat(int index)
         {
+            if (!IsTuple && index == 0) return float.Parse(Value);
             if (!IsTuple) throw new Exception("This is not a tuple value");
             return float.Parse(ValueArray[index]);
         }
 
         public string ReadAsString(int index)
         {
+            if (!IsTuple && index == 0) return Value;
             if (!IsTuple) throw new Exception("This is not a tuple value");
             return ValueArray[index];
         }
