@@ -169,6 +169,11 @@ namespace SimTelemetry.Domain.Telemetry
             {
                 LapsList = (Pool as MemoryPool).Pools["Laps"].ReadAs<List<Lap>>("List");
                 LastLapsUpdate = DateTime.Now;
+
+                for(int i = 0; i < LapsList.Count; i++)
+                {
+                    LapsList[i].SetDriver(BaseAddress);
+                }
             }
 
             if (Pool.Contains("TrackSector"))

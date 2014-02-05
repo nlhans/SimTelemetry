@@ -37,6 +37,15 @@ namespace SimTelemetry.Domain.ValueObjects
             OutLap = outl;
         }
 
+        public void SetDriver(int id)
+        {
+            // Only set when the current ID is invalid
+            if (Driver < 0)
+            {
+                Driver = id;
+            }
+        }
+        
         public bool Equals(Lap other)
         {
             return (other.Driver==this.Driver && other.LapNumber == LapNumber && other.Total == Total);

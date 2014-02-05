@@ -277,5 +277,12 @@ namespace SimTelemetry.Domain.Aggregates
                 GlobalEvents.Fire(new LoadingFinished(), true, 500);
             }
         }
+
+        public TelemetryDriver GetDriverById(int id)
+        {
+            if (id < 0) return default(TelemetryDriver);
+            return Drivers.FirstOrDefault(x => x.BaseAddress == id);
+
+        }
     }
 }

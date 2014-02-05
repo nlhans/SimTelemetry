@@ -113,196 +113,189 @@ namespace LiveTelemetry
                 var overallBestS2 = TelemetryApplication.Telemetry.Laps.BestS2;
                 var overallBestS3 = TelemetryApplication.Telemetry.Laps.BestS3;
 
-                var BestSector1Position = TelemetryApplication.Telemetry.Laps.BestS1Lap.Driver;
-                var BestSector2Position = TelemetryApplication.Telemetry.Laps.BestS2Lap.Driver;
-                var BestSector3Position = TelemetryApplication.Telemetry.Laps.BestS3Lap.Driver;
+                var bestSector1Driver = TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS1Lap.Driver);
+                var bestSector2Driver = TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS2Lap.Driver);
+                var bestSector3Driver = TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS3Lap.Driver);
 
                 var myBestSector1 = TelemetryApplication.Telemetry.Player.BestS1;
                 var myBestSector2 = TelemetryApplication.Telemetry.Player.BestS2;
                 var myBestSector3 = TelemetryApplication.Telemetry.Player.BestS3;
 
                 var drivers = TelemetryApplication.Telemetry.Drivers.OrderBy(x => x.Position);
-                int driverCount = drivers.Count();
+                var driverCount = drivers.Count();
 
                 // Calculate the line height
                 var lineHeight = (float) (driverCount < 16 ? 20 : Math.Max(10, (Size.Height - 20)/(4.0 + driverCount)));
 
-
-
                 // Go through all drivers
-                if (driverCount>0)
+                if (driverCount <= 0) return;
+                var currentSessionTime = TelemetryApplication.Telemetry.Session.Time;
+
+                foreach (var driver in drivers)
                 {
-                    var currentSessionTime = TelemetryApplication.Telemetry.Session.Time;
+                    var y = 10f + ind*lineHeight;
 
-                    double Previous_SplitLeader = 0;
-                    foreach (TelemetryDriver driver in drivers)
+                    if (y > Size.Height - 4*20) break;
+
+                    var bestLapObj = driver.BestLap;
+                    var bestLap = bestLapObj.Total;
+
+                    var lastLap = driver.LastLap;
+                    var lastLapValid = lastLap.Total > 0;
+
+                    // **** Position **** //
+                    g.DrawString(driver.Position.ToString("00"), f, Brushes.White, columns["P"], y);
+
+                    // **** NAME **** //
+                    var nameBrush = Brushes.White;
+                    if (driver.Speed < 10) nameBrush = Brushes.OrangeRed;
+                    if (driver.IsPits) nameBrush = Brushes.DarkGray;
+                    g.DrawString(driver.Name, f, nameBrush, columns["Driver"], y);
+
+                    bool showLastLap = false;
+
+                    // **** LAP COUNT **** //
+                    if (columns.ContainsKey("Lap"))
                     {
-                        var y = 10f + ind * lineHeight;
+                        g.DrawString(driver.Laps.ToString("000"), f, Brushes.White, columns["Lap"], y);
+                    }
 
-                        if (y > Size.Height - 4 * 20) break;
+                    // **** LAP TIME **** //
+                    if (columns.ContainsKey("Laptime"))
+                    {
+                        // TODO: Add UI setting "Show laptimes for.."
+                        showLastLap = lastLapValid && (currentSessionTime - lastLap.TimeEnd) < 10;
+                        var lastLapIsBestLap = showLastLap && Math.Abs(lastLap.Total - lapTimeBest) < 0.0001;
+                        var lastLapIsPersonalBestLap = showLastLap &&
+                                                       Math.Abs(lastLap.Total - driver.BestLap.Total) < 0.0001;
+                        var laptimeBrush = Brushes.DarkGray;
 
-                        var bestSector1 = driver.BestS1;
-                        var bestSector2 = driver.BestS2;
-                        var bestSector3 = driver.BestS3;
+                        if (showLastLap) laptimeBrush = Brushes.Yellow;
+                        if (showLastLap && lastLapIsPersonalBestLap) laptimeBrush = Brushes.YellowGreen;
+                        if (lastLapIsBestLap) laptimeBrush = Brushes.Magenta;
 
-                        var bestLapObj = driver.BestLap;
-                        var bestLap = bestLapObj.Total;
-                        var bestSector1HotLap = bestLapObj.Sector1;
-                        var bestSector2HotLap = bestLapObj.Sector2;
-                        var bestSector3HotLap = bestLapObj.Sector3;
+                        var laptimeToPrint = showLastLap ? lastLap.Total : bestLap;
+                        var gaptimeToPrint = laptimeToPrint - bestLap;
 
-                        var lastLap = driver.LastLap;
-                        var lastLapValid = lastLap.Total > 0;
-
-                        var lastS1 = driver.LastS1;
-                        var lastS2 = driver.LastS2;
-                        var lastS3 = driver.LastS3;
-
-                        // **** Position **** //
-                        g.DrawString(driver.Position.ToString("00"), f, Brushes.White, columns["P"], y);
-
-                        // **** NAME **** //
-                        var nameBrush = Brushes.White;
-                        if(driver.Speed < 10) nameBrush = Brushes.OrangeRed;
-                        if (driver.IsPits) nameBrush = Brushes.DarkGray;
-                        g.DrawString(driver.Name, f, nameBrush, columns["Driver"], y);
-
-                        bool showLastLap = false;
-
-                        if(columns.ContainsKey("Lap"))
-                        {
-                            g.DrawString(driver.Laps.ToString("000"), f, Brushes.White, columns["Lap"], y);
-                        }
-
-                        if (columns.ContainsKey("Laptime"))
-                        {
-                            // TODO: Add UI setting "Show laptimes for.."
-                             showLastLap = lastLapValid && (currentSessionTime - lastLap.TimeEnd) < 10;
-                             var lastLapIsBestLap = showLastLap && Math.Abs(lastLap.Total - lapTimeBest) < 0.0001;
-                             var lastLapIsPersonalBestLap = showLastLap && Math.Abs(lastLap.Total - driver.BestLap.Total) < 0.0001;
-                            var laptimeBrush = Brushes.DarkGray;
-
-                            if(showLastLap) laptimeBrush = Brushes.Yellow;
-                            if (showLastLap && lastLapIsPersonalBestLap) laptimeBrush = Brushes.YellowGreen;
-                            if (lastLapIsBestLap) laptimeBrush = Brushes.Magenta;
-
-                            var laptimeToPrint = showLastLap ? lastLap.Total : bestLap;
-                            var gaptimeToPrint = laptimeToPrint - bestLap;
-
-                            if(laptimeToPrint>0)
+                        if (laptimeToPrint > 0)
                             g.DrawString(PrintLapTime(laptimeToPrint, false), f, laptimeBrush, columns["Laptime"], y);
 
-                            // Also display gap
-                            if (gaptimeToPrint > 0)
-                                g.DrawString(PrintLapTime(gaptimeToPrint, false), f, laptimeBrush, columns["Gap"], y);
-                        }
-                        if (columns.ContainsKey("S1") && columns.ContainsKey("S2") && columns.ContainsKey("S3"))
+                        // Also display gap
+                        if (gaptimeToPrint > 0)
+                            g.DrawString(PrintLapTime(gaptimeToPrint, false), f, laptimeBrush, columns["Gap"], y);
+                    }
+                    // **** SECTOR TIME **** //
+                    if (columns.ContainsKey("S1") && columns.ContainsKey("S2") && columns.ContainsKey("S3"))
+                    {
+                        // Draw sector lap times
+                        var showBestLap = driver.IsPits;
+                        var showCurrentLap = !showLastLap && !showBestLap;
+
+                        var sector1ToShow = (showBestLap)
+                                                ? driver.BestLap.Sector1
+                                                : (showLastLap)
+                                                      ? lastLap.Sector1
+                                                      : driver.CurrentLap.Sector1;
+                        var sector2ToShow = (showBestLap)
+                                                ? driver.BestLap.Sector2
+                                                : (showLastLap)
+                                                      ? lastLap.Sector2
+                                                      : driver.CurrentLap.Sector2;
+                        var sector3ToShow = (showBestLap)
+                                                ? driver.BestLap.Sector3
+                                                : (showLastLap)
+                                                      ? lastLap.Sector3
+                                                      : driver.CurrentLap.Sector3;
+
+                        var sector1Brush = (showLastLap) ? Brushes.Yellow : Brushes.White;
+                        var sector2Brush = (showLastLap) ? Brushes.Yellow : Brushes.White;
+                        var sector3Brush = (showLastLap) ? Brushes.Yellow : Brushes.White;
+
+                        if (sector1ToShow == driver.BestS1) sector1Brush = Brushes.YellowGreen;
+                        if (sector2ToShow == driver.BestS2) sector2Brush = Brushes.YellowGreen;
+                        if (sector3ToShow == driver.BestS3) sector3Brush = Brushes.YellowGreen;
+
+                        if (sector1ToShow == TelemetryApplication.Telemetry.Laps.BestS1)
+                            sector1Brush = Brushes.Magenta;
+                        if (sector2ToShow == TelemetryApplication.Telemetry.Laps.BestS2)
+                            sector2Brush = Brushes.Magenta;
+                        if (sector3ToShow == TelemetryApplication.Telemetry.Laps.BestS3)
+                            sector3Brush = Brushes.Magenta;
+
+                        var showSector1AtAll = showLastLap || showBestLap ||
+                                               showCurrentLap &&
+                                               (driver.TrackPosition == TrackPointType.SECTOR2 ||
+                                                driver.TrackPosition == TrackPointType.SECTOR3);
+                        var showSector2AtAll = showLastLap || showBestLap ||
+                                               showCurrentLap && driver.TrackPosition == TrackPointType.SECTOR3;
+                        var showSector3AtAll = showLastLap || showBestLap;
+
+                        showSector1AtAll &= sector1ToShow > 0;
+                        showSector2AtAll &= sector2ToShow > 0;
+                        showSector3AtAll &= sector3ToShow > 0;
+
+                        // Is the driver on outlap?
+                        if (driver.CurrentLap.OutLap && !driver.IsPits)
                         {
-                            // Draw sector lap times
-                            var showBestLap = driver.IsPits;
-                            var showCurrentLap = !showLastLap && !showBestLap;
-
-                            var sector1ToShow = (showBestLap)
-                                                    ? driver.BestLap.Sector1
-                                                    : (showLastLap)
-                                                          ? lastLap.Sector1
-                                                          : driver.CurrentLap.Sector1;
-                            var sector2ToShow = (showBestLap)
-                                                    ? driver.BestLap.Sector2
-                                                    : (showLastLap)
-                                                          ? lastLap.Sector2
-                                                          : driver.CurrentLap.Sector2;
-                            var sector3ToShow = (showBestLap)
-                                                    ? driver.BestLap.Sector3
-                                                    : (showLastLap)
-                                                          ? lastLap.Sector3
-                                                          : driver.CurrentLap.Sector3;
-                            
-                            var sector1Brush = (showLastLap) ? Brushes.Yellow : Brushes.White;
-                            var sector2Brush = (showLastLap) ? Brushes.Yellow : Brushes.White;
-                            var sector3Brush = (showLastLap) ? Brushes.Yellow : Brushes.White;
-
-                            if (sector1ToShow == driver.BestS1) sector1Brush = Brushes.YellowGreen;
-                            if (sector2ToShow == driver.BestS2) sector2Brush = Brushes.YellowGreen;
-                            if (sector3ToShow == driver.BestS3) sector3Brush = Brushes.YellowGreen;
-
-                            if (sector1ToShow == TelemetryApplication.Telemetry.Laps.BestS1) sector1Brush = Brushes.Magenta;
-                            if (sector2ToShow == TelemetryApplication.Telemetry.Laps.BestS2) sector2Brush = Brushes.Magenta;
-                            if (sector3ToShow == TelemetryApplication.Telemetry.Laps.BestS3) sector3Brush = Brushes.Magenta;
-
-                            var showSector1AtAll = showLastLap || showBestLap ||
-                                                   showCurrentLap &&
-                                                   (driver.TrackPosition == TrackPointType.SECTOR2 ||
-                                                    driver.TrackPosition == TrackPointType.SECTOR3);
-                            var showSector2AtAll = showLastLap || showBestLap ||
-                                                   showCurrentLap && driver.TrackPosition == TrackPointType.SECTOR3;
-                            var showSector3AtAll = showLastLap || showBestLap;
-
-                            showSector1AtAll &= sector1ToShow > 0;
-                            showSector2AtAll &= sector2ToShow > 0;
-                            showSector3AtAll &= sector3ToShow > 0;
-
-                            // Is the driver on outlap?
-                            if (driver.CurrentLap.OutLap && !driver.IsPits)
-                            {
-                                g.DrawString("OUT LAP", f, Brushes.Yellow, columns["S1"], y);
-                            }
-                            else if (showSector1AtAll)
-                            {
-                                g.DrawString(PrintLapTime(sector1ToShow, true), f, sector1Brush, columns["S1"], y);
-                            }
-
-                            if (showSector2AtAll)
-                            {
-                                g.DrawString(PrintLapTime(sector2ToShow, true), f, sector2Brush, columns["S2"], y);
-                            }
-
-                            if (showSector3AtAll)
-                            {
-                                g.DrawString(PrintLapTime(sector3ToShow, true), f, sector3Brush, columns["S3"], y);
-                            }
-
+                            g.DrawString("OUT LAP", f, Brushes.Yellow, columns["S1"], y);
+                        }
+                        else if (showSector1AtAll)
+                        {
+                            g.DrawString(PrintLapTime(sector1ToShow, true), f, sector1Brush, columns["S1"], y);
                         }
 
-                        ind++;
+                        if (showSector2AtAll)
+                        {
+                            g.DrawString(PrintLapTime(sector2ToShow, true), f, sector2Brush, columns["S2"], y);
+                        }
 
+                        if (showSector3AtAll)
+                        {
+                            g.DrawString(PrintLapTime(sector3ToShow, true), f, sector3Brush, columns["S3"], y);
+                        }
                     }
 
-                    // Place fastest lap & combined lap
-                    if (BestSector3Position > 0)
-                    {
-                        g.DrawString("Fastest lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
-                        g.DrawString(TelemetryApplication.Telemetry.Laps.BestLap.Driver.ToString(), f, Brushes.Yellow, 195f, 10f + ind*lineHeight);
-                        g.DrawString(PrintLapTime(TelemetryApplication.Telemetry.Laps.BestLap.Total, false), f, Brushes.Magenta, 140f, 10f + ind * lineHeight);
+                    ind++;
+                }
+
+                // Place fastest lap & combined lap
+                if (bestSector1Driver != null && bestSector2Driver != null && bestSector3Driver != null)
+                {
+                    var bestLapDriver =
+                        TelemetryApplication.Telemetry.GetDriverById(
+                            TelemetryApplication.Telemetry.Laps.BestLap.Driver);
+
+                    g.DrawString("Fastest lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
+                    g.DrawString(bestLapDriver.Name, f, Brushes.Yellow, 195f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(TelemetryApplication.Telemetry.Laps.BestLap.Total, false), f,
+                                 Brushes.Magenta, 140f, 10f + ind*lineHeight);
 
 
+                    g.DrawString("P" + bestSector1Driver.Position, f, Brushes.Yellow, 275f, 10f + ind*lineHeight);
+                    g.DrawString("P" + bestSector2Driver.Position, f, Brushes.Yellow, 325f, 10f + ind*lineHeight);
+                    g.DrawString("P" + bestSector3Driver.Position, f, Brushes.Yellow, 375f, 10f + ind*lineHeight);
+                }
+                if (overallBestS3 > 0)
+                {
+                    ind++;
+                    g.DrawString("Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(overallBestS1 + overallBestS2 + overallBestS3, false), f,
+                                 Brushes.Magenta,
+                                 140f,
+                                 10f + ind*lineHeight);
 
-                        g.DrawString("P" + BestSector1Position, f, Brushes.Yellow, 275f, 10f + ind*lineHeight);
-                        g.DrawString("P" + BestSector2Position, f, Brushes.Yellow, 325f, 10f + ind*lineHeight);
-                        g.DrawString("P" + BestSector3Position, f, Brushes.Yellow, 375f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(overallBestS1, true), f, Brushes.Magenta, 245f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(overallBestS2, true), f, Brushes.Magenta, 295f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(overallBestS3, true), f, Brushes.Magenta, 345f, 10f + ind*lineHeight);
+                    ind++;
+                    g.DrawString("Personal Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(myBestSector1 + myBestSector2 + myBestSector3, false), f,
+                                 Brushes.Magenta, 140f,
+                                 10f + ind*lineHeight);
 
-                    }
-                    if (overallBestS3 > 0)
-                    {
-                        ind++;
-                        g.DrawString("Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
-                        g.DrawString(PrintLapTime(overallBestS1 + overallBestS2 + overallBestS3, false), f, Brushes.Magenta,
-                                     140f,
-                                     10f + ind*lineHeight);
-
-                        g.DrawString(PrintLapTime(overallBestS1, true), f, Brushes.Magenta, 245f, 10f + ind*lineHeight);
-                        g.DrawString(PrintLapTime(overallBestS2, true), f, Brushes.Magenta, 295f, 10f + ind * lineHeight);
-                        g.DrawString(PrintLapTime(overallBestS3, true), f, Brushes.Magenta, 345f, 10f + ind * lineHeight);
-                        ind++;
-                        g.DrawString("Personal Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
-                        g.DrawString(PrintLapTime(myBestSector1 + myBestSector2 + myBestSector3, false), f,
-                                     Brushes.Magenta, 140f,
-                                     10f + ind*lineHeight);
-
-                        g.DrawString(PrintLapTime(myBestSector1, true), f, Brushes.Magenta, 245f, 10f + ind*lineHeight);
-                        g.DrawString(PrintLapTime(myBestSector2, true), f, Brushes.Magenta, 295f, 10f + ind*lineHeight);
-                        g.DrawString(PrintLapTime(myBestSector3, true), f, Brushes.Magenta, 345f, 10f + ind*lineHeight);
-                    }
+                    g.DrawString(PrintLapTime(myBestSector1, true), f, Brushes.Magenta, 245f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(myBestSector2, true), f, Brushes.Magenta, 295f, 10f + ind*lineHeight);
+                    g.DrawString(PrintLapTime(myBestSector3, true), f, Brushes.Magenta, 345f, 10f + ind*lineHeight);
                 }
             }
             catch (Exception ex)
