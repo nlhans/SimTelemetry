@@ -16,17 +16,9 @@ namespace SimTelemetry.Domain.Telemetry
 
         public int RaceLaps { get; protected set; }
 
-        public double TrackTemperature
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+        public double TrackTemperature { get; private set; }
 
-        public double AmbientTemperature
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+        public double AmbientTemperature { get; private set; }
 
         public Session Info { get; private set; }
 

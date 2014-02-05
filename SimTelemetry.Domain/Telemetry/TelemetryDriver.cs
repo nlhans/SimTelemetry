@@ -10,6 +10,8 @@ namespace SimTelemetry.Domain.Telemetry
 {
     public class TelemetryDriver : ITelemetryObject
     {
+        private Lap dummyLap;
+
         private bool _initial = true;
 
         internal IDataNode Pool { get; set; }
@@ -47,11 +49,6 @@ namespace SimTelemetry.Domain.Telemetry
         public float EngineRpmMax { get; protected set; }
         public float Speed { get; protected set; }
         public int Gear { get; protected set; }
-        
-        public float TyreWearLF { get; protected set; }
-        public float TyreWearRF { get; protected set; }
-        public float TyreWearLR { get; protected set; }
-        public float TyreWearRR { get; protected set; }
 
         public float CoordinateX { get; protected set; }
         public float CoordinateY { get; protected set; }
@@ -66,10 +63,7 @@ namespace SimTelemetry.Domain.Telemetry
 
         public double EngineLifetime { get; private set; }
 
-        public TelemetryWheel WheelRF { get; private set; }
-
         public double OilTemperature { get; private set; }
-
         public double WaterTemperature { get; private set; }
 
         public double EngineTorque { get; private set; }
@@ -78,6 +72,7 @@ namespace SimTelemetry.Domain.Telemetry
 
         public TelemetryWheel WheelRR { get; private set; }
         public TelemetryWheel WheelLR { get; private set; }
+        public TelemetryWheel WheelRF { get; private set; }
         public TelemetryWheel WheelLF { get; private set; }
 
         public double BestS1 { get; internal set; }
@@ -100,6 +95,10 @@ namespace SimTelemetry.Domain.Telemetry
             BestS1 = LapsList.Any(x => x.Sector1 > 0) ? LapsList.Where(x => x.Sector1 > 0).Min(x => x.Sector1) : -1;
             BestS2 = LapsList.Any(x => x.Sector2 > 0) ? LapsList.Where(x => x.Sector2 > 0).Min(x => x.Sector2) : -1;
             BestS3 = LapsList.Any(x => x.Sector3 > 0) ? LapsList.Where(x => x.Sector3 > 0).Min(x => x.Sector3) : -1;
+
+            BestLap = LapsList.Any(x => x.Total > 0) ? LapsList.Where(x => x.Total > 0).OrderBy(x => x.Sector3).FirstOrDefault() : dummyLap;
+            LastLap = LapsList.Any(x => x.Completed) ? LapsList.LastOrDefault(x => x.Completed) : dummyLap;
+            CurrentLap = LapsList.Any() ? LapsList.LastOrDefault() : dummyLap;
         }
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
@@ -127,11 +126,6 @@ namespace SimTelemetry.Domain.Telemetry
             Mass = Pool.ReadAs<float>("Mass");
             Fuel = Pool.ReadAs<float>("Fuel");
 
-            TyreWearLF = Pool.ReadAs<float>("TyreWearLF");
-            TyreWearLR = Pool.ReadAs<float>("TyreWearLR");
-            TyreWearRF = Pool.ReadAs<float>("TyreWearRF");
-            TyreWearRR = Pool.ReadAs<float>("TyreWearRR");
-            
             CoordinateX = Pool.ReadAs<float>("CoordinateX");
             CoordinateY = Pool.ReadAs<float>("CoordinateY");
             CoordinateZ = Pool.ReadAs<float>("CoordinateZ");
@@ -231,19 +225,25 @@ namespace SimTelemetry.Domain.Telemetry
                     break;
             }
 
+            if (WheelLF != null) WheelLF.Update(telemetry, Memory);
+            if (WheelRF != null) WheelRF.Update(telemetry, Memory);
+            if (WheelLR != null) WheelLR.Update(telemetry, Memory);
+            if (WheelRR != null) WheelRR.Update(telemetry, Memory);
+
             if (IsPlayer)
             {
-
+                
             }
         }
 
         public TelemetryDriver(IDataNode pool)
         {
             Pool = pool;
+            dummyLap = new Lap(-1, false, -1, -1, -1, -1, -1, false, false);
 
             // Last&Best Lap is done in TelemetryLapsPool
-            LastLap = new Lap(-1, false, -1, -1, -1, -1, -1, false, false);
-            BestLap = new Lap(-1, false, -1, -1, -1, -1, -1, false, false);
+            LastLap = dummyLap;
+            BestLap = dummyLap;
 
             BestS1 = -1;
             BestS2 = -1;
@@ -252,6 +252,16 @@ namespace SimTelemetry.Domain.Telemetry
             if (Pool is MemoryPool)
             {
                 BaseAddress = ((MemoryPool) Pool).Address;
+            }
+
+            // Add 4 wheels if they exist
+            if (Pool.Contains("TyreTemperatureMiddleLF"))
+            {
+                // We have something atleast..
+                WheelLF = new TelemetryWheel(WheelLocation.FRONTLEFT, pool);
+                WheelLR = new TelemetryWheel(WheelLocation.REARLEFT, pool);
+                WheelRF = new TelemetryWheel(WheelLocation.FRONTRIGHT, pool);
+                WheelRR = new TelemetryWheel(WheelLocation.REARRIGHT, pool);
             }
         }
 
@@ -269,63 +279,6 @@ namespace SimTelemetry.Domain.Telemetry
         public double GetSplitTime(TelemetryDriver telemetryDriver)
         {
             return 0;
-        }
-    }
-
-    public class TelemetryWheel
-    {
-        public float BrakeThickness
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float BrakeThicknessBase
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float Pressure
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float Wear
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float TemperatureMiddle
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float TemperatureInside
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float TemperatureOutside
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float Speed
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public float BrakeTemperature
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
         }
     }
 }

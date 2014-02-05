@@ -6,6 +6,7 @@ using System.Linq;
 using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Entities;
+using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.Utils;
 using SimTelemetry.Domain.ValueObjects;
 
@@ -17,12 +18,19 @@ namespace SimTelemetry.Plugins.Tests
         string path = @"C:\Program Files (x86)\rFactor\GameData\Vehicles\";
 
         private IEnumerable<string> hdvFiles;
-        private IEnumerable<string>  iniFiles;
+        private IEnumerable<string> iniFiles;
+        private IEnumerable<string> tbcFiles;
 
         public string SearchHDV(string id)
         {
             id = id.ToLower();
             return hdvFiles.Any(x => x.Contains(id)) ? hdvFiles.FirstOrDefault(x => x.Contains(id)) : string.Empty;
+        }
+
+        public string SearchTBC(string id)
+        {
+            id = id.ToLower();
+            return tbcFiles.Any(x => x.Contains(id)) ? tbcFiles.FirstOrDefault(x => x.Contains(id)) : string.Empty;
         }
 
 
@@ -39,6 +47,7 @@ namespace SimTelemetry.Plugins.Tests
             // Search also for other files.
             hdvFiles = Directory.GetFiles(path, "*.hdv", SearchOption.AllDirectories).Select(x => x.ToLower());
             iniFiles = Directory.GetFiles(path, "*.ini", SearchOption.AllDirectories).Select(x => x.ToLower());
+            tbcFiles = Directory.GetFiles(path, "*.tbc", SearchOption.AllDirectories).Select(x => x.ToLower());
 
             string[] files = Directory.GetFiles(path, "*.veh", SearchOption.AllDirectories);
             var fileList = new List<string>(files);
@@ -61,6 +70,7 @@ namespace SimTelemetry.Plugins.Tests
             string vehFile = path + id;
 
             // Helpers for other car parts.
+            var tbcFile = "";
             var hdvFile = "";
             var engFile = "";
             var engineName = "";
@@ -129,6 +139,7 @@ namespace SimTelemetry.Plugins.Tests
             {
                 hdvIni.AddHandler(x =>
                                       {
+                                          if (x.Key == "TireBrand") tbcFile = x.ReadAsString();
                                           if (x.Key == "Normal" && x.Group == "ENGINE") engFile = x.ReadAsString();
                                       });
                 hdvIni.Parse();
@@ -139,8 +150,196 @@ namespace SimTelemetry.Plugins.Tests
 
             carObj.Assign(BuildEngine(engFile, engineName, engineManufacturer));
             carObj.Assign(BuildChassis(hdvFile));
+            carObj.Assign(BuildTyres(tbcFile));
+            carObj.Assign(BuildBrakes(hdvFile));
 
             return carObj;
+        }
+
+        private IEnumerable<Wheel> BuildTyres(string tbcFile)
+        {
+            List<Wheel> wheels = new List<Wheel>();
+
+            var filePath = SearchTBC(tbcFile);
+
+            if (string.IsNullOrEmpty(filePath)) return wheels;
+
+            using(IniReader tbcReader = new IniReader(filePath, true))
+            {
+                bool frontIsDone = false;
+                bool rearIsDone = false;
+                bool tyreWaiting = false;
+                var currentCompound = "";
+                var radius = 0.0f;
+                var rollResistance = 0.0f;
+
+                var peakTemp = 0.0f;
+                var peakPressure = 0.0f;
+                var peakPressureWeight = 0.0f;
+                var pitsTemp = 0.0f;
+
+                Action addWheel = () =>
+                                   {
+                                       if (tyreWaiting && (!frontIsDone || !rearIsDone))
+                                       {
+                                           WheelLocation locationA;
+                                           WheelLocation locationB;
+                                           if (frontIsDone)
+                                           {
+                                               locationA = WheelLocation.REARLEFT;
+                                               locationB = WheelLocation.REARRIGHT;
+                                               rearIsDone = true;
+                                           }else
+                                           {
+                                               locationA = WheelLocation.FRONTLEFT;
+                                               locationB = WheelLocation.FRONTRIGHT;
+                                               frontIsDone = true;
+                                           }
+                                           Wheel wA = new Wheel(locationA, radius * 2, rollResistance, pitsTemp, peakTemp,
+                                                               peakPressure, peakPressureWeight);
+
+                                           Wheel wB = new Wheel(locationB, radius * 2, rollResistance, pitsTemp, peakTemp,
+                                                               peakPressure, peakPressureWeight);
+
+                                           wheels.Add(wA);
+                                           wheels.Add(wB);
+
+
+                                       }
+                                       tyreWaiting = false;
+                                   };
+
+                tbcReader.AddHandler(x =>
+                                         {
+                                             if (x.Group.ToLower() != "compound") return;
+                                             switch(x.Key)
+                                             {
+                                                 case "Name":
+                                                     currentCompound = x.ReadAsString();
+                                                     break;
+                                                 case "DryLatLong":
+                                                     if (tyreWaiting) addWheel();
+                                                     tyreWaiting = true;
+                                                     break;
+
+                                                 case "Radius":
+                                                     radius = x.ReadAsFloat();
+                                                     break;
+
+                                                 case "RollingResistance":
+                                                     rollResistance = x.ReadAsFloat();
+                                                     break;
+
+                                                 case "Temperatures":
+                                                     peakTemp = Conversions.Celsius2Kelvin(x.ReadAsFloat(0));
+                                                     if (x.ValueCount == 2)
+                                                     {
+                                                         pitsTemp = x.ReadAsFloat(1);
+                                                     }
+                                                     break;
+
+                                                 case "OptimumPressure":
+                                                     peakPressure = x.ReadAsFloat(0);
+                                                     peakPressureWeight = x.ReadAsFloat(1);
+                                                     break;
+                                             }
+                                         });
+
+                tbcReader.Parse();
+                addWheel();
+            }
+
+            return wheels;
+        }
+
+        private IEnumerable<Brake> BuildBrakes(string hdvFile)
+        {
+            List<Brake> brakes = new List<Brake>();
+
+            using (IniReader hdvReader = new IniReader(hdvFile, true))
+            {
+                bool wheelDone = false;
+
+                WheelLocation location = WheelLocation.UNKNOWN;
+
+                var optimumTemperature = new Range(0,1000);
+                var thicknessStart = new Range(1, 2);
+                var thicknessFailure = 0.5f;
+                var torque = 10000.0f;
+
+                Action addBrake = () =>
+                                      {
+                                          if(wheelDone)
+                                          {
+                                              var br = new Brake(location, optimumTemperature, thicknessStart,
+                                                                 thicknessFailure, torque);
+                                              brakes.Add(br);
+
+                                              wheelDone = false;
+                                          }
+                                      };
+
+                hdvReader.AddHandler((x) =>
+                                         {
+                                             switch(x.Key)
+                                             {
+                                                 case "SpringRange":
+                                                     if (wheelDone) addBrake();
+                                                     wheelDone = true;
+
+                                                     switch(x.Group.ToLower())
+                                                     {
+                                                         case "frontleft":
+                                                             location = WheelLocation.FRONTLEFT;
+                                                             break;
+                                                         case "frontright":
+                                                             location = WheelLocation.FRONTRIGHT;
+                                                             break;
+                                                         case "rearleft":
+                                                             location = WheelLocation.REARLEFT;
+                                                             break;
+                                                         case "rearright":
+                                                             location = WheelLocation.REARRIGHT;
+                                                             break;
+                                                     }
+                                                     break;
+
+                                                 case "BrakeResponseCurve":
+                                                     var minT = Conversions.Celsius2Kelvin(x.ReadAsFloat(1));
+                                                     var maxT = Conversions.Celsius2Kelvin(x.ReadAsFloat(2));
+                                                     var opt = (maxT + minT)/2;
+                                                     optimumTemperature = new Range(minT, maxT, opt);
+                                                     break;
+
+                                                 case "BrakeFailure":
+                                                     var avg = x.ReadAsFloat(0);
+                                                     var stdDev = x.ReadAsFloat(1);
+
+                                                     thicknessFailure = avg;
+                                                     break;
+
+                                                 case "BrakeTorque":
+                                                     torque = x.ReadAsFloat(0);
+                                                     break;
+
+                                                 case "BrakeDiscRange":
+
+                                                     var min = x.ReadAsFloat(0);
+                                                     var steps = x.ReadAsInteger(2);
+                                                     var stepSize = x.ReadAsFloat(1);
+                                                     var max = min + steps * stepSize;
+
+                                                     thicknessStart = new Range(min, max);
+                                                     break;
+                                             }
+                                         });
+
+                hdvReader.Parse();
+
+                addBrake();
+            }
+
+            return brakes;
         }
 
         private Chassis BuildChassis(string hdvFile)

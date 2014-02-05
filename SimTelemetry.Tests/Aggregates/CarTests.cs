@@ -183,14 +183,10 @@ namespace SimTelemetry.Tests.Aggregates
         public void TestWheels()
         {
             var hasException = false;
-            var WheelLF = new CarTestWheel(WheelLocation.FRONTLEFT, 0.6f, 1000, new Range(90, 110, 97),
-                                             new Range(85, 90, 85), new Range(140, 170, 155));
-            var WheelRF = new CarTestWheel(WheelLocation.FRONTRIGHT, 0.6f, 1000, new Range(90, 110, 97),
-                                             new Range(85, 90, 85), new Range(140, 170, 155));
-            var WheelLR = new CarTestWheel(WheelLocation.REARLEFT, 0.6f, 1000, new Range(90, 110, 97),
-                                             new Range(85, 90, 85), new Range(140, 170, 155));
-            var WheelRR = new CarTestWheel(WheelLocation.REARRIGHT, 0.6f, 1000, new Range(90, 110, 97),
-                                             new Range(85, 90, 85), new Range(140, 170, 155));
+            var WheelLF = new CarTestWheel(WheelLocation.FRONTLEFT, 0.6f, 1000, 90, 105, 50, 0.05f);
+            var WheelRF = new CarTestWheel(WheelLocation.FRONTRIGHT, 0.6f, 1000, 90, 105, 50, 0.05f);
+            var WheelLR = new CarTestWheel(WheelLocation.REARLEFT, 0.6f, 1000, 90, 105, 50, 0.05f);
+            var WheelRR = new CarTestWheel(WheelLocation.REARRIGHT, 0.6f, 1000, 90, 105, 50, 0.05f);
             
             // Left - front
             car.Assign(WheelLF);
@@ -391,7 +387,7 @@ namespace SimTelemetry.Tests.Aggregates
 
     internal class CarTestWheel : Wheel
     {
-        public CarTestWheel(WheelLocation location, float perimeter, float rollResistance, Range peakTemperature, Range pitsTemperature, Range peakPressure) : base(location, perimeter, rollResistance, peakTemperature, pitsTemperature, peakPressure)
+        public CarTestWheel(WheelLocation location, float perimeter, float rollResistance, float pitsTemperature, float peakTemperature, float peakPressure, float peakPressureWeightSlope) : base(location, perimeter, rollResistance, pitsTemperature, peakTemperature, peakPressure, peakPressureWeightSlope)
         {
         }
     }

@@ -71,7 +71,7 @@ namespace LiveTelemetry
                         else if (driver.Speed < 5)                                                  // Stopped
                             c = Brushes.Red;
                         else if (driver.FlagYellow)                                                 // Local yellow flag
-                            c = Brushes.Yellow;
+                            c = Brushes.Gold;
                         else if (TelemetryApplication.Telemetry.Session.Info.Type == SessionType.RACE &&
                                  driver.GetSplitTime(TelemetryApplication.Telemetry.Player) >= 10000)
                             c = new SolidBrush(Color.FromArgb(80, 80, 80));                         // InRace && lapped vehicle

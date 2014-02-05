@@ -180,6 +180,7 @@
     <Compile Include="Telemetry\TelemetryLoggerLevel.cs" />
     <Compile Include="Telemetry\TelemetrySession.cs" />
     <Compile Include="Telemetry\TelemetrySupport.cs" />
+    <Compile Include="Telemetry\TelemetryWheel.cs" />
     <Compile Include="Utils\IniReader.cs" />
     <Compile Include="Utils\IniScannerOld.cs" />
     <Compile Include="Utils\MMTimer.cs" />

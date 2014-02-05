@@ -259,5 +259,8 @@ namespace SimTelemetry.Plugins.Tests
     {
         public static float Kelvin2Celsius(float data) { return data - 273.15f; }
         public static double Kelvin2Celsius(double data) { return data - 273.15; }
+
+        public static float Celsius2Kelvin(float data) { return data + 273.15f; }
+        public static double Celsius2Kelvin(double data) { return data + 273.15; }
     }
 }

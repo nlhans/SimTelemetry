@@ -79,6 +79,12 @@ namespace SimTelemetry.Domain.Aggregates
             }
         }
 
+        public void Assign(IEnumerable<Wheel> wheels)
+        {
+            foreach(var w in wheels)
+                Assign(w);
+        }
+
         public void Assign(Wheel wheel)
         {
             if (this.Wheels.Any(x => x.Location == wheel.Location) == false)
@@ -90,6 +96,12 @@ namespace SimTelemetry.Domain.Aggregates
             {
                 throw new CarAlreadyHasWheelException(this);
             }
+        }
+
+        public void Assign(IEnumerable<Brake> brakes)
+        {
+            foreach(var b in brakes)
+                Assign(b);
         }
 
         public void Assign(Brake brake)

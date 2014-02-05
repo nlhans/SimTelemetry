@@ -20,41 +20,14 @@ namespace SimTelemetry.Domain.Entities
 
         public EngineLifetime Lifetime { get; private set; }
 
-        public double MaximumPower
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+        public double MaximumPower { get; private set; }
+        public double MaximumPowerRpm { get; private set; }
 
-        public double MaximumTorque
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+        public double MaximumTorque { get; private set; }
+        public double MaximumTorqueRpm { get; private set; }
 
-        public double MaximumTorqueRpm
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
-
-        public double MaximumPowerRpm
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
-
-        public double MaximumOilTemperature
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
-
-        public double MaximumWaterTemperature
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
+        public double MaximumOilTemperature { get; private set; }
+        public double MaximumWaterTemperature { get; private set; }
 
         public Engine(string name, string manufacturer, int cilinders, int displacement, Range idleRpm, Range maximumRpm, IEnumerable<EngineMode> modes, IEnumerable<EngineTorque> torqueCurve, EngineLifetime lifetime)
         {

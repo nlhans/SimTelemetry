@@ -9,31 +9,21 @@ namespace SimTelemetry.Domain.Entities
 
         public float Perimeter { get; private set; }
         public float RollResistance { get; private set; }
+        public float PitsTemperature { get; private set; }
 
-        public Range PeakTemperature { get; private set; }
-        public Range PitsTemperature { get; private set; }
-        public Range PeakPressure { get; private set; }
+        public float PeakTemperature { get; private set; }
+        public float PeakPressure { get; private set; }
+        public float PeakPressureWeightSlope { get; private set; }
 
-        public Range BrakeTemperature
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
-
-        public float BrakeThicknessFailurePoint
-        {
-            get { throw new System.NotImplementedException(); }
-            set { throw new System.NotImplementedException(); }
-        }
-
-        public Wheel(WheelLocation location, float perimeter, float rollResistance, Range peakTemperature, Range pitsTemperature, Range peakPressure)
+        public Wheel(WheelLocation location, float perimeter, float rollResistance, float pitsTemperature, float peakTemperature, float peakPressure, float peakPressureWeightSlope)
         {
             Location = location;
             Perimeter = perimeter;
             RollResistance = rollResistance;
-            PeakTemperature = peakTemperature;
             PitsTemperature = pitsTemperature;
+            PeakTemperature = peakTemperature;
             PeakPressure = peakPressure;
+            PeakPressureWeightSlope = peakPressureWeightSlope;
         }
     }
 }

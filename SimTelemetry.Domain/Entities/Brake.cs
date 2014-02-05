@@ -14,6 +14,7 @@ namespace SimTelemetry.Domain.Entities
 
         public float Torque { get; private set; }
 
+
         public Brake(WheelLocation location, Range optimumTemperature, Range thicknessStart, float thicknessFailure, float torque)
         {
             Location = location;

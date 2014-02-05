@@ -82,13 +82,14 @@ namespace LiveTelemetry
                     columns.Add("S2", 295);
                     columns.Add("S3", 345);
                     columns.Add("Lap", 395);
-                }else
+                }
+                else
                 {
                     columns.Add("P", 10);
-                    columns.Add("Driver", 38);
-                    columns.Add("Gap", 140);
-                    columns.Add("Interval", 165);
-                    columns.Add("Lap", 222);
+                    columns.Add("Lap", 30);
+                    columns.Add("Driver", 60);
+                    columns.Add("Gap", 160);
+                    columns.Add("Interval", 200);
                     columns.Add("S1", 245);
                     columns.Add("S2", 295);
                     columns.Add("S3", 345);
@@ -101,7 +102,7 @@ namespace LiveTelemetry
                 int ind = 1;
 
                 var player = TelemetryApplication.Telemetry.Player;
-                if(player == null)
+                if (player == null)
                 {
                     g.DrawString("Could not find player memory object", f, Brushes.White, 10f, 30f);
                     return;
@@ -113,9 +114,12 @@ namespace LiveTelemetry
                 var overallBestS2 = TelemetryApplication.Telemetry.Laps.BestS2;
                 var overallBestS3 = TelemetryApplication.Telemetry.Laps.BestS3;
 
-                var bestSector1Driver = TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS1Lap.Driver);
-                var bestSector2Driver = TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS2Lap.Driver);
-                var bestSector3Driver = TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS3Lap.Driver);
+                var bestSector1Driver =
+                    TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS1Lap.Driver);
+                var bestSector2Driver =
+                    TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS2Lap.Driver);
+                var bestSector3Driver =
+                    TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS3Lap.Driver);
 
                 var myBestSector1 = TelemetryApplication.Telemetry.Player.BestS1;
                 var myBestSector2 = TelemetryApplication.Telemetry.Player.BestS2;
@@ -130,6 +134,8 @@ namespace LiveTelemetry
                 // Go through all drivers
                 if (driverCount <= 0) return;
                 var currentSessionTime = TelemetryApplication.Telemetry.Session.Time;
+
+                var previousGap = 0.0;
 
                 foreach (var driver in drivers)
                 {
@@ -160,6 +166,16 @@ namespace LiveTelemetry
                         g.DrawString(driver.Laps.ToString("000"), f, Brushes.White, columns["Lap"], y);
                     }
 
+                    // **** PIT COUNT **** //
+                    if (columns.ContainsKey("Pit"))
+                    {
+                        var pitBrush = Brushes.White;
+                        if (driver.IsPits)
+                            pitBrush = Brushes.Yellow;
+
+                        g.DrawString(driver.Pitstops.ToString("00"), f, pitBrush, columns["Pit"], y);
+                    }
+
                     // **** LAP TIME **** //
                     if (columns.ContainsKey("Laptime"))
                     {
@@ -175,15 +191,32 @@ namespace LiveTelemetry
                         if (lastLapIsBestLap) laptimeBrush = Brushes.Magenta;
 
                         var laptimeToPrint = showLastLap ? lastLap.Total : bestLap;
-                        var gaptimeToPrint = laptimeToPrint - bestLap;
+                        var gaptimeToPrint = laptimeToPrint - lapTimeBest;
 
                         if (laptimeToPrint > 0)
                             g.DrawString(PrintLapTime(laptimeToPrint, false), f, laptimeBrush, columns["Laptime"], y);
 
                         // Also display gap
-                        if (gaptimeToPrint > 0)
-                            g.DrawString(PrintLapTime(gaptimeToPrint, false), f, laptimeBrush, columns["Gap"], y);
+                        if (laptimeToPrint > 0 && lapTimeBest > 0)
+                            g.DrawString(PrintLapTime(gaptimeToPrint, true), f, laptimeBrush, columns["Gap"], y);
                     }
+
+
+                    // **** INTERVAL **** //
+                    if (columns.ContainsKey("Interval"))
+                    {
+                        // dunno..
+                        var gaptimeToPrint = 0;
+
+                        g.DrawString(PrintLapTime(gaptimeToPrint, true), f,  Brushes.White, columns["Gap"], y);
+                        var interval = gaptimeToPrint - previousGap;
+
+                        g.DrawString(PrintLapTime(interval, true), f, Brushes.White, columns["Interval"], y);
+
+                        previousGap = gaptimeToPrint;
+                    }
+
+
                     // **** SECTOR TIME **** //
                     if (columns.ContainsKey("S1") && columns.ContainsKey("S2") && columns.ContainsKey("S3"))
                     {
@@ -287,6 +320,11 @@ namespace LiveTelemetry
                     g.DrawString(PrintLapTime(overallBestS1, true), f, Brushes.Magenta, 245f, 10f + ind*lineHeight);
                     g.DrawString(PrintLapTime(overallBestS2, true), f, Brushes.Magenta, 295f, 10f + ind*lineHeight);
                     g.DrawString(PrintLapTime(overallBestS3, true), f, Brushes.Magenta, 345f, 10f + ind*lineHeight);
+                }
+
+                if (myBestSector1 > 0 && myBestSector2 > 0 && myBestSector3 > 0)
+                {
+
                     ind++;
                     g.DrawString("Personal Combined lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
                     g.DrawString(PrintLapTime(myBestSector1 + myBestSector2 + myBestSector3, false), f,
@@ -297,6 +335,7 @@ namespace LiveTelemetry
                     g.DrawString(PrintLapTime(myBestSector2, true), f, Brushes.Magenta, 295f, 10f + ind*lineHeight);
                     g.DrawString(PrintLapTime(myBestSector3, true), f, Brushes.Magenta, 345f, 10f + ind*lineHeight);
                 }
+
             }
             catch (Exception ex)
             {
