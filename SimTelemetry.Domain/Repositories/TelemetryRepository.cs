@@ -49,11 +49,14 @@ namespace SimTelemetry.Domain.Repositories
                                 var driver = int.Parse(telemetryRepo.GetAttribute("driver"));
                                 var number = int.Parse(telemetryRepo.GetAttribute("number"));
                                 var laptime = float.Parse(telemetryRepo.GetAttribute("laptime"));
+                                var time = float.Parse(telemetryRepo.GetAttribute("sessiontime"));
                                 var sector1 = float.Parse(telemetryRepo.GetAttribute("sector1"));
                                 var sector2 = float.Parse(telemetryRepo.GetAttribute("sector2"));
                                 var sector3 = float.Parse(telemetryRepo.GetAttribute("sector3"));
+                                var inl = bool.Parse(telemetryRepo.GetAttribute("inlap"));
+                                var outl = bool.Parse(telemetryRepo.GetAttribute("outlap"));
 
-                                var l = new Lap(driver, number, sector1, sector2, sector3);
+                                var l = new Lap(driver, true, number, time, sector1, sector2, sector3, inl, outl);
 
                                 if (activeLogFileSet)
                                     activeLogFile.AddLap(l);
@@ -91,9 +94,12 @@ namespace SimTelemetry.Domain.Repositories
                         writer.WriteAttributeString("driver", lap.Driver.ToString());
                         writer.WriteAttributeString("number", lap.LapNumber.ToString());
                         writer.WriteAttributeString("laptime", lap.Total.ToString());
+                        writer.WriteAttributeString("sessiontime", lap.TimeStart.ToString());
                         writer.WriteAttributeString("sector1", lap.Sector1.ToString());
                         writer.WriteAttributeString("sector2", lap.Sector2.ToString());
                         writer.WriteAttributeString("sector3", lap.Sector3.ToString());
+                        writer.WriteAttributeString("inlap", lap.InLap.ToString());
+                        writer.WriteAttributeString("outlap", lap.OutLap.ToString());
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();

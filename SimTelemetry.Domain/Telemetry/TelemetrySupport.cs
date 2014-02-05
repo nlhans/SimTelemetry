@@ -13,5 +13,10 @@ namespace SimTelemetry.Domain.Telemetry
             Supported.Add("Driver.Meters", Memory.Get("DriverTemplate").Fields.ContainsKey("MetersDriven"));
 
         }
+
+        public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
+        {
+            //
+        }
     }
 }

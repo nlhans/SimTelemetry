@@ -13,6 +13,10 @@ namespace SimTelemetry.Domain.Aggregates
 {
     public class Telemetry : ITelemetry
     {
+        private int _secondTick = 0;
+        private const int SecondMaximum = 1000 / ClockPeriod;
+        public const int ClockPeriod = 25;
+
         public bool IsRunning { get; protected set; }
         public bool IsDriving { get; protected set; }
         public bool IsLoading { get; protected set; }
@@ -25,6 +29,9 @@ namespace SimTelemetry.Domain.Aggregates
         public TelemetryLogger Logger { get; protected set; }
 
         #region Telemetry data yard
+
+        public TelemetryLapsPool Laps { get; protected set; }
+
         public TelemetrySession Session { get; protected set; }
         public TelemetryGame Simulator { get; protected set; }
 
@@ -58,13 +65,14 @@ namespace SimTelemetry.Domain.Aggregates
             Memory.Scanner.Disable();
 
             // Start outside-world telemetry objects
+            Laps = new TelemetryLapsPool();
             Session = new TelemetrySession();
             Simulator = new TelemetryGame();
             Acquisition = new TelemetryAcquisition();
             Support = new TelemetrySupport();
 
             // Start 40Hz clock signal (25ms)
-            Clock = new MMTimer(25);
+            Clock = new MMTimer(ClockPeriod);
             Clock.Tick += (o, s) => GlobalEvents.Fire(new TelemetryRefresh(this), true);
             Clock.Start();
 
@@ -96,7 +104,16 @@ namespace SimTelemetry.Domain.Aggregates
 
         public void Update(TelemetryRefresh instance)
         {
+            bool updateSlow = false;
             if (instance.Telemetry != this) return;
+
+            // Every second: do slow tick
+            _secondTick++;
+            if (_secondTick > SecondMaximum)
+            {
+                _secondTick = 0;
+                updateSlow = true;
+            }
 
             // Updates memory pools and reads value to this class.
             Memory.Refresh();
@@ -127,9 +144,20 @@ namespace SimTelemetry.Domain.Aggregates
             }
 
             // Simulator environment etc.
+            Laps.Update(this, Memory);
             Support.Update(this, Memory);
             Simulator.Update(this, Memory);
             Acquisition.Update(this, Memory);
+
+            if (updateSlow)
+            {
+                Session.UpdateSlow(this, Memory);
+                Laps.UpdateSlow(this, Memory);
+                Support.UpdateSlow(this, Memory);
+                Simulator.UpdateSlow(this, Memory);
+                Acquisition.UpdateSlow(this, Memory);
+            }
+
 
             if (isSessionActive)
             {
@@ -137,6 +165,11 @@ namespace SimTelemetry.Domain.Aggregates
                 UpdateDrivers();
                 foreach (var driver in Drivers)
                     driver.Update(this, Memory);
+                if(updateSlow)
+                {
+                    foreach (var driver in Drivers)
+                        driver.UpdateSlow(this, Memory);
+                }
             }
 
             // TODO: This takes a considerable amount of CPU time. Fix it.

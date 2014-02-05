@@ -49,6 +49,11 @@ namespace SimTelemetry.Domain.Telemetry
            Info = new Session("race 1", SessionType.PRACTICE, 1, "Sunday", new Time(16,30,0,0), new TimeSpan(0,3,0,0), 150, 80);
         }
 
+        public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
+        {
+            //
+        }
+
         public TelemetrySession Clone()
         {
             return (TelemetrySession)MemberwiseClone();

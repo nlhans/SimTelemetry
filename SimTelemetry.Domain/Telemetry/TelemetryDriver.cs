@@ -12,7 +12,6 @@ namespace SimTelemetry.Domain.Telemetry
     {
         private bool _initial = true;
 
-
         internal IDataNode Pool { get; set; }
 
         public bool IsPlayer { get; protected set; }
@@ -81,7 +80,27 @@ namespace SimTelemetry.Domain.Telemetry
         public TelemetryWheel WheelLR { get; private set; }
         public TelemetryWheel WheelLF { get; private set; }
 
+        public double BestS1 { get; internal set; }
+        public double BestS2 { get; internal set; }
+        public double BestS3 { get; internal set; }
+
+        public double LastS1 { get; internal set; }
+        public double LastS2 { get; internal set; }
+        public double LastS3 { get; internal set; }
+
+        public Lap BestLap { get; internal set; }
+        public Lap LastLap { get; internal set; }
+        public Lap CurrentLap { get; internal set; }
+
+        public DateTime LastLapsUpdate { get; private set; }
         protected List<Lap> LapsList { get; set; }
+
+        public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
+        {
+            BestS1 = LapsList.Any(x => x.Sector1 > 0) ? LapsList.Where(x => x.Sector1 > 0).Min(x => x.Sector1) : -1;
+            BestS2 = LapsList.Any(x => x.Sector2 > 0) ? LapsList.Where(x => x.Sector2 > 0).Min(x => x.Sector2) : -1;
+            BestS3 = LapsList.Any(x => x.Sector3 > 0) ? LapsList.Where(x => x.Sector3 > 0).Min(x => x.Sector3) : -1;
+        }
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
         {
@@ -146,8 +165,11 @@ namespace SimTelemetry.Domain.Telemetry
 
             Name = Pool.ReadAs<string>("Name");
 
-            if (Pool is MemoryPool && (Pool as MemoryPool).Pools.ContainsKey("Laps"))
+            if (Pool is MemoryPool && (Pool as MemoryPool).Pools.ContainsKey("Laps") && DateTime.Now.Subtract(LastLapsUpdate).TotalMilliseconds > 500)
+            {
                 LapsList = (Pool as MemoryPool).Pools["Laps"].ReadAs<List<Lap>>("List");
+                LastLapsUpdate = DateTime.Now;
+            }
 
             if (Pool.Contains("TrackSector"))
             {
@@ -169,15 +191,58 @@ namespace SimTelemetry.Domain.Telemetry
                     TrackPosition = TrackPointType.SECTOR1;
                 }
             }
+
+            CurrentLap = LapsList.LastOrDefault();
+
+            // Generate sector times
+            switch (TrackPosition)
+            {
+                case TrackPointType.SECTOR1:
+                    // Then he just completed S3.
+                    if (LapsList.Count() > 2)
+                    {
+                        LastS1 = LapsList[LapsList.Count() - 2].Sector1;
+                        LastS2 = LapsList[LapsList.Count() - 2].Sector2;
+                        LastS3 = LapsList[LapsList.Count() - 2].Sector3;
+                    }
+                    break;
+
+                case TrackPointType.SECTOR2:
+                    LastS1 = LapsList.LastOrDefault().Sector1;
+                    if (LapsList.Count() > 1)
+                    {
+                        LastS2 = LapsList[LapsList.Count() - 1].Sector2;
+                        LastS3 = LapsList[LapsList.Count() - 1].Sector3;
+                    }
+                    break;
+
+                case TrackPointType.SECTOR3:
+                    LastS1 = LapsList.LastOrDefault().Sector1;
+                    LastS2 = LapsList.LastOrDefault().Sector2;
+                    if (LapsList.Count() > 1)
+                    {
+                        LastS3 = LapsList[LapsList.Count() - 1].Sector3;
+                    }
+                    break;
+            }
+
             if (IsPlayer)
             {
-                // Minimize the amount of fields in this section
+
             }
         }
 
         public TelemetryDriver(IDataNode pool)
         {
             Pool = pool;
+
+            // Last&Best Lap is done in TelemetryLapsPool
+            LastLap = new Lap(-1, false, -1, -1, -1, -1, -1, false, false);
+            BestLap = new Lap(-1, false, -1, -1, -1, -1, -1, false, false);
+
+            BestS1 = -1;
+            BestS2 = -1;
+            BestS3 = -1;
 
             if (Pool is MemoryPool)
             {
@@ -194,14 +259,8 @@ namespace SimTelemetry.Domain.Telemetry
         public IEnumerable<Lap> GetLaps()
         {
             return LapsList;
-            return new List<Lap>();
         }
-
-        public Lap GetBestLap()
-        {
-            return LapsList[0] ;
-        }
-
+        
         public double GetSplitTime(TelemetryDriver telemetryDriver)
         {
             return 0;

@@ -8,6 +8,11 @@
         {
         }
 
+        public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
+        {
+
+        }
+
 
         public TelemetryGame Clone()
         {

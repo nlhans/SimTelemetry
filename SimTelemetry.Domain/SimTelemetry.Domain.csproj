@@ -60,6 +60,8 @@
     <Compile Include="Aggregates\RecordedLap.cs" />
     <Compile Include="Aggregates\Simulator.cs" />
     <Compile Include="Aggregates\Telemetry.cs" />
+    <Compile Include="Events\TelemetryLapDriven.cs" />
+    <Compile Include="Telemetry\TelemetryLapsPool.cs" />
     <Compile Include="Aggregates\Track.cs" />
     <Compile Include="Common\IEntity.cs" />
     <Compile Include="Common\ILazyRepositoryDataSource.cs" />
@@ -87,7 +89,7 @@
     <Compile Include="Events\DriversRemoved.cs" />
     <Compile Include="Events\DrivingStarted.cs" />
     <Compile Include="Events\DrivingStopped.cs" />
-    <Compile Include="Events\LapAdded.cs" />
+    <Compile Include="Events\LoggedLapAdded.cs" />
     <Compile Include="Events\LoadingFinished.cs" />
     <Compile Include="Events\LoadingStarted.cs" />
     <Compile Include="Events\LogFileWriteAction.cs" />

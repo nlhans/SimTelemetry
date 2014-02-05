@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Collections;
+using SimTelemetry.Domain.Events;
 
 namespace SimTelemetry.Domain
 {
@@ -55,6 +56,10 @@ namespace SimTelemetry.Domain
 
         public static void Fire<T>(T Data, bool includeNetwork)
         {
+            if (!(typeof(T).Name == "TelemetryRefresh"))
+            {
+                Debug.WriteLine(typeof (T).Name + " fired");
+            }
             foreach (var handler in _handlers
                 .Where(x => includeNetwork || (includeNetwork == false && x.Value.Network == false))
                 .Select(x => x.Value.Action).OfType<Action<T>>())

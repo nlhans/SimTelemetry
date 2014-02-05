@@ -79,7 +79,21 @@ namespace LiveTelemetry
             GlobalEvents.Fire(new SimulatorStarted(Plugins.Simulators[0]), true);
             GlobalEvents.Hook<SessionStarted>(x => delayedSessionStartHandler.Start(), true);
             //GlobalEvents.Hook<DrivingStarted>(x => t_Elapsed(0, null), true);
-            GlobalEvents.Hook<SessionStopped>(x => delayedSessionStartHandler.Stop(), true);
+            GlobalEvents.Hook<SessionStopped>(x =>
+                                                  {
+                                                      delayedSessionStartHandler.Stop();
+
+                                                      CarAvailable = false;
+                                                      TrackAvailable = false;
+
+
+                                                      GlobalEvents.Fire(new CarUnloaded(Car), true);
+                                                      GlobalEvents.Fire(new TrackUnloaded(Track), true);
+
+                                                      Car = null;
+                                                      Track = null;
+
+                                                  }, true);
 
             if (rfactor != null)
             {
@@ -97,6 +111,11 @@ namespace LiveTelemetry
                 Track = Tracks.GetByFile(Telemetry.Session.Track);
                 if (Track != null)
                     trackAvail = true;
+            }
+            else
+            {
+                Track = null;
+                trackAvail = false;
             }
 
             if (TelemetryAvailable && Telemetry.Player != null)
@@ -144,6 +163,10 @@ namespace LiveTelemetry
                             carAvail = true;
                     }
                 }
+            }
+            else
+            {
+                Car = null;
             }
 
             if (carAvail != CarAvailable)

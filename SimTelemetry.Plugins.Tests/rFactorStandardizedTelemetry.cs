@@ -97,30 +97,7 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<bool>("Ignition", MemoryAddress.Dynamic, 0, 0xAA, 1));
             
             // Add converter for byte <> List<Laps>
-            MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<List<Lap>>((data, offset) =>
-                {
-                    int lapId = 0;
-                    var lapList = new List<Lap>();
-
-                    for (int i = 0; i < data.Length; i += 0x04*0x06)
-                    {
-                        float startTime = BitConverter.ToSingle(data, i);
-
-                        if (startTime == -1 && i != 0) break; 
-
-                        // TODO: detect aborted laps
-                        
-                        float sector1 = BitConverter.ToSingle(data, i + 4);
-                        float sector2 = BitConverter.ToSingle(data, i + 8) -sector1;
-                        float sector3 = BitConverter.ToSingle(data, i + 12)-sector2-sector1;
-
-                        var l = new Lap(-1, lapId, sector1, sector2, sector3); // TODO: Add start time in session
-                        lapList.Add(l);
-                        lapId++;
-                    }
-
-                    return lapList;
-                }, (o) => o is List<Lap> ? o as List<Lap> : new List<Lap>()));
+            MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<List<Lap>>(ByteArrayToLapList, (o) => o is List<Lap> ? o as List<Lap> : new List<Lap>()));
 
             var laps = new MemoryPool("Laps", MemoryAddress.Dynamic, templateDriver, 0x3D90, 0x1000); 
             laps.Add(new MemoryFieldLazy<List<Lap>>("List", MemoryAddress.Dynamic, 0, 0, 0x1000));
@@ -138,6 +115,43 @@ namespace SimTelemetry.Plugins.Tests
 
             DriverPositionOffset = templateDriver.Fields["Position"].Offset;
             NamePositionOffset = templateDriver.Fields["Name"].Offset;
+        }
+
+        private List<Lap> ByteArrayToLapList(byte[] data, int offset)
+        {
+            int lapId = 0;
+            var lapList = new List<Lap>();
+
+            var lastWasInLap = true;
+
+            for (int i = 0; i < data.Length; i += 0x04*0x06)
+            {
+                float startTime = BitConverter.ToSingle(data, i);
+
+                if (startTime < 0 && i != 0) break;
+
+                float sector1 = BitConverter.ToSingle(data, i + 4);
+                float sector2 = BitConverter.ToSingle(data, i + 8) - sector1;
+                float sector3 = BitConverter.ToSingle(data, i + 12) - sector2 - sector1;
+
+                // only check if the array is long enough to contain another lap.
+                bool nextLapIsOutlap = i + 4*6+4 <= data.Length &&
+                    (BitConverter.ToSingle(data, i + 4*6) > 0 && BitConverter.ToSingle(data, i + 4*6 + 4) < 0);
+ 
+                // A lap is done when the next lap is going.
+                var isLapDone = i + 4 * 6 + 4 <= data.Length && BitConverter.ToSingle(data, i + 4 * 6) > 0;
+
+                var outlap = sector1 < 0 && lastWasInLap;
+                var inlap = sector3 <= 0 && nextLapIsOutlap && !lastWasInLap;
+
+                lastWasInLap = inlap;
+
+                var l = new Lap(-1, isLapDone, lapId, startTime, sector1, sector2, sector3, inlap, outlap); // TODO: Add start time in session
+                lapList.Add(l);
+                lapId++;
+            }
+
+            return lapList;
         }
 
         public void CreateDriver(MemoryPool pool, bool isPlayer)

@@ -78,7 +78,7 @@ namespace SimTelemetry.Domain.Entities
             BestSector2 = _lapTimes.Min(x => x.Sector2);
             BestSector3 = _lapTimes.Min(x => x.Sector3);
 
-            GlobalEvents.Fire(new LapAdded(this, lap), true);
+            GlobalEvents.Fire(new LoggedLapAdded(this, lap), true);
         }
 
         public void SetDriverSplits(IEnumerable<double> splits)

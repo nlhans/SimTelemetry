@@ -50,7 +50,7 @@ namespace LiveTelemetry.Garage
 
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.DoubleBuffer, true);
 
-            cb_mode.SelectedIndex = 0;
+            //cb_mode.SelectedIndex = 0;
             tb_throttle.Value = 100;
             tb_speed.Text = "0";
 

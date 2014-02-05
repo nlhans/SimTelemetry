@@ -9,5 +9,9 @@
 
         }
 
+        public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
+        {
+
+        }
     }
 }
