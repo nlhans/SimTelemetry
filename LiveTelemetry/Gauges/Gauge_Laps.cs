@@ -62,142 +62,145 @@ namespace LiveTelemetry
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            var f = new Font("Arial", 8, FontStyle.Regular);
+
             base.OnPaint(e);
+
+            var g = e.Graphics;
+            g.FillRectangle(Brushes.Black, e.ClipRectangle);
+            if (!TelemetryApplication.TelemetryAvailable) return;
 
             try
             {
-                Graphics g = e.Graphics;
-                g.FillRectangle(Brushes.Black, e.ClipRectangle);
-                if (!TelemetryApplication.TelemetryAvailable) return;
+                var columns = new Dictionary<string, float>();
 
-                System.Drawing.Font f = new Font("Arial", 8, FontStyle.Regular);
+                columns.Add("Lap", 70);
+                columns.Add("S1", 100);
+                columns.Add("S2", 150);
+                columns.Add("S3", 200);
+                columns.Add("Time", 250);
+                columns.Add("Gap", 320);
 
-                g.DrawString("Lap", f, Brushes.DarkGray, 70f, 10f);
-                g.DrawString("S1", f, Brushes.DarkGray, 100f, 10f);
-                g.DrawString("S2", f, Brushes.DarkGray, 150f, 10f);
-                g.DrawString("S3", f, Brushes.DarkGray, 200f, 10f);
-                g.DrawString("Time", f, Brushes.DarkGray, 250f, 10f);
-                g.DrawString("Diff", f, Brushes.DarkGray, 320f, 10f);
+
+                foreach(var c in columns)
+                    g.DrawString(c.Key, f, Brushes.DarkGray, c.Value, 10f);
+
+                var laps = TelemetryApplication.Telemetry.Player.GetLaps().ToList();
+                    var bestLap = TelemetryApplication.Telemetry.Player.BestLap;
+
+                if (!laps.Any(x => x.Completed && x.Total > 0)) return;
 
                 float lineheight = 16f;
                 int ind = 16;
                 int sind = ind;
-                var laps = TelemetryApplication.Telemetry.Player.GetLaps().ToList();
 
-                float best_lap = 1000f;
-                float best_sector1 = 1000f;
-                float best_sector2 = 1000f;
-                float best_sector3 = 1000f;
+                var lapsBeforeThese16 = laps.Count() > 16
+                                            ? laps.OrderBy(x => x.TimeStart).Take(laps.Count() - 16).ToList()
+                                            : new List<Lap>();
 
-                // TODO: Determine laptimes
-                float absolute_best_lap = laps.Min(x => x.Total);
-                float absolute_best_sector1 = laps.Min(x=>x.Sector1);
-                float absolute_best_sector2 = laps.Min(x=>x.Sector2);
-                float absolute_best_sector3 = laps.Min(x=>x.Sector3);
+                var personalBestS1SoFar = lapsBeforeThese16.Count > 0 ? lapsBeforeThese16.Where(x=>x.Sector1>0).Min(x => x.Sector1) : -1;
+                var personalBestS2SoFar = lapsBeforeThese16.Count > 0 ? lapsBeforeThese16.Where(x => x.Sector2 > 0).Min(x => x.Sector2) : -1;
+                var personalBestS3SoFar = lapsBeforeThese16.Count > 0 ? lapsBeforeThese16.Where(x => x.Sector3 > 0).Min(x => x.Sector3) : -1;
+                var personalBestSoFar = lapsBeforeThese16.Count > 0 ? lapsBeforeThese16.Where(x => x.Total > 0).Min(x => x.Total) : -1;
 
-                for (int lap = laps.Count - ind; lap <= laps.Count - 1;  lap++)
+                ind = 16;
+                foreach(var lap in laps.OrderBy(x=>-x.TimeStart).Take(16).Reverse())
                 {
-                    if (lap <= 0) continue;
-                    g.DrawString(lap.ToString(), f, ((lap == laps.Count) ? Brushes.White : Brushes.Yellow),
-                                80f, 10f + lineheight * ind);
+                    var y = 10f + lineheight*ind;
 
-                    if (laps[lap].Total > 0)
-                        best_lap = Math.Min(best_lap, laps[lap].Total);
-                    if (laps[lap].Sector1 > 0)
-                        best_sector1 = Math.Min(best_sector1, laps[lap].Sector1);
-                    if (laps[lap].Sector2 > 0)
-                        best_sector2 = Math.Min(best_sector2, laps[lap].Sector2);
-                    if (laps[lap].Sector3 > 0)
-                        best_sector3 = Math.Min(best_sector3, laps[lap].Sector3);
+                    g.DrawString(lap.LapNumber.ToString("000"), f, Brushes.White, columns["Lap"], y);
 
-
-                    if (laps[lap].Sector1 > 0)
+                    if(lap.OutLap)
                     {
-                        Brush br1 = ((lap == laps.Count) ? Brushes.White : Brushes.Yellow);
-                        if (laps[lap].Sector1 == best_sector1)
-                            br1 = Brushes.DarkGreen;
-                        if (laps[lap].Sector1 == absolute_best_sector1)
-                            br1 = Brushes.Magenta;
+                        g.DrawString("OUT LAP", f, Brushes.White, columns["S1"], y);
+                    }
+                    else if (lap.Sector1 > 0)
+                    {
+                        personalBestS1SoFar = personalBestS1SoFar < 0
+                                                  ? lap.Sector1
+                                                  : Math.Min(personalBestS1SoFar, lap.Sector1);
 
-                        g.DrawString(PrintLapTime(laps[lap].Sector1, true), f, br1, 100f, 10f + ind * lineheight);
+                        var sector1brush = Brushes.Yellow;
+                        if (personalBestS1SoFar == lap.Sector1) sector1brush = Brushes.YellowGreen;
+                        if (TelemetryApplication.Telemetry.Laps.BestS1 == lap.Sector1) sector1brush = Brushes.Magenta;
 
+                        g.DrawString(PrintLapTime(lap.Sector1, true), f, sector1brush, columns["S1"], y);
                     }
 
-                    if (laps[lap].Sector2 > 0)
+                    if (lap.Sector2 > 0)
                     {
-                        Brush br1 = ((lap == laps.Count) ? Brushes.White : Brushes.Yellow);
-                        if (laps[lap].Sector2 == best_sector2)
-                            br1 = Brushes.DarkGreen;
-                        if (laps[lap].Sector2 == absolute_best_sector2)
-                            br1 = Brushes.Magenta;
+                        personalBestS2SoFar = personalBestS2SoFar < 0
+                                                  ? lap.Sector2
+                                                  : Math.Min(personalBestS2SoFar, lap.Sector2);
 
-                        g.DrawString(PrintLapTime(laps[lap].Sector2, true), f, br1, 150f, 10f + ind * lineheight);
+                        var sector2brush = Brushes.Yellow;
+                        if (personalBestS2SoFar == lap.Sector2) sector2brush = Brushes.YellowGreen;
+                        if (TelemetryApplication.Telemetry.Laps.BestS1 == lap.Sector1) sector2brush = Brushes.Magenta;
 
+                        g.DrawString(PrintLapTime(lap.Sector2, true), f, sector2brush, columns["S2"], y);
                     }
 
-                    if (laps[lap].Sector3 > 0)
+                    if (lap.InLap)
                     {
-                        Brush br1 = ((lap == laps.Count) ? Brushes.White : Brushes.Yellow);
-                        if (laps[lap].Sector3 == best_sector3)
-                            br1 = Brushes.DarkGreen;
-                        if (laps[lap].Sector3 == absolute_best_sector3)
-                            br1 = Brushes.Magenta;
+                        g.DrawString("IN LAP", f, Brushes.White, columns["S3"], y);
+                    }
+                    else if (lap.Sector3 > 0)
+                    {
+                        personalBestS3SoFar = personalBestS3SoFar < 0
+                                                  ? lap.Sector3
+                                                  : Math.Min(personalBestS3SoFar, lap.Sector3);
 
-                        g.DrawString(PrintLapTime(laps[lap].Sector3, true), f, br1, 200f, 10f + ind * lineheight);
+                        var sector3brush = Brushes.Yellow;
+                        if (personalBestS3SoFar == lap.Sector3) sector3brush = Brushes.YellowGreen;
+                        if (TelemetryApplication.Telemetry.Laps.BestS2 == lap.Sector3) sector3brush = Brushes.Magenta;
 
+                        g.DrawString(PrintLapTime(lap.Sector3, true), f, sector3brush, columns["S3"], y);
                     }
 
-                    if (laps[lap].Total > 0)
+                    if (lap.Total > 0)
                     {
-                        Brush br1 = ((lap == laps.Count) ? Brushes.White : Brushes.Yellow);
-                        if (laps[lap].Total == best_lap)
-                            br1 = Brushes.DarkGreen;
-                        if (laps[lap].Total == absolute_best_lap)
-                            br1 = Brushes.Magenta;
+                        personalBestSoFar = personalBestSoFar < 0
+                                                  ? lap.Total
+                                                  : Math.Min(personalBestSoFar, lap.Total);
 
-                        g.DrawString(PrintLapTime(laps[lap].Total, true), f, br1, 250f, 10f + ind * lineheight);
+                        var lapBrush = Brushes.Yellow;
+                        if (personalBestSoFar == lap.Total) lapBrush = Brushes.YellowGreen;
+                        if (TelemetryApplication.Telemetry.Laps.BestLap.Total == lap.Total) lapBrush = Brushes.Magenta;
+
+                        g.DrawString(PrintLapTime(lap.Total, false), f, lapBrush, columns["Time"], y);
+
+                        var gapToBest = lap.Total - bestLap.Total;
+                        g.DrawString(PrintLapTime(gapToBest, true), f, lapBrush, columns["Gap"], y);
 
                     }
-                    if (laps[lap].Sector1 < 1 && laps[lap].Sector2 < 1 && laps[lap].Sector3 < 1)
-                    {
-                        if (laps[lap - 1].Sector3 < 0 || (laps.Count == lap && TelemetryApplication.Telemetry.Player.TrackPosition != TrackPointType.SECTOR1))
-                        g.DrawString("Out lap - no sector data", f, Brushes.Red, 100f, 10f + ind * lineheight);
-                    }
-                    if (laps[lap].Sector1 > 1 && laps[lap].Sector2 > 1 && laps[lap].Sector3 < 1 && !(TelemetryApplication.Telemetry.Player.TrackPosition == TrackPointType.SECTOR3 && lap + 1 == laps.Count))
-                    {
-                        g.DrawString("Pits", f, Brushes.Red,200f, 10f + ind * lineheight);
-                    }
-                    if (laps[lap].Total > 0)
-                        // - Telemetry.m.Sim.Drivers.Player.LapTime_Best -> Total - 0
-                        // TODO: Add laptimes
-                        g.DrawString(PrintLapTime(laps[lap].Total - 0, true), f, Brushes.White, 310f, 10f + ind * lineheight);
 
                     ind--;
-
-
                 }
+
                 sind++;
                 g.DrawString("Fastest lap:", f, Brushes.DarkGray,35f, 10f + sind * lineheight);
 
-                // TODO: Add laptimes
-                //g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector1, true), f, Brushes.Magenta, 100f, 10f + sind * lineheight);
-                //g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector2, true), f, Brushes.Magenta, 150f, 10f + sind * lineheight);
-                //g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best_Sector3, true), f, Brushes.Magenta, 200f, 10f + sind * lineheight);
+                if (personalBestSoFar > 0)
+                {
+                    g.DrawString(PrintLapTime(bestLap.Sector1, true), f, Brushes.Magenta, 100f,10f + sind * lineheight);
+                    g.DrawString(PrintLapTime(bestLap.Sector2, true), f, Brushes.Magenta, 150f,10f + sind * lineheight);
+                    g.DrawString(PrintLapTime(bestLap.Sector3, true), f, Brushes.Magenta, 200f,10f + sind * lineheight);
 
-                //g.DrawString(PrintLapTime(Telemetry.m.Sim.Drivers.Player.LapTime_Best, false), f, Brushes.Magenta, 250f, 10f + sind * lineheight);
+                    g.DrawString(PrintLapTime(personalBestSoFar, false), f, Brushes.Magenta, 250f, 10f + sind * lineheight);
+                }
 
                 sind++;
+
                 g.DrawString("Combined lap:", f, Brushes.DarkGray, 20f, 10f + sind * lineheight);
 
-                g.DrawString(PrintLapTime(absolute_best_sector1, true), f, Brushes.Magenta, 100f, 10f + sind * lineheight);
-                g.DrawString(PrintLapTime(absolute_best_sector2, true), f, Brushes.Magenta, 150f, 10f + sind * lineheight);
-                g.DrawString(PrintLapTime(absolute_best_sector3, true), f, Brushes.Magenta, 200f, 10f + sind * lineheight);
+                if (personalBestS3SoFar > 0)
+                {
+                    g.DrawString(PrintLapTime(personalBestS1SoFar, true), f, Brushes.Magenta, 100f,10f + sind*lineheight);
+                    g.DrawString(PrintLapTime(personalBestS2SoFar, true), f, Brushes.Magenta, 150f,10f + sind*lineheight);
+                    g.DrawString(PrintLapTime(personalBestS3SoFar, true), f, Brushes.Magenta, 200f,10f + sind*lineheight);
 
-                g.DrawString(PrintLapTime(absolute_best_sector1 + absolute_best_sector2 + absolute_best_sector3, false), f, Brushes.Magenta, 250f, 10f + sind * lineheight);
-
-                // TODO: Add laptimes
-                //g.DrawString(PrintLapTime(absolute_best_sector1 + absolute_best_sector2 + absolute_best_sector3 -Telemetry.m.Sim.Drivers.Player.LapTime_Best, true), f, Brushes.White, 310f, 10f + sind * lineheight);
-
+                    g.DrawString(PrintLapTime(personalBestS1SoFar + personalBestS2SoFar + personalBestS3SoFar, false), f,Brushes.Magenta, 250f, 10f + sind*lineheight);
+                }
 
                 Font sf = new Font("Arial", 8f);
 
@@ -208,14 +211,8 @@ namespace LiveTelemetry
             }
             catch (Exception ex)
             {
-                Graphics g = e.Graphics;
-                g.FillRectangle(Brushes.Black, e.ClipRectangle);
-
-                System.Drawing.Font f = new Font("Arial", 8f);
-
                 g.DrawString(ex.Message, f, Brushes.White, 10, 10);
                 g.DrawString(ex.StackTrace, f, Brushes.White, 10, 30);
-
 
             }
         }

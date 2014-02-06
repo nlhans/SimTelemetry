@@ -391,12 +391,12 @@ namespace LiveTelemetry
 
 
                 // Track temperatures etc.
-                g.DrawString("TRACK TEMPERATURE", f, DimBrush, 300f, 50f);
-                g.DrawString("AMBIENT TEMPERATURE", f, DimBrush, 300f, 150f);
+                g.DrawString("TRACK TEMPERATURE", f, Brushes.DarkGray, 300f, 50f);
+                g.DrawString("AMBIENT TEMPERATURE", f, Brushes.DarkGray, 300f, 150f);
 
                 var trf = new Font("Calibri", 36f);
-                g.DrawString(TelemetryApplication.Telemetry.Session.TrackTemperature.ToString("00.0") + "C", trf, Brushes.DarkGray, 320f, 70f);
-                g.DrawString(TelemetryApplication.Telemetry.Session.AmbientTemperature.ToString("00.0") + "C", trf, Brushes.DarkGray, 320f, 170f);
+                g.DrawString(TelemetryApplication.Telemetry.Session.TrackTemperature.ToString("00.0") + "C", trf, Brushes.White, 300f, 70f);
+                g.DrawString(TelemetryApplication.Telemetry.Session.AmbientTemperature.ToString("00.0") + "C", trf, Brushes.White, 300f, 170f);
 
             }
             catch (Exception ex)

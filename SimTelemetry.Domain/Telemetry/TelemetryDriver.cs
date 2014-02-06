@@ -96,7 +96,7 @@ namespace SimTelemetry.Domain.Telemetry
             BestS2 = LapsList.Any(x => x.Sector2 > 0) ? LapsList.Where(x => x.Sector2 > 0).Min(x => x.Sector2) : -1;
             BestS3 = LapsList.Any(x => x.Sector3 > 0) ? LapsList.Where(x => x.Sector3 > 0).Min(x => x.Sector3) : -1;
 
-            BestLap = LapsList.Any(x => x.Total > 0) ? LapsList.Where(x => x.Total > 0).OrderBy(x => x.Sector3).FirstOrDefault() : dummyLap;
+            BestLap = LapsList.Any(x => x.Total > 0) ? LapsList.Where(x => x.Total > 0).OrderBy(x => x.Total).FirstOrDefault() : dummyLap;
             LastLap = LapsList.Any(x => x.Completed) ? LapsList.LastOrDefault(x => x.Completed) : dummyLap;
             CurrentLap = LapsList.Any() ? LapsList.LastOrDefault() : dummyLap;
         }
