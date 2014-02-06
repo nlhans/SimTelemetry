@@ -26,6 +26,19 @@ namespace SimTelemetry.Plugins.Tests
             session.Add(new MemoryFieldLazy<float>("Time", MemoryAddress.Static, 0x60022C, 4));
             session.Add(new MemoryFieldLazy<float>("Clock", MemoryAddress.Static, 0x6E2CD8, 4));
 
+            session.Add(new MemoryFieldLazy<int>("LapsLimit", MemoryAddress.Static, 0x314654, 4));
+            session.Add(new MemoryFieldLazy<TimeSpan>("TimeLimit", MemoryAddress.Static, 0x5932EC, 4));
+            session.Add(new MemoryFieldLazy<SessionType>("Type", MemoryAddress.Static, 0x58696C, 4));
+            session.Add(new MemoryFieldLazy<byte>("TypeIndex", MemoryAddress.Static, 0x58696C, 4, (b) =>
+                                                                                                      {
+                                                                                                          if (b > 0 && b <= 4)
+                                                                                                              return b;
+                                                                                                          return 1;
+                                                                                                      }));
+            session.Add(new MemoryFieldConstant<string>("Day", "???")); // TODO: Day of week of this session
+            // TODO: Time of day of this session.
+            // TODO: Pit speed limit
+
             session.Add(new MemoryFieldLazy<string>("LocationTrack", MemoryAddress.Static, 0x309D28, 0, 256,
                                                     x => x.Length > 20 ? x.Substring(19).ToLower().Replace("aiw", "gdb") : string.Empty));
 
@@ -92,22 +105,23 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<bool>("IsPits", MemoryAddress.Dynamic, 0, 0x27A8, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("IsDriving", MemoryAddress.Dynamic, 0, 0x3CBF, 1));
             templateDriver.Add(new MemoryFieldLazy<byte>("IsDisqualified", MemoryAddress.Dynamic, 0x3D24, 1,
-                                                         (v) => (byte)((v == 3) ? 1 : 0)));
+                                                         v => (byte) ((v == 3) ? 1 : 0)));
 
-            templateDriver.Add(new MemoryFieldLazy<bool>("FlagYellow", MemoryAddress.Dynamic, 0, 0x104, 1, (x) => !x));
+            templateDriver.Add(new MemoryFieldLazy<bool>("FlagYellow", MemoryAddress.Dynamic, 0, 0x104, 1, (x) => x));
             templateDriver.Add(new MemoryFieldLazy<bool>("FlagBlue", MemoryAddress.Dynamic, 0, 0x3E39, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("FlagBlack", MemoryAddress.Dynamic, 0, 0x3D24, 1));
             templateDriver.Add(new MemoryFieldLazy<bool>("Ignition", MemoryAddress.Dynamic, 0, 0xAA, 1));
-            
+
             // Add converter for byte <> List<Laps>
             MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<List<Lap>>(ByteArrayToLapList, (o) => o is List<Lap> ? o as List<Lap> : new List<Lap>()));
+            MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<SessionType>(ByteArrayToSessionType, (o) => o is SessionType ? (SessionType)o : default(SessionType)));
+            MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<Time>(ByteArrayToTime, (o) => o is Time ? o as Time : default(Time)));
+            MemoryDataConverter.AddProvider(new MemoryDataConverterProvider<TimeSpan>(ByteArrayToTimeSpan, (o) => o is TimeSpan ? (TimeSpan)o : default(TimeSpan)));
 
             var laps = new MemoryPool("Laps", MemoryAddress.Dynamic, templateDriver, 0x3D90, 0x1000); 
             laps.Add(new MemoryFieldLazy<List<Lap>>("List", MemoryAddress.Dynamic, 0, 0, 0x1000));
 
-            // 200 laps, 6 floats each.
             templateDriver.Add(laps);
-
 
             provider.Add(simulator);
             provider.Add(session);
@@ -116,8 +130,45 @@ namespace SimTelemetry.Plugins.Tests
             provider.Refresh();
             templateDriver.SetTemplate(true);
 
+            // variabeles for raw-API "QuickDriverCheck"
             DriverPositionOffset = templateDriver.Fields["Position"].Offset;
             NamePositionOffset = templateDriver.Fields["Name"].Offset;
+        }
+
+        private Time ByteArrayToTime(byte[] a, int b)
+        {
+            var f = BitConverter.ToSingle(a, b);
+            return new Time(f);
+        }
+
+        private TimeSpan ByteArrayToTimeSpan(byte[] a, int b)
+        {
+            var f = BitConverter.ToSingle(a, b);
+            return new TimeSpan(0, 0, 0, 0, (int)Math.Round((f-30)*1000));
+        }
+
+        private SessionType ByteArrayToSessionType(byte[] a, int b)
+        {
+            //
+            switch (a[b])
+            {
+                case 0:
+                    return SessionType.TEST_DAY;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    return SessionType.PRACTICE;
+                case 5:
+                    return SessionType.QUALIFY;
+                case 6:
+                    return SessionType.WARMUP;
+                case 7:
+                    return SessionType.RACE;
+
+                default:
+                    return SessionType.TEST_DAY;
+            }
         }
 
         private List<Lap> ByteArrayToLapList(byte[] data, int offset)

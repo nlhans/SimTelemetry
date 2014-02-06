@@ -50,7 +50,7 @@ namespace LiveTelemetry
 
                 // What session type?
                 // TODO: Get session type from track
-                Session i = new Session("", SessionType.RACE, 1, "Sunday", new Time(0), new TimeSpan(1), 125, 80);
+                Session i = TelemetryApplication.Telemetry.Session.Info;
 
                 string sSessionType = "";
                 switch (i.Type)

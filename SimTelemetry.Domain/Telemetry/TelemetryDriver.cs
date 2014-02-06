@@ -79,15 +79,11 @@ namespace SimTelemetry.Domain.Telemetry
         public double BestS2 { get; internal set; }
         public double BestS3 { get; internal set; }
 
-        public double LastS1 { get; internal set; }
-        public double LastS2 { get; internal set; }
-        public double LastS3 { get; internal set; }
-
         public Lap BestLap { get; internal set; }
         public Lap LastLap { get; internal set; }
         public Lap CurrentLap { get; internal set; }
 
-        public DateTime LastLapsUpdate { get; private set; }
+        protected DateTime LastLapsUpdate { get; set; }
         protected List<Lap> LapsList { get; set; }
 
         public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
@@ -195,38 +191,6 @@ namespace SimTelemetry.Domain.Telemetry
             }
 
             CurrentLap = LapsList.LastOrDefault();
-
-            // Generate sector times
-            switch (TrackPosition)
-            {
-                case TrackPointType.SECTOR1:
-                    // Then he just completed S3.
-                    if (LapsList.Count() > 2)
-                    {
-                        LastS1 = LapsList[LapsList.Count() - 2].Sector1;
-                        LastS2 = LapsList[LapsList.Count() - 2].Sector2;
-                        LastS3 = LapsList[LapsList.Count() - 2].Sector3;
-                    }
-                    break;
-
-                case TrackPointType.SECTOR2:
-                    LastS1 = LapsList.LastOrDefault().Sector1;
-                    if (LapsList.Count() > 1)
-                    {
-                        LastS2 = LapsList[LapsList.Count() - 1].Sector2;
-                        LastS3 = LapsList[LapsList.Count() - 1].Sector3;
-                    }
-                    break;
-
-                case TrackPointType.SECTOR3:
-                    LastS1 = LapsList.LastOrDefault().Sector1;
-                    LastS2 = LapsList.LastOrDefault().Sector2;
-                    if (LapsList.Count() > 1)
-                    {
-                        LastS3 = LapsList[LapsList.Count() - 1].Sector3;
-                    }
-                    break;
-            }
 
             if (WheelLF != null) WheelLF.Update(telemetry, Memory);
             if (WheelRF != null) WheelRF.Update(telemetry, Memory);
