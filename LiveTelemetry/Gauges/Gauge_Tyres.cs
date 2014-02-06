@@ -338,22 +338,23 @@ namespace LiveTelemetry
 
 
 
-                double oil = TelemetryApplication.Telemetry.Player.OilTemperature;
-                double oil_max = TelemetryApplication.Car.Engine.MaximumOilTemperature;
+                var oil = TelemetryApplication.Telemetry.Player.OilTemperature;
+                var oil_max = TelemetryApplication.Car.Engine.MaximumOilTemperature;
 
                 g.DrawString("OIL", f, DimBrush, 30, 130);
                 for (int perc = 0; perc < 120; perc += 3)
                 {
-                    if (perc * oil_max / 120 > TelemetryApplication.Car.Engine.MaximumOilTemperature)
+                    var oil_pos = perc * oil_max / 120;
+                    if (perc>100)
                     {
-                        if (perc * oil_max / 120 > oil)
+                        if (oil_pos > oil)
                             g.FillRectangle(DimRed, 60 + 30 + perc, 130, 2, 13);
                         else
                             g.FillRectangle(Brushes.DarkRed, 60 + 30 + perc, 130, 2, 13);
                     }
                     else
                     {
-                        if (perc * oil_max / 120 > oil)
+                        if (oil_pos > oil)
                             g.FillRectangle(DimBrush, 60 + 30 + perc, 130, 2, 13);
                         else
                             g.FillRectangle(Brushes.DarkGoldenrod, 60 + 30 + perc, 130, 2, 13);
@@ -362,22 +363,23 @@ namespace LiveTelemetry
                 }
                 g.DrawString((oil).ToString("000") + "C", f, Brushes.Yellow, 220, 130);
 
-                double water = TelemetryApplication.Telemetry.Player.WaterTemperature;
-                double water_max = TelemetryApplication.Car.Engine.MaximumWaterTemperature;// TODO: Check this
+                var water = TelemetryApplication.Telemetry.Player.WaterTemperature;
+                var water_max = TelemetryApplication.Car.Engine.MaximumWaterTemperature;
 
                 g.DrawString("Water", f, DimBrush, 30, 150);
                 for (int perc = 0; perc < 120; perc += 3)
                 {
-                    if (perc * water_max / 120 > TelemetryApplication.Car.Engine.MaximumWaterTemperature)
+                    var water_pos = perc * water_max / 120;
+                    if (perc > 100)
                     {
-                        if (perc * water_max / 120 > water)
+                        if (water_pos > water)
                             g.FillRectangle(DimRed, 60 + 30 + perc, 150, 2, 13);
                         else
                             g.FillRectangle(Brushes.DarkRed, 60 + 30 + perc, 150, 2, 13);
                     }
                     else
                     {
-                        if (perc * water_max / 120 > water)
+                        if (water_pos > water)
                             g.FillRectangle(DimBrush, 60 + 30 + perc, 150, 2, 13);
                         else
                             g.FillRectangle(Brushes.DarkSlateBlue, 60 + 30 + perc, 150, 2, 13);

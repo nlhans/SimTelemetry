@@ -390,6 +390,7 @@ namespace LiveTelemetry.Gauges
 
                 if (!TelemetryApplication.TelemetryAvailable || !TelemetryApplication.CarAvailable) return;
                 if (TelemetryApplication.Telemetry.Player == null) return;
+                if (_emptyGauges == null) return;
                 lock (g)
                 {
                     CompositingMode compMode = g.CompositingMode;

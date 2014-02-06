@@ -29,7 +29,7 @@ namespace SimTelemetry.Domain.Entities
         public double MaximumOilTemperature { get; private set; }
         public double MaximumWaterTemperature { get; private set; }
 
-        public Engine(string name, string manufacturer, int cilinders, int displacement, Range idleRpm, Range maximumRpm, IEnumerable<EngineMode> modes, IEnumerable<EngineTorque> torqueCurve, EngineLifetime lifetime)
+        public Engine(string name, string manufacturer, int cilinders, int displacement, Range idleRpm, Range maximumRpm, IEnumerable<EngineMode> modes, IEnumerable<EngineTorque> torqueCurve, EngineLifetime lifetime,  float maxOil, float maxWater)
         {
             Lifetime = lifetime;
             Name = name;
@@ -40,6 +40,9 @@ namespace SimTelemetry.Domain.Entities
             MaximumRpm = maximumRpm;
             Modes = modes;
             TorqueCurve = torqueCurve;
+
+            MaximumOilTemperature = maxOil;
+            MaximumWaterTemperature = maxWater;
         }
 
         public void Apply(double settingsSpeed, double settingsThrottle, int engineMode)

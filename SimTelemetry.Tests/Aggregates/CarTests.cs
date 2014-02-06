@@ -100,7 +100,7 @@ namespace SimTelemetry.Tests.Aggregates
                                             new Range(17500, 18500), new List<EngineMode>(), new List<EngineTorque>(),
                                             new EngineLifetime(new NormalDistrbution(3600, 200),
                                                                new NormalDistrbution(15000, 100),
-                                                               new NormalDistrbution(100, 5)));
+                                                               new NormalDistrbution(100, 5)), 95, 105);
 
             car.Assign(testEng);
 
@@ -409,7 +409,8 @@ namespace SimTelemetry.Tests.Aggregates
 
     public class CarTestEngine : Engine
     {
-        public CarTestEngine(string name, string manufacturer, int cilinders, int displacement, Range idleRpm, Range maximumRpm, IEnumerable<EngineMode> modes, IEnumerable<EngineTorque> torqueCurve, EngineLifetime lifetime) : base(name, manufacturer, cilinders, displacement, idleRpm, maximumRpm, modes, torqueCurve, lifetime)
+        public CarTestEngine(string name, string manufacturer, int cilinders, int displacement, Range idleRpm, Range maximumRpm, IEnumerable<EngineMode> modes, IEnumerable<EngineTorque> torqueCurve, EngineLifetime lifetime, float oilTemperature, float waterTemperature)
+            : base(name, manufacturer, cilinders, displacement, idleRpm, maximumRpm, modes, torqueCurve, lifetime, oilTemperature, waterTemperature)
         {
             // FUMS
         }

@@ -159,6 +159,9 @@ namespace SimTelemetry.Domain.Telemetry
 
             Name = Pool.ReadAs<string>("Name");
 
+            WaterTemperature = Pool.ReadAs<float>("EngineWater");
+            OilTemperature = Pool.ReadAs<float>("EngineOil");
+
             if (Pool is MemoryPool && (Pool as MemoryPool).Pools.ContainsKey("Laps") && DateTime.Now.Subtract(LastLapsUpdate).TotalMilliseconds > 500)
             {
                 LapsList = (Pool as MemoryPool).Pools["Laps"].ReadAs<List<Lap>>("List");

@@ -454,7 +454,7 @@ namespace SimTelemetry.Plugins.Tests
             }
             var lifetime = new EngineLifetime(lifetimeTime, lifetimeRpm, lifetimeOil);
 
-            return new Engine(name, manufacturer, 0, 0, idleRpm, maximumRpm, engineMode, engineTorque, lifetime);
+            return new Engine(name, manufacturer, 0, 0, idleRpm, maximumRpm, engineMode, engineTorque, lifetime, lifetimeOil.Optimum, lifetimeOil.Optimum);
         }
 
         public bool Remove(string Id)
