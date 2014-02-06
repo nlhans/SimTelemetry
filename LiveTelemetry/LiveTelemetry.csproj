@@ -70,6 +70,12 @@
     <Compile Include="Gauges\TrackMap.Designer.cs">
       <DependentUpon>TrackMap.cs</DependentUpon>
     </Compile>
+    <Compile Include="Gauges\ucGForce.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Gauges\ucGForce.Designer.cs">
+      <DependentUpon>ucGForce.cs</DependentUpon>
+    </Compile>
     <Compile Include="TelemetryApplication.cs" />
     <Compile Include="UI\Data.cs">
       <SubType>Form</SubType>
@@ -179,6 +185,9 @@
     </Compile>
     <EmbeddedResource Include="Gauges\TrackMap.resx">
       <DependentUpon>TrackMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gauges\ucGForce.resx">
+      <DependentUpon>ucGForce.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Data.resx">
       <DependentUpon>Data.cs</DependentUpon>

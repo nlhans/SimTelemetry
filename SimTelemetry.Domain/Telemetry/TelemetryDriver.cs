@@ -54,6 +54,9 @@ namespace SimTelemetry.Domain.Telemetry
         public float CoordinateY { get; protected set; }
         public float CoordinateZ { get; protected set; }
 
+        public float AccelerationX { get; private set; }
+        public float AccelerationY { get; private set; }
+
         public double Heading { get; private set; }
 
         public float InputThrottle { get; protected set; }
@@ -125,6 +128,9 @@ namespace SimTelemetry.Domain.Telemetry
             CoordinateX = Pool.ReadAs<float>("CoordinateX");
             CoordinateY = Pool.ReadAs<float>("CoordinateY");
             CoordinateZ = Pool.ReadAs<float>("CoordinateZ");
+
+            AccelerationX = Pool.ReadAs<float>("AccelerationX");
+            AccelerationY = Pool.ReadAs<float>("AccelerationY");
 
             InputThrottle = Pool.ReadAs<float>("InputThrottle");
             InputBrake = Pool.ReadAs<float>("InputBrake");

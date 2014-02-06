@@ -58,6 +58,7 @@ namespace LiveTelemetry
         private LapChart ucLapChart;
         private LiveTrackMap ucTrackmap;
         private UcGaugeA1Gp ucA1GP;
+        private ucGForce ucGForce;
         private Gauge_Tyres ucTyres;
         private Gauge_Laps ucLaps;
         private Gauge_Splits ucSplits;
@@ -169,6 +170,7 @@ namespace LiveTelemetry
             ucLaps = new Gauge_Laps();
             ucSplits = new Gauge_Splits();
             ucA1GP = new UcGaugeA1Gp(Joystick_Instance);
+            ucGForce = new ucGForce();
             ucTyres = new Gauge_Tyres();
             ucSessionData = new ucSessionInfo();
             ucTrackmap = new LiveTrackMap();
@@ -259,6 +261,8 @@ namespace LiveTelemetry
                 Controls.Remove(ucLaps);
             if (Controls.Contains(ucSplits))
                 Controls.Remove(ucSplits);
+            if (Controls.Contains(ucGForce))
+                Controls.Remove(ucGForce);
 
             switch (StatusMenu)
             {
@@ -273,6 +277,9 @@ namespace LiveTelemetry
                     break;
                 case 3:
                     Controls.Add(ucSplits);
+                    break;
+                case 4:
+                    Controls.Add(ucGForce);
                     break;
                 default:
                     StatusMenu = 0;
@@ -482,6 +489,9 @@ namespace LiveTelemetry
                         this.ucLaps.Size = ucA1GP.Size;
                         this.ucLaps.Location = ucA1GP.Location;
 
+                        this.ucGForce.Size = ucA1GP.Size;
+                        this.ucGForce.Location = ucA1GP.Location;
+
                         ucSplits.Size = ucA1GP.Size;
                         ucSplits.Location = ucA1GP.Location;
                         StatusMenu = tmp;
@@ -513,6 +523,7 @@ namespace LiveTelemetry
             }
 
             ucA1GP.Update();
+            if (Controls.Contains(ucGForce)) ucGForce.Invalidate();
             if (Controls.Contains(ucA1GP)) ucA1GP.Invalidate();
             if (Controls.Contains(ucTyres)) ucTyres.Invalidate();
         }

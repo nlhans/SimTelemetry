@@ -29,12 +29,7 @@ namespace SimTelemetry.Plugins.Tests
             session.Add(new MemoryFieldLazy<int>("LapsLimit", MemoryAddress.Static, 0x314654, 4));
             session.Add(new MemoryFieldLazy<TimeSpan>("TimeLimit", MemoryAddress.Static, 0x5932EC, 4));
             session.Add(new MemoryFieldLazy<SessionType>("Type", MemoryAddress.Static, 0x58696C, 4));
-            session.Add(new MemoryFieldLazy<byte>("TypeIndex", MemoryAddress.Static, 0x58696C, 4, (b) =>
-                                                                                                      {
-                                                                                                          if (b > 0 && b <= 4)
-                                                                                                              return b;
-                                                                                                          return 1;
-                                                                                                      }));
+            session.Add(new MemoryFieldLazy<byte>("TypeIndex", MemoryAddress.Static, 0x58696C, 4, SessionTypeToIndex));
             session.Add(new MemoryFieldConstant<string>("Day", "???")); // TODO: Day of week of this session
             // TODO: Time of day of this session.
             // TODO: Pit speed limit
@@ -85,6 +80,9 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<float>("CoordinateY", MemoryAddress.Dynamic, 0, 0x28A4, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("CoordinateZ", MemoryAddress.Dynamic, 0, 0x28A0, 4));
 
+            templateDriver.Add(new MemoryFieldLazy<float>("AccelerationX", MemoryAddress.Dynamic, 0, 0x2910, 4));
+            templateDriver.Add(new MemoryFieldLazy<float>("AccelerationY", MemoryAddress.Dynamic, 0, 0x2908, 4));
+
             templateDriver.Add(new MemoryFieldLazy<float>("CoordinateX-Replay", MemoryAddress.Dynamic, 0, 0x10, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("CoordinateY-Replay", MemoryAddress.Dynamic, 0, 0x18, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("CoordinateZ-Replay", MemoryAddress.Dynamic, 0, 0x14, 4));
@@ -93,7 +91,7 @@ namespace SimTelemetry.Plugins.Tests
             templateDriver.Add(new MemoryFieldLazy<float>("RotationY", MemoryAddress.Dynamic, 0, 0x48, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("RotationZ", MemoryAddress.Dynamic, 0, 0x44, 4));
             templateDriver.Add(new MemoryFieldFunc<float>("Yaw", (pool) => (float)Math.Atan2(pool.ReadAs<float>("RotationX"), pool.ReadAs<float>("RotationY")), true));
-            templateDriver.Add(new MemoryFieldLazy<float>("AccelerationX", MemoryAddress.Dynamic, 0, 0x57C8, 4));
+            //templateDriver.Add(new MemoryFieldLazy<float>("AccelerationX", MemoryAddress.Dynamic, 0, 0x57C8, 4));
            
             templateDriver.Add(new MemoryFieldLazy<int>("Pitstops", MemoryAddress.Dynamic, 0, 0x3D2C, 4));
             templateDriver.Add(new MemoryFieldLazy<int>("Position", MemoryAddress.Dynamic, 0, 0x3D20, 4));
@@ -145,6 +143,13 @@ namespace SimTelemetry.Plugins.Tests
         {
             var f = BitConverter.ToSingle(a, b);
             return new TimeSpan(0, 0, 0, 0, (int)Math.Round((f-30)*1000));
+        }
+
+        private byte SessionTypeToIndex(byte b)
+        {
+            if (b > 0 && b <= 4)
+                return b;
+            return 1;
         }
 
         private SessionType ByteArrayToSessionType(byte[] a, int b)
