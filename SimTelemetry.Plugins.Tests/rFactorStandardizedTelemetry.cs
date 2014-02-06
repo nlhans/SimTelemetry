@@ -34,6 +34,9 @@ namespace SimTelemetry.Plugins.Tests
             session.Add(new MemoryFieldLazy<bool>("IsReplay", MemoryAddress.Static, 0x315444, 1));
             session.Add(new MemoryFieldFunc<bool>("IsLoading", (pool) => !pool.ReadAs<bool>("IsActive") && pool.ReadAs<int>("Cars") > 0 && pool.ReadAs<string>("LocationTrack").Length != 0 ));
 
+            session.Add(new MemoryFieldLazy<float>("TemperatureTrack", MemoryAddress.Static, 0x6E2CD8, 4));
+            session.Add(new MemoryFieldLazy<float>("TemperatureAmbient", MemoryAddress.Static, 0x6E2CD4, 4));
+
             MemoryPool templateDriver = new MemoryPool("DriverTemplate", MemoryAddress.StaticAbsolute, 0, 0x5F48); // base, 0x5F48 size
             templateDriver.Add(new MemoryFieldConstant<bool>("IsActive", true));
 

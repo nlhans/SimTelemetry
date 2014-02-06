@@ -389,12 +389,13 @@ namespace LiveTelemetry
                 }
                 g.DrawString((water).ToString("000") + "C", f, Brushes.Yellow, 220, 150);
 
+
+                // Track temperatures etc.
                 g.DrawString("TRACK TEMPERATURE", f, DimBrush, 300f, 50f);
+                g.DrawString("AMBIENT TEMPERATURE", f, DimBrush, 300f, 150f);
 
                 var trf = new Font("Calibri", 36f);
                 g.DrawString(TelemetryApplication.Telemetry.Session.TrackTemperature.ToString("00.0") + "C", trf, Brushes.DarkGray, 320f, 70f);
-
-                g.DrawString("AMBIENT TEMPERATURE", f, DimBrush, 300f, 150f);
                 g.DrawString(TelemetryApplication.Telemetry.Session.AmbientTemperature.ToString("00.0") + "C", trf, Brushes.DarkGray, 320f, 170f);
 
             }

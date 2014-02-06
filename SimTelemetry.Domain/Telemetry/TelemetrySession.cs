@@ -17,7 +17,6 @@ namespace SimTelemetry.Domain.Telemetry
         public int RaceLaps { get; protected set; }
 
         public double TrackTemperature { get; private set; }
-
         public double AmbientTemperature { get; private set; }
 
         public Session Info { get; private set; }
@@ -37,6 +36,9 @@ namespace SimTelemetry.Domain.Telemetry
             IsLoading = sessionGroup.ReadAs<bool>("IsLoading");
 
             Track = sessionGroup.ReadAs<string>("LocationTrack");
+
+            TrackTemperature = sessionGroup.ReadAs<float>("TemperatureTrack");
+            AmbientTemperature = sessionGroup.ReadAs<float>("TemperatureAmbient");
 
            Info = new Session("race 1", SessionType.PRACTICE, 1, "Sunday", new Time(16,30,0,0), new TimeSpan(0,3,0,0), 150, 80);
         }
