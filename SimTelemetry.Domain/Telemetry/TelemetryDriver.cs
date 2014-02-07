@@ -49,6 +49,7 @@ namespace SimTelemetry.Domain.Telemetry
         public float EngineRpmMax { get; protected set; }
         public float Speed { get; protected set; }
         public int Gear { get; protected set; }
+        public int Gears { get; private set; }
 
         public float CoordinateX { get; protected set; }
         public float CoordinateY { get; protected set; }
@@ -89,6 +90,9 @@ namespace SimTelemetry.Domain.Telemetry
         protected DateTime LastLapsUpdate { get; set; }
         protected List<Lap> LapsList { get; set; }
 
+        public IEnumerable<double> GearRatios { get; private set; }
+
+
         public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
         {
             BestS1 = LapsList.Any(x => x.Sector1 > 0) ? LapsList.Where(x => x.Sector1 > 0).Min(x => x.Sector1) : -1;
@@ -121,6 +125,11 @@ namespace SimTelemetry.Domain.Telemetry
             EngineTorque = Pool.ReadAs<float>("EngineTorque");
             EngineLifetime = Pool.ReadAs<float>("EngineLifetime");
             Gear = Pool.ReadAs<int>("Gear");
+            Gears = Pool.ReadAs<int>("Gears");
+            var ratios = new List<double>();
+            ratios.Add(Pool.ReadAs<double>("GearRatioR"));
+            for(int i = 1; i <= Gears; i++)
+                ratios.Add(Pool.ReadAs<double>("GearRatio" + i));
 
             Mass = Pool.ReadAs<float>("Mass");
             Fuel = Pool.ReadAs<float>("Fuel");

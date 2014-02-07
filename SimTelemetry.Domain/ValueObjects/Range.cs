@@ -28,6 +28,8 @@ namespace SimTelemetry.Domain.ValueObjects
         public float Step { get; private set; }
         public float Span { get { return Maximum - Minimum; } }
 
+        public float Average { get { return (Maximum + Minimum)/2; } }
+
         public Range()
         {
             Minimum = -1;
