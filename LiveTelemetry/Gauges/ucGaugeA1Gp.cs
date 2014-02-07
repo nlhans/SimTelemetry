@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using SimTelemetry.Domain;
@@ -330,8 +331,6 @@ namespace LiveTelemetry.Gauges
                                        Convert.ToSingle(x2B), Convert.ToSingle(y2B));
 
                     }
-                    BackgroundImage = null;
-                    BackgroundImage = _emptyGauges;
                 }
 
                 // Maximum power
@@ -508,8 +507,7 @@ namespace LiveTelemetry.Gauges
                     }
 
                     // Fuel
-                    // TODO: Fix bug where red bar doesn'tmrUpdateConsumptionStats decrease.
-                    // Check if car data is available. Otherwise, assume the tanksize is 150L
+                    // Check if car data is available. Otherwise, assume the tanksize is 150L (?)
                     double fuelState = TelemetryApplication.Car == null || TelemetryApplication.Car.Chassis.FuelTankSize == 0
                                            ? TelemetryApplication.Telemetry.Player.Fuel/150.0
                                            : TelemetryApplication.Telemetry.Player.Fuel/ TelemetryApplication.Car.Chassis.FuelTankSize;
@@ -517,15 +515,15 @@ namespace LiveTelemetry.Gauges
 
                     if (fuelState > 0.1)
                     {
-                        g.FillRectangle(Brushes.Red, height + 10, 140, 12, 13);
-                        g.FillRectangle(Brushes.DarkOrange, height + 22, 140, Convert.ToSingle(120*(fuelState - 0.1)), 13);
+                        g.FillRectangle(Brushes.Red, height + 10, 141, 12, 12);
+                        g.FillRectangle(Brushes.DarkOrange, height + 22, 141, Convert.ToSingle(120*(fuelState - 0.1)), 12);
                     }
                     else
                     {
-                        g.FillRectangle(Brushes.Red, height + 10, 180, Convert.ToSingle(fuelState*120), 13);
+                        g.FillRectangle(Brushes.Red, height + 10, 141, Convert.ToSingle(fuelState*120), 12);
                     }
                     if (fuelState < 0.1)
-                        g.DrawString(TelemetryApplication.Telemetry.Player.Fuel.ToString("00.0").Replace(".", "L"),
+                        g.DrawString(TelemetryApplication.Telemetry.Player.Fuel.ToString("00.00").Replace(".", "L"),
                                      fontArial10Bold, Brushes.Red,
                                      width + borderBounds - 45, 139);
                     else
@@ -536,17 +534,15 @@ namespace LiveTelemetry.Gauges
                     // Laps estimation.
                     var dimBrush = new SolidBrush(Color.FromArgb(70, 70, 70));
 
-                    if (_fuelUsage.Count > 5)
+                    if (_fuelUsage.Count > 3)
                     {
-                        double avg = 0;
-                        for (int i = _fuelUsage.Count - 5; i < _fuelUsage.Count; i++) avg += _fuelUsage[i];
-                        avg /= _fuelUsage.Count - (_fuelUsage.Count - 5);
+                        double avg = _fuelUsage.Take(8).Where(x=>x > 0).Average();
                         if (avg > 0)
                         {
                             double laps = TelemetryApplication.Telemetry.Player.Fuel / avg;
                             g.DrawString(laps.ToString("(000)"), fontArial10Bold, Brushes.DarkOrange,
                                          width + borderBounds - 45, 159);
-                            g.DrawString(avg.ToString("0.00L") + " per lap", fontArial10Bold, Brushes.DarkOrange,
+                            g.DrawString(avg.ToString("0.000L") + " per lap", fontArial10Bold, Brushes.DarkOrange,
                                          height + 10, 159);
                         }
                     }

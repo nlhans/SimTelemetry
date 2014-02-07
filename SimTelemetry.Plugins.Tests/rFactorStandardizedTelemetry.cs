@@ -60,7 +60,7 @@ namespace SimTelemetry.Plugins.Tests
 
             templateDriver.Add(new MemoryFieldLazy<float>("Meter", MemoryAddress.Dynamic, 0, 0x3D04, 4));
             templateDriver.Add(new MemoryFieldLazy<float>("Speed", MemoryAddress.Dynamic, 0, 0x57C0, 4));
-            templateDriver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0x317C, 4, (x) => x/ 0.104720f));
+            templateDriver.Add(new MemoryFieldLazy<float>("RPM", MemoryAddress.Dynamic, 0, 0x317C, 4, (x) => x / 0.104720f));
             templateDriver.Add(new MemoryFieldLazy<float>("RPMMax", MemoryAddress.Dynamic, 0, 0x3180, 4, (x) => x / 0.104720f));
             templateDriver.Add(new MemoryFieldLazy<int>("Gear", MemoryAddress.Dynamic, 0, 0x321C, 1));
 
@@ -227,7 +227,7 @@ namespace SimTelemetry.Plugins.Tests
                 pool.Add(new MemoryFieldLazy<double>("EngineOil", MemoryAddress.Static, 0x006DC044, 8, Conversions.Kelvin2Celsius));
                 pool.Add(new MemoryFieldLazy<double>("EngineWater", MemoryAddress.Static, 0x006DC084, 8, Conversions.Kelvin2Celsius));
                 pool.Add(new MemoryFieldLazy<byte>("EngineMode", MemoryAddress.Static, 0x006DBF70, 1));
-                pool.Add(new MemoryFieldLazy<byte>("EngineTorque", MemoryAddress.Static, 0x006DC224, 1));
+                pool.Add(new MemoryFieldLazy<double>("EngineTorque", MemoryAddress.Static, 0x006DC224, 8));
 
                 pool.Add(new MemoryFieldLazy<int>("FuelStop1", MemoryAddress.Static, 0x006E1EAC, 4));
                 pool.Add(new MemoryFieldLazy<int>("FuelStop1", MemoryAddress.Static, 0x006E1EEC, 4));

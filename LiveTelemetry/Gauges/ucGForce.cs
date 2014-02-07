@@ -42,7 +42,7 @@ namespace LiveTelemetry.Gauges
                 if (!TelemetryApplication.TelemetryAvailable) return;
 
                 // Persistance housekeeping.
-                if(persistance.Count > 50000) // Chart updated at 10Hz -> 10 sec persistance
+                while(persistance.Count > 1000) // Chart updated at 10Hz -> 10 sec persistance
                 {
                     persistance.Remove(persistance.Keys.Min());
                 }
@@ -86,12 +86,13 @@ namespace LiveTelemetry.Gauges
                 }
 
                 // Dots
+                var dot = 5;
                 var opacity = 1.0;
                 var ind = persistance.Count;
                 foreach(var item in persistance.OrderBy(x=>x.Key))
                 {
                     ind--;
-                    opacity = 1.0 - ind/500;
+                    opacity = 1.0 - ind/500.0;
                     if (opacity < 0.3) opacity = 0.3;
                     var p = new SolidBrush(Color.FromArgb((int)Math.Round(opacity * 255), 200, 50, 0));
                     if (Math.Abs(item.Key - time) < 0.001)
@@ -99,15 +100,10 @@ namespace LiveTelemetry.Gauges
                         p = new SolidBrush(Color.FromArgb((int) Math.Round(opacity*255), 255, 50, 255));
                     }
 
-                    var x = (float)(center.X + span.Width / 2 * item.Value.Item2 / 9.81 / scaleX);
-                    var y = (float)(center.Y - span.Height / 2 * item.Value.Item1 / 9.81 / scaleY);
+                    var x = (float)(center.X + span.Width / 2 * item.Value.Item2 / 9.81 / scaleX-dot/2);
+                    var y = (float)(center.Y - span.Height / 2 * item.Value.Item1 / 9.81 / scaleY - dot / 2);
 
-                    if (x < 0) x = 0;
-                    if (x > span.Width) x = span.Width;
-                    if (y < 0) y = 0;
-                    if (y > span.Height) x = span.Height;
-
-                    g.FillEllipse(p, x, y, 5, 5);
+                    g.FillEllipse(p, x, y, dot,dot);
 
                 }
             }

@@ -120,6 +120,7 @@ namespace SimTelemetry.Domain.Telemetry
             Speed = Pool.ReadAs<float>("Speed");
             EngineRpm = Pool.ReadAs<float>("RPM");
             EngineRpmMax = Pool.ReadAs<float>("RPMMax");
+            EngineTorque = Pool.ReadAs<float>("EngineTorque");
             Gear = Pool.ReadAs<int>("Gear");
 
             Mass = Pool.ReadAs<float>("Mass");
