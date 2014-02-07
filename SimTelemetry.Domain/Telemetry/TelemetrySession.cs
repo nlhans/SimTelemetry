@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using SimTelemetry.Domain.Enumerations;
 using SimTelemetry.Domain.ValueObjects;
 
@@ -15,6 +16,7 @@ namespace SimTelemetry.Domain.Telemetry
         public int Cars { get; protected set; }
 
         public int RaceLaps { get; protected set; }
+        public int LeaderLaps { get; protected set; }
 
         public double TrackTemperature { get; private set; }
         public double AmbientTemperature { get; private set; }
@@ -36,7 +38,6 @@ namespace SimTelemetry.Domain.Telemetry
             IsLoading = sessionGroup.ReadAs<bool>("IsLoading");
 
             Track = sessionGroup.ReadAs<string>("LocationTrack");
-            RaceLaps = sessionGroup.ReadAs<int>("LapsLimit");
 
             TrackTemperature = sessionGroup.ReadAs<float>("TemperatureTrack");
             AmbientTemperature = sessionGroup.ReadAs<float>("TemperatureAmbient");
@@ -45,6 +46,11 @@ namespace SimTelemetry.Domain.Telemetry
         public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
         {
             IDataNode sessionGroup = Memory.Get("Session");
+
+            // Laps leader/max info
+            RaceLaps = sessionGroup.ReadAs<int>("LapsLimit");
+            if (telemetry.Drivers.Any(x => x.Laps > 0))
+                LeaderLaps = telemetry.Drivers.Max(x => x.Laps);
 
             var type = sessionGroup.ReadAs<SessionType>("Type");
             var index = sessionGroup.ReadAs<int>("TypeIndex");

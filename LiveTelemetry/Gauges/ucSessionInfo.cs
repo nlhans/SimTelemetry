@@ -88,8 +88,6 @@ namespace LiveTelemetry
                 if (i.Type != SessionType.RACE)
                 {
                     // Timed session.
-                    // 30 seconds is typical offset used in rFactor.
-                    // TODO: Fix time offsets.
                     double ftime = TelemetryApplication.Telemetry.Session.Time;
 
                     int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
@@ -107,12 +105,15 @@ namespace LiveTelemetry
 
                     // Display time.
                     // If session not yet started, display --:--:--
-                    if(ftime>0)
-                        g.DrawString(String.Format("{0:00}:{1:00}:{2:00} / {3:00}:{4:00}:{5:00}", 
-                            hours, minutes, seconds, hours_l, minutes_l, seconds_l), f16, Brushes.White, 200,20);
-                    else
-                        g.DrawString(String.Format("--:--:-- / {3:00}:{4:00}:{5:00}", 
-                            hours, minutes, seconds, hours_l, minutes_l, seconds_l), f16, Brushes.White, 200,20);
+                    if (ftime > 0)
+                    {
+                        g.DrawString(String.Format("{0:00}:{1:00}:{2:00} / {3:00}:{4:00}:{5:00}",
+                                                   hours, minutes, seconds, hours_l, minutes_l, seconds_l), f16,
+                                     Brushes.White, 200, 20);
+                    }
+                    else{
+                        g.DrawString(String.Format("--:--:-- / {0:00}:{1:00}:{2:00}", hours_l, minutes_l, seconds_l), f16, Brushes.White, 200, 20);
+                    }
                 }
                 else
                 {
@@ -129,6 +130,7 @@ namespace LiveTelemetry
                     int seconds_l = Convert.ToInt32((duration - hours_l * 3600 - minutes_l * 60));
 
                     int total_laps = TelemetryApplication.Telemetry.Session.RaceLaps;
+                    int leader_laps = TelemetryApplication.Telemetry.Session.LeaderLaps;
                     
                     if (total_laps > 0)
                     {
@@ -140,21 +142,9 @@ namespace LiveTelemetry
                                 hours, minutes, seconds, hours_l, minutes_l, seconds_l), f14, Brushes.White, 200,15);
                         else
                             g.DrawString(
-                                String.Format("--:--:-- / {3:00}:{4:00}:{5:00}", 
-                                hours, minutes, seconds, hours_l, minutes_l, seconds_l), f14, Brushes.White, 200,15);
+                                String.Format("--:--:-- / {0:00}:{1:00}:{2:00}", hours_l, minutes_l, seconds_l), f14, Brushes.White, 200,15);
 
-                        // TODO: Add LeaderLaps property to frame-work.
-                        int leader_laps = 0;
-                        foreach (TelemetryDriver dg in TelemetryApplication.Telemetry.Drivers)
-                        {
-                            if (dg.Position == 1)
-                            {
-                                leader_laps = dg.Laps;
-                                break;
-                            }
-                        }
-                        g.DrawString(string.Format("{0:000}/{1:000} laps", leader_laps, total_laps), f24, Brushes.White,
-                                     195, 35);
+                        g.DrawString(string.Format("{0:000}/{1:000} laps", leader_laps, total_laps), f24, Brushes.White, 195, 35);
                     }
                     else
                     {
@@ -164,7 +154,7 @@ namespace LiveTelemetry
                             g.DrawString(String.Format("{0:00}:{1:00}:{2:00} / {3:00}:{4:00}:{5:00}", hours, minutes, seconds, hours_l, minutes_l, seconds_l), f16, Brushes.White, 200,
                                          20);
                         else
-                            g.DrawString(String.Format("--:--:-- / {3:00}:{4:00}:{5:00}", hours, minutes, seconds, hours_l, minutes_l, seconds_l), f16, Brushes.White, 200,
+                            g.DrawString(String.Format("--:--:-- / {0:00}:{1:00}:{2:00}", hours_l, minutes_l, seconds_l), f16, Brushes.White, 200,
                                          20);
                     }
                 }
