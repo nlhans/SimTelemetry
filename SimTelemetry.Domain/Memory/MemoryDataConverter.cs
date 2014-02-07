@@ -53,11 +53,8 @@ namespace SimTelemetry.Domain.Memory
         public static T Read<T>(byte[] dataInput, int index)
         {
             if (dataInput.Length <= index)
-            {
-                index = 0;
-                // TODO: array.resize?
-                dataInput = new byte[128];
-            }
+                return default(T);
+
             Type inputType = typeof(T);
             return ((MemoryDataConverterProvider<T>)_providers[inputType]).Byte2Obj(dataInput, index);
         }
