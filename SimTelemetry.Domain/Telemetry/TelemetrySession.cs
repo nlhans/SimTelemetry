@@ -80,13 +80,20 @@ namespace SimTelemetry.Domain.Telemetry
                     break;
             }
 
+            var timeLimit = sessionGroup.ReadAs<TimeSpan>("TimeLimit");
+
+            // In some cases, like test sessions, the time limit is undefined and negative.
+            // Then we clip to zero seconds.
+            if(timeLimit.TotalSeconds < 0)
+                timeLimit = new TimeSpan(0, 0, 0, 0);
+
             // construct session.
             Info = new Session(typeAsString,
                                type,
                                index,
                                sessionGroup.ReadAs<string>("Day"),
                                sessionGroup.ReadAs<Time>("StartTime"),
-                               sessionGroup.ReadAs<TimeSpan>("TimeLimit"),
+                               timeLimit,
                                sessionGroup.ReadAs<int>("LapsLimit"),
                                sessionGroup.ReadAs<int>("PitSpeed")
                 );

@@ -31,132 +31,75 @@ namespace LiveTelemetry
 {
     public partial class ucSessionInfo : UserControl
     {
+        private Font f24, f16, f14, f12, f10, f8;
+
         public ucSessionInfo()
         {
             InitializeComponent();
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+
+            string FontFamily = "Calibri";
+            f24 = new Font(FontFamily, 26f);
+            f16 = new Font(FontFamily, 16f);
+            f14 = new Font(FontFamily, 14f);
+            f12 = new Font(FontFamily, 12f);
+            f10 = new Font(FontFamily, 10f);
+            f8 = new Font(FontFamily, 8f);
         }
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
+            g.FillRectangle(Brushes.Black, e.ClipRectangle);
+            if (!TelemetryApplication.TelemetryAvailable) return;
 
             try
             {
-                g.FillRectangle(Brushes.Black, e.ClipRectangle);
-                if (!TelemetryApplication.TelemetryAvailable) return;
+                var sessionInfo = TelemetryApplication.Telemetry.Session.Info;
 
-                // What session type?
-                // TODO: Get session type from track
-                Session i = TelemetryApplication.Telemetry.Session.Info;
+                g.DrawString(sessionInfo.Name, f24, Brushes.White, 8, 5);
 
-                string sSessionType = "";
-                switch (i.Type)
+                // Compute session time left / total.
+                double ftime = TelemetryApplication.Telemetry.Session.Time;
+
+                int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
+                int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
+                int seconds = Convert.ToInt32((ftime - hours * 3600 - minutes * 60));
+
+                double duration = sessionInfo.Duration.TotalSeconds;
+
+                int hours_l = Convert.ToInt32(Math.Floor(duration / 3600));
+                int minutes_l = Convert.ToInt32(Math.Floor((duration - hours_l * 3600) / 60));
+                int seconds_l = Convert.ToInt32((duration - hours_l * 3600 - minutes_l * 60));
+
+                // Display --:--:-- when session is not under way
+                var timeToDisplay = ftime > 0
+                                        ? string.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds)
+                                        : "--:--:--";
+
+                // Don't display session length if the duration is invalid (sometimes valid for test sessions)
+                timeToDisplay += duration > 0
+                                     ? string.Format(" / {0:00}:{1:00}:{2:00}", hours_l, minutes_l, seconds_l)
+                                     : "";
+
+                // Figure out what to-do
+                int total_laps = TelemetryApplication.Telemetry.Session.RaceLaps;
+                int leader_laps = TelemetryApplication.Telemetry.Session.LeaderLaps;
+
+                if (sessionInfo.Type != SessionType.RACE || (sessionInfo.Type == SessionType.RACE && total_laps <= 0))
                 {
-                    case SessionType.WARMUP:
-                        sSessionType = "Warmup";
-                        break;
-                    case SessionType.QUALIFY:
-                        sSessionType = "Qualifying " + i.Number;
-                        break;
-                    case SessionType.TEST_DAY:
-                        sSessionType = "Test Day";
-                        break;
-                    case SessionType.PRACTICE:
-                        sSessionType = "Practice " + i.Number;
-                        break;
-                    case SessionType.RACE:
-                        sSessionType = "Race";
-                        break;
-                    default:
-                        sSessionType = "???";
-                        break;
-                }
-
-                string FontFamily = "Calibri";
-                Font f24 = new Font(FontFamily, 26f);
-                Font f16 = new Font(FontFamily, 16f);
-                Font f14 = new Font(FontFamily, 14f);
-                Font f12 = new Font(FontFamily, 12f);
-                Font f10 = new Font(FontFamily, 10f);
-                Font f8 = new Font(FontFamily, 8f);
-
-                g.DrawString(sSessionType, f24, Brushes.White, 8, 5);
-
-                if (i.Type != SessionType.RACE)
-                {
-                    // Timed session.
-                    double ftime = TelemetryApplication.Telemetry.Session.Time;
-
-                    int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
-                    int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
-                    int seconds = Convert.ToInt32((ftime - hours * 3600 - minutes * 60));
-
-                    double duration = i.Duration.TotalSeconds;
-                    // Test-days often don't have time limits, so display 24 hours.
-                    if (i.Type == SessionType.TEST_DAY)
-                        duration = 24*3600;
-
-                    int hours_l = Convert.ToInt32(Math.Floor(duration / 3600));
-                    int minutes_l = Convert.ToInt32(Math.Floor((duration - hours_l * 3600) / 60));
-                    int seconds_l = Convert.ToInt32((duration - hours_l * 3600 - minutes_l * 60));
-
-                    // Display time.
-                    // If session not yet started, display --:--:--
-                    if (ftime > 0)
-                    {
-                        g.DrawString(String.Format("{0:00}:{1:00}:{2:00} / {3:00}:{4:00}:{5:00}",
-                                                   hours, minutes, seconds, hours_l, minutes_l, seconds_l), f16,
-                                     Brushes.White, 200, 20);
-                    }
-                    else{
-                        g.DrawString(String.Format("--:--:-- / {0:00}:{1:00}:{2:00}", hours_l, minutes_l, seconds_l), f16, Brushes.White, 200, 20);
-                    }
+                    // Timed session (24h races, practice, etc.) ; only display time.
+                    g.DrawString(timeToDisplay, f16, Brushes.White, 200, 20);
                 }
                 else
                 {
-                    // Race session. Time/laps based.
-                    double ftime = TelemetryApplication.Telemetry.Session.Time;
+                    var lapsToDisplay = string.Format("{0:000}/{1:000} laps", leader_laps, total_laps);
 
-                    int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
-                    int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
-                    int seconds = Convert.ToInt32((ftime - hours * 3600 - minutes * 60));
-
-                    double duration = i.Duration.TotalSeconds;
-                    int hours_l = Convert.ToInt32(Math.Floor(duration / 3600));
-                    int minutes_l = Convert.ToInt32(Math.Floor((duration - hours_l * 3600) / 60));
-                    int seconds_l = Convert.ToInt32((duration - hours_l * 3600 - minutes_l * 60));
-
-                    int total_laps = TelemetryApplication.Telemetry.Session.RaceLaps;
-                    int leader_laps = TelemetryApplication.Telemetry.Session.LeaderLaps;
-                    
-                    if (total_laps > 0)
-                    {
-                        // Display laps + time.
-                        // If session not yet started, display --:--:--
-                        if (ftime > 0)
-                            g.DrawString(
-                                String.Format("{0:00}:{1:00}:{2:00} / {3:00}:{4:00}:{5:00}", 
-                                hours, minutes, seconds, hours_l, minutes_l, seconds_l), f14, Brushes.White, 200,15);
-                        else
-                            g.DrawString(
-                                String.Format("--:--:-- / {0:00}:{1:00}:{2:00}", hours_l, minutes_l, seconds_l), f14, Brushes.White, 200,15);
-
-                        g.DrawString(string.Format("{0:000}/{1:000} laps", leader_laps, total_laps), f24, Brushes.White, 195, 35);
-                    }
-                    else
-                    {
-                        // Display time.
-                        // If session not yet started, display --:--:--
-                        if (ftime > 0)
-                            g.DrawString(String.Format("{0:00}:{1:00}:{2:00} / {3:00}:{4:00}:{5:00}", hours, minutes, seconds, hours_l, minutes_l, seconds_l), f16, Brushes.White, 200,
-                                         20);
-                        else
-                            g.DrawString(String.Format("--:--:-- / {0:00}:{1:00}:{2:00}", hours_l, minutes_l, seconds_l), f16, Brushes.White, 200,
-                                         20);
-                    }
+                    // Lapped sessions (possibly with time limit)
+                    g.DrawString(timeToDisplay, f14, Brushes.White, 200, 15);
+                    g.DrawString(lapsToDisplay, f24, Brushes.White, 195, 35);
                 }
             }
             catch (Exception ex)
@@ -166,8 +109,6 @@ namespace LiveTelemetry
                 g.FillRectangle(Brushes.Black, e.ClipRectangle);
                 g.DrawString(ex.Message, f, Brushes.White, 10, 10);
                 g.DrawString(ex.StackTrace, f, Brushes.White, 10, 30);
-
-
             }
         }
     }
