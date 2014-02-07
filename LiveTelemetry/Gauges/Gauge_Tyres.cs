@@ -46,8 +46,6 @@ namespace LiveTelemetry
 
         private SolidBrush GetTyreBrush(double temperature, double optimal)
         {
-            optimal -= 273.15;
-            temperature -= 273.15;
             // 579 is yelow, optimal
             // 650 is VERY hot (>15%)   75
             // 500 is cold     (<15%)   75

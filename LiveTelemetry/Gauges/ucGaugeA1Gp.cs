@@ -483,8 +483,8 @@ namespace LiveTelemetry.Gauges
                                      borderBounds/2 + height/2 + 10, borderBounds/2 + height/2 + 80);
 
                     // TODO: Add odo-meter
-                    g.DrawString(Math.Round(0.0, 2).ToString("00000.00km"), fontArial12,
-                                 Brushes.LightGray, borderBounds/2 + height/2 + 10, borderBounds/2 + height/2 + 110);
+                    //g.DrawString(Math.Round(0.0, 2).ToString("00000.00km"), fontArial12,
+                    //             Brushes.LightGray, borderBounds/2 + height/2 + 10, borderBounds/2 + height/2 + 110);
 
                     // ---------------------------------    Labels   ---------------------------------
 

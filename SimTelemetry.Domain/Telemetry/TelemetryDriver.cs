@@ -112,8 +112,6 @@ namespace SimTelemetry.Domain.Telemetry
 
                 FuelCapacity = Pool.ReadAs<float>("FuelCapacity");
 
-                // TODO: check
-                EngineLifetime = Pool.ReadAs<float>("EngineLifetime");
             }
 
             Meter = Pool.ReadAs<float>("Meter");
@@ -121,6 +119,7 @@ namespace SimTelemetry.Domain.Telemetry
             EngineRpm = Pool.ReadAs<float>("RPM");
             EngineRpmMax = Pool.ReadAs<float>("RPMMax");
             EngineTorque = Pool.ReadAs<float>("EngineTorque");
+            EngineLifetime = Pool.ReadAs<float>("EngineLifetime");
             Gear = Pool.ReadAs<int>("Gear");
 
             Mass = Pool.ReadAs<float>("Mass");
