@@ -231,7 +231,7 @@ namespace SimTelemetry.Plugins.Tests
                                                      break;
 
                                                  case "Temperatures":
-                                                     peakTemp = Conversions.Celsius2Kelvin(x.ReadAsFloat(0));
+                                                     peakTemp = x.ReadAsFloat(0);
                                                      if (x.ValueCount == 2)
                                                      {
                                                          pitsTemp = x.ReadAsFloat(1);
@@ -305,8 +305,8 @@ namespace SimTelemetry.Plugins.Tests
                                                      break;
 
                                                  case "BrakeResponseCurve":
-                                                     var minT = Conversions.Celsius2Kelvin(x.ReadAsFloat(1));
-                                                     var maxT = Conversions.Celsius2Kelvin(x.ReadAsFloat(2));
+                                                     var minT = x.ReadAsFloat(1);
+                                                     var maxT = x.ReadAsFloat(2);
                                                      var opt = (maxT + minT)/2;
                                                      optimumTemperature = new Range(minT, maxT, opt);
                                                      break;

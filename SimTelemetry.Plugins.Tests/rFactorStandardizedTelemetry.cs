@@ -220,8 +220,6 @@ namespace SimTelemetry.Plugins.Tests
 
             if (isPlayer)
             {
-                //pool.Add(new MemoryFieldLazy<float>("", MemoryAddress.Static, 0, 4));
-                // I can now add tyre temperatures, pressure, brake info etc.
                 pool.Add(new MemoryFieldConstant<bool>("IsPlayer", true));
                 pool.Add(new MemoryFieldLazy<double>("EngineLifetime", MemoryAddress.Static, 0x006DC0AC, 8));
                 pool.Add(new MemoryFieldLazy<double>("EngineOil", MemoryAddress.Static, 0x006DC044, 8, Conversions.Kelvin2Celsius));
@@ -251,30 +249,30 @@ namespace SimTelemetry.Plugins.Tests
                 pool.Add(new MemoryFieldLazy<double>("TyreSpeedLR", MemoryAddress.Static, 0x006DA804, 8));
                 pool.Add(new MemoryFieldLazy<double>("TyreSpeedRR", MemoryAddress.Static, 0x006DAE04, 8));
 
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideLF", MemoryAddress.Static, 0x006D9F44, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideRF", MemoryAddress.Static, 0x006DA534, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideLR", MemoryAddress.Static, 0x006DAB44, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideRR", MemoryAddress.Static, 0x006DB134, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideLF", MemoryAddress.Static, 0x006D9F44, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideRF", MemoryAddress.Static, 0x006DA534, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideLR", MemoryAddress.Static, 0x006DAB44, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideRR", MemoryAddress.Static, 0x006DB134, 8, Conversions.Kelvin2Celsius));
 
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleLF", MemoryAddress.Static, 0x006D9F3C, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleRF", MemoryAddress.Static, 0x006DA53C, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleLR", MemoryAddress.Static, 0x006DAB3C, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleRR", MemoryAddress.Static, 0x006DB13C, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleLF", MemoryAddress.Static, 0x006D9F3C, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleRF", MemoryAddress.Static, 0x006DA53C, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleLR", MemoryAddress.Static, 0x006DAB3C, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureMiddleRR", MemoryAddress.Static, 0x006DB13C, 8, Conversions.Kelvin2Celsius));
 
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideLF", MemoryAddress.Static, 0x006D9F34, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideRF", MemoryAddress.Static, 0x006DA544, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideLR", MemoryAddress.Static, 0x006DAB34, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideRR", MemoryAddress.Static, 0x006DB144, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideLF", MemoryAddress.Static, 0x006D9F34, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideRF", MemoryAddress.Static, 0x006DA544, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideLR", MemoryAddress.Static, 0x006DAB34, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("TyreTemperatureOutsideRR", MemoryAddress.Static, 0x006DB144, 8, Conversions.Kelvin2Celsius));
 
                 pool.Add(new MemoryFieldLazy<int>("AerodyanmicFrontwingSetting", MemoryAddress.Static, 0x006E182C, 4));
                 pool.Add(new MemoryFieldLazy<int>("AerodyanmicRearwingSetting", MemoryAddress.Static, 0x006E186C, 4));
                 pool.Add(new MemoryFieldLazy<int>("AerodyanmicRadiatorSetting", MemoryAddress.Static, 0x006E18AC, 4));
                 pool.Add(new MemoryFieldLazy<int>("AerodyanmicBrakeductSetting", MemoryAddress.Static, 0x006E18EC, 4));
 
-                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureLF", MemoryAddress.Static, 0x006DA0E0, 8));
-                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureRF", MemoryAddress.Static, 0x006DA6E0, 8));
-                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureLR", MemoryAddress.Static, 0x006DACE0, 8));
-                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureRR", MemoryAddress.Static, 0x006DB2E0, 8));
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureLF", MemoryAddress.Static, 0x006DA0E0, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureRF", MemoryAddress.Static, 0x006DA6E0, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureLR", MemoryAddress.Static, 0x006DACE0, 8, Conversions.Kelvin2Celsius));
+                pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureRR", MemoryAddress.Static, 0x006DB2E0, 8, Conversions.Kelvin2Celsius));
 
                 pool.Add(new MemoryFieldLazy<double>("BrakeThicknessLF", MemoryAddress.Static, 0x006DA110, 8));
                 pool.Add(new MemoryFieldLazy<double>("BrakeThicknessRF", MemoryAddress.Static, 0x006DA710, 8));

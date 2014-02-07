@@ -253,18 +253,18 @@ namespace LiveTelemetry
                     g.FillRectangle(GetTyreBrush(drvWheelRR.TemperatureInside, carWheelRR.PeakTemperature), 200, 220, 8, 50);
                 }
 
-                g.DrawString(Temperature.KC(drvWheelLF.TemperatureOutside).ToString("000") + "C", f, Brushes.White, 12, 20);
-                g.DrawString(Temperature.KC(drvWheelLF.TemperatureMiddle).ToString("000") + "C", f, Brushes.White, 47, 20);
-                g.DrawString(Temperature.KC(drvWheelLF.TemperatureInside).ToString("000") + "C", f, Brushes.White, 82, 20);
+                g.DrawString(drvWheelLF.TemperatureOutside.ToString("000") + "C", f, Brushes.White, 12, 20);
+                g.DrawString(drvWheelLF.TemperatureMiddle.ToString("000") + "C", f, Brushes.White, 47, 20);
+                g.DrawString(drvWheelLF.TemperatureInside.ToString("000") + "C", f, Brushes.White, 82, 20);
 
                 g.DrawString(drvWheelLF.TyreWear.ToString("000%"), f, Brushes.White, 47, 92);
 
                 g.DrawString(drvWheelLF.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelLF.TyrePressure + 273.15, carWheelLF.PeakPressure + 273.15), 47, 107);
 
 
-                g.DrawString(Temperature.KC(drvWheelRF.TemperatureInside).ToString("000") + "C", f, Brushes.White, 162, 20);
-                g.DrawString(Temperature.KC(drvWheelRF.TemperatureMiddle).ToString("000") + "C", f, Brushes.White, 197, 20);
-                g.DrawString(Temperature.KC(drvWheelRF.TemperatureOutside).ToString("000") + "C", f, Brushes.White, 232, 20);
+                g.DrawString(drvWheelRF.TemperatureInside.ToString("000") + "C", f, Brushes.White, 162, 20);
+                g.DrawString(drvWheelRF.TemperatureMiddle.ToString("000") + "C", f, Brushes.White, 197, 20);
+                g.DrawString(drvWheelRF.TemperatureOutside.ToString("000") + "C", f, Brushes.White, 232, 20);
 
                 g.DrawString(drvWheelRF.TyreWear.ToString("000%"), f, Brushes.White, 197, 92);
 
@@ -272,18 +272,18 @@ namespace LiveTelemetry
 
 
 
-                g.DrawString(Temperature.KC(drvWheelLR.TemperatureOutside).ToString("000") + "C", f, Brushes.White, 12, 200);
-                g.DrawString(Temperature.KC(drvWheelLR.TemperatureMiddle).ToString("000") + "C", f, Brushes.White, 47, 200);
-                g.DrawString(Temperature.KC(drvWheelLR.TemperatureInside).ToString("000") + "C", f, Brushes.White, 82, 200);
+                g.DrawString(drvWheelLR.TemperatureOutside.ToString("000") + "C", f, Brushes.White, 12, 200);
+                g.DrawString(drvWheelLR.TemperatureMiddle.ToString("000") + "C", f, Brushes.White, 47, 200);
+                g.DrawString(drvWheelLR.TemperatureInside.ToString("000") + "C", f, Brushes.White, 82, 200);
 
                 g.DrawString(drvWheelLR.TyreWear.ToString("000%"), f, Brushes.White, 47, 272);
 
                 g.DrawString(drvWheelLR.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelLR.TyrePressure + 273.15, carWheelLR.PeakPressure + 273.15), 47, 287);
 
 
-                g.DrawString(Temperature.KC(drvWheelRR.TemperatureInside).ToString("000") + "C", f, Brushes.White, 162, 200);
-                g.DrawString(Temperature.KC(drvWheelRR.TemperatureMiddle).ToString("000") + "C", f, Brushes.White, 197, 200);
-                g.DrawString(Temperature.KC(drvWheelRR.TemperatureOutside).ToString("000") + "C", f, Brushes.White, 232, 200);
+                g.DrawString(drvWheelRR.TemperatureInside.ToString("000") + "C", f, Brushes.White, 162, 200);
+                g.DrawString(drvWheelRR.TemperatureMiddle.ToString("000") + "C", f, Brushes.White, 197, 200);
+                g.DrawString(drvWheelRR.TemperatureOutside.ToString("000") + "C", f, Brushes.White, 232, 200);
 
                 g.DrawString(drvWheelRR.TyreWear.ToString("000%"), f, Brushes.White, 197, 272);
 
@@ -304,7 +304,7 @@ namespace LiveTelemetry
 
                 // Draw brakes. front
                 g.FillRectangle(GetBrakeBrush(drvWheelLF.BrakeTemperature, carBrakeLF.OptimumTemperature.Minimum, carBrakeLF.OptimumTemperature.Maximum), 78, 50, 7, 30);
-                g.DrawString(Temperature.KC(drvWheelLF.BrakeTemperature).ToString("0000") + "C", f, Brushes.White, 84, 50);
+                g.DrawString(drvWheelLF.BrakeTemperature.ToString("0000") + "C", f, Brushes.White, 84, 50);
 
                 if (drvWheelLF.BrakeThickness == 0)
                     g.DrawString("FAULT", f, Brushes.Red, 84, 65);
@@ -312,7 +312,7 @@ namespace LiveTelemetry
                     g.DrawString(BrakeWear_LF.ToString("000%"), f, ((BrakeWear_LF < 0.5) ? Brushes.Orange : Brushes.White), 84, 65);
 
                 g.FillRectangle(GetBrakeBrush(drvWheelRF.BrakeTemperature, carBrakeRF.OptimumTemperature.Minimum, carBrakeRF.OptimumTemperature.Maximum), 188, 50, 7, 30);
-                g.DrawString(Temperature.KC(drvWheelRF.BrakeTemperature).ToString("0000") + "C", f, Brushes.White, 149, 50);
+                g.DrawString(drvWheelRF.BrakeTemperature.ToString("0000") + "C", f, Brushes.White, 149, 50);
 
                 if (drvWheelRF.BrakeThickness == 0)
                     g.DrawString("FAULT", f, Brushes.Red, 155, 65);
@@ -321,7 +321,7 @@ namespace LiveTelemetry
 
                 // Draw brakes. rear
                 g.FillRectangle(GetBrakeBrush(drvWheelLR.BrakeTemperature, carBrakeLR.OptimumTemperature.Minimum, carBrakeLR.OptimumTemperature.Maximum), 78, 230, 7, 30);
-                g.DrawString(Temperature.KC(drvWheelLR.BrakeTemperature).ToString("0000") + "C", f, Brushes.White, 84, 230);
+                g.DrawString(drvWheelLR.BrakeTemperature.ToString("0000") + "C", f, Brushes.White, 84, 230);
 
                 if (drvWheelLR.BrakeThickness == 0)
                     g.DrawString("FAULT", f, Brushes.Red, 84, 245);
@@ -329,7 +329,7 @@ namespace LiveTelemetry
                     g.DrawString(BrakeWear_LR.ToString("000%"), f, ((BrakeWear_LR < 0.5) ? Brushes.Orange : Brushes.White), 84, 245);
 
                 g.FillRectangle(GetBrakeBrush(drvWheelRR.BrakeTemperature, carBrakeRR.OptimumTemperature.Minimum, carBrakeRR.OptimumTemperature.Maximum), 188, 230, 7, 30);
-                g.DrawString(Temperature.KC(drvWheelRR.BrakeTemperature).ToString("0000") + "C", f, Brushes.White, 149, 230);
+                g.DrawString(drvWheelRR.BrakeTemperature.ToString("0000") + "C", f, Brushes.White, 149, 230);
 
                 if (drvWheelRR.BrakeThickness == 0)
                     g.DrawString("FAULT", f, Brushes.Red, 155, 245);
