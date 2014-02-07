@@ -46,7 +46,12 @@ namespace SimTelemetry.Domain.Aggregates
             return new List<Track>();
         }
 
-
+        public virtual string GetSimulatorVersions()
+        {
+            GlobalEvents.Fire(new DebugWarning("Each simulator plugin should implement it's own GetSimulatorVersions() method.", new Exception("")),
+                              false);
+            return "None";
+        }
     }
 
 }

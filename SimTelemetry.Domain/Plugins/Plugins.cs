@@ -38,6 +38,7 @@ namespace SimTelemetry.Domain.Plugins
         /// </summary>
         [ImportMany(typeof(IPluginExtension))]
         public IList<IPluginExtension> Extensions { get; protected set; }
+
         #endregion
 
         /// <summary>
