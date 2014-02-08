@@ -63,6 +63,7 @@ namespace LiveTelemetry.Gauges
 
         private Joystick joystickResetConsumptionStats; 
         private Timer tmrUpdateConsumptionStats = new Timer();
+        private Timer delayedPaintBackground = new Timer();
         private int _counter; // Timer used to reset engine wear.
 
         private Image _emptyGauges;
@@ -85,12 +86,20 @@ namespace LiveTelemetry.Gauges
             tmrUpdateConsumptionStats.Tick += TmrUpdateConsumptionStatsTick;
             tmrUpdateConsumptionStats.Start();
 
+            delayedPaintBackground = new Timer {Interval = 500, Enabled = true};
+            delayedPaintBackground.Tick += (s, e) =>
+                                               {
+                                                   PaintBackground(0);
+                                                   delayedPaintBackground.Stop();
+                                               };
+
             //GlobalEvents.Hook<SessionStarted>(x => PaintBackground(0), true);
             //GlobalEvents.Hook<SessionStopped>(x => PaintBackground(0), true);
             //GlobalEvents.Hook<DrivingStarted>(x => PaintBackground(0), true);
 
             GlobalEvents.Hook<CarLoaded>(PaintBackground, true);
             GlobalEvents.Hook<CarUnloaded>(PaintBackground, true);
+            GlobalEvents.Hook<SessionStarted>((e) => delayedPaintBackground.Start(), true);
 
             _emptyGauges = new Bitmap(Size.Width, Size.Height);
         }
@@ -125,14 +134,12 @@ namespace LiveTelemetry.Gauges
         {
             if (!TelemetryApplication.TelemetryAvailable) return;
             if (TelemetryApplication.Telemetry.Player == null) return;
-            if (TelemetryApplication.Car == null) return;
             try
             {
                 // TOOD: Move back to Data libraries so they can be used without the UI.
                 if (_fuelLastLapNo != TelemetryApplication.Telemetry.Player.Laps)
                 {
-                    var engineState = TelemetryApplication.Telemetry.Player.EngineLifetime/
-                                          TelemetryApplication.Car.Engine.Lifetime.EngineRpm.Optimum;//avg
+                    var engineState = TelemetryApplication.CarAvailable ? TelemetryApplication.Telemetry.Player.EngineLifetime / TelemetryApplication.Car.Engine.Lifetime.EngineRpm.Optimum : 1.0;//avg
 
                     _fuelLastLapNo = TelemetryApplication.Telemetry.Player.Laps;
 
@@ -160,7 +167,6 @@ namespace LiveTelemetry.Gauges
 
         private void PaintBackground(object sender)
         {
-            //System.Threading.Thread.Sleep(500);
             // Fonts
             var fontArial10Bold = new Font("Arial", 10f, FontStyle.Bold);
             var fontArial8 = new Font("Arial", 8f);
@@ -174,12 +180,20 @@ namespace LiveTelemetry.Gauges
             lock (g)
             {
                 g.FillRectangle(Brushes.Black, 0, 0, Width, Height);
-                if (!TelemetryApplication.TelemetryAvailable || !TelemetryApplication.CarAvailable) return;
-                if (TelemetryApplication.Telemetry.Player == null) return;
+                if (!TelemetryApplication.TelemetryAvailable || TelemetryApplication.Telemetry.Player == null) return;
+
+                // Compute all car-related variabeles
+                var topSpeed = 360.0;
+                var rpmLifetime = TelemetryApplication.Telemetry.Player.EngineRpmMax - 1000;
+                if(TelemetryApplication.CarAvailable)
+                {
+                    //
+                    rpmLifetime = TelemetryApplication.Car.Engine.Lifetime.EngineRpm.Optimum;
+                }
 
                 // ---------------------------------       Speed      ---------------------------------
                 _speedMin = 0;
-                _speedMax = 360; // TODO: Calculate top speed
+                _speedMax = topSpeed; // TODO: Calculate top speed
 
                 _speedStep = 30;
                 if (_speedMax < 300) _speedStep = 25;
@@ -262,7 +276,7 @@ namespace LiveTelemetry.Gauges
                 if (double.IsInfinity(fAngleRpmRedLine) || double.IsNaN(fAngleRpmRedLine)) fAngleRpmRedLine = 200;
                 int angleRpmRedLine = Convert.ToInt32(Math.Round(fAngleRpmRedLine));
 
-                double fAngleRpmWarningLine = (TelemetryApplication.Car.Engine.Lifetime.EngineRpm.Optimum - rpmStep / 2 -
+                double fAngleRpmWarningLine = (rpmLifetime - rpmStep / 2 -
                                                  _rpmMin)/(_rpmMax - _rpmMin)*225;
                 if (double.IsInfinity(fAngleRpmWarningLine) || double.IsNaN(fAngleRpmWarningLine))
                     fAngleRpmWarningLine = 180;
@@ -369,6 +383,7 @@ namespace LiveTelemetry.Gauges
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            if (!TelemetryApplication.TelemetryAvailable || TelemetryApplication.Telemetry.Player == null) return;
 
             // Fonts
             var fontArial10Bold = new Font("Arial", 10f, FontStyle.Bold);
@@ -387,9 +402,18 @@ namespace LiveTelemetry.Gauges
 
                 var g = e.Graphics;
 
-                if (!TelemetryApplication.TelemetryAvailable || !TelemetryApplication.CarAvailable) return;
-                if (TelemetryApplication.Telemetry.Player == null) return;
                 if (_emptyGauges == null) return;
+
+                // get all car-related variabeles
+                var fuelTankSize = 150.0f;
+                if(TelemetryApplication.CarAvailable)
+                {
+                    fuelTankSize = TelemetryApplication.Car.Chassis.FuelTankSize;
+                } else if(TelemetryApplication.Telemetry.Player.FuelCapacity != 0)
+                {
+                    fuelTankSize = TelemetryApplication.Telemetry.Player.FuelCapacity;
+                }
+
                 lock (g)
                 {
                     CompositingMode compMode = g.CompositingMode;
@@ -508,9 +532,7 @@ namespace LiveTelemetry.Gauges
 
                     // Fuel
                     // Check if car data is available. Otherwise, assume the tanksize is 150L (?)
-                    double fuelState = TelemetryApplication.Car == null || TelemetryApplication.Car.Chassis.FuelTankSize == 0
-                                           ? TelemetryApplication.Telemetry.Player.Fuel/150.0
-                                           : TelemetryApplication.Telemetry.Player.Fuel/ TelemetryApplication.Car.Chassis.FuelTankSize;
+                    double fuelState = TelemetryApplication.Telemetry.Player.Fuel/fuelTankSize;
 
 
                     if (fuelState > 0.1)
