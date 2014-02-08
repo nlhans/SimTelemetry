@@ -300,6 +300,7 @@ namespace LiveTelemetry.UI
             col.Add(sAdd + " Tyre Temperature", string.Format("{0:000.00}C inside / {1:000.00}C center / {2:000.00}C outside", wheel.TemperatureInside, wheel.TemperatureMiddle, wheel.TemperatureOutside));
             col.Add(sAdd + " Tyre Pressure", string.Format("{0:000.00} kPa", wheel.TyrePressure));
             col.Add(sAdd + " Tyre Wear", string.Format("{0:000.00}%", wheel.TyreWear * 100));
+            col.Add(sAdd + " Tyre Contact Patch", string.Format("{0:0.00000} [m]m^2?", wheel.TyreContactPatch));
             col.Add(sAdd + " RideHeight", string.Format("{0:000.00}cm", wheel.Rideheight * 100));
             col.Add(sAdd + " Brake temperature", string.Format("{0:0000.0}C", wheel.BrakeTemperature));
             col.Add(sAdd + " Brake thickness", string.Format("{0:0.00}cm", wheel.BrakeThickness*100));

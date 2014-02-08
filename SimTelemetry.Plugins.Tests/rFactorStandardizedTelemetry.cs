@@ -251,8 +251,8 @@ namespace SimTelemetry.Plugins.Tests
 
                 pool.Add(new MemoryFieldLazy<double>("TyreContactPatchLF", MemoryAddress.Static, 0x006D9EDC, 8));
                 pool.Add(new MemoryFieldLazy<double>("TyreContactPatchRF", MemoryAddress.Static, 0x006DA4DC, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreContactPatchLR", MemoryAddress.Static, 0x00ADAADC, 8));
-                pool.Add(new MemoryFieldLazy<double>("TyreContactPatchRR", MemoryAddress.Static, 0x00ADB0DC, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreContactPatchLR", MemoryAddress.Static, 0x006DAADC, 8));
+                pool.Add(new MemoryFieldLazy<double>("TyreContactPatchRR", MemoryAddress.Static, 0x006DB0DC, 8));
 
                 pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideLF", MemoryAddress.Static, 0x006D9F44, 8, Conversions.Kelvin2Celsius));
                 pool.Add(new MemoryFieldLazy<double>("TyreTemperatureInsideRF", MemoryAddress.Static, 0x006DA534, 8, Conversions.Kelvin2Celsius));
