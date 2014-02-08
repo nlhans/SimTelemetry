@@ -16,10 +16,12 @@ namespace SimTelemetry.Domain.Entities
         private IMathFormula DragBrakeDucts { get; set; }
         private IMathFormula DragRideHeight { get; set; }
 
-        public IMathFormula RideheightFront { get; set; }
-        public IMathFormula RideheightRear { get; set; }
+        public IMathFormula RideheightFront { get; private set; }
+        public IMathFormula RideheightRear { get; private set; }
 
-        public Chassis(float weight, float fuelTankSize, float dragBody, IMathFormula dragFrontWing, IMathFormula dragRearWing, IMathFormula dragRadiator, IMathFormula dragBrakeDucts, IMathFormula dragRideHeight, IMathFormula rideheightFront, IMathFormula rideheightRear)
+        public IMathFormula WeightDistForAft { get; private set; }
+
+        public Chassis(float weight, float fuelTankSize, float dragBody, IMathFormula dragFrontWing, IMathFormula dragRearWing, IMathFormula dragRadiator, IMathFormula dragBrakeDucts, IMathFormula dragRideHeight, IMathFormula rideheightFront, IMathFormula rideheightRear, IMathFormula weightDist)
         {
             Weight = weight;
             FuelTankSize = fuelTankSize;
@@ -31,6 +33,8 @@ namespace SimTelemetry.Domain.Entities
             DragRideHeight = dragRideHeight;
             RideheightFront = rideheightFront;
             RideheightRear = rideheightRear;
+
+            WeightDistForAft = weightDist;
         }
 
         public double GetAeroDrag(int frontwing, int rearwing, int radiator, int brakes, int rideheight_front, int rideheight_rear)
@@ -54,5 +58,18 @@ namespace SimTelemetry.Domain.Entities
             return drag;
         }
 
+        public double GetWeightFront(float mass, int weightDistSteps)
+        {
+            var dist = WeightDistForAft.Get(weightDistSteps);
+
+            return dist * mass;
+        }
+
+        public double GetWeightRear(float mass, int weightDistSteps)
+        {
+            var dist = WeightDistForAft.Get(weightDistSteps);
+
+            return (1-dist) * mass;
+        }
     }
 }

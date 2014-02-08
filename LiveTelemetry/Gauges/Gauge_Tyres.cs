@@ -257,7 +257,7 @@ namespace LiveTelemetry
 
                 g.DrawString(drvWheelLF.TyreWear.ToString("000%"), f, Brushes.White, 47, 92);
 
-                g.DrawString(drvWheelLF.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelLF.TyrePressure + 273.15, carWheelLF.PeakPressure + 273.15), 47, 107);
+                g.DrawString(drvWheelLF.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelLF.TyrePressure + 273.15, carWheelLF.GetOptimalPressure(drvWheelLF.LoadForce) + 273.15), 47, 107);
 
 
                 g.DrawString(drvWheelRF.TemperatureInside.ToString("000") + "C", f, Brushes.White, 162, 20);
@@ -266,7 +266,7 @@ namespace LiveTelemetry
 
                 g.DrawString(drvWheelRF.TyreWear.ToString("000%"), f, Brushes.White, 197, 92);
 
-                g.DrawString(drvWheelRF.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelRF.TyrePressure + 273.15, carWheelRF.PeakPressure + 273.15), 197, 107);
+                g.DrawString(drvWheelRF.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelRF.TyrePressure + 273.15, carWheelRF.GetOptimalPressure(drvWheelRF.LoadForce) + 273.15), 197, 107);
 
 
 
@@ -276,7 +276,7 @@ namespace LiveTelemetry
 
                 g.DrawString(drvWheelLR.TyreWear.ToString("000%"), f, Brushes.White, 47, 272);
 
-                g.DrawString(drvWheelLR.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelLR.TyrePressure + 273.15, carWheelLR.PeakPressure + 273.15), 47, 287);
+                g.DrawString(drvWheelLR.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelLR.TyrePressure + 273.15, carWheelLR.GetOptimalPressure(drvWheelLR.LoadForce) + 273.15), 47, 287);
 
 
                 g.DrawString(drvWheelRR.TemperatureInside.ToString("000") + "C", f, Brushes.White, 162, 200);
@@ -285,7 +285,7 @@ namespace LiveTelemetry
 
                 g.DrawString(drvWheelRR.TyreWear.ToString("000%"), f, Brushes.White, 197, 272);
 
-                g.DrawString(drvWheelRR.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelRR.TyrePressure + 273.15, carWheelRR.PeakPressure + 273.15), 197, 287);
+                g.DrawString(drvWheelRR.TyrePressure.ToString("000.0") + "kPa", f, GetTyreBrush(drvWheelRR.TyrePressure + 273.15, carWheelRR.GetOptimalPressure(drvWheelRR.LoadForce) + 273.15), 197, 287);
                 
                 double BrakeWear_LF = 1 -
                                       (carBrakeLF.ThicknessStart.Minimum - drvWheelLF.BrakeThickness) /

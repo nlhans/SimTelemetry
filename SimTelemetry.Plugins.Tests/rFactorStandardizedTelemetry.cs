@@ -239,6 +239,11 @@ namespace SimTelemetry.Plugins.Tests
                 pool.Add(new MemoryFieldLazy<string>("TyreCompoundFront", MemoryAddress.Static, 0x006E1177, 16));
                 pool.Add(new MemoryFieldLazy<string>("TyreCompoundRear", MemoryAddress.Static, 0x006E11B7, 16));
 
+                pool.Add(new MemoryFieldLazy<double>("WheelLoadLF", MemoryAddress.Static, 0x006D9ED4, 8));
+                pool.Add(new MemoryFieldLazy<double>("WheelLoadRF", MemoryAddress.Static, 0x006DA4D4, 8));
+                pool.Add(new MemoryFieldLazy<double>("WheelLoadLR", MemoryAddress.Static, 0x006DAAD4, 8));
+                pool.Add(new MemoryFieldLazy<double>("WheelLoadRR", MemoryAddress.Static, 0x006DB0D4, 8));
+
                 pool.Add(new MemoryFieldLazy<double>("TyrePressureLF", MemoryAddress.Static, 0x006D9F5C, 8));
                 pool.Add(new MemoryFieldLazy<double>("TyrePressureRF", MemoryAddress.Static, 0x006DA55C, 8));
                 pool.Add(new MemoryFieldLazy<double>("TyrePressureLR", MemoryAddress.Static, 0x006DAB5C, 8));
@@ -275,6 +280,7 @@ namespace SimTelemetry.Plugins.Tests
                 pool.Add(new MemoryFieldLazy<int>("SetupAeroBrakeDuct", MemoryAddress.Static, 0x006E18EC, 4));
                 pool.Add(new MemoryFieldLazy<int>("SetupAeroRideHeightFront", MemoryAddress.Static, 0x006E05AC, 4));
                 pool.Add(new MemoryFieldLazy<int>("SetupAeroRideHeightRear", MemoryAddress.Static, 0x006E0BAC, 4));
+                pool.Add(new MemoryFieldLazy<int>("SetupWeightDistForeAfter", MemoryAddress.Static, 0x006E122C, 4));
 
                 pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureLF", MemoryAddress.Static, 0x006DA0E0, 8, Conversions.Kelvin2Celsius));
                 pool.Add(new MemoryFieldLazy<double>("BrakeTemperatureRF", MemoryAddress.Static, 0x006DA6E0, 8, Conversions.Kelvin2Celsius));

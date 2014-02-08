@@ -355,6 +355,7 @@ namespace SimTelemetry.Plugins.Tests
             Polynomial brakesDrag = default(Polynomial);
             Polynomial rideHeightFront = default(Polynomial);
             Polynomial rideHeightRear = default(Polynomial);
+            Polynomial weightDist = default(Polynomial);
 
             // Create other objects.
             using (var hdvIni = new IniReader(hdvFile, true))
@@ -374,6 +375,7 @@ namespace SimTelemetry.Plugins.Tests
                     if (x.Key == "BrakeDuctDrag") brakesDrag = new Polynomial(0, x.ReadAsFloat());
                     if (x.Key == "RideHeightRange" && x.Group.ToLower() == "frontleft") rideHeightFront = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
                     if (x.Key == "RideHeightRange" && x.Group.ToLower() == "rearleft") rideHeightRear = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
+                    // TODO: parse weight dist
                 });
                 hdvIni.Parse();
             }
@@ -381,7 +383,7 @@ namespace SimTelemetry.Plugins.Tests
             var rideheightDrag = new DiffAvgFormula(dragHeightProp, dragHeightDiff);
 
             var s = new Chassis(weight, fuelTankSize, dragBody, frontwingDrag, rearwingDrag, radiatorDrag, brakesDrag,
-                                rideheightDrag, rideHeightFront, rideHeightRear);
+                                rideheightDrag, rideHeightFront, rideHeightRear, weightDist);
             
             return s;
         }

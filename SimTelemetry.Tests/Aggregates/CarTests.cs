@@ -130,7 +130,7 @@ namespace SimTelemetry.Tests.Aggregates
             var hasException = false;
             var testChassis = new CarTestChassis(500, 125, 0.3f, new Polynomial(0.3), new Polynomial(0.3),
                                                  new Polynomial(0.05), new Polynomial(0.025), new Polynomial(1, 0.25),
-                                                 new Polynomial(0.03, 0.001), new Polynomial(0.035, 0.001));
+                                                 new Polynomial(0.03, 0.001), new Polynomial(0.035, 0.001), new Polynomial(0.42,0.02));
 
             car.Assign(testChassis);
 
@@ -403,8 +403,8 @@ namespace SimTelemetry.Tests.Aggregates
 
     internal class CarTestChassis : Chassis
     {
-        public CarTestChassis(float weight, float fuelTankSize, float dragBody, IMathFormula dragFrontWing, IMathFormula dragRearWing, IMathFormula dragRadiator, IMathFormula dragBrakeDucts, IMathFormula dragRideHeight, IMathFormula rideheightFront, IMathFormula rideheightRear)
-            : base(weight, fuelTankSize, dragBody, dragFrontWing, dragRearWing, dragRadiator, dragBrakeDucts, dragRideHeight, rideheightFront, rideheightRear)
+        public CarTestChassis(float weight, float fuelTankSize, float dragBody, IMathFormula dragFrontWing, IMathFormula dragRearWing, IMathFormula dragRadiator, IMathFormula dragBrakeDucts, IMathFormula dragRideHeight, IMathFormula rideheightFront, IMathFormula rideheightRear, IMathFormula weightDist)
+            : base(weight, fuelTankSize, dragBody, dragFrontWing, dragRearWing, dragRadiator, dragBrakeDucts, dragRideHeight, rideheightFront, rideheightRear,weightDist)
         {
         }
     }

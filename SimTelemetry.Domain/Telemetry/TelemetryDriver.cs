@@ -92,8 +92,7 @@ namespace SimTelemetry.Domain.Telemetry
 
         public IEnumerable<double> GearRatios { get; private set; }
 
-        public TelemetrySetup AeroSetup { get; private set; }
-
+        public TelemetrySetup Setup { get; private set; }
 
         public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
         {
@@ -106,12 +105,13 @@ namespace SimTelemetry.Domain.Telemetry
             CurrentLap = LapsList.Any() ? LapsList.LastOrDefault() : dummyLap;
 
             // update Aero Setup
-            AeroSetup = new TelemetrySetup(Pool.ReadAs<int>("SetupAeroFrontWing"),
+            Setup = new TelemetrySetup(Pool.ReadAs<int>("SetupAeroFrontWing"),
                                            Pool.ReadAs<int>("SetupAeroRearWing"),
                                            Pool.ReadAs<int>("SetupAeroRadiator"),
                                            Pool.ReadAs<int>("SetupAeroBrakeDuct"),
                                            Pool.ReadAs<int>("SetupAeroRideHeightFront"),
-                                           Pool.ReadAs<int>("SetupAeroRideHeightRear"));
+                                           Pool.ReadAs<int>("SetupAeroRideHeightRear"),
+                                           Pool.ReadAs<int>("SetupWeightDistForeAfter"));
         }
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
@@ -277,8 +277,9 @@ namespace SimTelemetry.Domain.Telemetry
         public int BrakeDuct { get; private set; }
         public int RideHeightFront { get; private set; }
         public int RideHeightRear { get; private set; }
+        public int WeightDist { get; private set; }
 
-        public TelemetrySetup(int frontWing, int rearWing, int radiator, int brakeDuct, int rideHeightFront, int rideHeightRear)
+        public TelemetrySetup(int frontWing, int rearWing, int radiator, int brakeDuct, int rideHeightFront, int rideHeightRear, int weightDist)
         {
             FrontWing = frontWing;
             RearWing = rearWing;
@@ -286,6 +287,7 @@ namespace SimTelemetry.Domain.Telemetry
             BrakeDuct = brakeDuct;
             RideHeightFront = rideHeightFront;
             RideHeightRear = rideHeightRear;
+            WeightDist = weightDist;
         }
     }
 }

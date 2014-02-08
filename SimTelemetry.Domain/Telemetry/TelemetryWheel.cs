@@ -19,6 +19,8 @@ namespace SimTelemetry.Domain.Telemetry
         public float TemperatureInside { get; private set; }
         public float TemperatureOutside { get; private set; }
 
+        public double LoadForce { get; private set; }
+
         public float Speed { get; private set; }
         public float Rideheight { get; private set; }
 
@@ -35,6 +37,8 @@ namespace SimTelemetry.Domain.Telemetry
 
             TyrePressure = -1;
             TyreWear = 0;
+            TyreContactPatch = 0;
+            LoadForce = 0;
 
             TemperatureInside = -1;
             TemperatureMiddle = -1;
@@ -65,6 +69,8 @@ namespace SimTelemetry.Domain.Telemetry
             
             BrakeTemperature = Pool.ReadAs<float>("BrakeTemperature" + locationAsString);
             BrakeThickness = Pool.ReadAs<float>("BrakeThickness" + locationAsString);
+
+            LoadForce = Pool.ReadAs<float>("WheelLoad" + locationAsString);
 
             TyreWear = Pool.ReadAs<float>("TyreWear" + locationAsString);
             TyrePressure = Pool.ReadAs<float>("TyrePressure" + locationAsString);

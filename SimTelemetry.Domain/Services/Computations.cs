@@ -12,19 +12,19 @@ namespace SimTelemetry.Domain.Services
     {
         public static double GetTopSpeed(TelemetryDriver drv, Car c)
         {
-            if (drv.AeroSetup == null)
+            if (drv.Setup == null)
                 return 360;
 
             double maxPower = c.Engine.MaximumPower;
             maxPower = 125;
 
             // Get setup
-            var frontWing = drv.AeroSetup.FrontWing;
-            var rearWing = drv.AeroSetup.RearWing;
-            var radiator = drv.AeroSetup.Radiator;
-            var brakes = drv.AeroSetup.BrakeDuct;
-            var rideheightFront = drv.AeroSetup.RideHeightFront;
-            var rideheightRear = drv.AeroSetup.RideHeightRear;
+            var frontWing = drv.Setup.FrontWing;
+            var rearWing = drv.Setup.RearWing;
+            var radiator = drv.Setup.Radiator;
+            var brakes = drv.Setup.BrakeDuct;
+            var rideheightFront = drv.Setup.RideHeightFront;
+            var rideheightRear = drv.Setup.RideHeightRear;
 
             var drag = c.Chassis.GetAeroDrag(frontWing, rearWing, radiator, brakes, rideheightFront, rideheightRear);
 

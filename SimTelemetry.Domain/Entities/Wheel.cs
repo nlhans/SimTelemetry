@@ -25,5 +25,10 @@ namespace SimTelemetry.Domain.Entities
             PeakPressure = peakPressure;
             PeakPressureWeightSlope = peakPressureWeightSlope;
         }
+
+        public double GetOptimalPressure(double forceOnWheel)
+        {
+            return PeakPressure + PeakPressureWeightSlope * forceOnWheel;
+        }
     }
 }

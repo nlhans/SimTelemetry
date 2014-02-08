@@ -98,8 +98,6 @@ namespace LiveTelemetry
             GlobalEvents.Hook<SimulatorStarted>(mUpdateUI, true);
             GlobalEvents.Hook<SimulatorStopped>(mUpdateUI, true);
 
-            // TODO: Detect hardware devices (COM-ports or USB devices)
-
             // Form of singleton for public StatusMenu access.
             _frmLiveTelemetry = this;
 
