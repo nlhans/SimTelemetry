@@ -89,39 +89,8 @@
     <Compile Include="UI\Error.Designer.cs">
       <DependentUpon>Error.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\fGarage.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\fGarage.Designer.cs">
-      <DependentUpon>fGarage.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\BufferedFlowLayoutPanel.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Garage\ucSelectModel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Garage\ucSelectModel.Designer.cs">
-      <DependentUpon>ucSelectModel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Garage\ucSelectModel_EngineCurve.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Garage\ucSelectModel_EngineCurve.Designer.cs">
-      <DependentUpon>ucSelectModel_EngineCurve.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Garage\IGarageUserControl.cs" />
-    <Compile Include="Garage\ucSelectGame.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Garage\ucSelectGame.Designer.cs">
-      <DependentUpon>ucSelectGame.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Garage\ucSelectTrackCars.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Garage\ucSelectTrackCars.Designer.cs">
-      <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
     </Compile>
     <Compile Include="Gauges\ucGaugeA1Gp.cs">
       <SubType>UserControl</SubType>
@@ -194,21 +163,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\Error.resx">
       <DependentUpon>Error.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\fGarage.resx">
-      <DependentUpon>fGarage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Garage\ucSelectGame.resx">
-      <DependentUpon>ucSelectGame.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Garage\ucSelectModel.resx">
-      <DependentUpon>ucSelectModel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Garage\ucSelectModel_EngineCurve.resx">
-      <DependentUpon>ucSelectModel_EngineCurve.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Garage\ucSelectTrackCars.resx">
-      <DependentUpon>ucSelectTrackCars.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Gauges\ucGaugeA1Gp.resx">
       <DependentUpon>ucGaugeA1Gp.cs</DependentUpon>

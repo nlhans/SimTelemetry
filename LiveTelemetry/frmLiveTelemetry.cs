@@ -232,8 +232,7 @@ namespace LiveTelemetry
 
         private void btGarage_Click(object sender, EventArgs e)
         {
-            fGarage g = new fGarage();
-            g.Show();
+            // TODO: create garage
         }
 
         /// <summary>

@@ -182,7 +182,6 @@
     <Compile Include="Telemetry\TelemetrySupport.cs" />
     <Compile Include="Telemetry\TelemetryWheel.cs" />
     <Compile Include="Utils\IniReader.cs" />
-    <Compile Include="Utils\IniScannerOld.cs" />
     <Compile Include="Utils\MMTimer.cs" />
     <Compile Include="Utils\ZipStorer.cs" />
     <Compile Include="ValueObjects\IniValueObject.cs" />
