@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Services;
 using SimTelemetry.Domain.ValueObjects;
 
 namespace LiveTelemetry
@@ -85,8 +86,8 @@ namespace LiveTelemetry
                 foreach(var c in columns)
                     g.DrawString(c.Key, f, Brushes.DarkGray, c.Value, 10f);
 
-                var laps = TelemetryApplication.Telemetry.Player.GetLaps().ToList();
-                    var bestLap = TelemetryApplication.Telemetry.Player.BestLap;
+                var laps = TelemetryApplication.Data.Player.GetLaps().ToList();
+                    var bestLap = TelemetryApplication.Data.Player.BestLap;
 
                 if (!laps.Any(x => x.Completed && x.Total > 0)) return;
 
@@ -122,7 +123,7 @@ namespace LiveTelemetry
 
                         var sector1brush = Brushes.Yellow;
                         if (personalBestS1SoFar == lap.Sector1) sector1brush = Brushes.YellowGreen;
-                        if (TelemetryApplication.Telemetry.Laps.BestS1 == lap.Sector1) sector1brush = Brushes.Magenta;
+                        if (TelemetryApplication.Data.Laps.BestS1 == lap.Sector1) sector1brush = Brushes.Magenta;
 
                         g.DrawString(PrintLapTime(lap.Sector1, true), f, sector1brush, columns["S1"], y);
                     }
@@ -135,7 +136,7 @@ namespace LiveTelemetry
 
                         var sector2brush = Brushes.Yellow;
                         if (personalBestS2SoFar == lap.Sector2) sector2brush = Brushes.YellowGreen;
-                        if (TelemetryApplication.Telemetry.Laps.BestS1 == lap.Sector1) sector2brush = Brushes.Magenta;
+                        if (TelemetryApplication.Data.Laps.BestS1 == lap.Sector1) sector2brush = Brushes.Magenta;
 
                         g.DrawString(PrintLapTime(lap.Sector2, true), f, sector2brush, columns["S2"], y);
                     }
@@ -152,7 +153,7 @@ namespace LiveTelemetry
 
                         var sector3brush = Brushes.Yellow;
                         if (personalBestS3SoFar == lap.Sector3) sector3brush = Brushes.YellowGreen;
-                        if (TelemetryApplication.Telemetry.Laps.BestS2 == lap.Sector3) sector3brush = Brushes.Magenta;
+                        if (TelemetryApplication.Data.Laps.BestS2 == lap.Sector3) sector3brush = Brushes.Magenta;
 
                         g.DrawString(PrintLapTime(lap.Sector3, true), f, sector3brush, columns["S3"], y);
                     }
@@ -165,7 +166,7 @@ namespace LiveTelemetry
 
                         var lapBrush = Brushes.Yellow;
                         if (personalBestSoFar == lap.Total) lapBrush = Brushes.YellowGreen;
-                        if (TelemetryApplication.Telemetry.Laps.BestLap.Total == lap.Total) lapBrush = Brushes.Magenta;
+                        if (TelemetryApplication.Data.Laps.BestLap.Total == lap.Total) lapBrush = Brushes.Magenta;
 
                         g.DrawString(PrintLapTime(lap.Total, false), f, lapBrush, columns["Time"], y);
 

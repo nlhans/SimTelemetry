@@ -92,6 +92,8 @@ namespace SimTelemetry.Domain.Telemetry
 
         public IEnumerable<double> GearRatios { get; private set; }
 
+        public TelemetrySetup AeroSetup { get; private set; }
+
 
         public void UpdateSlow(ITelemetry telemetry, IDataProvider Memory)
         {
@@ -102,6 +104,14 @@ namespace SimTelemetry.Domain.Telemetry
             BestLap = LapsList.Any(x => x.Total > 0) ? LapsList.Where(x => x.Total > 0).OrderBy(x => x.Total).FirstOrDefault() : dummyLap;
             LastLap = LapsList.Any(x => x.Completed) ? LapsList.LastOrDefault(x => x.Completed) : dummyLap;
             CurrentLap = LapsList.Any() ? LapsList.LastOrDefault() : dummyLap;
+
+            // update Aero Setup
+            AeroSetup = new TelemetrySetup(Pool.ReadAs<int>("SetupAeroFrontWing"),
+                                           Pool.ReadAs<int>("SetupAeroRearWing"),
+                                           Pool.ReadAs<int>("SetupAeroRadiator"),
+                                           Pool.ReadAs<int>("SetupAeroBrakeDuct"),
+                                           Pool.ReadAs<int>("SetupAeroRideHeightFront"),
+                                           Pool.ReadAs<int>("SetupAeroRideHeightRear"));
         }
 
         public void Update(ITelemetry telemetry, IDataProvider Memory)
@@ -211,11 +221,6 @@ namespace SimTelemetry.Domain.Telemetry
             if (WheelRF != null) WheelRF.Update(telemetry, Memory);
             if (WheelLR != null) WheelLR.Update(telemetry, Memory);
             if (WheelRR != null) WheelRR.Update(telemetry, Memory);
-
-            if (IsPlayer)
-            {
-                
-            }
         }
 
         public TelemetryDriver(IDataNode pool)
@@ -261,6 +266,26 @@ namespace SimTelemetry.Domain.Telemetry
         public double GetSplitTime(TelemetryDriver telemetryDriver)
         {
             return 0;
+        }
+    }
+
+    public class TelemetrySetup
+    {
+        public int FrontWing { get; private set; }
+        public int RearWing { get; private set; }
+        public int Radiator { get; private set; }
+        public int BrakeDuct { get; private set; }
+        public int RideHeightFront { get; private set; }
+        public int RideHeightRear { get; private set; }
+
+        public TelemetrySetup(int frontWing, int rearWing, int radiator, int brakeDuct, int rideHeightFront, int rideHeightRear)
+        {
+            FrontWing = frontWing;
+            RearWing = rearWing;
+            Radiator = radiator;
+            BrakeDuct = brakeDuct;
+            RideHeightFront = rideHeightFront;
+            RideHeightRear = rideHeightRear;
         }
     }
 }

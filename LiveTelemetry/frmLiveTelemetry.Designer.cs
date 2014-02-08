@@ -57,7 +57,7 @@ namespace LiveTelemetry
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 662);
             this.Name = "frmLiveTelemetry";
-            this.Text = "Live Telemetry";
+            this.Text = "Live Data";
             this.ResumeLayout(false);
 
         }

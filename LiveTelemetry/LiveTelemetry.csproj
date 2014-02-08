@@ -76,7 +76,6 @@
     <Compile Include="Gauges\ucGForce.Designer.cs">
       <DependentUpon>ucGForce.cs</DependentUpon>
     </Compile>
-    <Compile Include="TelemetryApplication.cs" />
     <Compile Include="UI\Data.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -88,9 +87,6 @@
     </Compile>
     <Compile Include="UI\Error.Designer.cs">
       <DependentUpon>Error.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\BufferedFlowLayoutPanel.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Gauges\ucGaugeA1Gp.cs">
       <SubType>UserControl</SubType>
@@ -133,13 +129,6 @@
     <Compile Include="Gauges\LiveTrackMap.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UI\fNetwork.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\fNetwork.Designer.cs">
-      <DependentUpon>fNetwork.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\GarageWindow.cs" />
     <Compile Include="UI\ucResizableImage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -184,9 +173,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Gauges\ucSessionInfo.resx">
       <DependentUpon>ucSessionInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\fNetwork.resx">
-      <DependentUpon>fNetwork.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

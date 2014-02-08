@@ -61,6 +61,8 @@
     <Compile Include="Aggregates\Simulator.cs" />
     <Compile Include="Aggregates\Telemetry.cs" />
     <Compile Include="Events\TelemetryLapDriven.cs" />
+    <Compile Include="Services\Computations.cs" />
+    <Compile Include="Services\TelemetryApplication.cs" />
     <Compile Include="Telemetry\TelemetryLapsPool.cs" />
     <Compile Include="Aggregates\Track.cs" />
     <Compile Include="Common\IEntity.cs" />
@@ -184,6 +186,8 @@
     <Compile Include="Utils\IniReader.cs" />
     <Compile Include="Utils\MMTimer.cs" />
     <Compile Include="Utils\ZipStorer.cs" />
+    <Compile Include="ValueObjects\DiffAvgFormula.cs" />
+    <Compile Include="ValueObjects\IMathFormula.cs" />
     <Compile Include="ValueObjects\IniValueObject.cs" />
     <Compile Include="ValueObjects\EngineLifetime.cs" />
     <Compile Include="ValueObjects\EngineMode.cs" />

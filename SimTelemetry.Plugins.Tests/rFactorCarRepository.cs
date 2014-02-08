@@ -347,6 +347,14 @@ namespace SimTelemetry.Plugins.Tests
             float weight = 0;
             float fuelTankSize = 0;
             float dragBody = 0;
+            float dragHeightProp = 0;
+            float dragHeightDiff = 0;
+            Polynomial frontwingDrag = default(Polynomial);
+            Polynomial rearwingDrag = default(Polynomial);
+            Polynomial radiatorDrag = default(Polynomial);
+            Polynomial brakesDrag = default(Polynomial);
+            Polynomial rideHeightFront = default(Polynomial);
+            Polynomial rideHeightRear = default(Polynomial);
 
             // Create other objects.
             using (var hdvIni = new IniReader(hdvFile, true))
@@ -354,13 +362,27 @@ namespace SimTelemetry.Plugins.Tests
                 hdvIni.AddHandler(x =>
                 {
                     if (x.Key == "Mass" && x.Group == "GENERAL") weight = x.ReadAsFloat();
-                    if (x.Key == "BodyDragBase" && x.Group == "GENERAL") dragBody = x.ReadAsFloat();
                     if (x.Key == "FuelRange" && x.Group == "GENERAL") fuelTankSize = x.ReadAsFloat(2);
+
+                    if (x.Key == "BodyDragBase") dragBody = x.ReadAsFloat();
+                    if (x.Key == "BodyDragHeightAvg") dragHeightProp = x.ReadAsFloat();
+                    if (x.Key == "BodyDragHeightDiff") dragHeightDiff = x.ReadAsFloat();
+                    if (x.Key == "FWDragParams") frontwingDrag = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2));
+                    if (x.Key == "RWDragParams") rearwingDrag = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2));
+
+                    if (x.Key == "RadiatorDrag") radiatorDrag = new Polynomial(0, x.ReadAsFloat());
+                    if (x.Key == "BrakeDuctDrag") brakesDrag = new Polynomial(0, x.ReadAsFloat());
+                    if (x.Key == "RideHeightRange" && x.Group.ToLower() == "frontleft") rideHeightFront = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
+                    if (x.Key == "RideHeightRange" && x.Group.ToLower() == "rearleft") rideHeightRear = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
                 });
                 hdvIni.Parse();
             }
-            //TODO: Do aero work
-            var s = new Chassis(weight, fuelTankSize, dragBody, new Polynomial(0), new Polynomial(0), new Polynomial(0), new Polynomial(0), 0 );
+
+            var rideheightDrag = new DiffAvgFormula(dragHeightProp, dragHeightDiff);
+
+            var s = new Chassis(weight, fuelTankSize, dragBody, frontwingDrag, rearwingDrag, radiatorDrag, brakesDrag,
+                                rideheightDrag, rideHeightFront, rideHeightRear);
+            
             return s;
         }
 

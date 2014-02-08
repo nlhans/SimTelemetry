@@ -175,7 +175,7 @@ namespace LiveTelemetry
                     g.DrawString("Car is not modelled in this plug-in.", f, Brushes.White, 10, 10);
                     return;
                 }
-                if(TelemetryApplication.Telemetry.Player.WheelLF == null)
+                if(TelemetryApplication.Data.Player.WheelLF == null)
                 {
                     g.DrawString("Wheels are not modelled in this plug-in.", f, Brushes.White, 10, 10);
                     return;
@@ -185,10 +185,10 @@ namespace LiveTelemetry
                 var carWheelRF = TelemetryApplication.Car.Wheels.FirstOrDefault(x => x.Location == WheelLocation.FRONTRIGHT);
                 var carWheelRR = TelemetryApplication.Car.Wheels.FirstOrDefault(x => x.Location == WheelLocation.REARRIGHT);
 
-                var drvWheelLF = TelemetryApplication.Telemetry.Player.WheelLF;
-                var drvWheelLR = TelemetryApplication.Telemetry.Player.WheelLR;
-                var drvWheelRF = TelemetryApplication.Telemetry.Player.WheelRF;
-                var drvWheelRR = TelemetryApplication.Telemetry.Player.WheelRR;
+                var drvWheelLF = TelemetryApplication.Data.Player.WheelLF;
+                var drvWheelLR = TelemetryApplication.Data.Player.WheelLR;
+                var drvWheelRF = TelemetryApplication.Data.Player.WheelRF;
+                var drvWheelRR = TelemetryApplication.Data.Player.WheelRR;
                 
                 var carBrakeLF = TelemetryApplication.Car.Brakes.FirstOrDefault(x => x.Location == WheelLocation.FRONTLEFT);
                 var carBrakeRF = TelemetryApplication.Car.Brakes.FirstOrDefault(x => x.Location == WheelLocation.REARLEFT);
@@ -196,7 +196,7 @@ namespace LiveTelemetry
                 var carBrakeRR = TelemetryApplication.Car.Brakes.FirstOrDefault(x => x.Location == WheelLocation.REARRIGHT);
                 
                 double SLF = 0, SLR = 0, SRF = 0, SRR = 0;
-                double SPD = 3.6 * TelemetryApplication.Telemetry.Player.Speed;
+                double SPD = 3.6 * TelemetryApplication.Data.Player.Speed;
 
                 SLF = -1 * 3.6 * drvWheelLF.Speed * carWheelLF.Perimeter;
                 SLR = -1 * 3.6 * drvWheelLR.Speed * carWheelRF.Perimeter;
@@ -336,7 +336,7 @@ namespace LiveTelemetry
 
 
 
-                var oil = TelemetryApplication.Telemetry.Player.OilTemperature;
+                var oil = TelemetryApplication.Data.Player.OilTemperature;
                 var oil_max = TelemetryApplication.Car.Engine.MaximumOilTemperature;
 
                 g.DrawString("OIL", f, DimBrush, 30, 130);
@@ -361,7 +361,7 @@ namespace LiveTelemetry
                 }
                 g.DrawString((oil).ToString("000") + "C", f, Brushes.Yellow, 220, 130);
 
-                var water = TelemetryApplication.Telemetry.Player.WaterTemperature;
+                var water = TelemetryApplication.Data.Player.WaterTemperature;
                 var water_max = TelemetryApplication.Car.Engine.MaximumWaterTemperature;
 
                 g.DrawString("Water", f, DimBrush, 30, 150);
@@ -393,8 +393,8 @@ namespace LiveTelemetry
                 g.DrawString("AMBIENT TEMPERATURE", f, Brushes.DarkGray, 300f, 150f);
 
                 var trf = new Font("Calibri", 36f);
-                g.DrawString(TelemetryApplication.Telemetry.Session.TrackTemperature.ToString("00.0") + "C", trf, Brushes.White, 300f, 70f);
-                g.DrawString(TelemetryApplication.Telemetry.Session.AmbientTemperature.ToString("00.0") + "C", trf, Brushes.White, 300f, 170f);
+                g.DrawString(TelemetryApplication.Data.Session.TrackTemperature.ToString("00.0") + "C", trf, Brushes.White, 300f, 70f);
+                g.DrawString(TelemetryApplication.Data.Session.AmbientTemperature.ToString("00.0") + "C", trf, Brushes.White, 300f, 170f);
 
             }
             catch (Exception ex)

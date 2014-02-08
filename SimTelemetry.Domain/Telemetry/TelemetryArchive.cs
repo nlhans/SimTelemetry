@@ -51,7 +51,7 @@ namespace SimTelemetry.Domain.Telemetry
                 i++;
             }
 
-            // TODO: get configuration file Telemetry directory
+            // TODO: get configuration file Data directory
             File.Move("./tmp.zip", suggestedPath);
         }
     }

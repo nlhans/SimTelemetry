@@ -20,10 +20,19 @@
  ************************************************************************/
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Timers;
+using SimTelemetry.Domain.Services;
+using Timer = System.Timers.Timer;
 using System.Windows.Forms;
+using SimTelemetry.Domain;
+using SimTelemetry.Domain.Aggregates;
+using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Plugins;
+using SimTelemetry.Domain.Repositories;
 
 namespace LiveTelemetry
 {
@@ -110,31 +119,31 @@ namespace LiveTelemetry
                 error.AppendLine("-----------------------------------------------------------------");
                 error.Append("Session: ");
                 if (TelemetryApplication.TelemetryAvailable == false) error.AppendLine("No session running");
-                else error.AppendLine(TelemetryApplication.Telemetry.Session.Info.Type.ToString());
+                else error.AppendLine(TelemetryApplication.Data.Session.Info.Type.ToString());
 
                 if (TelemetryApplication.TelemetryAvailable)
                 {
                     error.AppendLine("-----------------------------------------------------------------");
                     error.Append("Driver: ");
-                    if (TelemetryApplication.SimulatorAvailable && TelemetryApplication.Telemetry.Drivers != null &&
-                        TelemetryApplication.Telemetry.Player != null)
+                    if (TelemetryApplication.SimulatorAvailable && TelemetryApplication.Data.Drivers != null &&
+                        TelemetryApplication.Data.Player != null)
                     {
-                        error.AppendLine(TelemetryApplication.Telemetry.Player.Name + " / " +
-                                         TelemetryApplication.Telemetry.Player.CarClasses + " / " +
-                                         TelemetryApplication.Telemetry.Player.CarModel);
-                        error.AppendLine("Laps: " + TelemetryApplication.Telemetry.Player.Laps);
+                        error.AppendLine(TelemetryApplication.Data.Player.Name + " / " +
+                                         TelemetryApplication.Data.Player.CarClasses + " / " +
+                                         TelemetryApplication.Data.Player.CarModel);
+                        error.AppendLine("Laps: " + TelemetryApplication.Data.Player.Laps);
                     }
                     else if (TelemetryApplication.SimulatorAvailable == false)
                         error.AppendLine("Error in Sim object");
-                    else if (TelemetryApplication.Telemetry.Drivers == null)
+                    else if (TelemetryApplication.Data.Drivers == null)
                         error.AppendLine("Error in Drivers object");
-                    else if (TelemetryApplication.Telemetry.Player == null)
+                    else if (TelemetryApplication.Data.Player == null)
                         error.AppendLine("No player found");
 
-                    error.AppendLine("Cars: " + TelemetryApplication.Telemetry.Session.Cars);
+                    error.AppendLine("Cars: " + TelemetryApplication.Data.Session.Cars);
                     error.AppendLine("-----------------------------------------------------------------");
                     error.AppendLine("Track loaded: " + ((TelemetryApplication.TrackAvailable == false) ? "No" : "Yes"));
-                    error.AppendLine("Track: " + TelemetryApplication.Telemetry.Session.Track);
+                    error.AppendLine("Track: " + TelemetryApplication.Data.Session.Track);
                     if (TelemetryApplication.TrackAvailable)
                     {
                         error.AppendLine("Track: " + TelemetryApplication.Track.Name);

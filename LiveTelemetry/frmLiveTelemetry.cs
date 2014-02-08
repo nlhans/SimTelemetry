@@ -30,6 +30,7 @@ using SimTelemetry;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Events;
 using SimTelemetry.Domain.Plugins;
+using SimTelemetry.Domain.Services;
 using Triton;
 using Triton.Joysticks;
 using System.Globalization;
@@ -89,7 +90,7 @@ namespace LiveTelemetry
             // This is mainly used within track parsers.
             Application.CurrentCulture = new CultureInfo("en-US");
             
-            // Boot up the Telemetry Domain
+            // Boot up the Data Domain
             TelemetryApplication.Init();
 
             GlobalEvents.Hook<SessionStarted>(mUpdateUI, true);
@@ -221,8 +222,7 @@ namespace LiveTelemetry
 
         private void btNetwork_Click(object sender, EventArgs e)
         {
-            fNetwork ntwk = new fNetwork();
-            ntwk.ShowDialog();
+            // TODO: Create network panel
         }
 
         private void btSettings_Click(object sender, EventArgs e)
@@ -307,7 +307,7 @@ namespace LiveTelemetry
         /// Completely redraws the user interface. It will bring this window into 3 modes:
         /// A) Waiting for simulator.
         /// B) Waiting for session.
-        /// C) Telemetry window.
+        /// C) Data window.
         /// 
         /// The simulator panel displays all installed modules of simulators (if an image is found).
         /// The session panel displays the full-size simulator image (if exists) with "waiting for session".

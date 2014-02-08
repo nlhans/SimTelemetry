@@ -28,7 +28,7 @@ namespace SimTelemetry.Domain.Aggregates
 
         public TelemetryLogger Logger { get; protected set; }
 
-        #region Telemetry data yard
+        #region Data data yard
 
         public TelemetryLapsPool Laps { get; protected set; }
 
@@ -75,6 +75,8 @@ namespace SimTelemetry.Domain.Aggregates
             Clock = new MMTimer(ClockPeriod);
             Clock.Tick += (o, s) => GlobalEvents.Fire(new TelemetryRefresh(this), true);
             Clock.Start();
+
+            _secondTick = 100;
 
             // Hook both events together:
             GlobalEvents.Hook<TelemetryRefresh>(Update, true);

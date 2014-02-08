@@ -4,6 +4,8 @@ using System.Linq;
 using SimTelemetry.Domain.Common;
 using SimTelemetry.Domain.Entities;
 using SimTelemetry.Domain.Exceptions;
+using SimTelemetry.Domain.Telemetry;
+using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Aggregates
 {
@@ -21,8 +23,6 @@ namespace SimTelemetry.Domain.Aggregates
         public int StartNumber { get; private set; }
         public string Driver { get; private set; }
         public Team Team { get; private set; } 
-
-
 
         public Engine Engine { get; private set; }
         public Chassis Chassis { get; private set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using SimTelemetry.Domain.Services;
 using SimTelemetry.Domain.Telemetry;
 
 namespace LiveTelemetry.UI
@@ -99,16 +100,16 @@ namespace LiveTelemetry.UI
                     var sessLabels = new List<Tuple<int, Dictionary<string, string>>>();
                     var sessCol1 = new Dictionary<string, string>();
 
-                    var sessData = TelemetryApplication.Telemetry.Session;
+                    var sessData = TelemetryApplication.Data.Session;
                     sessCol1.Add("Session Info", string.Empty);
                     sessCol1.Add("Type", string.Format("{0}({1})", sessData.Info.Name, sessData.Info.Type.ToString()));
                     sessCol1.Add("Duration", string.Format("{0} seconds", sessData.Info.Duration.TotalSeconds));
                     sessCol1.Add("Time", string.Format("{0} seconds", sessData.Time));
                     sessCol1.Add("No. of cars", sessData.Cars.ToString());
                     sessCol1.Add("of which: on track",
-                                 TelemetryApplication.Telemetry.Drivers.Count(x => !x.IsPits).ToString());
+                                 TelemetryApplication.Data.Drivers.Count(x => !x.IsPits).ToString());
                     sessCol1.Add("of which: in pits",
-                                 TelemetryApplication.Telemetry.Drivers.Count(x => x.IsPits).ToString());
+                                 TelemetryApplication.Data.Drivers.Count(x => x.IsPits).ToString());
                     sessCol1.Add("Flags",
                                  string.Format("Active:{0} Offline:{1} Replay: {2} Loading: {3}",
                                                (sessData.IsActive ? "Yes" : "No"), (sessData.IsOffline ? "Yes" : "No"),
@@ -149,7 +150,7 @@ namespace LiveTelemetry.UI
 
                     plr1Col1.Add("Car", string.Empty);
                     plr1Col1.Add("Loaded?", (TelemetryApplication.CarAvailable ? "Yes" : "No"));
-                    plr1Col1.Add("Game File", TelemetryApplication.Telemetry.Player.CarFile);
+                    plr1Col1.Add("Game File", TelemetryApplication.Data.Player.CarFile);
 
                     var carObj = TelemetryApplication.Car;
                     if (carObj != null)
@@ -194,7 +195,7 @@ namespace LiveTelemetry.UI
                     var plr2Col1 = new Dictionary<string, string>();
                     var plr2Col2 = new Dictionary<string, string>();
 
-                    var plr = TelemetryApplication.Telemetry.Player;
+                    var plr = TelemetryApplication.Data.Player;
 
                     plr2Col1.Add("Competition", string.Empty);
                     plr2Col1.Add("Position", "P" + plr.Position);

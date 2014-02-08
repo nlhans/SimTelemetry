@@ -24,6 +24,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using SimTelemetry.Domain.Aggregates;
 using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Services;
 using SimTelemetry.Domain.Telemetry;
 using SimTelemetry.Domain.ValueObjects;
 
@@ -57,12 +58,12 @@ namespace LiveTelemetry
 
             try
             {
-                var sessionInfo = TelemetryApplication.Telemetry.Session.Info;
+                var sessionInfo = TelemetryApplication.Data.Session.Info;
 
                 g.DrawString(sessionInfo.Name, f24, Brushes.White, 8, 5);
 
                 // Compute session time left / total.
-                double ftime = TelemetryApplication.Telemetry.Session.Time;
+                double ftime = TelemetryApplication.Data.Session.Time;
 
                 int hours = Convert.ToInt32(Math.Floor(ftime / 3600));
                 int minutes = Convert.ToInt32(Math.Floor((ftime - hours * 3600) / 60));
@@ -85,8 +86,8 @@ namespace LiveTelemetry
                                      : "";
 
                 // Figure out what to-do
-                int total_laps = TelemetryApplication.Telemetry.Session.RaceLaps;
-                int leader_laps = TelemetryApplication.Telemetry.Session.LeaderLaps;
+                int total_laps = TelemetryApplication.Data.Session.RaceLaps;
+                int leader_laps = TelemetryApplication.Data.Session.LeaderLaps;
 
                 if (sessionInfo.Type != SessionType.RACE || (sessionInfo.Type == SessionType.RACE && total_laps <= 0))
                 {

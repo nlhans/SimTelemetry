@@ -26,6 +26,7 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using LiveTelemetry.Gauges;
 using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Services;
 using SimTelemetry.Domain.Telemetry;
 
 namespace LiveTelemetry
@@ -55,9 +56,9 @@ namespace LiveTelemetry
 
             try
             {
-                lock (TelemetryApplication.Telemetry.Drivers)
+                lock (TelemetryApplication.Data.Drivers)
                 {
-                    foreach (var driver in TelemetryApplication.Telemetry.Drivers)
+                    foreach (var driver in TelemetryApplication.Data.Drivers)
                     {
                         if (driver.Position == 0 || driver.Position > 120 || !(Math.Abs(driver.CoordinateX) >= 0.1))
                             continue;
@@ -66,16 +67,16 @@ namespace LiveTelemetry
                         var a2 = GetImageY(driver.CoordinateY);
 
                         Brush c;
-                        if (driver.Position == TelemetryApplication.Telemetry.Player.Position)      // Player
+                        if (driver.Position == TelemetryApplication.Data.Player.Position)      // Player
                             c = Brushes.Magenta;
                         else if (driver.Speed < 5)                                                  // Stopped
                             c = Brushes.Red;
                         else if (driver.FlagYellow)                                                 // Local yellow flag
                             c = Brushes.Gold;
-                        else if (TelemetryApplication.Telemetry.Session.Info.Type == SessionType.RACE &&
-                                 driver.GetSplitTime(TelemetryApplication.Telemetry.Player) >= 10000)
+                        else if (TelemetryApplication.Data.Session.Info.Type == SessionType.RACE &&
+                                 driver.GetSplitTime(TelemetryApplication.Data.Player) >= 10000)
                             c = new SolidBrush(Color.FromArgb(80, 80, 80));                         // InRace && lapped vehicle
-                        else if (driver.Position > TelemetryApplication.Telemetry.Player.Position)
+                        else if (driver.Position > TelemetryApplication.Data.Player.Position)
                             c = Brushes.YellowGreen;                                                // In front of player.
                         else
                             c = new SolidBrush(Color.FromArgb(90, 120, 120));                       // Behind player, but not lapped.

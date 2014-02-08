@@ -28,6 +28,7 @@ using System.Threading;
 using System.Windows.Forms;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Services;
 using Triton.Joysticks;
 using Triton.Maths;
 using Timer = System.Windows.Forms.Timer;
@@ -86,7 +87,7 @@ namespace LiveTelemetry.Gauges
             tmrUpdateConsumptionStats.Tick += TmrUpdateConsumptionStatsTick;
             tmrUpdateConsumptionStats.Start();
 
-            delayedPaintBackground = new Timer {Interval = 500, Enabled = true};
+            delayedPaintBackground = new Timer {Interval = 1500, Enabled = true};
             delayedPaintBackground.Tick += (s, e) =>
                                                {
                                                    PaintBackground(0);
@@ -121,7 +122,7 @@ namespace LiveTelemetry.Gauges
                 if (_counter >= 4 && _counter != 10) // Timer for resetting engine wear.
                 {
                     frmLiveTelemetry.StatusMenu = 0;
-                    _engineMax = TelemetryApplication.Telemetry.Player.EngineLifetime; //Telemetry.m.Sim.Player.Engine_Lifetime;
+                    _engineMax = TelemetryApplication.Data.Player.EngineLifetime; //Data.m.Sim.Player.Engine_Lifetime;
                     _counter = 10;
                 }
             }
@@ -133,21 +134,21 @@ namespace LiveTelemetry.Gauges
         public void Update()
         {
             if (!TelemetryApplication.TelemetryAvailable) return;
-            if (TelemetryApplication.Telemetry.Player == null) return;
+            if (TelemetryApplication.Data.Player == null) return;
             try
             {
                 // TOOD: Move back to Data libraries so they can be used without the UI.
-                if (_fuelLastLapNo != TelemetryApplication.Telemetry.Player.Laps)
+                if (_fuelLastLapNo != TelemetryApplication.Data.Player.Laps)
                 {
-                    var engineState = TelemetryApplication.CarAvailable ? TelemetryApplication.Telemetry.Player.EngineLifetime / TelemetryApplication.Car.Engine.Lifetime.EngineRpm.Optimum : 1.0;//avg
+                    var engineState = TelemetryApplication.CarAvailable ? TelemetryApplication.Data.Player.EngineLifetime / TelemetryApplication.Car.Engine.Lifetime.EngineRpm.Optimum : 1.0;//avg
 
-                    _fuelLastLapNo = TelemetryApplication.Telemetry.Player.Laps;
+                    _fuelLastLapNo = TelemetryApplication.Data.Player.Laps;
 
-                    var usedFuelPerc = TelemetryApplication.Telemetry.Player.Fuel - _fuelLastLap;
+                    var usedFuelPerc = TelemetryApplication.Data.Player.Fuel - _fuelLastLap;
                     var usedEnginePerc = _engineLastLap - engineState;
 
                     _engineLastLap = engineState;
-                    _fuelLastLap = TelemetryApplication.Telemetry.Player.Fuel;
+                    _fuelLastLap = TelemetryApplication.Data.Player.Fuel;
 
                     if (usedFuelPerc < 0)
                         _fuelUsage.Add(0 - usedFuelPerc);
@@ -180,14 +181,15 @@ namespace LiveTelemetry.Gauges
             lock (g)
             {
                 g.FillRectangle(Brushes.Black, 0, 0, Width, Height);
-                if (!TelemetryApplication.TelemetryAvailable || TelemetryApplication.Telemetry.Player == null) return;
+                if (!TelemetryApplication.TelemetryAvailable || TelemetryApplication.Data.Player == null) return;
 
                 // Compute all car-related variabeles
                 var topSpeed = 360.0;
-                var rpmLifetime = TelemetryApplication.Telemetry.Player.EngineRpmMax - 1000;
+                var rpmLifetime = TelemetryApplication.Data.Player.EngineRpmMax - 1000;
                 if(TelemetryApplication.CarAvailable)
                 {
                     //
+                    topSpeed = Computations.GetTopSpeed(TelemetryApplication.Data.Player, TelemetryApplication.Car);
                     rpmLifetime = TelemetryApplication.Car.Engine.Lifetime.EngineRpm.Optimum;
                 }
 
@@ -233,14 +235,14 @@ namespace LiveTelemetry.Gauges
                 _rpmAutoRange = false;
                 do
                 {
-                    _rpmMax = 1000*Math.Ceiling(TelemetryApplication.Telemetry.Player.EngineRpmMax/1000);
+                    _rpmMax = 1000*Math.Ceiling(TelemetryApplication.Data.Player.EngineRpmMax/1000);
                     Thread.Sleep(10);
                 } while (_rpmMax < 100 && retry-- > 0);
 
                 if(_rpmMax < 1000)
                 {
                     _rpmAutoRange = true;
-                    _rpmMax = Math.Max(1000 * Math.Ceiling(TelemetryApplication.Telemetry.Player.EngineRpm/ 1000), 6000);
+                    _rpmMax = Math.Max(1000 * Math.Ceiling(TelemetryApplication.Data.Player.EngineRpm/ 1000), 6000);
                 }
 
                 _rpmMin = 0;
@@ -271,7 +273,7 @@ namespace LiveTelemetry.Gauges
                     _rpmMax += rpmStep - (_rpmMax%rpmStep);
 
                 // ---------------------------------     RPM Gauge    ---------------------------------
-                double fAngleRpmRedLine = (TelemetryApplication.Telemetry.Player.EngineRpmMax - rpmStep / 2 - _rpmMin) /
+                double fAngleRpmRedLine = (TelemetryApplication.Data.Player.EngineRpmMax - rpmStep / 2 - _rpmMin) /
                                             (_rpmMax - _rpmMin)*225;
                 if (double.IsInfinity(fAngleRpmRedLine) || double.IsNaN(fAngleRpmRedLine)) fAngleRpmRedLine = 200;
                 int angleRpmRedLine = Convert.ToInt32(Math.Round(fAngleRpmRedLine));
@@ -349,7 +351,7 @@ namespace LiveTelemetry.Gauges
 
                 // Maximum power
                 // TODO: Add maximum power
-                _powerMax = 600; // Telemetry.m.Computations.MaximumPower(Telemetry.m.Sim, null);
+                _powerMax = 600; // Data.m.Computations.MaximumPower(Data.m.Sim, null);
                 if (_powerMax <= 0 || _powerMax >= 1000)
                     _powerMax = 1000;
 
@@ -383,7 +385,7 @@ namespace LiveTelemetry.Gauges
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (!TelemetryApplication.TelemetryAvailable || TelemetryApplication.Telemetry.Player == null) return;
+            if (!TelemetryApplication.TelemetryAvailable || TelemetryApplication.Data.Player == null) return;
 
             // Fonts
             var fontArial10Bold = new Font("Arial", 10f, FontStyle.Bold);
@@ -409,9 +411,9 @@ namespace LiveTelemetry.Gauges
                 if(TelemetryApplication.CarAvailable)
                 {
                     fuelTankSize = TelemetryApplication.Car.Chassis.FuelTankSize;
-                } else if(TelemetryApplication.Telemetry.Player.FuelCapacity != 0)
+                } else if(TelemetryApplication.Data.Player.FuelCapacity != 0)
                 {
-                    fuelTankSize = TelemetryApplication.Telemetry.Player.FuelCapacity;
+                    fuelTankSize = TelemetryApplication.Data.Player.FuelCapacity;
                 }
 
                 lock (g)
@@ -423,7 +425,7 @@ namespace LiveTelemetry.Gauges
                     g.CompositingMode = compMode;
 
                     // ---------------------------------      RPM Needle    ---------------------------------
-                    double rpmLive = TelemetryApplication.Telemetry.Player.EngineRpm;
+                    double rpmLive = TelemetryApplication.Data.Player.EngineRpm;
                     double fAngleRpm = 90 + (rpmLive - _rpmMin)/(_rpmMax - _rpmMin)*225;
                     if (fAngleRpm < 90) fAngleRpm = 90;
                     if (fAngleRpm > 90 + 225) fAngleRpm = 90 + 225;
@@ -450,7 +452,7 @@ namespace LiveTelemetry.Gauges
                                Convert.ToSingle(rpmGaugeXb), Convert.ToSingle(rpmGaugeYb));
 
                     // ---------------------------------     Speed Needle    ---------------------------------
-                    double speedLive = TelemetryApplication.Telemetry.Player.Speed* 3.6;
+                    double speedLive = TelemetryApplication.Data.Player.Speed* 3.6;
 
                     double fAngleSpeed = 90 + (speedLive - _speedMin)/(_speedMax - _speedMin)*225;
                     if (fAngleSpeed < 90) fAngleSpeed = 90;
@@ -486,23 +488,23 @@ namespace LiveTelemetry.Gauges
 
                     // ---------------------------------    Gear/Speed    ---------------------------------
 
-                    if (TelemetryApplication.Telemetry.Player.Gear == -1 || TelemetryApplication.Telemetry.Player.Gear == 0xFF)
+                    if (TelemetryApplication.Data.Player.Gear == -1 || TelemetryApplication.Data.Player.Gear == 0xFF)
                         g.DrawString("R", fontArial30, Brushes.White, borderBounds/2 + height/2 + 5,
                                      borderBounds/2 + height/2 + 40);
-                    else if (TelemetryApplication.Telemetry.Player.Gear > 0)
-                        g.DrawString(TelemetryApplication.Telemetry.Player.Gear.ToString(), fontArial30, Brushes.White,
+                    else if (TelemetryApplication.Data.Player.Gear > 0)
+                        g.DrawString(TelemetryApplication.Data.Player.Gear.ToString(), fontArial30, Brushes.White,
                                      borderBounds/2 + height/2 + 5,
                                      borderBounds/2 + height/2 + 40);
-                    else if (TelemetryApplication.Telemetry.Player.Gear == 0)
+                    else if (TelemetryApplication.Data.Player.Gear == 0)
                         g.DrawString("N", fontArial30, Brushes.White, borderBounds/2 + height/2 + 5,
                                      borderBounds/2 + height/2 + 40);
 
-                    if (TelemetryApplication.Telemetry.Player.IsLimiter)
-                        g.DrawString(Math.Abs(TelemetryApplication.Telemetry.Player.Speed* 3.6).ToString("000") + "km/h", fontArial18,
+                    if (TelemetryApplication.Data.Player.IsLimiter)
+                        g.DrawString(Math.Abs(TelemetryApplication.Data.Player.Speed* 3.6).ToString("000") + "km/h", fontArial18,
                                      Brushes.DarkOrange,
                                      borderBounds/2 + height/2 + 10, borderBounds/2 + height/2 + 80);
                     else
-                        g.DrawString(Math.Abs(TelemetryApplication.Telemetry.Player.Speed * 3.6).ToString("000") + "km/h", fontArial18,
+                        g.DrawString(Math.Abs(TelemetryApplication.Data.Player.Speed * 3.6).ToString("000") + "km/h", fontArial18,
                                      Brushes.White,
                                      borderBounds/2 + height/2 + 10, borderBounds/2 + height/2 + 80);
 
@@ -514,25 +516,25 @@ namespace LiveTelemetry.Gauges
 
                     // Throttle
                     g.FillRectangle(Brushes.DarkRed, height + 10, 120,
-                                    Convert.ToSingle(TelemetryApplication.Telemetry.Player.InputBrake* 120), 13);
+                                    Convert.ToSingle(TelemetryApplication.Data.Player.InputBrake* 120), 13);
                     g.FillRectangle(Brushes.DarkGreen, height + 10, 120,
-                                    Convert.ToSingle(TelemetryApplication.Telemetry.Player.InputThrottle* 120), 13);
-                    if (TelemetryApplication.Telemetry.Player.InputBrake > TelemetryApplication.Telemetry.Player.InputThrottle)
+                                    Convert.ToSingle(TelemetryApplication.Data.Player.InputThrottle* 120), 13);
+                    if (TelemetryApplication.Data.Player.InputBrake > TelemetryApplication.Data.Player.InputThrottle)
                     {
-                        g.DrawString(TelemetryApplication.Telemetry.Player.InputBrake.ToString("000%"), fontArial10Bold,
+                        g.DrawString(TelemetryApplication.Data.Player.InputBrake.ToString("000%"), fontArial10Bold,
                                      Brushes.DarkRed,
                                      width + borderBounds - 45, 119);
                     }
                     else
                     {
-                        g.DrawString(TelemetryApplication.Telemetry.Player.InputThrottle.ToString("000%"), fontArial10Bold,
+                        g.DrawString(TelemetryApplication.Data.Player.InputThrottle.ToString("000%"), fontArial10Bold,
                                      Brushes.DarkGreen,
                                      width + borderBounds - 45, 119);
                     }
 
                     // Fuel
                     // Check if car data is available. Otherwise, assume the tanksize is 150L (?)
-                    double fuelState = TelemetryApplication.Telemetry.Player.Fuel/fuelTankSize;
+                    double fuelState = TelemetryApplication.Data.Player.Fuel/fuelTankSize;
 
 
                     if (fuelState > 0.1)
@@ -545,11 +547,11 @@ namespace LiveTelemetry.Gauges
                         g.FillRectangle(Brushes.Red, height + 10, 141, Convert.ToSingle(fuelState*120), 12);
                     }
                     if (fuelState < 0.1)
-                        g.DrawString(TelemetryApplication.Telemetry.Player.Fuel.ToString("00.00").Replace(".", "L"),
+                        g.DrawString(TelemetryApplication.Data.Player.Fuel.ToString("00.00").Replace(".", "L"),
                                      fontArial10Bold, Brushes.Red,
                                      width + borderBounds - 45, 139);
                     else
-                        g.DrawString(TelemetryApplication.Telemetry.Player.Fuel.ToString("000.0").Replace(".", "L"),
+                        g.DrawString(TelemetryApplication.Data.Player.Fuel.ToString("000.0").Replace(".", "L"),
                                      fontArial10Bold, Brushes.DarkOrange,
                                      width + borderBounds - 45, 139);
 
@@ -561,7 +563,7 @@ namespace LiveTelemetry.Gauges
                         double avg = _fuelUsage.Take(8).Where(x=>x > 0).Average();
                         if (avg > 0)
                         {
-                            double laps = TelemetryApplication.Telemetry.Player.Fuel / avg;
+                            double laps = TelemetryApplication.Data.Player.Fuel / avg;
                             g.DrawString(laps.ToString("(000)"), fontArial10Bold, Brushes.DarkOrange,
                                          width + borderBounds - 45, 159);
                             g.DrawString(avg.ToString("0.000L") + " per lap", fontArial10Bold, Brushes.DarkOrange,
@@ -572,7 +574,7 @@ namespace LiveTelemetry.Gauges
                         g.DrawString("(???)", fontArial10Bold, dimBrush, width + borderBounds - 45, 159);
 
                     // Engine
-                    double engineLive = TelemetryApplication.Telemetry.Player.EngineLifetime;
+                    double engineLive = TelemetryApplication.Data.Player.EngineLifetime;
                     double enginePerc = engineLive/_engineMax;
                     if (double.IsInfinity(enginePerc) || double.IsNaN(enginePerc)) enginePerc = 1;
 
@@ -622,11 +624,11 @@ namespace LiveTelemetry.Gauges
                     // Power
                     double power;
 
-                    if (true) //Telemetry.m.Sim.Modules.Engine_Power)
-                        power = TelemetryApplication.Telemetry.Player.EngineTorque*
-                                TelemetryApplication.Telemetry.Player.EngineRpm*Math.PI*2/60000.0;
+                    if (true) //Data.m.Sim.Modules.Engine_Power)
+                        power = TelemetryApplication.Data.Player.EngineTorque*
+                                TelemetryApplication.Data.Player.EngineRpm*Math.PI*2/60000.0;
                     else
-                        power = 0; // Telemetry.m.Computations.GetPower(Telemetry.m.Sim.Player.Engine_RPM, Telemetry.m.Sim.Player.Pedals_Throttle);
+                        power = 0; // Data.m.Computations.GetPower(Data.m.Sim.Player.Engine_RPM, Data.m.Sim.Player.Pedals_Throttle);
                     
                     _powerUsage.Add(power);
                     _powerUsage.MaxSize = 3;

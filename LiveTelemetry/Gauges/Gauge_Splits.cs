@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using SimTelemetry.Domain.Services;
 using SimTelemetry.Domain.Telemetry;
 
 namespace LiveTelemetry
@@ -65,21 +66,21 @@ namespace LiveTelemetry
                 g.DrawString("Last Lap", f, Brushes.DarkGray, 300f, 10f);
                 g.DrawString("Pits", f, Brushes.DarkGray, 380f, 10f);
 
-                List<TelemetryDriver> drivers = (List<TelemetryDriver>) TelemetryApplication.Telemetry.Drivers;
+                List<TelemetryDriver> drivers = (List<TelemetryDriver>) TelemetryApplication.Data.Drivers;
                 drivers.Sort(sortDriver);
 
                 int ind =1;
                 float LineHeight = 16f;
 
                 // Go through all drivers
-                for (int p = Math.Max(0, TelemetryApplication.Telemetry.Player.Position - 6); p <= TelemetryApplication.Telemetry.Player.Position + 12; p++)
+                for (int p = Math.Max(0, TelemetryApplication.Data.Player.Position - 6); p <= TelemetryApplication.Data.Player.Position + 12; p++)
                 {
                     if (ind == 16 || p >= drivers.Count)
                         break;
                     TelemetryDriver driver = drivers[p];
 
                     Brush OntrackBrush = ((!driver.IsPits && driver.Speed > 5) ? Brushes.White : Brushes.Red);
-                    if (TelemetryApplication.Telemetry.Player.Position == driver.Position) OntrackBrush = Brushes.Yellow;
+                    if (TelemetryApplication.Data.Player.Position == driver.Position) OntrackBrush = Brushes.Yellow;
                     g.DrawString(driver.Position.ToString(), f, Brushes.White, 10f, 10f + ind * LineHeight);
                     string[] name = driver.Name.ToUpper().Split(" ".ToCharArray());
                     if (name.Length == 1)

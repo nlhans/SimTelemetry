@@ -63,7 +63,7 @@ namespace SimTelemetry.Tests.Telemetry
 
             var logger = new TelemetryLogger("testSim", new TelemetryLoggerConfiguration(true, true, true, true));
             logger.SetDatasource(provider);
-            logger.SetTemporaryLocations("LapTests.zip", "SimTelemetry.Tests.Telemetry.TelemetryLoggerTests_LapTests");
+            logger.SetTemporaryLocations("LapTests.zip", "SimTelemetry.Tests.Data.TelemetryLoggerTests_LapTests");
             
             //logger.SetAnnotater(new TelemetryArchive());
             GlobalEvents.Fire(new SessionStarted(), true);

@@ -4,7 +4,7 @@ using SimTelemetry.Domain.Common;
 
 namespace SimTelemetry.Domain.ValueObjects
 {
-    public class Polynomial : IValueObject<Polynomial>
+    public class Polynomial : IMathFormula, IValueObject<Polynomial>
     {
         public IList<double> Factors { get; private set; }
 
@@ -37,6 +37,11 @@ namespace SimTelemetry.Domain.ValueObjects
                 r += Math.Pow(x, exponent++) * c;
 
             return r;
+        }
+
+        public double Get(double input1, double input2)
+        {
+            return Get(input1);
         }
 
         public bool Equals(Polynomial other)

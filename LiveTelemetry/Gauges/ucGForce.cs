@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using SimTelemetry.Domain;
 using SimTelemetry.Domain.Events;
+using SimTelemetry.Domain.Services;
 
 namespace LiveTelemetry.Gauges
 {
@@ -47,9 +48,9 @@ namespace LiveTelemetry.Gauges
                     persistance.Remove(persistance.Keys.Min());
                 }
 
-                var time = TelemetryApplication.Telemetry.Session.Time;
-                var accX = TelemetryApplication.Telemetry.Player.AccelerationX;
-                var accY = TelemetryApplication.Telemetry.Player.AccelerationY;
+                var time = TelemetryApplication.Data.Session.Time;
+                var accX = TelemetryApplication.Data.Player.AccelerationX;
+                var accY = TelemetryApplication.Data.Player.AccelerationY;
                 var acc = new Tuple<float, float>(accX, accY);
 
                 if (persistance.ContainsKey(time) == false)

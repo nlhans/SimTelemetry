@@ -124,7 +124,6 @@ namespace SimTelemetry.Plugins.Tests
                                                                break;
 
                                                            default:
-                                                               // TODO: Double check this.
                                                                type = TrackPointType.GRID;
                                                                break;
                                                        }

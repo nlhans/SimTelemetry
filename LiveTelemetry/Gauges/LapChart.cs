@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using SimTelemetry.Domain.Enumerations;
+using SimTelemetry.Domain.Services;
 using SimTelemetry.Domain.Telemetry;
 
 namespace LiveTelemetry
@@ -71,7 +72,7 @@ namespace LiveTelemetry
 
             try
             {
-                var sessionIsRace = TelemetryApplication.Telemetry.Session.Info.Type == SessionType.RACE;
+                var sessionIsRace = TelemetryApplication.Data.Session.Info.Type == SessionType.RACE;
                 if (!sessionIsRace)
                 {
                     columns.Add("P", 10);
@@ -101,31 +102,31 @@ namespace LiveTelemetry
 
                 int ind = 1;
 
-                var player = TelemetryApplication.Telemetry.Player;
+                var player = TelemetryApplication.Data.Player;
                 if (player == null)
                 {
                     g.DrawString("Could not find player memory object", f, Brushes.White, 10f, 30f);
                     return;
                 }
 
-                var lapTimeBest = TelemetryApplication.Telemetry.Laps.BestLap.Total;
+                var lapTimeBest = TelemetryApplication.Data.Laps.BestLap.Total;
 
-                var overallBestS1 = TelemetryApplication.Telemetry.Laps.BestS1;
-                var overallBestS2 = TelemetryApplication.Telemetry.Laps.BestS2;
-                var overallBestS3 = TelemetryApplication.Telemetry.Laps.BestS3;
+                var overallBestS1 = TelemetryApplication.Data.Laps.BestS1;
+                var overallBestS2 = TelemetryApplication.Data.Laps.BestS2;
+                var overallBestS3 = TelemetryApplication.Data.Laps.BestS3;
 
                 var bestSector1Driver =
-                    TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS1Lap.Driver);
+                    TelemetryApplication.Data.GetDriverById(TelemetryApplication.Data.Laps.BestS1Lap.Driver);
                 var bestSector2Driver =
-                    TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS2Lap.Driver);
+                    TelemetryApplication.Data.GetDriverById(TelemetryApplication.Data.Laps.BestS2Lap.Driver);
                 var bestSector3Driver =
-                    TelemetryApplication.Telemetry.GetDriverById(TelemetryApplication.Telemetry.Laps.BestS3Lap.Driver);
+                    TelemetryApplication.Data.GetDriverById(TelemetryApplication.Data.Laps.BestS3Lap.Driver);
 
-                var myBestSector1 = TelemetryApplication.Telemetry.Player.BestS1;
-                var myBestSector2 = TelemetryApplication.Telemetry.Player.BestS2;
-                var myBestSector3 = TelemetryApplication.Telemetry.Player.BestS3;
+                var myBestSector1 = TelemetryApplication.Data.Player.BestS1;
+                var myBestSector2 = TelemetryApplication.Data.Player.BestS2;
+                var myBestSector3 = TelemetryApplication.Data.Player.BestS3;
 
-                var drivers = TelemetryApplication.Telemetry.Drivers.OrderBy(x => x.Position);
+                var drivers = TelemetryApplication.Data.Drivers.OrderBy(x => x.Position);
                 var driverCount = drivers.Count();
 
                 // Calculate the line height
@@ -133,7 +134,7 @@ namespace LiveTelemetry
 
                 // Go through all drivers
                 if (driverCount <= 0) return;
-                var currentSessionTime = TelemetryApplication.Telemetry.Session.Time;
+                var currentSessionTime = TelemetryApplication.Data.Session.Time;
 
                 var previousGap = 0.0;
 
@@ -248,11 +249,11 @@ namespace LiveTelemetry
                         if (sector2ToShow == driver.BestS2) sector2Brush = Brushes.YellowGreen;
                         if (sector3ToShow == driver.BestS3) sector3Brush = Brushes.YellowGreen;
 
-                        if (sector1ToShow == TelemetryApplication.Telemetry.Laps.BestS1)
+                        if (sector1ToShow == TelemetryApplication.Data.Laps.BestS1)
                             sector1Brush = Brushes.Magenta;
-                        if (sector2ToShow == TelemetryApplication.Telemetry.Laps.BestS2)
+                        if (sector2ToShow == TelemetryApplication.Data.Laps.BestS2)
                             sector2Brush = Brushes.Magenta;
-                        if (sector3ToShow == TelemetryApplication.Telemetry.Laps.BestS3)
+                        if (sector3ToShow == TelemetryApplication.Data.Laps.BestS3)
                             sector3Brush = Brushes.Magenta;
 
                         var showSector1AtAll = showLastLap || showBestLap ||
@@ -295,12 +296,12 @@ namespace LiveTelemetry
                 if (bestSector1Driver != null && bestSector2Driver != null && bestSector3Driver != null)
                 {
                     var bestLapDriver =
-                        TelemetryApplication.Telemetry.GetDriverById(
-                            TelemetryApplication.Telemetry.Laps.BestLap.Driver);
+                        TelemetryApplication.Data.GetDriverById(
+                            TelemetryApplication.Data.Laps.BestLap.Driver);
 
                     g.DrawString("Fastest lap: ", f, Brushes.DarkGray, 10f, 10f + ind*lineHeight);
                     g.DrawString(bestLapDriver.Name, f, Brushes.Yellow, 195f, 10f + ind*lineHeight);
-                    g.DrawString(PrintLapTime(TelemetryApplication.Telemetry.Laps.BestLap.Total, false), f,
+                    g.DrawString(PrintLapTime(TelemetryApplication.Data.Laps.BestLap.Total, false), f,
                                  Brushes.Magenta, 140f, 10f + ind*lineHeight);
 
 
