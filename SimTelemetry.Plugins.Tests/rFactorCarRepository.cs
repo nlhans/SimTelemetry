@@ -414,7 +414,7 @@ namespace SimTelemetry.Plugins.Tests
                 engFile.AddHandler(x =>
                                        {
                                            if (x.Key == "RPMTorque") 
-                                               engineTorque.Add(new EngineTorque(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2)));
+                                               engineTorque.Add(new EngineTorque(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2)-x.ReadAsFloat(1)));
 
                                            if (x.Key == "IdleRPMLogic")
                                                idleRpm = new Range(x.ReadAsFloat(0), x.ReadAsFloat(1));

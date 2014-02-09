@@ -225,12 +225,12 @@ namespace LiveTelemetry
 
         private void btSettings_Click(object sender, EventArgs e)
         {
-            // TODO: Need to create this panel
+            // TODO: Create setting panels
         }
 
         private void btGarage_Click(object sender, EventArgs e)
         {
-            // TODO: create garage
+            // TODO: Create garage panels
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SimTelemetry.Domain.ValueObjects;
 
 namespace SimTelemetry.Domain.Entities
@@ -43,6 +45,24 @@ namespace SimTelemetry.Domain.Entities
 
             MaximumOilTemperature = maxOil;
             MaximumWaterTemperature = maxWater;
+
+            MaximumTorque = torqueCurve.Max(x => x.Torque.Maximum);
+            foreach (var t in torqueCurve.Where(t => t.Torque.Maximum == MaximumTorque))
+            {
+                MaximumTorqueRpm = t.RPM;
+                break;
+            }
+
+            MaximumPower = float.MinValue;
+            
+            foreach (var t in GetPowerCurve(1))
+            {
+                if(t.Value > MaximumPower)
+                {
+                    MaximumPower = t.Value;
+                    MaximumPowerRpm = t.Key;
+                }
+            }
         }
 
         public void Apply(double settingsSpeed, double settingsThrottle, int engineMode)
@@ -50,14 +70,16 @@ namespace SimTelemetry.Domain.Entities
             throw new System.NotImplementedException();
         }
 
-        public Dictionary<double, double> GetPowerCurve()
+        public Dictionary<double, double> GetPowerCurve(double throttle = 1)
         {
-            throw new System.NotImplementedException();
+            var powerCurve = GetTorqueCurve(throttle).ToDictionary(x => x.Key, x => x.Key*Math.PI*2/60.0/1000*x.Value);
+            return powerCurve;
         }
 
-        public Dictionary<double, double> GetTorqueCurve()
+        public Dictionary<double, double> GetTorqueCurve(double throttle = 1)
         {
-            throw new System.NotImplementedException();
+            return TorqueCurve.ToDictionary(x => (double) x.RPM,
+                                            x => (double) (x.Torque.Minimum + x.Torque.Maximum*throttle));
         }
     }
 }

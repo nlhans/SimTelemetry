@@ -115,7 +115,8 @@ namespace LiveTelemetry.Gauges
             Graphics g = Graphics.FromImage(_BackgroundTrackMap);
             g.FillRectangle(Brushes.Black, 0, 0, this.Size.Width, this.Size.Height);
 
-            if (TelemetryApplication.TrackAvailable == false) return;
+            if (TelemetryApplication.TrackAvailable == false ||
+                TelemetryApplication.Track == null) return;
 
             g.SmoothingMode = SmoothingMode.AntiAlias;
 

@@ -30,10 +30,10 @@ namespace SimTelemetry.Plugins.Tests
             session.Add(new MemoryFieldLazy<TimeSpan>("TimeLimit", MemoryAddress.Static, 0x5932EC, 4));
             session.Add(new MemoryFieldLazy<SessionType>("Type", MemoryAddress.Static, 0x58696C, 4));
             session.Add(new MemoryFieldLazy<byte>("TypeIndex", MemoryAddress.Static, 0x58696C, 4, SessionTypeToIndex));
-            session.Add(new MemoryFieldConstant<string>("Day", "???")); // TODO: Day of week of this session
-            // TODO: Time of day of this session.
-            // TODO: Pit speed limit
-
+            session.Add(new MemoryFieldLazy<string>("Day", MemoryAddress.Static, 0x6E2EAC, 32));
+            session.Add(new MemoryFieldLazy<Time>("StartTime", MemoryAddress.Static, 0x593328, 4));
+            session.Add(new MemoryFieldLazy<float>("PitSpeed", MemoryAddress.Static, 0x59332C, 4, (x) => x * 3.6f));
+            
             session.Add(new MemoryFieldLazy<string>("LocationTrack", MemoryAddress.Static, 0x309D28, 0, 256,
                                                     x => x.Length > 20 ? x.Substring(19).ToLower().Replace("aiw", "gdb") : string.Empty));
 

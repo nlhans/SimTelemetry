@@ -195,7 +195,7 @@ namespace LiveTelemetry.Gauges
 
                 // ---------------------------------       Speed      ---------------------------------
                 _speedMin = 0;
-                _speedMax = topSpeed; // TODO: Calculate top speed
+                _speedMax = topSpeed;
 
                 _speedStep = 30;
                 if (_speedMax < 300) _speedStep = 25;

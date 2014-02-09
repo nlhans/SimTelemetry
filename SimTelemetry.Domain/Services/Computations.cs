@@ -12,11 +12,10 @@ namespace SimTelemetry.Domain.Services
     {
         public static double GetTopSpeed(TelemetryDriver drv, Car c)
         {
-            if (drv.Setup == null)
+            if (drv.Setup == null || c.Engine.MaximumPower <= 0)
                 return 360;
 
             double maxPower = c.Engine.MaximumPower;
-            maxPower = 125;
 
             // Get setup
             var frontWing = drv.Setup.FrontWing;
@@ -28,11 +27,8 @@ namespace SimTelemetry.Domain.Services
 
             var drag = c.Chassis.GetAeroDrag(frontWing, rearWing, radiator, brakes, rideheightFront, rideheightRear);
 
-            var tyreDrag = c.Wheels.FirstOrDefault().RollResistance + c.Wheels.LastOrDefault().RollResistance;
-            tyreDrag /= 2;
+            // TODO: Tyre resistance -> drag
 
-            tyreDrag *= 0.0125f; // contact patch(average)
-            drag += tyreDrag;
             return 3.6*Math.Pow(maxPower*1000.0/drag, 1/3.0);
         }
     }
