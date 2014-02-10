@@ -363,19 +363,20 @@ namespace SimTelemetry.Plugins.Tests
                 hdvIni.AddHandler(x =>
                 {
                     if (x.Key == "Mass" && x.Group == "GENERAL") weight = x.ReadAsFloat();
-                    if (x.Key == "FuelRange" && x.Group == "GENERAL") fuelTankSize = x.ReadAsFloat(2);
+                    else if (x.Key == "FuelRange" && x.Group == "GENERAL") fuelTankSize = x.ReadAsFloat(2);
 
-                    if (x.Key == "BodyDragBase") dragBody = x.ReadAsFloat();
-                    if (x.Key == "BodyDragHeightAvg") dragHeightProp = x.ReadAsFloat();
-                    if (x.Key == "BodyDragHeightDiff") dragHeightDiff = x.ReadAsFloat();
-                    if (x.Key == "FWDragParams") frontwingDrag = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2));
-                    if (x.Key == "RWDragParams") rearwingDrag = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2));
+                    else if (x.Key == "BodyDragBase") dragBody = x.ReadAsFloat();
+                    else if (x.Key == "BodyDragHeightAvg") dragHeightProp = x.ReadAsFloat();
+                    else if (x.Key == "BodyDragHeightDiff") dragHeightDiff = x.ReadAsFloat();
+                    else if (x.Key == "FWDragParams") frontwingDrag = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2));
+                    else if (x.Key == "RWDragParams") rearwingDrag = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1), x.ReadAsFloat(2));
 
-                    if (x.Key == "RadiatorDrag") radiatorDrag = new Polynomial(0, x.ReadAsFloat());
-                    if (x.Key == "BrakeDuctDrag") brakesDrag = new Polynomial(0, x.ReadAsFloat());
-                    if (x.Key == "RideHeightRange" && x.Group.ToLower() == "frontleft") rideHeightFront = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
-                    if (x.Key == "RideHeightRange" && x.Group.ToLower() == "rearleft") rideHeightRear = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
-                    // TODO: parse weight dist
+                    else if (x.Key == "RadiatorDrag") radiatorDrag = new Polynomial(0, x.ReadAsFloat());
+                    else if (x.Key == "BrakeDuctDrag") brakesDrag = new Polynomial(0, x.ReadAsFloat());
+                    else if (x.Key == "RideHeightRange" && x.Group.ToLower() == "frontleft") rideHeightFront = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
+                    else if (x.Key == "RideHeightRange" && x.Group.ToLower() == "rearleft") rideHeightRear = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
+
+                    else if (x.Key == "CGRearRange") weightDist = new Polynomial(x.ReadAsFloat(0), x.ReadAsFloat(1));
                 });
                 hdvIni.Parse();
             }

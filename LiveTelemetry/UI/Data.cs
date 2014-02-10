@@ -178,7 +178,7 @@ namespace LiveTelemetry.UI
                                      carObj.Engine.MaximumTorque.ToString("000 nm") + "@" +
                                      carObj.Engine.MaximumTorqueRpm.ToString("0000 rpm"));
                         plr1Col1.Add("Power",
-                                     carObj.Engine.MaximumPower.ToString("000 hp") + "@" +
+                                     carObj.Engine.MaximumPower.ToString("000 kW") + "@" +
                                      carObj.Engine.MaximumPowerRpm.ToString("0000 rpm"));
                         plr1Col1.Add("Typical lifetime",
                                      string.Format("{0} seconds @ {1} / {2}",
