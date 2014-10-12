@@ -32,7 +32,8 @@ namespace SimTelemetry.Tests.Utils
                                       if (x.Key == "LaunchEfficiency")
                                       {
                                           Assert.AreEqual(0.92f, x.ReadAsFloat());
-                                           x.ReadAsFloat(0);
+                                          Assert.AreEqual(0.92f, x.ReadAsFloat(0));
+                                           x.ReadAsFloat(1);
                                           // shouldn't reach this
                                           Assert.Fail("Exception failed");
                                       }

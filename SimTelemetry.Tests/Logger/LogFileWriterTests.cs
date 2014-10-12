@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -138,7 +139,7 @@ namespace SimTelemetry.Tests.Logger
 
             file.Unsubscribe(source);
 
-            file.Update(i++); // does nothing now, but the data thing does miss 1 time .
+            file.Update(i++); // does nothing now, but the data does miss 1 time .
 
             file.Subscribe(source);
 
@@ -150,18 +151,28 @@ namespace SimTelemetry.Tests.Logger
 
             // We should have logged 2 data files by now.
             Assert.True(File.Exists("LogFileWriterTestsDataWithResubscriptions/test/Data.bin"));
+            Assert.True(File.Exists("LogFileWriterTestsDataWithResubscriptions/test/Time.bin"));
+            Assert.True(File.Exists("LogFileWriterTestsDataWithResubscriptions/test/Structure.xml"));
 
             file.Save();
 
             ZipStorer z = ZipStorer.Open("test4.zip", FileAccess.Read);
 
             var files = z.ReadCentralDir();
+            Debug.WriteLine("File count =3 -> " + files.Count);
             Assert.AreEqual(3, files.Count);
+
             Assert.True(files.Any(x => x.FilenameInZip == "test/Data.bin"));
-            Assert.True(files.Where(x => x.FilenameInZip == "test/Data.bin").FirstOrDefault().FileSize == (1441792-1)*28);
+            Debug.WriteLine("Data.bin: "+files.FirstOrDefault(x => x.FilenameInZip == "test/Data.bin").FileSize + "=" + ((1441792 - 1) * 28));
+            Assert.True(files.FirstOrDefault(x => x.FilenameInZip == "test/Data.bin").FileSize == (1441792-1)*28);
+
             Assert.True(files.Any(x => x.FilenameInZip == "test/Structure.xml"));
+            Debug.WriteLine("Structure.xml: " +files.FirstOrDefault(x => x.FilenameInZip == "test/Structure.xml").FileSize + "=528");
+            Assert.True(files.FirstOrDefault(x => x.FilenameInZip == "test/Structure.xml").FileSize == 528);
+
             Assert.True(files.Any(x => x.FilenameInZip == "test/Time.bin"));
-            Assert.True(files.Where(x => x.FilenameInZip == "test/Time.bin").FirstOrDefault().FileSize == 1441792 * 8 - 8);
+            Debug.WriteLine("Time.bin: " + files.FirstOrDefault(x => x.FilenameInZip == "test/Time.bin").FileSize + "=" + (1441792 * 8 - 8));
+            Assert.True(files.FirstOrDefault(x => x.FilenameInZip == "test/Time.bin").FileSize == 1441792 * 8 - 8);
         }
 
         [Test]

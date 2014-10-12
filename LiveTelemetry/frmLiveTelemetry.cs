@@ -521,6 +521,11 @@ namespace LiveTelemetry
             if (Controls.Contains(ucSplits)) ucSplits.Invalidate();
         }
 
+        /// <summary>
+        /// Retrieves button value pressed by user based on configured index
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public static bool GetButton(UiButtons button)
         {
             try
@@ -536,6 +541,11 @@ namespace LiveTelemetry
             }
         }
 
+        /// <summary>
+        /// Retrieves button index based on configured index
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
         public static int GetButtonIndex(UiButtons button)
         {
             try

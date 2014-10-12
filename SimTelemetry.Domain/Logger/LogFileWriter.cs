@@ -34,7 +34,7 @@ namespace SimTelemetry.Domain.Logger
             _pendingWriteBusy = true;
 
             while (_pendingWriteActive || _pendingWrites.Count>0)
-            {
+                {
                 var myActions = new List<LogFileWriteAction>();
                 LogFileWriteAction myAction;
                 while (_pendingWrites.TryTake(out myAction))
@@ -42,6 +42,7 @@ namespace SimTelemetry.Domain.Logger
 
                 foreach (var action in myActions.OrderBy(x => x.WriteNumber))
                 {
+                    var seekToBegin = false;
                     var file = "";
                     var fm = FileMode.Append;
                     switch (action.FileType)
@@ -57,6 +58,7 @@ namespace SimTelemetry.Domain.Logger
                         case LogFileType.Structure:
                             file = "Structure.xml";
                             fm = FileMode.Truncate;
+                            seekToBegin = true;
                             break;
 
                         case LogFileType.Laps:
@@ -91,6 +93,8 @@ namespace SimTelemetry.Domain.Logger
                         Debug.WriteLine("writing to structure.xml @ "+path);
                     }
                     FileStream fs = fileStreams[path];
+
+                    if (seekToBegin)
                         fs.Seek(0, SeekOrigin.Begin);
 
                     fs.Write(action.Data, 0, action.Data.Length);
@@ -219,6 +223,7 @@ namespace SimTelemetry.Domain.Logger
                 var filenameInZip = file.Substring(tmpIndex+TemporaryDirectory.Length+1);
 
                 _archive.AddFile(ZipStorer.Compression.Deflate, file, filenameInZip, "");
+                File.Delete(file);
             }
 
             // Close zip file.

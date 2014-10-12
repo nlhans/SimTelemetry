@@ -95,9 +95,15 @@ namespace SimTelemetry.Tests.Aggregates
         [Test]
         public void TestEngine()
         {
+            var fakeEngineTorque = new List<EngineTorque>();
+            fakeEngineTorque.Add(new EngineTorque(0, -100, 100));
+            fakeEngineTorque.Add(new EngineTorque(3500, -100, 200));
+            fakeEngineTorque.Add(new EngineTorque(7000, -100, 300));
+            fakeEngineTorque.Add(new EngineTorque(10500, -100, 200));
+
             var hasException = false;
             var testEng = new CarTestEngine("V10 3.0L", "Cosworth", 10, 3000, new Range(3000, 4000),
-                                            new Range(17500, 18500), new List<EngineMode>(), new List<EngineTorque>(),
+                                            new Range(17500, 18500), new List<EngineMode>(), fakeEngineTorque,
                                             new EngineLifetime(new NormalDistrbution(3600, 200),
                                                                new NormalDistrbution(15000, 100),
                                                                new NormalDistrbution(100, 5)), 95, 105);

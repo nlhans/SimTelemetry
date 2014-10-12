@@ -10,6 +10,7 @@ namespace SimTelemetry.Tests.Memory
     [TestFixture]
     public class MemoryFieldLazyTests
     {
+
         private DiagnosticMemoryReader reader;
         private MemoryPool drvPool;
         private MemoryProvider memory;

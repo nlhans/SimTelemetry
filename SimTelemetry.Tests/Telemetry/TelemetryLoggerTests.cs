@@ -70,7 +70,7 @@ namespace SimTelemetry.Tests.Telemetry
             GlobalEvents.Fire(new DriversAdded(null, fakeDrivers), true);
 
             for (int i = 0; i < 1024; i++)
-                logger.Update(i * 25);
+                logger.Update(i * 5);
 
             GlobalEvents.Fire(new SessionStopped(), true);
 

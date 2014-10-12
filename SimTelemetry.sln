@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveTelemetry", "LiveTelemetry\LiveTelemetry.csproj", "{8A946732-F275-449E-92D3-53FBDA69865E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry", "SimTelemetry\SimTelemetry.csproj", "{9C68C799-305F-417C-BFA5-9BF6E1280107}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Tests", "SimTelemetry.Tests\SimTelemetry.Tests.csproj", "{CFE14725-ECFB-4D8F-8167-E2D116BC6361}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimTelemetry.Plugins.Tests", "SimTelemetry.Plugins.Tests\SimTelemetry.Plugins.Tests.csproj", "{8F00BB8C-A49E-4AD7-981C-EA949A97B3C7}"
@@ -31,16 +29,6 @@ Global
 		{8A946732-F275-449E-92D3-53FBDA69865E}.Release|Mixed Platforms.Build.0 = Release|x86
 		{8A946732-F275-449E-92D3-53FBDA69865E}.Release|x86.ActiveCfg = Release|x86
 		{8A946732-F275-449E-92D3-53FBDA69865E}.Release|x86.Build.0 = Release|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Debug|x86.ActiveCfg = Debug|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Debug|x86.Build.0 = Debug|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|Any CPU.ActiveCfg = Release|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|Mixed Platforms.Build.0 = Release|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|x86.ActiveCfg = Release|x86
-		{9C68C799-305F-417C-BFA5-9BF6E1280107}.Release|x86.Build.0 = Release|x86
 		{CFE14725-ECFB-4D8F-8167-E2D116BC6361}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CFE14725-ECFB-4D8F-8167-E2D116BC6361}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFE14725-ECFB-4D8F-8167-E2D116BC6361}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

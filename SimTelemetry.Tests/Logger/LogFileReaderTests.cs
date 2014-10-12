@@ -65,6 +65,10 @@ namespace SimTelemetry.Tests.Logger
                 var time = sample.Timestamp;
 
                 // The difference is always 1, because test has sample every 1.
+                if ((time - lastTime) != 1)
+                {
+                    
+                }
                 Assert.AreEqual(1, time - lastTime);
                 lastTime = time;
 

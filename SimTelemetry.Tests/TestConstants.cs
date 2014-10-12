@@ -17,7 +17,7 @@ namespace SimTelemetry.Tests
         public static int Warnings { get; set; }
 
 
-        public const  float MemoryTestFuelCapacity = 260.0f;
+        public const  float MemoryTestFuelCapacity = 100.0f;
 
         public static void Prepare()
         {
