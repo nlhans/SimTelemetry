@@ -21,8 +21,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using LiveTelemetry.Gauges;
 using LiveTelemetry.UI;
@@ -42,8 +44,8 @@ namespace LiveTelemetry
         private static frmLiveTelemetry _frmLiveTelemetry;
         
         // Joystick data for cycling through panels.
-        private Joystick Joystick_Instance;
-        public static int Joystick_Button;
+        private static Joystick JoystickInstance;
+        private Configuration ApplicationConfig;
 
         // Interface update timers.
         // See end of init function for speed settings.
@@ -101,62 +103,32 @@ namespace LiveTelemetry
             // Form of singleton for public StatusMenu access.
             _frmLiveTelemetry = this;
 
-            // Read joystick configuration.
-            if(File.Exists("config.txt") == false)
+            ApplicationConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            // Search for the joystick.
+            List<JoystickDevice> devices = JoystickDevice.Search();
+            if (devices.Count == 0)
             {
-                // TODO: Needs fancy dialogs to first-time setup.
-                File.Create("config.txt");
-                MessageBox.Show(
-                    "Please edit config.txt:\r\ncontroller=[your controller you want to use for cyclign through panels]\r\nbutton=[the button on the controller you want to use]\r\n\r\nJust type the name of your controller (G25 alone is enough usually) and look up the button in Devices -> Game Controllers.");
-            }else
+                // TODO: Show error message that there were no controllers found.
+            }
+            else
             {
-                string[] lines = File.ReadAllLines("config.txt");
-                string controller = "";
-                bool controlleruseindex = false;
-                int controllerindex = 0;
-                foreach (string line in lines)
+                // Find the controller we've configured
+                var targetJoystick =
+                    devices.FirstOrDefault(
+                        x => x.Name.Equals(ApplicationConfig.AppSettings.Settings["UI.Joystick.Name"].Value));
+
+                if (targetJoystick == null)
                 {
-                    string[] p = line.Trim().Split("=".ToCharArray());
-                    if (line.StartsWith("button")) Joystick_Button = Convert.ToInt32(p[1]);
-                    if (line.StartsWith("index"))
-                    {
-                        controlleruseindex = true;
-                        controllerindex = Convert.ToInt32(p[1]);
-                    }
-                    if (line.StartsWith("controller"))
-                        controller = p[1];
-
-
-                }
-
-                // Search for the joystick.
-                List<JoystickDevice> devices = JoystickDevice.Search();
-                if (devices.Count == 0)
-                {
-                    //MessageBox.Show("No (connected) joystick found for display panel control.\r\nTo utilize this please connect a joystick, configure and restart this program.");
+                    // TODO: Show message in UI the controller could not be found
                 }
                 else
                 {
-                    if (controlleruseindex)
-                    {
-                        Joystick_Instance = new Joystick(devices[controllerindex]);
-                        Joystick_Instance.Release += Joy_Release;
-                    }
-                    else
-                    {
-                        int i = 0;
-                        foreach (JoystickDevice jd in devices)
-                        {
-                            if (jd.Name.Contains(controller.Trim()))
-                            {
-                                Joystick_Instance = new Joystick(jd);
-                                Joystick_Instance.Release += Joy_Release;
-                            }
-                            i++;
-                        }
-                    }
+                    JoystickInstance = new Joystick(targetJoystick);
+                    JoystickInstance.Release += Joy_Release;
                 }
             }
+            
 
             // Set-up the main interface.
             FormClosing += LiveTelemetry_FormClosing;
@@ -168,7 +140,7 @@ namespace LiveTelemetry
             BackColor = Color.Black;
             ucLaps = new Gauge_Laps();
             ucSplits = new Gauge_Splits();
-            ucA1GP = new UcGaugeA1Gp(Joystick_Instance);
+            ucA1GP = new UcGaugeA1Gp(JoystickInstance);
             ucGForce = new ucGForce();
             ucTyres = new Gauge_Tyres();
             ucSessionData = new ucSessionInfo();
@@ -440,10 +412,9 @@ namespace LiveTelemetry
         /// <param name="button">The button that was released.</param>
         private void Joy_Release(Joystick joystick, int button)
         {
-            if (button == Joystick_Button)
+            if (button == GetButtonIndex(UiButtons.PaneCycle))
             {
                 StatusMenu++;
-
             }
         }
 
@@ -550,6 +521,35 @@ namespace LiveTelemetry
             if (Controls.Contains(ucSplits)) ucSplits.Invalidate();
         }
 
-    }
+        public static bool GetButton(UiButtons button)
+        {
+            try
+            {
+                var joystickButton = GetButtonIndex(button);
 
+                return JoystickInstance.GetButton(joystickButton);
+            }
+            catch
+            {
+                // TODO: report error?
+                return false;
+            }
+        }
+
+        public static int GetButtonIndex(UiButtons button)
+        {
+            try
+            {
+                string configurationkey = "UI.Joystick.Button." + Enum.GetName(typeof (UiButtons), button);
+                string configurationValueString = ConfigurationSettings.AppSettings[configurationkey];
+                int joystickButton = int.Parse(configurationValueString);
+
+                return joystickButton;
+            }
+            catch
+            {
+                return -1;
+            }
+        }
+    }
 }

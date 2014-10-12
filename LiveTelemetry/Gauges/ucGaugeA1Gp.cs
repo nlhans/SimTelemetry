@@ -108,7 +108,7 @@ namespace LiveTelemetry.Gauges
         #region Joystick Engine Wear control
         private void j_Release(Joystick joystick, int button)
         {
-            if(_counter == 10 && button == frmLiveTelemetry.Joystick_Button)
+            if(_counter == 10 && button == frmLiveTelemetry.GetButtonIndex(UiButtons.ResetEngineWear))
             {
                 _counter = 0;
                 frmLiveTelemetry.StatusMenu = 0;
@@ -116,13 +116,20 @@ namespace LiveTelemetry.Gauges
         }
         private void TmrUpdateConsumptionStatsTick(object sender, EventArgs e)
         {
-            if (joystickResetConsumptionStats != null && joystickResetConsumptionStats.GetButton(frmLiveTelemetry.Joystick_Button))
+            if (joystickResetConsumptionStats == null)
+            {
+                _counter = 0;
+                return;
+            }
+            
+            // Keep counting while the button is pressed;
+            if (frmLiveTelemetry.GetButton(UiButtons.ResetEngineWear) == true)
             {
                 _counter++;
                 if (_counter >= 4 && _counter != 10) // Timer for resetting engine wear.
                 {
                     frmLiveTelemetry.StatusMenu = 0;
-                    _engineMax = TelemetryApplication.Data.Player.EngineLifetime; //Data.m.Sim.Player.Engine_Lifetime;
+                    _engineMax = TelemetryApplication.Data.Player.EngineLifetime;
                     _counter = 10;
                 }
             }
