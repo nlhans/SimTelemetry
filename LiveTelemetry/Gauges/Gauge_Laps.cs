@@ -136,7 +136,7 @@ namespace LiveTelemetry
 
                         var sector2brush = Brushes.Yellow;
                         if (personalBestS2SoFar == lap.Sector2) sector2brush = Brushes.YellowGreen;
-                        if (TelemetryApplication.Data.Laps.BestS1 == lap.Sector1) sector2brush = Brushes.Magenta;
+                        if (TelemetryApplication.Data.Laps.BestS2 == lap.Sector2) sector2brush = Brushes.Magenta;
 
                         g.DrawString(PrintLapTime(lap.Sector2, true), f, sector2brush, columns["S2"], y);
                     }
@@ -153,7 +153,7 @@ namespace LiveTelemetry
 
                         var sector3brush = Brushes.Yellow;
                         if (personalBestS3SoFar == lap.Sector3) sector3brush = Brushes.YellowGreen;
-                        if (TelemetryApplication.Data.Laps.BestS2 == lap.Sector3) sector3brush = Brushes.Magenta;
+                        if (TelemetryApplication.Data.Laps.BestS3 == lap.Sector3) sector3brush = Brushes.Magenta;
 
                         g.DrawString(PrintLapTime(lap.Sector3, true), f, sector3brush, columns["S3"], y);
                     }
