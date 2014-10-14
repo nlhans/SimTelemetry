@@ -7,13 +7,24 @@ namespace SimTelemetry.Domain.Utils
     public class IniValueObject
     {
         public IEnumerable<string> NestedGroup { get; private set; }
-        public string Group { get { return NestedGroup.ElementAt(NestedGroup.Count() - 1); } }
-        public string NestedGroupName { get { return string.Join(".", NestedGroup); } }
+
+        public string Group
+        {
+            get { return NestedGroup.ElementAt(NestedGroup.Count() - 1); }
+        }
+
+        public string NestedGroupName
+        {
+            get { return string.Join(".", NestedGroup); }
+        }
 
         public string Key { get; private set; }
         public string RawValue { get; private set; }
 
-        public int ValueCount { get { return !IsTuple ? 1 : ValueArray.Count(); } }
+        public int ValueCount
+        {
+            get { return !IsTuple ? 1 : ValueArray.Count(); }
+        }
 
         protected string Value { get; private set; }
         protected string[] ValueArray { get; private set; }
@@ -37,7 +48,7 @@ namespace SimTelemetry.Domain.Utils
             {
                 IsTuple = true;
 
-                var values = value.Split(new[] { ',' });
+                var values = value.Split(new[] {','});
                 ValueArray = new string[values.Length];
 
                 for (var i = 0; i < values.Length; i++)
@@ -67,7 +78,14 @@ namespace SimTelemetry.Domain.Utils
         {
             if (!IsTuple && index == 0) return Convert.ToInt32(Value);
             if (!IsTuple) throw new Exception("This is not a tuple value");
-            return Convert.ToInt32(ReadAsDouble(index));
+            try
+            {
+                return Convert.ToInt32(ReadAsDouble(index));
+            }
+            catch
+            {
+                return -1;
+            }
             //return int.Parse(ValueArray[index]);
         }
 
@@ -75,14 +93,28 @@ namespace SimTelemetry.Domain.Utils
         {
             if (!IsTuple && index == 0) return double.Parse(Value);
             if (!IsTuple) throw new Exception("This is not a tuple value");
-            return double.Parse(ValueArray[index]);
+            try
+            {
+                return double.Parse(ValueArray[index]);
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         public float ReadAsFloat(int index)
         {
             if (!IsTuple && index == 0) return float.Parse(Value);
             if (!IsTuple) throw new Exception("This is not a tuple value");
-            return float.Parse(ValueArray[index]);
+            try
+            {
+                return float.Parse(ValueArray[index]);
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         public string ReadAsString(int index)
@@ -99,18 +131,39 @@ namespace SimTelemetry.Domain.Utils
 
         public int ReadAsInteger()
         {
-            return IsTuple ? ReadAsInteger(0) : int.Parse(Value);
+            try
+            {
+                return IsTuple ? ReadAsInteger(0) : int.Parse(Value);
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         public double ReadAsDouble()
         {
-            return IsTuple ? ReadAsDouble(0) : double.Parse(Value);
+            try
+            {
+                return IsTuple ? ReadAsDouble(0) : double.Parse(Value);
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
 
         public float ReadAsFloat()
         {
-            return IsTuple ? ReadAsFloat(0) : float.Parse(Value);
+            try
+            {
+                return IsTuple ? ReadAsFloat(0) : float.Parse(Value);
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         public IEnumerable<string> ReadAsStringArray()

@@ -1,0 +1,52 @@
+//
+// The first section defines what maps to load for the new vehicle skinning
+// technology.  The first line defines a "prefix" to be used for all generic maps.
+// Currently, generic maps are used for the livery, wing, driver, driver arms,
+// driver helmet, and pit crew.  The second line will replace the default livery
+// with the new specified, for the track specified.  The format is as follows:
+//
+// PREFIX is the base texture map name, assumed to be BMP unless specified
+
+// The first section defines what maps to load for the new vehicle skinning
+// technology.  The first line defines a "prefix" to be used for all generic maps.
+// Currently, generic maps are used for the livery, wing, driver, driver arms,
+// driver helmet, and pit crew.  The second line will replace the default livery
+// with the new specified, for the track specified.  The format is as follows:
+//
+// PREFIX is the base texture map name, assumed to be BMP unless specified
+// PitCrewLivery="PREFIX"       // This is only needed if it differs from the default livery PREFIX
+// TrackLivery="TRACK, PREFIX"  // TRACK is the track name as defined in the event GDB
+// TrackLivery="TRACK, PREFIX"  // For example, "2004_Toban"
+// TrackLivery="TRACK, PREFIX"  // You can have an infinite # of these lines
+//
+
+DefaultLivery="Lister_Dunlop.DDS"
+
+HDVehicle=Lister_Dunlop.hdv       
+Graphics=Lister.gen
+Spinner=Lister_spinner.gen
+GenString=1102                  // First genstring changes headlights, 1 is single light, 2 is set of three lights. Second genstring is for wheels, 1 is Dunlop, 2 is Pirelli and 3 is Michelin.
+Sounds=Lister.sfx
+
+Cameras=EOAA.cam                 // Defaults to cams.cfg in UserData directory
+HeadPhysics=EOAA_head_physics.ini   // Affects driver eyepoint only
+Cockpit=Lister_cockpitinfo.ini
+
+//////////////////////////TEAM HISTORY AND INFORMATION///////////////////////////////////////////
+
+
+Number=Lister_Dunlop
+Team="Lister"
+PitGroup=""
+Driver="AI"
+Description="Lister Dunlop"
+Engine="Jaguar V12"
+Manufacturer="Lister Strorm"
+Classes="GT1,Lister"
+
+FullTeamName="Test drive"
+TeamFounded=""
+TeamHeadquarters=""
+
+Category="GT1,Lister"
+

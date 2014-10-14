@@ -58,7 +58,7 @@ namespace SimTelemetry.Domain.Utils
             var filelines = Filedata
                 .Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Contains("//") ? x.Remove(x.IndexOf("//")).Trim() : x.Trim())
-                .Where(x => x.Length != 0)
+                .Where(x => !string.IsNullOrEmpty(x))   
                 .ToList();
 
             ApplyGroup("Main",false);

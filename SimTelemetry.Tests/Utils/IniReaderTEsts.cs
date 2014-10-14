@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Remoting;
 using NUnit.Framework;
 using SimTelemetry.Domain.Utils;
 
@@ -105,6 +106,59 @@ namespace SimTelemetry.Tests.Utils
             reader.Parse();
 
             Assert.AreEqual(47, rpmTorques);
+        }
+
+        [Test]
+         public void TestLister()
+        {
+            var readCalls = 0;
+
+            var reader = new IniReader(TestConstants.TestFolder + "Lister_Dunlop.veh");
+            reader.AddHandler(x =>
+                              {
+                                  string group = x.NestedGroupName + "." + x.Key;
+
+                                  if (x.Key == "Number")
+                                  {
+                                      // In this file it's "Lister_Dunlop"
+                                      Assert.AreEqual("Main.Number", group);
+                                      Assert.AreEqual("Lister_Dunlop", x.ReadAsString());
+                                      Assert.AreEqual(-1, x.ReadAsInteger());
+                                      Assert.AreEqual(-1, x.ReadAsDouble());
+                                      Assert.AreEqual(-1, x.ReadAsFloat());
+                                  }
+
+                                  if (x.Key == "Team")
+                                  {
+                                      Assert.AreEqual("Main.Team",group);
+                                      Assert.AreEqual("Lister", x.ReadAsString());
+                                      Assert.AreEqual(-1, x.ReadAsInteger());
+                                      Assert.AreEqual(-1, x.ReadAsDouble());
+                                      Assert.AreEqual(-1, x.ReadAsFloat());
+                                  }
+
+                                  if (x.Key == "Classes")
+                                  {
+                                      Assert.AreEqual("Main.Classes", group);
+                                      Assert.AreEqual("GT1", x.ReadAsString());
+                                      Assert.AreEqual("GT1", x.ReadAsString(0));
+                                      Assert.AreEqual("Lister", x.ReadAsString(1));
+                                      Assert.AreEqual(-1, x.ReadAsInteger());
+                                      Assert.AreEqual(-1, x.ReadAsInteger(0));
+                                      Assert.AreEqual(-1, x.ReadAsInteger(1));
+                                      Assert.AreEqual(-1, x.ReadAsDouble());
+                                      Assert.AreEqual(-1, x.ReadAsDouble(0));
+                                      Assert.AreEqual(-1, x.ReadAsDouble(1));
+                                      Assert.AreEqual(-1, x.ReadAsFloat());
+                                      Assert.AreEqual(-1, x.ReadAsFloat(0));
+                                      Assert.AreEqual(-1, x.ReadAsFloat(1));
+                                  }
+
+                                  readCalls++;
+                              });
+            reader.Parse();
+
+            Assert.AreEqual(21, readCalls);
         }
 
         [Test]

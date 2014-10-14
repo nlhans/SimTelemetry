@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using SimTelemetry.Domain.Aggregates;
@@ -24,6 +25,8 @@ namespace SimTelemetry.Domain.Telemetry
 
         public Dictionary<string, List<Lap>> Laps { get { return _laps; } }
         private readonly Dictionary<string, List<Lap>> _laps = new Dictionary<string, List<Lap>>();
+
+        private Dictionary<IDataNode, Lap> activeLaps = new Dictionary<IDataNode, Lap>(); 
 
         public string TemporaryFile { get; private set; }
         public string TemporaryDirectory { get; private set; }
@@ -72,6 +75,11 @@ namespace SimTelemetry.Domain.Telemetry
         {
             TemporaryFile = file;
             TemporaryDirectory = dir;
+        }
+
+        public void DriverRemovedHandler(DriversRemoved removed)
+        {
+            
         }
 
         public void UpdateStructure(object driversAction)
@@ -189,6 +197,30 @@ namespace SimTelemetry.Domain.Telemetry
                 {
                     _writer.Update(time);
                     _timeLine.Add(time);
+
+                    // Compute which drivers have completed a lap
+                    foreach (var group in _writer.Groups)
+                    {
+                        var laps = group.DataSource.ReadAs<int>("Laps");
+
+                        // Create lap if the current driver does not have one
+                        if (activeLaps.ContainsKey(group.DataSource) == false)
+                        {
+                            var createNewLap = new Lap(group.DataSource.ReadAs<int>("DriverIndex"), false, laps,
+                                -1, -1, -1, -1, false, false);
+                            activeLaps.Add(group.DataSource, createNewLap);
+                        }
+                        else
+                        {
+                            if (activeLaps[group.DataSource].LapNumber != laps)
+                            {
+                                // We've driven a new lap.
+                                GlobalEvents.Fire(new TelemetryLapComplete(null, group.DataSource as TelemetryDriver, activeLaps[group.DataSource] ), true);
+                            }
+                        }
+                        // Update lap with new information.
+
+                    }
                 }
 
                 _lastTime = time;
