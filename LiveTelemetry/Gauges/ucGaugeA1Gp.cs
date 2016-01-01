@@ -428,7 +428,7 @@ namespace LiveTelemetry.Gauges
                     CompositingMode compMode = g.CompositingMode;
                     g.InterpolationMode = InterpolationMode.NearestNeighbor;
                     g.CompositingMode = CompositingMode.SourceCopy;
-                    g.DrawImage(_emptyGauges, new Rectangle(Point.Empty, _emptyGauges.Size));
+                    g.DrawImage(_emptyGauges, new Rectangle(0, 0, _emptyGauges.Width, _emptyGauges.Height));
                     g.CompositingMode = compMode;
 
                     // ---------------------------------      RPM Needle    ---------------------------------

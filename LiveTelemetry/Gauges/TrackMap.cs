@@ -94,9 +94,11 @@ namespace LiveTelemetry.Gauges
             else
             {
                 CompositingMode compMode = g.CompositingMode;
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.CompositingMode = CompositingMode.SourceCopy;
-                g.DrawImage(_BackgroundTrackMap, new Rectangle(Point.Empty, _BackgroundTrackMap.Size));
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+
+                g.DrawImage(_BackgroundTrackMap, new Rectangle(0, 0, _BackgroundTrackMap.Width, _BackgroundTrackMap.Height));
+
                 g.CompositingMode = compMode;
             }
         }

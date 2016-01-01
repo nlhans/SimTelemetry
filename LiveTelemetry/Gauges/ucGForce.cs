@@ -98,7 +98,7 @@ namespace LiveTelemetry.Gauges
                     var p = new SolidBrush(Color.FromArgb((int)Math.Round(opacity * 255), 200, 50, 0));
                     if (Math.Abs(item.Key - time) < 0.001)
                     {
-                        p = new SolidBrush(Color.FromArgb((int) Math.Round(opacity*255), 255, 50, 255));
+                        p = new SolidBrush(Color.FromArgb((int) Math.Round(opacity*255), 255, 255, 255));
                     }
 
                     var x = (float)(center.X + span.Width / 2 * item.Value.Item2 / 9.81 / scaleX-dot/2);
